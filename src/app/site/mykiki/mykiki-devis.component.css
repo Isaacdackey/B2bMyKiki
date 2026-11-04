@@ -1,0 +1,306 @@
+:host {
+      --kt-bordeaux: #721513;
+      --kt-red: #e51d24;
+      --kt-red-glow: rgba(229, 29, 36, 0.35);
+      --kt-beige: #e6daba;
+      --kt-text-dark: #1e293b;
+      --kt-text-secondary: #475569;
+      --kt-text-muted: #64748b;
+      --font-serif: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+    }
+
+    .mykiki-devis-container {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.8rem;
+    }
+
+    .text-bordeaux {
+      color: var(--kt-bordeaux) !important;
+    }
+
+    /* Header Banner */
+    .devis-header-card {
+      background: #ffffff;
+      border: 1.5px solid rgba(114, 21, 19, 0.12);
+      border-radius: 24px;
+      padding: 1.8rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+      box-shadow: 0 8px 24px rgba(114, 21, 19, 0.04);
+    }
+
+    .devis-header-texts {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .devis-kicker {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--kt-bordeaux);
+      font-weight: 800;
+    }
+
+    .devis-page-title {
+      font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+      font-weight: 700;
+      color: var(--kt-bordeaux);
+      margin: 0;
+    }
+
+    .devis-page-desc {
+      font-size: 0.85rem;
+      color: var(--kt-text-muted);
+      margin: 0;
+    }
+
+    .devis-counter-badge {
+      background: linear-gradient(135deg, var(--kt-bordeaux), var(--kt-red));
+      border-radius: 18px;
+      padding: 0.85rem 1.4rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px var(--kt-red-glow);
+      flex-shrink: 0;
+      color: #fff;
+    }
+
+    .counter-num {
+      font-size: 1.6rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .counter-txt {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--kt-beige);
+      font-weight: 800;
+      margin-top: 0.2rem;
+    }
+
+    /* Empty State */
+    .empty-devis-card {
+      background: #ffffff;
+      border: 1.5px solid rgba(114, 21, 19, 0.10);
+      border-radius: 24px;
+      padding: 3.5rem 1.5rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.85rem;
+      box-shadow: 0 8px 24px rgba(114, 21, 19, 0.04);
+    }
+
+    .empty-devis-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(114, 21, 19, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      color: var(--kt-bordeaux);
+    }
+
+    .empty-devis-card h3 {
+      font-size: 1.35rem;
+      color: var(--kt-bordeaux);
+      margin: 0;
+    }
+
+    .empty-devis-card p {
+      font-size: 0.85rem;
+      color: var(--kt-text-muted);
+      max-width: 440px;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .btn-new-devis {
+      margin-top: 0.5rem;
+      background: linear-gradient(135deg, var(--kt-bordeaux), var(--kt-red));
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 0.65rem 1.3rem;
+      border-radius: 50px;
+      text-decoration: none;
+      box-shadow: 0 4px 14px var(--kt-red-glow);
+    }
+
+    /* Devis List Grid */
+    .devis-list-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .devis-item-card {
+      background: #ffffff;
+      border: 1.5px solid rgba(114, 21, 19, 0.10);
+      border-radius: 22px;
+      padding: 1.4rem 1.6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      box-shadow: 0 6px 20px rgba(114, 21, 19, 0.04);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .devis-item-card:hover {
+      border-color: var(--kt-bordeaux);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px rgba(114, 21, 19, 0.10);
+    }
+
+    .devis-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .devis-type-info {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .devis-icon-circle {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: rgba(114, 21, 19, 0.08);
+      border: 1px solid rgba(114, 21, 19, 0.15);
+      color: var(--kt-bordeaux);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+    }
+
+    .devis-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--kt-text-dark);
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .devis-date {
+      font-size: 0.76rem;
+      color: var(--kt-text-muted);
+    }
+
+    .devis-badge-paye {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      color: #059669;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 0.35rem 0.85rem;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .devis-details-box {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      background: #faf8f6;
+      border: 1px solid rgba(114, 21, 19, 0.08);
+      border-radius: 16px;
+      padding: 1rem 1.2rem;
+    }
+
+    .detail-col {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .col-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--kt-text-muted);
+      font-weight: 700;
+    }
+
+    .col-val {
+      font-size: 0.88rem;
+      color: var(--kt-text-dark);
+      font-weight: 600;
+    }
+
+    .devis-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      padding-top: 0.6rem;
+      border-top: 1px solid rgba(114, 21, 19, 0.08);
+    }
+
+    .btn-pdf-download {
+      background: #ffffff;
+      border: 1.5px solid rgba(114, 21, 19, 0.18);
+      color: var(--kt-text-dark);
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 0.55rem 1.1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+
+    .btn-pdf-download:hover {
+      background: var(--kt-bordeaux);
+      color: #fff;
+      border-color: var(--kt-bordeaux);
+      transform: translateY(-1px);
+    }
+
+    .btn-view-dossier {
+      color: var(--kt-bordeaux);
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-view-dossier:hover {
+      color: var(--kt-red);
+      transform: translateX(2px);
+    }
+
+    @media (max-width: 600px) {
+      .devis-header-card {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .devis-counter-badge {
+        width: 100%;
+      }
+    }

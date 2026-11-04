@@ -1,0 +1,738 @@
+<div class="mykiki-profile-screen-wrapper">
+      
+      <!-- ═══════════════════════════════════════════════════════ -->
+      <!-- CARTE CENTRALE DU PROFIL (DESIGN STYLE APPLI MODERNE)   -->
+      <!-- ═══════════════════════════════════════════════════════ -->
+      <div class="profile-card-container animate-fade">
+        
+        <!-- 1. En-tête Top Bar avec Retour -->
+        <div class="profile-top-bar">
+          <button type="button" class="btn-top-back" (click)="retour()" title="Retour">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <h1 class="profile-top-title">Profil</h1>
+          <div style="width: 40px;"></div> <!-- Espaceur équilibré -->
+        </div>
+
+        <!-- 2. Zone Avatar & Identité Client -->
+        <div class="profile-identity-section">
+          <!-- Cercle Avatar : Fond bordeaux & Texte blanc -->
+          <div class="profile-avatar-circle">
+            <span class="profile-initials-text">{{ getInitials() }}</span>
+          </div>
+          <h2 class="profile-user-name">{{ formData.name || 'Client Kiki Traiteur' }}</h2>
+          <span class="profile-user-email">{{ formData.email }}</span>
+          @if (formData.phone) {
+<div class="profile-user-phone">
+            <i class="fas fa-phone-alt me-1"></i> {{ formData.phone }}
+          </div>
+}
+        </div>
+
+        <!-- 3. Groupe : ACTIVITÉ & STATISTIQUES (OPTION INFOS) -->
+        <div class="profile-group">
+          <span class="profile-group-header">Activité &amp; Statistiques</span>
+          
+          <div class="profile-menu-box">
+            <!-- Option Infos & Statistiques -->
+            <div class="profile-menu-item" (click)="ouvrirModaleInfos()">
+              <div class="menu-item-left">
+                <div class="menu-item-icon icon-stats-gold">
+                  <i class="fas fa-chart-pie"></i>
+                </div>
+                <div>
+                  <span class="menu-item-label">Mes Statistiques &amp; Activité</span>
+                  <span class="menu-item-sublabel d-block text-muted" style="font-size: 0.76rem; margin-top: 1px;">
+                    Commandes, devis, montants et filtre par mois
+                  </span>
+                </div>
+              </div>
+              <i class="fas fa-chevron-right menu-item-arrow"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Groupe 1 : COMPTE (Account) -->
+        <div class="profile-group">
+          <span class="profile-group-header">Compte</span>
+          
+          <div class="profile-menu-box">
+            <!-- Modifier mon profil -->
+            <div class="profile-menu-item" (click)="ouvrirModaleProfil()">
+              <div class="menu-item-left">
+                <div class="menu-item-icon">
+                  <i class="far fa-circle-user"></i>
+                </div>
+                <span class="menu-item-label">Modifier mon profil</span>
+              </div>
+              <i class="fas fa-chevron-right menu-item-arrow"></i>
+            </div>
+
+            <div class="menu-divider"></div>
+
+            <!-- Sécurité & Mot de passe -->
+            <div class="profile-menu-item" (click)="ouvrirModaleMdp()">
+              <div class="menu-item-left">
+                <div class="menu-item-icon">
+                  <i class="fas fa-shield-halved"></i>
+                </div>
+                <span class="menu-item-label">Sécurité &amp; Mot de passe</span>
+              </div>
+              <i class="fas fa-chevron-right menu-item-arrow"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Groupe 2 : SUPPORT & LÉGAL (Terms & Policies en POPUP) -->
+        <div class="profile-group">
+          <span class="profile-group-header">Support &amp; Légal</span>
+          
+          <div class="profile-menu-box">
+            <!-- Mentions Légales en Pop-up -->
+            <div class="profile-menu-item" (click)="ouvrirModaleMentions()">
+              <div class="menu-item-left">
+                <div class="menu-item-icon">
+                  <i class="far fa-file-lines"></i>
+                </div>
+                <span class="menu-item-label">Mentions Légales</span>
+              </div>
+              <i class="fas fa-chevron-right menu-item-arrow"></i>
+            </div>
+
+            <div class="menu-divider"></div>
+
+            <!-- Politique de Confidentialité en Pop-up -->
+            <div class="profile-menu-item" (click)="ouvrirModalePolitique()">
+              <div class="menu-item-left">
+                <div class="menu-item-icon">
+                  <i class="fas fa-user-shield"></i>
+                </div>
+                <span class="menu-item-label">Politique de Confidentialité</span>
+              </div>
+              <i class="fas fa-chevron-right menu-item-arrow"></i>
+            </div>
+
+            <div class="menu-divider"></div>
+
+            <!-- À propos de Kiki Traiteur en Pop-up -->
+            <div class="profile-menu-item" (click)="ouvrirModaleAPropos()">
+              <div class="menu-item-left">
+                <div class="menu-item-icon">
+                  <i class="fas fa-circle-info"></i>
+                </div>
+                <span class="menu-item-label">À propos de Kiki Traiteur</span>
+              </div>
+              <i class="fas fa-chevron-right menu-item-arrow"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Groupe 3 : SESSION (Déconnexion en Rouge avec Confirmation Popup) -->
+        <div class="profile-group" style="margin-bottom: 0.5rem;">
+          <span class="profile-group-header">Session</span>
+          
+          <div class="profile-menu-box box-logout">
+            <div class="profile-menu-item item-logout-red" (click)="demanderDeconnexion()">
+              <div class="menu-item-left">
+                <div class="menu-item-icon text-danger-icon">
+                  <i class="fas fa-arrow-right-from-bracket"></i>
+                </div>
+                <span class="menu-item-label text-danger-label">Se déconnecter</span>
+              </div>
+              <i class="fas fa-chevron-right menu-item-arrow text-danger-arrow"></i>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════ -->
+      <!-- POPUP MODALE 1 : MODIFIER MON PROFIL                   -->
+      <!-- ═══════════════════════════════════════════════════════ -->
+      @if (modaleProfilOuverte) {
+<div class="modal-overlay" (click)="fermerModaleProfil()">
+        <div class="modal-card modal-profile-edit" (click)="$event.stopPropagation()">
+          
+          <!-- En-tête Modale -->
+          <div class="modal-header-luxury">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <div class="modal-header-icon">
+                <i class="far fa-user-circle"></i>
+              </div>
+              <div>
+                <h3 class="modal-title">Modifier mon profil</h3>
+                <span class="modal-subtitle">Vos coordonnées pour vos commandes et devis</span>
+              </div>
+            </div>
+            <button type="button" class="modal-close-btn" (click)="fermerModaleProfil()">&times;</button>
+          </div>
+
+          <!-- Corps du Formulaire -->
+          <form (ngSubmit)="saveProfil()" class="modal-form-body">
+            
+            <div class="form-group-modern">
+              <label class="form-label-modern">Nom complet <span class="text-danger">*</span></label>
+              <input type="text" [(ngModel)]="formData.name" name="name" class="form-input-modern"
+                     placeholder="Ex: Amenuveve Nyadzi" required />
+            </div>
+
+            <div class="form-group-modern">
+              <label class="form-label-modern">Adresse E-mail (Identifiant)</label>
+              <input type="email" [value]="formData.email" disabled class="form-input-modern input-disabled" />
+              <span class="form-hint">L'adresse e-mail est liée à votre compte et ne peut être modifiée.</span>
+            </div>
+
+            <div class="form-group-modern">
+              <label class="form-label-modern">Numéro de téléphone</label>
+              <input type="tel" [(ngModel)]="formData.phone" name="phone" class="form-input-modern"
+                     placeholder="Ex: +221 77 000 00 00" />
+              <span class="form-hint">Nécessaire pour les notifications de livraison de vos commandes.</span>
+            </div>
+
+            <div class="form-group-modern">
+              <label class="form-label-modern">Adresse / Quartier de livraison</label>
+              <input type="text" [(ngModel)]="formData.address" name="address" class="form-input-modern"
+                     placeholder="Ex: Almadies, Dakar..." />
+            </div>
+
+            <div class="form-group-modern">
+              <label class="form-label-modern">Type de compte</label>
+              <select [(ngModel)]="formData.type" name="type" class="form-input-modern">
+                <option value="particulier">Particulier</option>
+                <option value="entreprise">Professionnel / Entreprise</option>
+              </select>
+            </div>
+
+            <!-- Boutons Modale -->
+            <div class="modal-footer-modern">
+              <button type="button" class="btn-cancel-modern" (click)="fermerModaleProfil()">
+                Annuler
+              </button>
+              <button type="submit" class="btn-submit-modern" [disabled]="isSaving">
+                @if (isSaving) {
+<i class="fas fa-spinner fa-spin me-1"></i>
+}
+                @if (!isSaving) {
+<i class="fas fa-check me-1"></i>
+}
+                <span>Enregistrer</span>
+              </button>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+}
+
+      <!-- ═══════════════════════════════════════════════════════ -->
+      <!-- POPUP MODALE 2 : SÉCURITÉ & CHANGEMENT DE MOT DE PASSE -->
+      <!-- ═══════════════════════════════════════════════════════ -->
+      @if (modaleMdpOuverte) {
+<div class="modal-overlay" (click)="fermerModaleMdp()">
+        <div class="modal-card modal-profile-edit" (click)="$event.stopPropagation()">
+          
+          <!-- En-tête Modale -->
+          <div class="modal-header-luxury">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <div class="modal-header-icon">
+                <i class="fas fa-shield-halved"></i>
+              </div>
+              <div>
+                <h3 class="modal-title">Sécurité &amp; Mot de passe</h3>
+                <span class="modal-subtitle">Confirmation par e-mail sécurisé</span>
+              </div>
+            </div>
+            <button type="button" class="modal-close-btn" (click)="fermerModaleMdp()">&times;</button>
+          </div>
+
+          <!-- Étape 1 : Demande d'envoi du code de vérification -->
+          @if (etapeMdp === 1) {
+<div class="modal-form-body">
+            
+            <div class="security-intro-box">
+              <div class="sec-intro-icon">
+                <i class="fas fa-envelope-circle-check"></i>
+              </div>
+              <div class="sec-intro-text">
+                <strong>Vérification d'identité requise</strong>
+                <p>
+                  Pour confirmer que vous êtes bien à l'origine de cette modification, un code de sécurité confidentiel va être envoyé à :
+                </p>
+                <div class="email-badge-highlight">{{ formData.email }}</div>
+              </div>
+            </div>
+
+            <div class="modal-footer-modern" style="margin-top: 1.5rem;">
+              <button type="button" class="btn-cancel-modern" (click)="fermerModaleMdp()">
+                Annuler
+              </button>
+              <button type="button" class="btn-submit-modern" (click)="demanderCodeMdp()" [disabled]="isEnvoiCode">
+                @if (isEnvoiCode) {
+<i class="fas fa-spinner fa-spin me-1"></i>
+}
+                @if (!isEnvoiCode) {
+<i class="fas fa-paper-plane me-1"></i>
+}
+                <span>Envoyer le code par e-mail</span>
+              </button>
+            </div>
+
+          </div>
+}
+
+          <!-- Étape 2 : Saisie du code et nouveau mot de passe -->
+          @if (etapeMdp === 2) {
+<form (ngSubmit)="validerNouveauMdp()" class="modal-form-body">
+            
+            <div class="alert-code-sent">
+              <i class="fas fa-check-circle text-success me-2"></i>
+              <span>Un code de confirmation à 6 chiffres a été envoyé à <strong>{{ formData.email }}</strong>.</span>
+            </div>
+
+            <div class="form-group-modern">
+              <label class="form-label-modern">Code de vérification (6 chiffres) <span class="text-danger">*</span></label>
+              <input type="text" [(ngModel)]="mdpData.code" name="code" maxlength="6" inputmode="numeric"
+                     placeholder="Ex: 123456" class="form-input-modern code-input" required />
+            </div>
+
+            <div class="form-group-modern">
+              <label class="form-label-modern">Nouveau mot de passe <span class="text-danger">*</span></label>
+              <div class="input-password-wrap">
+                <input [type]="afficherMdp ? 'text' : 'password'" [(ngModel)]="mdpData.nouveauMotDePasse"
+                       name="nouveauMotDePasse" class="form-input-modern" placeholder="Minimum 8 caractères" required />
+                <button type="button" class="btn-toggle-eye" (click)="afficherMdp = !afficherMdp">
+                  <i class="fas" [ngClass]="afficherMdp ? 'fa-eye-slash' : 'fa-eye'"></i>
+                </button>
+              </div>
+              <span class="form-hint">Doit contenir au moins 8 caractères, 1 majuscule, 1 minuscule et 1 chiffre.</span>
+            </div>
+
+            <div class="form-group-modern">
+              <label class="form-label-modern">Confirmer le nouveau mot de passe <span class="text-danger">*</span></label>
+              <input [type]="afficherMdp ? 'text' : 'password'" [(ngModel)]="mdpData.confirmation"
+                     name="confirmation" class="form-input-modern" placeholder="Confirmez le mot de passe" required />
+            </div>
+
+            <div style="text-align: right; margin-top: -0.25rem; margin-bottom: 0.5rem;">
+              <button type="button" class="btn-resend-link" (click)="demanderCodeMdp()" [disabled]="isEnvoiCode">
+                <i class="fas fa-rotate-right me-1"></i> Renvoyer un code
+              </button>
+            </div>
+
+            <div class="modal-footer-modern">
+              <button type="button" class="btn-cancel-modern" (click)="etapeMdp = 1">
+                Retour
+              </button>
+              <button type="submit" class="btn-submit-modern" [disabled]="isValidatingMdp">
+                @if (isValidatingMdp) {
+<i class="fas fa-spinner fa-spin me-1"></i>
+}
+                @if (!isValidatingMdp) {
+<i class="fas fa-lock me-1"></i>
+}
+                <span>Changer mon mot de passe</span>
+              </button>
+            </div>
+
+          </form>
+}
+
+        </div>
+      </div>
+}
+
+      <!-- ═══════════════════════════════════════════════════════ -->
+      <!-- POPUP MODALE 3 : CONFIRMATION DE DÉCONNEXION           -->
+      <!-- ═══════════════════════════════════════════════════════ -->
+      @if (modaleDeconnexionOuverte) {
+<div class="modal-overlay" (click)="fermerModaleDeconnexion()">
+        <div class="modal-card modal-confirm-logout" (click)="$event.stopPropagation()">
+          <div class="modal-logout-body">
+            <div class="logout-icon-circle">
+              <i class="fas fa-arrow-right-from-bracket"></i>
+            </div>
+            <h3 class="logout-modal-title">Déconnexion</h3>
+            <p class="logout-modal-text">
+              Êtes-vous certain de vouloir vous déconnecter de votre compte MyKiki ?
+            </p>
+            <div class="logout-actions-row">
+              <button type="button" class="btn-logout-cancel" (click)="fermerModaleDeconnexion()">
+                Annuler
+              </button>
+              <button type="button" class="btn-logout-confirm" (click)="confirmerDeconnexion()">
+                <i class="fas fa-power-off me-1"></i> Se déconnecter
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+}
+
+      <!-- ═══════════════════════════════════════════════════════ -->
+      <!-- POPUP MODALE 4 : MENTIONS LÉGALES                      -->
+      <!-- ═══════════════════════════════════════════════════════ -->
+      @if (modaleMentionsOuverte) {
+<div class="modal-overlay" (click)="fermerModaleMentions()">
+        <div class="modal-card modal-legal-view" (click)="$event.stopPropagation()">
+          <div class="modal-header-luxury">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <div class="modal-header-icon">
+                <i class="far fa-file-lines"></i>
+              </div>
+              <div>
+                <h3 class="modal-title">Mentions Légales</h3>
+                <span class="modal-subtitle">Informations juridiques &amp; éditeur</span>
+              </div>
+            </div>
+            <button type="button" class="modal-close-btn" (click)="fermerModaleMentions()">&times;</button>
+          </div>
+          <div class="modal-form-body legal-content-scroll">
+            <div class="legal-block">
+              <h4>1. Éditeur de la plateforme</h4>
+              <p>Le présent service est édité par la société <strong>KIKI TRAITEUR SÉNÉGAL</strong>, entreprise de gastronomie et d'organisation d'événements à Dakar.</p>
+              <p>Directeur de la publication : Direction Générale Kiki Traiteur.<br>Contact : <code>contact@kikitraiteursenegal.net</code> | Tél : <code>+221 33 832 29 66</code></p>
+            </div>
+
+            <div class="legal-block">
+              <h4>2. Hébergement &amp; Infrastructure</h4>
+              <p>La plateforme numérique est hébergée sur des infrastructures cloud sécurisées et conformes aux normes internationales de disponibilité et de protection des données.</p>
+            </div>
+
+            <div class="legal-block">
+              <h4>3. Propriété intellectuelle</h4>
+              <p>L'ensemble des cartes, recettes, photographies, logos, textes et éléments graphiques de Kiki Traiteur sont protégés au titre du droit d'auteur et de la propriété intellectuelle. Toute reproduction intégrale ou partielle sans accord préalable est strictement interdite.</p>
+            </div>
+
+            <div class="legal-block">
+              <h4>4. Service Clientèle</h4>
+              <p>Notre équipe traiteur est à votre disposition du Lundi au Dimanche de 08h00 à 21h00 pour toute question relative à vos commandes ou devis.</p>
+            </div>
+          </div>
+          <div class="modal-footer-modern">
+            <button type="button" class="btn-submit-modern" (click)="fermerModaleMentions()">
+              <i class="fas fa-check me-1"></i> Compris
+            </button>
+          </div>
+        </div>
+      </div>
+}
+
+      <!-- ═══════════════════════════════════════════════════════ -->
+      <!-- POPUP MODALE 5 : POLITIQUE DE CONFIDENTIALITÉ          -->
+      <!-- ═══════════════════════════════════════════════════════ -->
+      @if (modalePolitiqueOuverte) {
+<div class="modal-overlay" (click)="fermerModalePolitique()">
+        <div class="modal-card modal-legal-view" (click)="$event.stopPropagation()">
+          <div class="modal-header-luxury">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <div class="modal-header-icon">
+                <i class="fas fa-user-shield"></i>
+              </div>
+              <div>
+                <h3 class="modal-title">Politique de Confidentialité</h3>
+                <span class="modal-subtitle">Protection &amp; respect de vos données personnelles</span>
+              </div>
+            </div>
+            <button type="button" class="modal-close-btn" (click)="fermerModalePolitique()">&times;</button>
+          </div>
+          <div class="modal-form-body legal-content-scroll">
+            <div class="legal-block">
+              <h4>1. Collecte des données</h4>
+              <p>Dans le cadre de l'utilisation de votre espace client MyKiki, nous recueillons uniquement les informations nécessaires au traitement et à la livraison de vos prestations traiteur : nom, prénom, e-mail, numéro de téléphone et adresse de livraison.</p>
+            </div>
+
+            <div class="legal-block">
+              <h4>2. Utilisation &amp; Finalité</h4>
+              <p>Vos données sont exclusivement utilisées pour :</p>
+              <ul>
+                <li>La confirmation et le suivi de vos commandes en ligne.</li>
+                <li>L'élaboration de devis personnalisés pour vos événements.</li>
+                <li>La communication logistique le jour de la livraison ou du service.</li>
+                <li>La sécurisation de l'accès à votre compte MyKiki.</li>
+              </ul>
+            </div>
+
+            <div class="legal-block">
+              <h4>3. Confidentialité &amp; Sécurité</h4>
+              <p>Kiki Traiteur s'engage à ne jamais vendre, louer ou céder vos données personnelles à des tiers à des fins publicitaires. Toutes vos communications et mots de passe sont chiffrés selon les standards les plus stricts.</p>
+            </div>
+
+            <div class="legal-block">
+              <h4>4. Vos droits (Accès, Modification, Suppression)</h4>
+              <p>Vous disposez à tout moment d'un droit de modification de vos coordonnées directement depuis ce menu ou par demande écrite à <code>contact@kikitraiteursenegal.net</code>.</p>
+            </div>
+          </div>
+          <div class="modal-footer-modern">
+            <button type="button" class="btn-submit-modern" (click)="fermerModalePolitique()">
+              <i class="fas fa-check me-1"></i> J'accepte
+            </button>
+          </div>
+        </div>
+      </div>
+}
+
+      <!-- ═══════════════════════════════════════════════════════ -->
+      <!-- POPUP MODALE 6 : À PROPOS DE KIKI TRAITEUR             -->
+      <!-- ═══════════════════════════════════════════════════════ -->
+      @if (modaleAProposOuverte) {
+<div class="modal-overlay" (click)="fermerModaleAPropos()">
+        <div class="modal-card modal-legal-view" (click)="$event.stopPropagation()">
+          <div class="modal-header-luxury">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <div class="modal-header-icon">
+                <i class="fas fa-circle-info"></i>
+              </div>
+              <div>
+                <h3 class="modal-title">À propos de Kiki Traiteur</h3>
+                <span class="modal-subtitle">Excellence culinaire &amp; passion de recevoir</span>
+              </div>
+            </div>
+            <button type="button" class="modal-close-btn" (click)="fermerModaleAPropos()">&times;</button>
+          </div>
+          <div class="modal-form-body legal-content-scroll">
+            <div class="legal-block">
+              <h4>L'Art de la Haute Gastronomie à Dakar</h4>
+              <p>Depuis de nombreuses années, <strong>Kiki Traiteur</strong> sublime vos réceptions privées, mariages, séminaires et événements d'entreprise grâce à un savoir-faire culinaire d'exception alliant saveurs locales authentiques et créativité internationale.</p>
+              <p>Chaque formule est confectionnée avec des produits rigoureusement sélectionnés pour vous garantir fraîcheur, élégance et satisfaction totale.</p>
+            </div>
+            <div class="legal-block" style="background: #FAF5EA; padding: 1rem; border-radius: 12px; border: 1px solid #E2D5BE;">
+              <h4 style="color: #721513; margin-top: 0;">Coordonnées &amp; Showroom</h4>
+              <p style="margin: 0; font-size: 0.86rem; color: #475569;">
+                📍 Dakar, Sénégal<br>
+                📞 Téléphone : +221 33 832 29 66 / +221 77 000 00 00<br>
+                ✉️ E-mail : contact&#64;kikitraiteursenegal.net
+              </p>
+            </div>
+          </div>
+          <div class="modal-footer-modern">
+            <button type="button" class="btn-submit-modern" (click)="fermerModaleAPropos()">
+              <i class="fas fa-check me-1"></i> Fermer
+            </button>
+          </div>
+        </div>
+      </div>
+}
+
+      <!-- ═══════════════════════════════════════════════════════ -->
+      <!-- POPUP MODALE 7 : INFORMATIONS & STATISTIQUES DU CLIENT  -->
+      <!-- ═══════════════════════════════════════════════════════ -->
+      @if (modaleInfosOuverte) {
+<div class="modal-overlay" (click)="fermerModaleInfos()">
+        <div class="modal-card modal-infos-stats-view" (click)="$event.stopPropagation()">
+          
+          <!-- En-tête Modale Luxe -->
+          <div class="modal-header-luxury stats-header-gradient">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <div class="modal-header-icon header-icon-gold">
+                <i class="fas fa-chart-line"></i>
+              </div>
+              <div>
+                <h3 class="modal-title text-white">Informations &amp; Bilan d'Activité</h3>
+                <span class="modal-subtitle text-white-70">{{ formData.name }} • Espace Client</span>
+              </div>
+            </div>
+            <button type="button" class="modal-close-btn text-white" (click)="fermerModaleInfos()">&times;</button>
+          </div>
+
+          <div class="modal-form-body stats-body-scroll">
+
+            <!-- 1. Filtre par Mois / Période -->
+            <div class="stats-filtre-barre">
+              <div class="filtre-barre-label">
+                <i class="far fa-calendar-alt text-danger me-2"></i>
+                <span>Période analysée :</span>
+              </div>
+              <div class="stats-select-wrapper">
+                <select [(ngModel)]="moisSelectionne" (change)="onMoisChange()" class="stats-select-mois">
+                  <option value="ALL">Tout l'historique (Global)</option>
+                  @for (m of moisDisponibles; track $index) {
+<option [value]="m.key">
+                    {{ m.label }} ({{ m.totalActivites }} activité{{ m.totalActivites > 1 ? 's' : '' }})
+                  </option>
+}
+                </select>
+              </div>
+            </div>
+
+            @if (chargementStats) {
+<div class="text-center py-4">
+              <i class="fas fa-spinner fa-spin fa-2x text-danger"></i>
+              <p class="mt-2 text-muted">Calcul de vos statistiques...</p>
+            </div>
+}
+
+            @if (!chargementStats) {
+<div>
+              <!-- 2. Grille de 4 KPI Cards -->
+              <div class="stats-kpi-grid">
+                
+                <!-- KPI 1 : Commandes -->
+                <div class="kpi-card kpi-cmd-card">
+                  <div class="kpi-icon-badge cmd-icon-bg">
+                    <i class="fas fa-bag-shopping"></i>
+                  </div>
+                  <div class="kpi-content">
+                    <span class="kpi-label">Commandes de mets</span>
+                    <strong class="kpi-value">{{ totalCommandesMois }}</strong>
+                    <div class="kpi-subtext">
+                      <span>Total : <strong>{{ montantCommandesMois | number:'1.0-0' }} FCFA</strong></span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- KPI 2 : Demandes de devis -->
+                <div class="kpi-card kpi-devis-card">
+                  <div class="kpi-icon-badge devis-icon-bg">
+                    <i class="fas fa-clipboard-list"></i>
+                  </div>
+                  <div class="kpi-content">
+                    <span class="kpi-label">Demandes &amp; Devis</span>
+                    <strong class="kpi-value">{{ totalDemandesMois }}</strong>
+                    <div class="kpi-subtext">
+                      <span>Total : <strong>{{ montantDemandesMois | number:'1.0-0' }} FCFA</strong></span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- KPI 3 : Dépenses globales -->
+                <div class="kpi-card kpi-budget-card">
+                  <div class="kpi-icon-badge budget-icon-bg">
+                    <i class="fas fa-coins"></i>
+                  </div>
+                  <div class="kpi-content">
+                    <span class="kpi-label">Budget Total Engagé</span>
+                    <strong class="kpi-value highlight-gold">{{ (montantCommandesMois + montantDemandesMois) | number:'1.0-0' }} FCFA</strong>
+                    <div class="kpi-subtext">
+                      <span>Panier moyen : <strong>{{ panierMoyenMois | number:'1.0-0' }} FCFA</strong></span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- KPI 4 : Convives & Fidélité -->
+                <div class="kpi-card kpi-fidelite-card">
+                  <div class="kpi-icon-badge fidelite-icon-bg">
+                    <i class="fas fa-award"></i>
+                  </div>
+                  <div class="kpi-content">
+                    <span class="kpi-label">Convives &amp; Privilèges</span>
+                    <strong class="kpi-value">{{ totalConvivesMois }} pers.</strong>
+                    <div class="kpi-subtext">
+                      <span class="badge-fidelite-sub"><i class="fas fa-star text-warning me-1"></i> {{ pointsFideliteClient }} pts fidélité</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- 3. Section Insights & Préférences client -->
+              <div class="stats-insights-section">
+                
+                <!-- A. Plats favoris -->
+                <div class="insight-box-card">
+                  <div class="insight-box-header">
+                    <i class="fas fa-heart text-danger me-2"></i>
+                    <strong>Mets les plus commandés</strong>
+                  </div>
+                  @if (topPlatsFavoris.length > 0) {
+<div class="insight-box-body">
+                    @for (p of topPlatsFavoris; track $index; let idx = $index) {
+<div class="top-dish-item">
+                      <div class="dish-rank-badge">{{ idx + 1 }}</div>
+                      <div class="dish-details">
+                        <span class="dish-name">{{ p.nom }}</span>
+                        <span class="dish-stats">{{ p.quantite }} portion{{ p.quantite > 1 ? 's' : '' }} &bull; {{ p.montant | number:'1.0-0' }} FCFA</span>
+                      </div>
+                    </div>
+}
+                  </div>
+}
+                  @if (topPlatsFavoris.length === 0) {
+<div class="insight-empty">
+                    <p class="text-muted mb-0" style="font-size: 0.8rem;">Aucun mets commandé sur cette période.</p>
+                  </div>
+}
+                </div>
+
+                <!-- B. Modes de remise & Paiement -->
+                <div class="insight-box-card">
+                  <div class="insight-box-header">
+                    <i class="fas fa-sliders text-primary me-2"></i>
+                    <strong>Habitudes &amp; Préférences</strong>
+                  </div>
+                  <div class="insight-box-body habits-list">
+                    <div class="habit-row">
+                      <span class="habit-label"><i class="fas fa-truck text-muted me-2"></i> Remise principale :</span>
+                      <strong class="habit-value">{{ modeRemiseFavori }}</strong>
+                    </div>
+                    <div class="habit-row">
+                      <span class="habit-label"><i class="fas fa-credit-card text-muted me-2"></i> Mode paiement :</span>
+                      <strong class="habit-value">{{ modePaiementFavori }}</strong>
+                    </div>
+                    <div class="habit-row">
+                      <span class="habit-label"><i class="fas fa-calendar-check text-muted me-2"></i> Événements :</span>
+                      <strong class="habit-value">{{ totalDemandesMois }} réception{{ totalDemandesMois > 1 ? 's' : '' }}</strong>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- 4. Répartition des Statuts de Commandes & Demandes -->
+              @if (totalCommandesMois > 0 || totalDemandesMois > 0) {
+<div class="stats-breakdown-card">
+                <div class="breakdown-header">
+                  <i class="fas fa-layer-group me-2 text-danger"></i>
+                  <strong>Récapitulatif des statuts pour {{ getLibelleMoisActuel() }}</strong>
+                </div>
+                <div class="breakdown-pills-row">
+                  @if (compteStatutCommandes('EN_ATTENTE') > 0) {
+<span class="st-chip st-attente">
+                    <i class="fas fa-clock me-1"></i> {{ compteStatutCommandes('EN_ATTENTE') }} en attente
+                  </span>
+}
+                  @if ((compteStatutCommandes('ACCEPTEE') + compteStatutCommandes('EN_COURS')) > 0) {
+<span class="st-chip st-cours">
+                    <i class="fas fa-fire-burner me-1"></i> {{ (compteStatutCommandes('ACCEPTEE') + compteStatutCommandes('EN_COURS')) }} en cuisine
+                  </span>
+}
+                  @if (compteStatutCommandes('PRETE') > 0) {
+<span class="st-chip st-prete">
+                    <i class="fas fa-box-open me-1"></i> {{ compteStatutCommandes('PRETE') }} prête(s)
+                  </span>
+}
+                  @if (compteStatutCommandes('TERMINEE') > 0) {
+<span class="st-chip st-terminee">
+                    <i class="fas fa-check-double me-1"></i> {{ compteStatutCommandes('TERMINEE') }} terminée(s)
+                  </span>
+}
+                  @if (compteStatutCommandes('ANNULEE') > 0) {
+<span class="st-chip st-annulee">
+                    <i class="fas fa-ban me-1"></i> {{ compteStatutCommandes('ANNULEE') }} annulée(s)
+                  </span>
+}
+                  @if (totalDemandesMois > 0) {
+<span class="st-chip st-devis">
+                    <i class="fas fa-file-invoice me-1"></i> {{ totalDemandesMois }} devis / demandes
+                  </span>
+}
+                </div>
+              </div>
+}
+
+            </div>
+}
+
+          </div>
+
+          <div class="modal-footer-modern">
+            <button type="button" class="btn-submit-modern" (click)="fermerModaleInfos()">
+              <i class="fas fa-check me-1"></i> Fermer
+            </button>
+          </div>
+
+        </div>
+      </div>
+}
+
+    </div>

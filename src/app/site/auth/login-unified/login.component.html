@@ -1,0 +1,124 @@
+<div class="login-page">
+      <div class="login-container">
+        <!-- Logo au dessus de la carte -->
+        @if (false) {
+<div class="login-brand-top"> <!-- Optionnel si on veut le logo en dehors, mais l'image 2 le met DANS la carte -->
+        </div>
+}
+
+        <!-- Carte Blanche (Style Image 2) -->
+        <div class="login-card">
+          <div class="card-top-accent"></div>
+
+          <!-- Logo & Brand dans la carte -->
+          <div class="login-brand">
+            <div class="brand-logo-img">
+              <img src="assets/images/logo.png" alt="Kiki Traiteur" onerror="this.style.display='none'">
+            </div>
+            <h1 class="brand-name">{{ getLoginTitle() }}</h1>
+          </div>
+
+          <!-- Alert messages -->
+          @if (errorMessage) {
+<div class="login-alert login-alert-error">
+            <i class="fas fa-exclamation-circle"></i>
+            {{ errorMessage }}
+          </div>
+}
+          @if (sessionExpired) {
+<div class="login-alert login-alert-warning">
+            <i class="fas fa-clock"></i>
+            Votre session a expiré. Veuillez vous reconnecter.
+          </div>
+}
+
+          <!-- Formulaire -->
+          <form class="login-form" (ngSubmit)="onLogin()" #loginForm="ngForm">
+            <div class="form-group">
+              <label for="username">IDENTIFIANT OU E-MAIL</label>
+              <div class="input-with-icon">
+                <i class="fas fa-user input-icon"></i>
+                <input
+                  id="username"
+                  type="text"
+                  [(ngModel)]="credentials.username"
+                  name="username"
+                  placeholder="votre_identifiant"
+                  required
+                  autocomplete="username"
+                  [disabled]="loading"
+                >
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="password">MOT DE PASSE</label>
+              <div class="password-field input-with-icon">
+                <i class="fas fa-key input-icon"></i>
+                <input
+                  id="password"
+                  [type]="showPassword ? 'text' : 'password'"
+                  [(ngModel)]="credentials.password"
+                  name="password"
+                  placeholder="••••••••"
+                  required
+                  autocomplete="current-password"
+                  [disabled]="loading"
+                >
+                <button type="button" class="toggle-pwd" (click)="showPassword = !showPassword">
+                  <i class="fas" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
+                </button>
+              </div>
+            </div>
+
+            @if (isStaffLogin) {
+<div class="forgot-password">
+               <!-- L'admin/gestionnaire ne peut pas réinitialiser par email dans le MVP, mais on peut laisser l'espace -->
+            </div>
+}
+
+            <button
+              type="submit"
+              class="login-btn"
+              [disabled]="loading || !credentials.username || !credentials.password"
+              [class.loading]="loading"
+            >
+              @if (!loading) {
+<span>
+                <i class="fas fa-sign-in-alt"></i>
+                SE CONNECTER
+              </span>
+}
+              @if (loading) {
+<span>
+                <i class="fas fa-spinner fa-spin"></i>
+                Connexion...
+              </span>
+}
+            </button>
+          </form>
+
+          <!-- Connexion Google si disponible (non affichée pour l'accès staff via slug) -->
+          @if (!isStaffLogin && googleDisponible) {
+<div class="google-auth-section">
+            <div class="login-separator"><span>ou continuer avec</span></div>
+            <div class="zone-bouton-google">
+              <div #boutonGoogle></div>
+            </div>
+          </div>
+}
+
+          <!-- Liens selon contexte -->
+          <div class="login-links">
+            <a routerLink="/" class="back-link">
+              <i class="fas fa-arrow-left"></i> Retour au site
+            </a>
+            @if (!isStaffLogin) {
+<a routerLink="/mykiki/register" class="register-link">
+              <i class="fas fa-user-plus"></i> Créer un compte
+            </a>
+}
+          </div>
+        </div>
+      </div>
+    </div>

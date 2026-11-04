@@ -1,0 +1,399 @@
+<div class="catalogue-public-page">
+      
+      <!-- Page Hero Header avec fond blanc -->
+      <section class="page-hero-white">
+        <div class="container">
+          <h1 class="font-serif-luxury">Catalogue Gastronomique</h1>
+          <div class="page-hero-path">Accueil &nbsp;&gt;&nbsp; Prestations &nbsp;&gt;&nbsp; Plats à Emporter &amp; Commander</div>
+        </div>
+      </section>
+
+      <div class="container section-padding">
+
+        <!-- Barre de recherche et filtres par catégorie STICKY (Reste collé à l'en-tête au scroll) -->
+        <div class="catalogue-sticky-header">
+          <!-- Barre de recherche et Cart Button Icone Seule -->
+          <div class="catalogue-top-bar">
+            <div class="search-box-public">
+              <i class="fas fa-search search-icon"></i>
+              <input 
+                type="text" 
+                [(ngModel)]="rechercheTexte" 
+                (input)="onRechercheChange()" 
+                placeholder="Rechercher une entrée, un plat chaud, dessert, boisson..."
+                class="search-input"
+              />
+              @if (rechercheTexte) {
+<button class="btn-clear-search" (click)="rechercheTexte = ''; onRechercheChange()">&times;</button>
+}
+            </div>
+
+            <!-- Bouton Panier avec SEULEMENT l'icône et le badge -->
+            <button class="btn-panier-icon-only" (click)="panierOuvert = true" [class.has-items]="articlesPanier.length > 0" title="Mon Panier">
+              <i class="fas fa-basket-shopping"></i>
+              @if (articlesPanier.length > 0) {
+<span class="panier-badge">{{ totalArticlesPanier }}</span>
+}
+            </button>
+          </div>
+
+          <!-- Filtre des Catégories : Exactement comme MyKiki Catalogue (Sticky avec icônes et fond bordeaux actif) -->
+          @if (categories.length > 0) {
+<div class="categories-scroll-row">
+            <div class="category-card" 
+                 [class.active]="categorieActive === 'TOUTES'" 
+                 (click)="changerCategorie('TOUTES')">
+              <div class="cat-icon-box">
+                <i class="fas fa-border-all"></i>
+              </div>
+              <span class="cat-name">Toutes</span>
+            </div>
+
+            @for (cat of categories; track $index) {
+<div class="category-card" [class.active]="categorieActive === cat" (click)="changerCategorie(cat)">
+              <div class="cat-icon-box">
+                <i class="fas" [ngClass]="getCategoryIcon(cat)"></i>
+              </div>
+              <span class="cat-name">{{ cat }}</span>
+            </div>
+}
+          </div>
+}
+        </div>
+
+        <!-- Loader si chargement initial -->
+        @if (chargement) {
+<div class="text-center py-5">
+          <div class="spinner-border text-danger" role="status"></div>
+          <p class="mt-2 text-muted">Chargement de nos délices culinaires...</p>
+        </div>
+}
+
+        <!-- Grille des 4 plats par ligne sur desktop / 2 par ligne sur mobile (Design identique à MyKiki) -->
+        @if (!chargement && produitsAffiches.length > 0) {
+<div class="dishes-grid">
+          @for (p of produitsAffiches; track $index; let i = $index) {
+<div class="dish-card" [style.animation-delay]="((i % 12) * 0.04) + 's'" (click)="ouvrirDetails(p)">
+            
+            <div class="dish-image-wrap">
+              @if (p.imageUrl) {
+<img [src]="p.imageUrl" [alt]="p.nom" class="dish-img" loading="lazy" onerror="this.src='assets/images/table-with-delicious-sweets-covered-with-pink-silk.jpg'"/>
+}
+              @if (!p.imageUrl) {
+<div class="dish-img-placeholder">
+                <i class="fas fa-utensils"></i>
+              </div>
+}
+              @if (p.categorieNom) {
+<div class="dish-badge-overlay">
+                <span class="dish-tag">{{ p.categorieNom }}</span>
+              </div>
+}
+              <button class="dish-fav-btn" [class.in-cart]="getQuantite(p.id) > 0" (click)="ajouterDirectAuPanier(p, $event)" title="Ajouter au panier">
+                <i class="fas fa-cart-plus"></i>
+                @if (getQuantite(p.id) > 0) {
+<span class="card-cart-badge">{{ getQuantite(p.id) }}</span>
+}
+              </button>
+            </div>
+
+            <div class="dish-body">
+              <div class="dish-header-row">
+                <h4 class="dish-title font-serif-luxury">{{ p.nom }}</h4>
+              </div>
+
+              <p class="dish-desc">{{ p.description || 'Création traiteur raffinée cuisinée avec des ingrédients d\'exception.' }}</p>
+
+              <div class="dish-footer-row">
+                <div class="dish-price-box">
+                  <span class="price-amount">{{ p.prix | number:'1.0-0' }} FCFA</span>
+                  @if (p.quantiteMinimale && p.quantiteMinimale > 1) {
+<span class="dish-min-badge-inline">
+                    Min. {{ p.quantiteMinimale }}
+                  </span>
+}
+                </div>
+
+                <button class="btn-dish-action" [class.has-items]="getQuantite(p.id) > 0" (click)="ajouterDirectAuPanier(p, $event)" title="Ajouter au panier">
+                  @if (getQuantite(p.id) > 0) {
+<span class="btn-dish-qty">{{ getQuantite(p.id) }}</span>
+}
+                  <i class="fas" [ngClass]="getQuantite(p.id) > 0 ? 'fa-cart-shopping' : 'fa-plus'"></i>
+                </button>
+              </div>
+            </div>
+
+          </div>
+}
+        </div>
+}
+
+        <!-- Bouton Charger Plus (Pagination au scroll / clic) -->
+        @if (!chargement && produitsAffiches.length < produitsFiltresTotal) {
+<div class="chargement-scroll-zone">
+          <button class="btn-charger-plus" (click)="chargerPlus()" [disabled]="chargementSuite">
+            <i class="fas" [ngClass]="chargementSuite ? 'fa-spinner fa-spin' : 'fa-chevron-down'"></i>
+            <span>{{ chargementSuite ? 'Chargement...' : 'Charger plus de plats' }}</span>
+          </button>
+        </div>
+}
+
+        <!-- État vide -->
+        @if (!chargement && produitsAffiches.length === 0) {
+<div class="empty-state-card">
+          <i class="fas fa-utensils empty-icon"></i>
+          <h3>Aucun plat trouvé</h3>
+          <p>Essayez une autre catégorie ou modifiez votre mot-clé de recherche.</p>
+        </div>
+}
+
+      </div>
+
+      <!-- ============================================================== -->
+      <!-- MODALE DÉTAILS DU METS (Centrée par rapport à l'écran)          -->
+      <!-- ============================================================== -->
+      @if (produitSelectionne; as prodSel) {
+<div class="modal-overlay" (click)="fermerDetails()">
+        <div class="modal-card produit-details-card" (click)="$event.stopPropagation()">
+          <button class="modal-close-btn" (click)="fermerDetails()">&times;</button>
+          
+          @if (prodSel.imageUrl) {
+<div class="details-visuel">
+            <img [src]="prodSel.imageUrl" [alt]="prodSel.nom">
+          </div>
+}
+          @if (!prodSel.imageUrl) {
+<div class="details-visuel details-visuel-vide">
+            <i class="fas fa-utensils"></i>
+          </div>
+}
+
+          <div class="details-corps">
+            <div class="details-header">
+              @if (prodSel.categorieNom) {
+<span class="details-categorie">{{ prodSel.categorieNom }}</span>
+}
+              <span class="details-delai">
+                <i class="fas fa-clock"></i> Commande avant 48h
+              </span>
+            </div>
+
+            <h3 class="details-titre font-serif-luxury">{{ prodSel.nom }}</h3>
+            <p class="details-description">{{ prodSel.description || 'Spécialité traiteur d\'exception préparée sur commande.' }}</p>
+
+            @if (prodSel.quantiteMinimale && prodSel.quantiteMinimale > 1) {
+<div class="details-min-qty">
+              <i class="fas fa-layer-group"></i>
+              <span>Quantité minimale de commande : {{ prodSel.quantiteMinimale }} portions / pièces</span>
+            </div>
+}
+
+            @if (prodSel.exigences) {
+<div class="details-exigences">
+              <i class="fas fa-info-circle"></i>
+              <span>{{ prodSel.exigences }}</span>
+            </div>
+}
+
+            <div class="details-delai-warning">
+              <i class="fas fa-info-circle text-warning me-1"></i>
+              <span>À commander au moins <strong>48h avant la date de livraison ou de retrait</strong>.</span>
+            </div>
+
+            <div class="details-pied">
+              <div class="details-quantite">
+                <button type="button" class="btn-qty" (click)="diminuerQuantiteModal()" [disabled]="quantiteModal <= (prodSel.quantiteMinimale || 1)">-</button>
+                <span class="valeur-qty">{{ quantiteModal }}</span>
+                <button type="button" class="btn-qty" (click)="augmenterQuantiteModal()">+</button>
+              </div>
+
+              <div class="details-action">
+                <button class="btn-ajouter-details" (click)="validerAjoutModal()">
+                  <i class="fas fa-cart-plus me-1"></i>
+                  <span>Ajouter • {{ (prodSel.prix * quantiteModal) | number:'1.0-0' }} FCFA</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+}
+
+      <!-- ============================================================== -->
+      <!-- TIROIR / DRAWER DU PANIER CLIENT & COMMANDE INVITÉ              -->
+      <!-- ============================================================== -->
+      @if (panierOuvert) {
+<div class="cart-drawer-overlay" (click)="panierOuvert = false">
+        <div class="cart-drawer-panel" (click)="$event.stopPropagation()">
+          
+          <div class="drawer-header">
+            <div class="drawer-title-box">
+              <i class="fas fa-basket-shopping text-danger"></i>
+              <h3 class="drawer-title font-serif-luxury">Votre Panier Kiki</h3>
+            </div>
+            <button class="drawer-close-btn" (click)="panierOuvert = false">&times;</button>
+          </div>
+
+          <div class="drawer-body">
+            
+            <!-- Liste des articles -->
+            @if (articlesPanier.length > 0) {
+<div class="drawer-items-list">
+              @for (item of articlesPanier; track $index) {
+<div class="drawer-item-row">
+                @if (item.imageUrl) {
+<div class="item-img-thumb">
+                  <img [src]="item.imageUrl" [alt]="item.nom">
+                </div>
+}
+                <div class="item-details">
+                  <strong class="item-nom">{{ item.nom }}</strong>
+                  <span class="item-prix-unit">{{ item.prixUnitaire | number:'1.0-0' }} FCFA</span>
+                </div>
+                <div class="item-qty-control">
+                  <button class="btn-q-btn" (click)="diminuerArticle(item.produitId)">-</button>
+                  <span class="item-q-val">{{ item.quantite }}</span>
+                  <button class="btn-q-btn" (click)="augmenterArticle(item.produitId)">+</button>
+                </div>
+                <div class="item-total-col">
+                  <strong>{{ (item.prixUnitaire * item.quantite) | number:'1.0-0' }} FCFA</strong>
+                </div>
+              </div>
+}
+
+              <!-- Récapitulatif Total -->
+              <div class="drawer-total-card">
+                <div class="total-line">
+                  <span>Sous-total des mets :</span>
+                  <strong>{{ totalPanier | number:'1.0-0' }} FCFA</strong>
+                </div>
+                @if (commandeForm.modeRemise === 'LIVRAISON') {
+<div class="total-line">
+                  <span>Frais de livraison :</span>
+                  <strong>2 000 FCFA</strong>
+                </div>
+}
+                <div class="total-line main-total">
+                  <span>Total à régler :</span>
+                  <span class="price-highlight">{{ totalAvecLivraison | number:'1.0-0' }} FCFA</span>
+                </div>
+              </div>
+
+              <!-- Formulaire de Commande Express Invité -->
+              <div class="guest-checkout-form">
+                <h4 class="form-title font-serif-luxury"><i class="fas fa-user-check me-2"></i>Informations de Commande</h4>
+                
+                <div class="form-group mb-2">
+                  <label>Nom complet *</label>
+                  <input type="text" [(ngModel)]="commandeForm.nomClient" placeholder="Ex: Awa Ndiaye" class="form-control" required />
+                </div>
+
+                <div class="form-group mb-2">
+                  <label>Numéro de téléphone WhatsApp / Appel *</label>
+                  <input type="tel" [(ngModel)]="commandeForm.telephoneContact" placeholder="Ex: 77 123 45 67" class="form-control" required />
+                </div>
+
+                <div class="form-group mb-2">
+                  <label>Adresse e-mail (optionnel)</label>
+                  <input type="email" [(ngModel)]="commandeForm.emailClient" placeholder="Ex: awa@example.com" class="form-control" />
+                </div>
+
+                <div class="form-group mb-2">
+                  <label>Mode de remise *</label>
+                  <div class="radio-remise-group">
+                    <label class="radio-pill" [class.selected]="commandeForm.modeRemise === 'RETRAIT'">
+                      <input type="radio" [(ngModel)]="commandeForm.modeRemise" value="RETRAIT" name="remise" />
+                      <i class="fas fa-store me-1"></i> Retrait en boutique
+                    </label>
+                    <label class="radio-pill" [class.selected]="commandeForm.modeRemise === 'LIVRAISON'">
+                      <input type="radio" [(ngModel)]="commandeForm.modeRemise" value="LIVRAISON" name="remise" />
+                      <i class="fas fa-truck me-1"></i> Livraison à domicile
+                    </label>
+                  </div>
+                </div>
+
+                @if (commandeForm.modeRemise === 'LIVRAISON') {
+<div class="form-group mb-2">
+                  <label>Adresse complète de livraison *</label>
+                  <input type="text" [(ngModel)]="commandeForm.adresseLivraison" placeholder="Ex: Almadies, Villa 42, Dakar" class="form-control" />
+                </div>
+}
+
+                <div class="form-group mb-2">
+                  <label>Date et Heure souhaitées (Au moins {{ delaiMinimumRequis }}h à l'avance) *</label>
+                  <input type="datetime-local" [(ngModel)]="commandeForm.dateRemise" [min]="dateMinimumIso" class="form-control" required />
+                  <small class="text-muted d-block mt-1">Délai requis : min. {{ delaiMinimumRequis }}h pour la préparation par le Chef.</small>
+                </div>
+
+                <div class="form-group mb-2">
+                  <label>Moyen de paiement *</label>
+                  <select [(ngModel)]="commandeForm.modePaiement" class="form-select">
+                    <option value="WAVE">Wave Mobile Money</option>
+                    <option value="ORANGE_MONEY">Orange Money</option>
+                    <option value="CARTE_BANCAIRE">Carte Bancaire</option>
+                  </select>
+                </div>
+
+                <div class="form-group mb-3">
+                  <label>Instructions spécifiques (Allergies, piments...)</label>
+                  <textarea [(ngModel)]="commandeForm.noteClient" rows="2" placeholder="Précisez vos préférences culinaires..." class="form-control"></textarea>
+                </div>
+
+                <button class="btn-valider-commande-guest" [disabled]="envoiEnCours || !formulaireValide()" (click)="passerCommandeInvite()">
+                  <i class="fas" [ngClass]="envoiEnCours ? 'fa-spinner fa-spin' : 'fa-check-circle'"></i>
+                  <span>{{ envoiEnCours ? 'Validation en cours...' : 'Confirmer ma commande' }}</span>
+                </button>
+              </div>
+
+            </div>
+}
+
+            @if (articlesPanier.length === 0) {
+<div class="empty-cart-view">
+              <i class="fas fa-basket-shopping empty-cart-icon"></i>
+              <h4>Votre panier est vide</h4>
+              <p>Parcourez notre catalogue et ajoutez vos mets favoris !</p>
+            </div>
+}
+
+          </div>
+        </div>
+      </div>
+}
+
+      <!-- ============================================================== -->
+      <!-- MODALE SUCCÈS COMMANDE + INVITATION À CRÉER UN COMPTE          -->
+      <!-- ============================================================== -->
+      @if (commandeConfirmee; as cmdConf) {
+<div class="modal-overlay" (click)="fermerConfirmation()">
+        <div class="modal-card modal-succes-guest animate-pop" (click)="$event.stopPropagation()">
+          
+          <div class="succes-icon-circle">
+            <i class="fas fa-check"></i>
+          </div>
+
+          <h3 class="succes-title font-serif-luxury">Commande Reçue avec Succès !</h3>
+          <p class="succes-sub">Numéro de commande : <strong class="text-danger">{{ cmdConf.numero }}</strong></p>
+          <p class="succes-desc">Notre brigade commence la préparation pour votre date prévue. Un message récapitulatif vous a été envoyé.</p>
+
+          <!-- Invitation Création Compte Client (Fidélité 100 points) -->
+          <div class="creer-compte-cta-box">
+            <div class="cta-points-badge">
+              <i class="fas fa-gift text-warning me-1"></i> +100 Points Offerts
+            </div>
+            <h4>Gagnez vos points de fidélité !</h4>
+            <p>Créez votre compte en 1 clic pour suivre la livraison en direct et bénéficier de réductions et de plats bonus offerts.</p>
+            
+            <a [routerLink]="['/login-client']" [queryParams]="{ nom: commandeForm.nomClient, tel: commandeForm.telephoneContact }" class="btn-creer-compte-action">
+              <i class="fas fa-user-plus me-1"></i> Créer mon compte MyKiki
+            </a>
+          </div>
+
+          <button class="btn-continuer-achats" (click)="fermerConfirmation()">
+            Retour au catalogue
+          </button>
+        </div>
+      </div>
+}
+
+    </div>

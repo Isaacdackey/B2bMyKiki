@@ -1,0 +1,265 @@
+/* CSS variables for Kiki Traiteur - Official Brand Colors (White, Bordeaux, Red, Beige) */
+:root {
+  /* Color Palette - Official Brand Swatch on White Background */
+  --bg-primary: #FFFFFF;       /* Pure white main background */
+  --bg-secondary: #FAF8F4;     /* Very soft warm tint (beige-white) for cards/sections */
+  --bg-tertiary: #F3EDE0;      /* Soft beige for subtle separators and hover backgrounds */
+  --bg-white: #FFFFFF;         /* Crisp white */
+  
+  --primary-color: #E51D24;    /* Vibrant Red (#e51d24) */
+  --primary-dark: #721513;     /* Burgundy / Bordeaux Dark Red (#721513) */
+  --primary-light: #F03C42;    /* Medium Red for hover highlights */
+  
+  --accent-color: #E6DABA;     /* Beige / Champagne Gold (#e6daba) */
+  --accent-hover: #D5C8A6;     /* Muted Champagne Gold */
+  
+  --text-main: #332724;        /* Deep bordeaux-tinted charcoal for high-end contrast readability */
+  --text-muted: #6E5A56;       /* Muted brown-grey for subtitle details */
+  --text-light: #FFFFFF;       /* Pure white text */
+  
+  --border-color: #EDE7DC;     /* Soft border line color */
+  --border-color-focus: #E51D24;
+  
+  --success-color: #606C38;    /* Olive green for successes */
+  --warning-color: #DDA15E;    /* Yellow/orange for warnings */
+  --danger-color: #BC6C25;     /* Error color */
+  
+  /* Fonts */
+  --font-heading: 'Playfair Display', Georgia, serif;
+  --font-body: 'Poppins', 'Inter', system-ui, -apple-system, sans-serif;
+  
+  /* Layout and Spacing */
+  --max-width: 1200px;
+  --header-height: 80px;
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 16px;
+  --border-radius-xl: 32px; /* Rounded card styles inspired by Sarab */
+  
+  /* Shadows and Premium Effects */
+  --shadow-sm: 0 2px 8px rgba(114, 21, 19, 0.04);
+  --shadow-md: 0 10px 25px rgba(114, 21, 19, 0.06);
+  --shadow-lg: 0 20px 40px rgba(114, 21, 19, 0.09);
+  
+  /* Transitions */
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Special component backgrounds (light mode defaults) */
+  --header-bg: rgba(255, 255, 255, 0.95);
+  --hero-bg: linear-gradient(180deg, #FAF8F4 0%, #FFFFFF 100%);
+  --card-bg-glass: rgba(255, 255, 255, 0.85);
+  --input-bg: rgba(255, 255, 255, 0.9);
+  --login-body-bg: radial-gradient(circle at 10% 20%, rgba(253, 244, 240, 0.4) 0%, rgba(250, 248, 244, 0.8) 90.1%);
+}
+
+/* Luxury Dark Theme - All White and Beige -> Black, Red stays Red, White on Red stays White */
+[data-theme="dark"] {
+  --bg-primary: #000000;       /* Pure black background */
+  --bg-secondary: #0A0A0A;     /* Very dark black for cards/sections */
+  --bg-tertiary: #141414;      /* Dark charcoal black */
+  --bg-white: #000000;         /* All white card backgrounds become black */
+  
+  --primary-color: #E51D24;    /* Red stays exact brand red! */
+  --primary-dark: #721513;     /* Red bordeaux stays bordeaux! */
+  --primary-light: #F03C42;    /* Red hover stays red! */
+  
+  --accent-color: #1A1A1A;     /* Beige becomes dark black/charcoal */
+  --accent-hover: #262626;     
+  
+  --text-main: #FFFFFF;        /* Pure white text on black */
+  --text-muted: #A3A3A3;       /* Crisp light grey for subtitles */
+  --text-light: #FFFFFF;       /* White text stays white */
+  
+  --border-color: #262626;     /* Dark border lines */
+  --border-color-focus: #E51D24;
+  
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.8);
+  --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.9);
+  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.95);
+
+  /* Special component backgrounds (dark mode overrides) */
+  --header-bg: rgba(0, 0, 0, 0.95);
+  --hero-bg: linear-gradient(180deg, #000000 0%, #000000 100%);
+  --card-bg-glass: rgba(0, 0, 0, 0.85);
+  --input-bg: rgba(20, 20, 20, 0.9);
+  --login-body-bg: radial-gradient(circle at 10% 20%, rgba(30, 0, 0, 0.8) 0%, rgba(0, 0, 0, 1) 90.1%);
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-theme="system"] {
+    --bg-primary: #000000;
+    --bg-secondary: #0A0A0A;
+    --bg-tertiary: #141414;
+    --bg-white: #000000;
+    --primary-color: #E51D24;
+    --primary-dark: #721513;
+    --primary-light: #F03C42;
+    --accent-color: #1A1A1A;
+    --accent-hover: #262626;
+    --text-main: #FFFFFF;
+    --text-muted: #A3A3A3;
+    --text-light: #FFFFFF;
+    --border-color: #262626;
+    --border-color-focus: #E51D24;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.8);
+    --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.9);
+    --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.95);
+    --header-bg: rgba(0, 0, 0, 0.95);
+    --hero-bg: linear-gradient(180deg, #000000 0%, #000000 100%);
+    --card-bg-glass: rgba(0, 0, 0, 0.85);
+    --input-bg: rgba(20, 20, 20, 0.9);
+    --login-body-bg: radial-gradient(circle at 10% 20%, rgba(30, 0, 0, 0.8) 0%, rgba(0, 0, 0, 1) 90.1%);
+  }
+}
+
+/* Titres blancs sur fond noir en mode sombre */
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6,
+[data-theme="dark"] .brand-font {
+  color: #FFFFFF !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-theme="system"] h1,
+  [data-theme="system"] h2,
+  [data-theme="system"] h3,
+  [data-theme="system"] h4,
+  [data-theme="system"] h5,
+  [data-theme="system"] h6,
+  [data-theme="system"] .brand-font {
+    color: #FFFFFF !important;
+  }
+}
+
+/* En mode sombre, tous les fonds blancs ou beiges (classes ET styles en ligne) deviennent noirs */
+[data-theme="dark"] .bg-white,
+[data-theme="dark"] .bg-beige,
+[data-theme="dark"] .section-padding,
+[data-theme="dark"] .card,
+[data-theme="dark"] .prestation-card,
+[data-theme="dark"] .realisation-card,
+[data-theme="dark"] .devis-card,
+[data-theme="dark"] .auth-card,
+[data-theme="dark"] .login-card,
+[data-theme="dark"] .login-panel,
+[data-theme="dark"] header,
+[data-theme="dark"] nav,
+[data-theme="dark"] footer,
+[data-theme="dark"] .modal-content,
+[data-theme="dark"] .table-container,
+[data-theme="dark"] table,
+[data-theme="dark"] th,
+[data-theme="dark"] td,
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea,
+[data-theme="dark"] [style*="background: white"],
+[data-theme="dark"] [style*="background:white"],
+[data-theme="dark"] [style*="background: #fff"],
+[data-theme="dark"] [style*="background:#fff"],
+[data-theme="dark"] [style*="background: #FFFFFF"],
+[data-theme="dark"] [style*="background:#FFFFFF"],
+[data-theme="dark"] [style*="background: #FAF8F4"],
+[data-theme="dark"] [style*="background:#FAF8F4"],
+[data-theme="dark"] [style*="background: #F3EDE0"],
+[data-theme="dark"] [style*="background:#F3EDE0"],
+[data-theme="dark"] [style*="background: #E6DABA"],
+[data-theme="dark"] [style*="background:#E6DABA"],
+[data-theme="dark"] [style*="background: #EDE7DC"],
+[data-theme="dark"] [style*="background:#EDE7DC"],
+[data-theme="dark"] [style*="background: #FDFBF7"],
+[data-theme="dark"] [style*="background:#FDFBF7"] {
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
+  border-color: #262626 !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-theme="system"] .bg-white,
+  [data-theme="system"] .bg-beige,
+  [data-theme="system"] .section-padding,
+  [data-theme="system"] .card,
+  [data-theme="system"] .prestation-card,
+  [data-theme="system"] .realisation-card,
+  [data-theme="system"] .devis-card,
+  [data-theme="system"] .auth-card,
+  [data-theme="system"] .login-card,
+  [data-theme="system"] .login-panel,
+  [data-theme="system"] header,
+  [data-theme="system"] nav,
+  [data-theme="system"] footer,
+  [data-theme="system"] .modal-content,
+  [data-theme="system"] .table-container,
+  [data-theme="system"] table,
+  [data-theme="system"] th,
+  [data-theme="system"] td,
+  [data-theme="system"] input,
+  [data-theme="system"] select,
+  [data-theme="system"] textarea,
+  [data-theme="system"] [style*="background: white"],
+  [data-theme="system"] [style*="background:white"],
+  [data-theme="system"] [style*="background: #fff"],
+  [data-theme="system"] [style*="background:#fff"],
+  [data-theme="system"] [style*="background: #FFFFFF"],
+  [data-theme="system"] [style*="background:#FFFFFF"],
+  [data-theme="system"] [style*="background: #FAF8F4"],
+  [data-theme="system"] [style*="background:#FAF8F4"],
+  [data-theme="system"] [style*="background: #F3EDE0"],
+  [data-theme="system"] [style*="background:#F3EDE0"],
+  [data-theme="system"] [style*="background: #E6DABA"],
+  [data-theme="system"] [style*="background:#E6DABA"],
+  [data-theme="system"] [style*="background: #EDE7DC"],
+  [data-theme="system"] [style*="background:#EDE7DC"],
+  [data-theme="system"] [style*="background: #FDFBF7"],
+  [data-theme="system"] [style*="background:#FDFBF7"] {
+    background-color: #000000 !important;
+    color: #FFFFFF !important;
+    border-color: #262626 !important;
+  }
+}
+
+/* Le rouge reste toujours rouge et ses textes restent en blanc éclatant */
+[data-theme="dark"] .btn--primary,
+[data-theme="dark"] .btn-red,
+[data-theme="dark"] .btn-red-pill,
+[data-theme="dark"] .btn-header-devis,
+[data-theme="dark"] .btn-login-red,
+[data-theme="dark"] .btn-login-burgundy,
+[data-theme="dark"] [style*="background: #E51D24"],
+[data-theme="dark"] [style*="background: #DC2626"],
+[data-theme="dark"] [style*="background: #7A1C1C"],
+[data-theme="dark"] [style*="background:#DC2626"],
+[data-theme="dark"] [style*="background:#7A1C1C"],
+[data-theme="dark"] .badge-red {
+  background: linear-gradient(135deg, #E51D24, #B91C1C) !important;
+  color: #FFFFFF !important;
+  border-color: #E51D24 !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-theme="system"] .btn--primary,
+  [data-theme="system"] .btn-red,
+  [data-theme="system"] .btn-red-pill,
+  [data-theme="system"] .btn-header-devis,
+  [data-theme="system"] .btn-login-red,
+  [data-theme="system"] .btn-login-burgundy,
+  [data-theme="system"] [style*="background: #E51D24"],
+  [data-theme="system"] [style*="background: #DC2626"],
+  [data-theme="system"] [style*="background: #7A1C1C"],
+  [data-theme="system"] [style*="background:#DC2626"],
+  [data-theme="system"] [style*="background:#7A1C1C"],
+  [data-theme="system"] .badge-red {
+    background: linear-gradient(135deg, #E51D24, #B91C1C) !important;
+    color: #FFFFFF !important;
+    border-color: #E51D24 !important;
+  }
+}
+
+
+

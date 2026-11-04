@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Réinitialiser Mykiki</title>
+  <style>
+    body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+           background:#FAF5EA; color:#1C1413; font-family:system-ui,-apple-system,"Segoe UI",sans-serif; padding:1.5rem; }
+    .carte { background:#fff; border:1px solid #EFE6D2; border-radius:16px; padding:2rem; max-width:34rem;
+             box-shadow:0 8px 24px rgba(114,21,19,.08); }
+    h1 { margin:0 0 .5rem; font-size:1.3rem; color:#721513; }
+    p { color:#574A48; line-height:1.55; margin:0 0 1rem; }
+    #etat { font-family:ui-monospace,monospace; font-size:.85rem; background:#FAF7F3;
+            border:1px solid #E2D9D4; border-radius:8px; padding:.85rem; white-space:pre-wrap; }
+    .ok { color:#1F6B4A; } .ko { color:#A81420; }
+  </style>
+</head>
+<body>
+  <div class="carte">
+    <h1>Réinitialisation de Mykiki</h1>
+    <p>
+      Cette page supprime le service worker et vide le cache local. Elle sert
+      lorsqu'une version installée continue d'afficher un ancien contenu malgré
+      les mises à jour. Aucune donnée de votre compte n'est touchée.
+    </p>
+    <div id="etat">Opération en cours…</div>
+  </div>
+
+  <script>
+    const etat = document.getElementById('etat');
+    const lignes = [];
+    const dire = (txt, ok = true) => {
+      lignes.push((ok ? '✓ ' : '✗ ') + txt);
+      etat.innerHTML = lignes.map(l => '<span class="' + (l[0] === '✓' ? 'ok' : 'ko') + '">' + l + '</span>').join('\n');
+    };
+
+    (async () => {
+      try {
+        if ('serviceWorker' in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          for (const r of regs) await r.unregister();
+          dire(regs.length + ' service worker(s) désinscrit(s).');
+        } else {
+          dire('Aucun service worker sur ce navigateur.');
+        }
+
+        if ('caches' in window) {
+          const keys = await caches.keys();
+          await Promise.all(keys.map(k => caches.delete(k)));
+          dire(keys.length + ' cache(s) supprimé(s).');
+        }
+
+        dire('Terminé. Redirection dans 3 secondes…');
+        setTimeout(() => location.replace('/'), 3000);
+      } catch (e) {
+        dire('Échec : ' + e.message, false);
+      }
+    })();
+  </script>
+</body>
+</html>

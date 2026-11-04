@@ -1,0 +1,124 @@
+<!-- Page Hero -->
+    <section class="page-hero">
+      <div class="container">
+        <h1>Nos Prestations</h1>
+        <div class="page-hero-path">Accueil &nbsp;&gt;&nbsp; Prestations</div>
+      </div>
+    </section>
+
+    <!-- Master Prestations Slider Section -->
+    <section class="section-padding">
+      <div class="container">
+
+        <!-- En-tête -->
+        <div class="section-header text-center" style="margin-bottom: 2.5rem;">
+          <span class="slbl">Nos Domaines d'Expertise</span>
+          <h2>Le Grand Carrousel de nos Prestations</h2>
+          <div class="sline" style="margin: 0.8rem auto 0;"></div>
+        </div>
+
+        <!-- 1. Barre de navigation par onglets (Master Slider Tabs) -->
+        <div class="master-tabs-bar">
+          @for (prest of prestationsList; track $index; let i = $index) {
+<button class="master-tab-btn" [class.active-tab]="currentPrestationIndex === i" (click)="selectPrestation(i)">
+            <span class="tab-num">{{ prest.indexNum }}</span>
+            <span class="tab-label">{{ prest.tabTitle }}</span>
+          </button>
+}
+        </div>
+
+        <!-- 2. Le Slider Principal : Section Active en 2 Colonnes -->
+        @if (currentPrestation) {
+<div class="prestation-item active-prestation animate-fade">
+          
+          <!-- Colonne Gauche : Infos + CTA Catalogue + 5 Vignettes -->
+          <div class="prestation-text-wrapper">
+            <div class="prestation-info">
+              @if (currentPrestation.subtitle) {
+                <span class="slbl">{{ currentPrestation.subtitle }}</span>
+              }
+              <h3>{{ currentPrestation.title }}</h3>
+              <p class="prestation-desc">{{ currentPrestation.desc }}</p>
+
+              <!-- CTA Spécifique Catalogue (Plats à Emporter ou configuré via CMS) -->
+              @if (currentPrestation.showCatalogueCta || currentPrestation.id === 'takeaway') {
+<div class="prestation-cta-wrap">
+                <a routerLink="/catalogue" class="btn-catalogue-takeaway">
+                  <i class="fas fa-utensils"></i>
+                  <span>Voir le catalogue &amp; Commander</span>
+                  <i class="fas fa-arrow-right"></i>
+                </a>
+              </div>
+}
+
+              <!-- Vignettes cliquables pour cette prestation -->
+              @if (currentPrestation.images && currentPrestation.images.length > 0) {
+                <div class="prestation-thumbs">
+                  @for (img of currentPrestation.images; track $index; let idx = $index) {
+                    <img [src]="img.url" [alt]="img.alt" class="prestation-thumb" [class.active-thumb]="currentPrestation.currentPhotoIndex === idx" (click)="goToPhoto(idx)" title="Voir la photo {{ idx + 1 }}">
+                  }
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Colonne Droite : Le Slider de photos de la prestation -->
+          @if (currentPrestation.images && currentPrestation.images.length > 0 && currentPhoto) {
+            <div class="prestation-slider-card">
+              <img [src]="currentPhoto.url"
+                [alt]="currentPhoto.alt"
+                class="slider-main-img"
+                (click)="openLightbox(currentPhoto.url, currentPhoto.caption)">
+              
+              <!-- Overlay & Contrôles Photos -->
+              <div class="slider-overlay">
+                <div>
+                  <span class="photo-counter-badge">Photo {{ (currentPrestation.currentPhotoIndex || 0) + 1 }}/{{ currentPrestation.images.length }}</span>
+                  <p class="slider-caption-text">{{ currentPhoto.caption }}</p>
+                </div>
+                @if (currentPrestation.images.length > 1) {
+                  <div class="slider-controls-group">
+                    <button (click)="prevPhoto()" class="slider-btn" title="Photo précédente"><i class="fas fa-chevron-left"></i></button>
+                    <button (click)="nextPhoto()" class="slider-btn" title="Photo suivante"><i class="fas fa-chevron-right"></i></button>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+        </div>
+}
+
+        <!-- 3. Footer du Master Slider (Navigation Prestation Précédente / Suivante) -->
+        <div class="master-slider-footer">
+          <button (click)="prevPrestation()" class="master-nav-btn">
+            <i class="fas fa-arrow-left"></i>
+            <span>Prestation précédente</span>
+          </button>
+
+          <div class="master-counter">
+            <span class="current-num">{{ currentPrestationIndex + 1 }}</span>
+            <span class="sep">/</span>
+            <span class="total-num">{{ prestationsList.length }}</span>
+            <span class="prest-name">— {{ currentPrestation.tabTitle }}</span>
+          </div>
+
+          <button (click)="nextPrestation()" class="master-nav-btn">
+            <span>Prestation suivante</span>
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Lightbox Modal -->
+    <div class="lightbox" id="lightbox" [class.active]="lightboxOpen" (click)="closeLightbox()">
+      <span class="lightbox-close" (click)="closeLightbox()">&times;</span>
+      <div class="lightbox-content" (click)="$event.stopPropagation()">
+        <img [src]="lightboxImgSrc" alt="Kiki Traiteur - Vue Prestation">
+        @if (lightboxCaption) {
+<p class="lightbox-caption">{{ lightboxCaption }}</p>
+}
+      </div>
+    </div>

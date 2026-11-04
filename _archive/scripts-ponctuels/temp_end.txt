@@ -1,0 +1,120 @@
+    switch((status || '').toLowerCase()) {
+      case 'propositions_envoyees': return '#2563eb';
+      case 'accepted': return '#16a34a';
+      case 'aboutis': return '#16a34a';
+      case 'rejected': return '#dc2626';
+      default: return '#7a1c1c';
+    }
+  }
+}
+
+        <div class="spinner-border text-danger" role="status">
+          <span class="visually-hidden">Chargement...</span>
+        </div>
+      </div>
+
+      <div *ngIf="!isLoading && demandes.length === 0" class="alert alert-info" style="border-radius: 12px; background: rgba(59,130,246,0.05); border: 1px solid rgba(59,130,246,0.2); color: #2563eb;">
+        <i class="fas fa-info-circle me-2"></i> Vous n'avez aucune demande en cours.
+      </div>
+
+      <!-- Dossiers List -->
+      <div class="dossiers-list mt-4" *ngIf="!isLoading">
+        
+        <a *ngFor="let d of demandes" routerLink="#" class="dossier-card text-decoration-none">
+          <div class="dossier-icon-box" [ngStyle]="getIconStyle(d.status)">
+            <i class="fas" [ngClass]="getIconClass(d.status)"></i>
+          </div>
+          <div class="dossier-content">
+            <div class="dossier-title text-dark">{{ d.prestationTitle || d.prestationId }} ({{ d.guests }} convives)</div>
+            <div class="dossier-subtitle">Soumise le {{ d.dateSubmitted | date:'dd/MM/yyyy' }} • {{ getStatusLabel(d.status) }}</div>
+          </div>
+          <div class="dossier-arrow">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  `,
+  styles: [`
+    .clean-dashboard { max-width: 900px; margin: 0 auto; padding: 0 0 3rem 0; }
+    .dashboard-title h1 { font-size: 1.8rem; font-weight: 700; color: var(--color-bordeaux); margin: 0 0 0.25rem 0; }
+    .dashboard-title p { color: #64748b; margin: 0; font-size: 0.95rem; }
+    .dossiers-list { display: flex; flex-direction: column; gap: 1rem; }
+    .dossier-card {
+      display: flex; align-items: center; background: white; border-radius: 16px;
+      padding: 1.25rem 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: all 0.2s ease;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    .dossier-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.06); border-color: rgba(0,0,0,0.1); }
+    .dossier-icon-box {
+      width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+      font-size: 1.25rem; margin-right: 1.25rem; flex-shrink: 0;
+      background: rgba(229, 29, 36, 0.1); color: var(--color-red);
+    }
+    .dossier-content { flex: 1; min-width: 0; }
+    .dossier-title { font-weight: 700; font-size: 1.05rem; margin-bottom: 0.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .dossier-subtitle { color: #64748b; font-size: 0.85rem; margin: 0; }
+    .dossier-arrow { color: #cbd5e1; font-size: 1rem; transition: transform 0.2s; }
+    .dossier-card:hover .dossier-arrow { transform: translateX(3px); color: var(--color-red); }
+  `]
+})
+export class MyKikiDemandesComponent implements OnInit {
+  demandes: any[] = [];
+  isLoading = true;
+
+  constructor(private clientApi: ClientApiService, private authService: AuthService) {}
+
+  ngOnInit(): void {
+    const user = this.authService.getCurrentUser();
+    if (user && user.username) {
+      this.clientApi.getDemandesByEmail(user.username)
+        .pipe(finalize(() => this.isLoading = false))
+        .subscribe({
+          next: (data) => this.demandes = data,
+          error: (err) => console.error(err)
+        });
+    } else {
+      this.isLoading = false;
+    }
+  }
+
+  getStatusLabel(status: string): string {
+    if (!status) return 'En cours de traitement';
+    switch(status.toLowerCase()) {
+      case 'pending':
+      case 'en_attente': return 'En cours de traitement';
+      case 'propositions_envoyees': return 'Propositions reçues';
+      case 'selection_client':
+      case 'proposition_validee': return 'Choix validé (en attente du devis)';
+      case 'aboutis': return 'Devis validé';
+      case 'rejected':
+      case 'refuse': return 'Refusée / Annulée';
+      default: return 'En traitement';
+    }
+  }
+
+  getIconClass(status: string): string {
+    if (!status) return 'fa-hourglass-half';
+    switch(status.toLowerCase()) {
+      case 'pending':
+      case 'en_attente': return 'fa-hourglass-half';
+      case 'propositions_envoyees': return 'fa-envelope-open-text';
+      case 'aboutis': return 'fa-check-circle';
+      case 'rejected':
+      case 'refuse': return 'fa-times-circle';
+      default: return 'fa-folder';
+    }
+  }
+
+  getIconStyle(status: string): any {
+    if (!status) return { background: 'rgba(229,29,36,0.1)', color: 'var(--color-red)' };
+    switch(status.toLowerCase()) {
+      case 'propositions_envoyees': return { background: 'rgba(59,130,246,0.1)', color: '#2563eb' };
+      case 'aboutis': return { background: 'rgba(34,197,94,0.1)', color: '#16a34a' };
+      case 'rejected':
+      case 'refuse': return { background: 'rgba(220,38,38,0.1)', color: '#dc2626' };
+      default: return { background: 'rgba(229,29,36,0.1)', color: 'var(--color-red)' };
+    }
+  }
+}

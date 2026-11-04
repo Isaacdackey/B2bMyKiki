@@ -1,0 +1,513 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+    :host {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      min-height: 100dvh;
+      width: 100%;
+      background: linear-gradient(135deg, #FAF5EA 0%, #F5EDE0 50%, #ECE1CF 100%);
+      box-sizing: border-box;
+      padding: 2rem 1rem;
+      --color-bordeaux: #791a16;
+      --font-serif: 'Cormorant Garamond', serif;
+      --font-sans: 'Plus Jakarta Sans', sans-serif;
+      --font-heading: var(--font-serif);
+      font-family: var(--font-sans);
+    }
+
+    .login-wrapper {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 460px;
+      background: var(--bg-white);
+      border-radius: var(--border-radius-lg);
+      padding: 3rem 2.5rem;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+      border-top: 5px solid #791a16;
+      border-left: 1px solid var(--border-color);
+      border-right: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      position: relative;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .login-logo {
+      height: 65px;
+      margin: 0 auto 1.25rem auto;
+      object-fit: contain;
+    }
+
+    .login-title {
+      font-family: var(--font-heading);
+      font-size: 1.85rem;
+      color: #7A1C1C;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+
+    .login-subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin: 0;
+    }
+
+    /* Steps Tracker */
+    .steps-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+    
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .step-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #f3f4f6;
+      border: 2px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      color: #9ca3af;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .step.active .step-circle {
+      background: #791a16;
+      border-color: #791a16;
+      color: white;
+    }
+
+    .step.done .step-circle {
+      background: #fef2f2;
+      border-color: #791a16;
+      color: #791a16;
+    }
+
+    .step-line {
+      flex: 1;
+      max-width: 50px;
+      height: 2px;
+      background: #e5e7eb;
+      margin: 0 10px;
+      transition: all 0.3s;
+    }
+    
+    .step-line.active {
+      background: #791a16;
+    }
+
+    /* Form Styles */
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .form-group label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .input-with-icon {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 1rem;
+      color: #94A3B8;
+      font-size: 1rem;
+      pointer-events: none;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.5rem 0.75rem 0.5rem 2.8rem;
+      font-size: 0.9rem;
+      border: 1.5px solid var(--border-color);
+      border-radius: 5px;
+      background: var(--bg-white);
+      color: var(--text-main);
+      transition: all 0.25s ease;
+      font-family: var(--font-body);
+      box-sizing: border-box;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #DC2626;
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+    }
+    
+    select.form-control {
+      padding-left: 2.8rem !important;
+    }
+
+    .pwd-toggle {
+      position: absolute;
+      right: 1rem;
+      background: none;
+      border: none;
+      color: #9ca3af;
+      cursor: pointer;
+    }
+
+    /* Buttons */
+    .btn-login-red {
+      width: 100%;
+      padding: 0.9rem 1.5rem;
+      background: linear-gradient(135deg, #DC2626, #B91C1C);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 50px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(220, 38, 38, 0.25);
+      transition: all 0.25s ease;
+    }
+
+    .btn-login-red:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(220, 38, 38, 0.35);
+      background: linear-gradient(135deg, #EF4444, #C62828);
+    }
+    
+    .btn-login-red:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-outline {
+      padding: 0.9rem 1.5rem;
+      background: transparent;
+      color: #4b5563;
+      border: 1.5px solid #d1d5db;
+      border-radius: 50px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    
+    .btn-outline:hover {
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    /* Separator */
+    .login-separator {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .login-separator::before, .login-separator::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border-color);
+    }
+
+    .login-separator span {
+      color: #9ca3af;
+      font-size: 0.8rem;
+    }
+
+    /* Google Button */
+    .google-real-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      width: 100%;
+      padding: 0.75rem 1.5rem;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      color: #3c4043;
+      font-family: 'Roboto', 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      letter-spacing: 0.25px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 2px 0 rgba(60,64,67,0.30), 0 1px 3px 1px rgba(60,64,67,0.15);
+    }
+
+    .google-real-btn:hover {
+      background: #f8f9fa;
+      box-shadow: 0 1px 3px 0 rgba(60,64,67,0.30), 0 4px 8px 3px rgba(60,64,67,0.15);
+    }
+
+    .google-icon {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Messages */
+    .login-message {
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      text-align: center;
+    }
+
+    .msg-error {
+      background: rgba(220, 38, 38, 0.1);
+      color: #DC2626;
+      border: 1px solid rgba(220, 38, 38, 0.3);
+    }
+
+    /* Utilities */
+    .forgot-pwd-link {
+      font-size: 0.88rem;
+      color: #DC2626;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .forgot-pwd-link:hover {
+      text-decoration: underline;
+      color: #991B1B;
+    }
+
+    .text-center { text-align: center; }
+    .mb-4 { margin-bottom: 1.5rem; }
+    .mt-4 { margin-top: 1.5rem; }
+    .mb-3 { margin-bottom: 1rem; }
+    .me-2 { margin-right: 0.5rem; }
+    .ms-2 { margin-left: 0.5rem; }
+    .d-flex { display: flex; }
+    .gap-3 { gap: 1rem; }
+    .flex-grow-1 { flex-grow: 1; }
+    
+    .pwd-strength { height: 4px; background: #e5e7eb; border-radius: 2px; margin-top: 0.2rem; overflow: hidden; }
+    .pwd-strength .strength-bar { height: 100%; transition: all 0.3s; }
+    .pwd-strength.weak .strength-bar { width: 33%; background: #ef4444; }
+    .pwd-strength.medium .strength-bar { width: 66%; background: #f59e0b; }
+    .pwd-strength.strong .strength-bar { width: 100%; background: #10b981; }
+    .pwd-label { color: #6b7280; font-size: 0.75rem; margin-top: 0.2rem; display: block;}
+
+    .captcha-box {
+      background: #f9fafb;
+      border: 1px dashed #d1d5db;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: all 0.3s;
+    }
+    
+    .captcha-box:hover {
+      background: #f3f4f6;
+      border-color: #9ca3af;
+    }
+
+    .human-checkbox {
+      width: 28px;
+      height: 28px;
+      border: 2px solid #d1d5db;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      color: white;
+      transition: all 0.2s;
+    }
+
+    .human-checkbox.checked {
+      background: #10b981;
+      border-color: #10b981;
+    }
+
+    .human-checkbox i {
+      font-size: 14px;
+    }
+    
+    .success-icon {
+      font-size: 4rem;
+      color: #10b981;
+      animation: popIn 0.5s ease;
+    }
+    
+    @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 80% { transform: scale(1.2); } 100% { transform: scale(1); opacity: 1; } }
+
+    @media (max-width: 576px) {
+      .login-card {
+        padding: 2rem 1.5rem;
+      }
+    }
+    
+
+    /* Indicatif figé : le client ne saisit que les 9 chiffres, ce qui garantit
+       une écriture unique en base. */
+    .champ-telephone-mykiki {
+      display: flex;
+      align-items: stretch;
+      border: 1px solid #CBD5E1;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #ffffff;
+      transition: border-color 0.2s;
+    }
+
+    .champ-telephone-mykiki:focus-within { border-color: #721513; }
+
+    .indicatif-mykiki {
+      display: flex;
+      align-items: center;
+      padding: 0 0.75rem;
+      background: #FAF5EA;
+      border-right: 1px solid #EFE6D2;
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: #721513;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .champ-telephone-mykiki input {
+      flex: 1;
+      min-width: 0;
+      border: none;
+      outline: none;
+      padding: 0.75rem;
+      font-size: 0.9rem;
+      font-family: inherit;
+      letter-spacing: 0.03em;
+      background: transparent;
+    }
+
+
+    /* ── Inscription par Google ── */
+    .separateur-google {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 1.25rem 0 1rem;
+      color: #94a3b8;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .separateur-google::before,
+    .separateur-google::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #E2E8F0;
+    }
+
+    .zone-bouton-google {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.55rem;
+    }
+
+    .zone-bouton-google > div {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .zone-bouton-google iframe {
+      max-width: 100% !important;
+      border-radius: 50px !important;
+    }
+
+    .note-google {
+      font-size: 0.74rem;
+      color: #94a3b8;
+      text-align: center;
+      line-height: 1.4;
+      max-width: 34ch;
+    }
+
+
+    /* ── Geste de bienvenue ── */
+    .carte-bienvenue {
+      background: linear-gradient(135deg, #FAF5EA 0%, #F3E9D4 100%);
+      border: 1px solid #E5DABA;
+      border-radius: 16px;
+      padding: 1.4rem 1.2rem 1.2rem;
+      margin: 0 auto 1.5rem;
+      max-width: 26rem;
+    }
+
+    /* Beige et bordeaux, les deux couleurs du logo. */
+    .cercle-points {
+      width: 86px;
+      height: 86px;
+      margin: 0 auto 0.9rem;
+      border-radius: 50%;
+      background: #E5DABA;
+      border: 2px solid rgba(114, 21, 19, 0.18);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #721513;
+      line-height: 1;
+    }
+
+    .cercle-points i { font-size: 0.9rem; margin-bottom: 0.15rem; }
+    .cercle-points strong { font-size: 1.6rem; font-weight: 800; }
+    .cercle-points span { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+
+    .carte-bienvenue h4 {
+      margin: 0 0 0.5rem;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #721513;
+    }
+
+    .carte-bienvenue p {
+      margin: 0;
+      font-size: 0.84rem;
+      color: #6b5f56;
+      line-height: 1.5;
+    }

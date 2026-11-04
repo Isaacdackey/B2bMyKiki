@@ -1,0 +1,303 @@
+/* ═══════════════════════════════════════════════════════════════════
+   PROPOSITIONS DE MENUS — DESIGN HARMONISÉ CATALOGUE & METS
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* — Onglets — */
+.catalogue-onglets {
+  display: flex;
+  gap: 0.35rem;
+  border-bottom: 1px solid #E2E8F0;
+  margin-bottom: 1rem;
+}
+
+.onglet {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.6rem 1rem;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #94a3b8;
+  cursor: pointer;
+  margin-bottom: -1px;
+}
+
+.onglet:hover { color: #64748b; }
+
+.onglet.actif {
+  color: #721513;
+  border-bottom-color: #721513;
+}
+
+.onglet-compteur {
+  background: #F1F5F9;
+  border-radius: 9999px;
+  padding: 0.05rem 0.42rem;
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.onglet.actif .onglet-compteur {
+  background: #FAF5EA;
+  color: #721513;
+}
+
+/* — Barre de filtres — */
+.catalogue-barre {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.1rem;
+}
+
+.catalogue-select {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  background: #ffffff;
+  font-size: 0.84rem;
+  color: #475569;
+  min-width: 180px;
+  outline: none;
+}
+
+/* — Actions — */
+.catalogue-actions {
+  display: flex;
+  gap: 0.4rem;
+  justify-content: center;
+}
+
+.btn-icone {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #64748b;
+  cursor: pointer;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  transition: all 0.2s ease;
+}
+
+.btn-icone i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  margin: 0;
+  padding: 0;
+}
+
+.btn-icone:hover {
+  transform: translateY(-1px);
+}
+
+/* Icône Œil (Détails) : Bleu */
+.btn-icone--voir {
+  color: #2563EB;
+  background: #EFF6FF;
+  border-color: #BFDBFE;
+}
+.btn-icone--voir:hover {
+  background: #2563EB;
+  color: #ffffff;
+  border-color: #2563EB;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+}
+
+/* Icône Modifier : Ambre / Doré */
+.btn-icone--modifier {
+  color: #D97706;
+  background: #FEF3C7;
+  border-color: #FDE68A;
+}
+.btn-icone--modifier:hover {
+  background: #D97706;
+  color: #ffffff;
+  border-color: #D97706;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.25);
+}
+
+/* Icône Archiver / Supprimer : Rouge */
+.btn-icone--archiver {
+  color: #DC2626;
+  background: #FEE2E2;
+  border-color: #FECACA;
+}
+.btn-icone--archiver:hover {
+  background: #DC2626;
+  color: #ffffff;
+  border-color: #DC2626;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.25);
+}
+
+/* Icône Restaurer / Vert */
+.btn-icone--restaurer {
+  color: #16A34A;
+  background: #DCFCE7;
+  border-color: #BBF7D0;
+}
+.btn-icone--restaurer:hover {
+  background: #16A34A;
+  color: #ffffff;
+  border-color: #16A34A;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25);
+}
+
+/* — Formulaires — */
+.formulaire-grille {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.champ {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.champ--large { grid-column: span 2; }
+
+.champ label {
+  font-weight: 600;
+  font-size: 0.72rem;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.champ .requis { color: #DC2626; }
+
+.champ input[type="text"],
+.champ input[type="number"],
+.champ select,
+.champ textarea {
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+  outline: none;
+  font-size: 0.86rem;
+  font-family: inherit;
+  background: #ffffff;
+  transition: border-color 0.2s;
+}
+
+.champ input:focus,
+.champ select:focus,
+.champ textarea:focus {
+  border-color: #721513;
+}
+
+.champ small {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+/* — États — */
+.catalogue-etat {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: #94a3b8;
+  font-size: 0.86rem;
+}
+
+.catalogue-vide i {
+  display: block;
+  font-size: 2.2rem;
+  color: #E5DABA;
+  margin-bottom: 0.75rem;
+}
+.catalogue-vide h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1rem;
+  color: #721513;
+  font-weight: 700;
+}
+.catalogue-vide p {
+  margin: 0 auto;
+  max-width: 46ch;
+  line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+  .formulaire-grille { grid-template-columns: 1fr; }
+  .champ--large { grid-column: span 1; }
+}
+
+/* — Pagination (Design Catalogue) — */
+.catalogue-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem 0.5rem 0.5rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid #E2E8F0;
+}
+
+.pagination-info {
+  font-size: 0.84rem;
+  color: #64748B;
+}
+
+.pagination-info strong {
+  color: #1E293B;
+  font-weight: 700;
+}
+
+.pagination-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.btn-page {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #E2E8F0;
+  background: #ffffff;
+  color: #475569;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-page:hover:not(:disabled) {
+  border-color: #721513;
+  color: #721513;
+  background: #FAF5EA;
+}
+
+.btn-page.actif {
+  background: #721513;
+  color: #ffffff;
+  border-color: #721513;
+  box-shadow: 0 2px 6px rgba(114, 21, 19, 0.25);
+}
+
+.btn-page:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-color: #E2E8F0;
+  background: #F8FAFC;
+}

@@ -1,0 +1,664 @@
+<div class="personnel-container">
+
+  <!-- ── En-tête et barre d'action ── -->
+  <div class="panel-header" style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 1rem;">
+    <button class="btn btn-primary" (click)="openCreateModal()">
+      <i class="fas fa-plus me-2"></i> Ajouter un personnel
+    </button>
+  </div>
+    
+    <!-- BARRE DE RECHERCHE ET FILTRES -->
+    <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; background: white; padding: 1rem 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); justify-content: space-between;">
+      <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; flex: 1;">
+        <div class="kiki-recherche">
+          <input type="text" [(ngModel)]="personnelSearchQuery" (ngModelChange)="onFilterChange()" placeholder="Rechercher par nom, identifiant, poste...">
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <select [(ngModel)]="personnelFilterRole" (ngModelChange)="onFilterChange()" style="padding: 0.6rem 0.8rem; border: 1px solid #E2E8F0; border-radius: 8px; outline: none; background: white; font-size: 0.85rem; color: #334155; min-width: 170px; font-weight: 600;">
+            <option value="ALL">Tous les postes</option>
+            @for (p of postes; track $index) {
+<option [value]="p.value">{{ p.label }}</option>
+}
+          </select>
+          
+          <!-- Desktop Filters -->
+          <div class="desktop-filters" style="display: flex; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; overflow: hidden;">
+            <button class="btn btn-sm" [style.background]="personnelFilterStatus === 'ALL' ? '#7A1C1C' : 'transparent'" [style.color]="personnelFilterStatus === 'ALL' ? 'white' : '#64748B'" (click)="personnelFilterStatus = 'ALL'; onFilterChange()" style="border: none; border-radius: 0; font-weight: 600; padding: 0.4rem 1rem;">Tous</button>
+            <button class="btn btn-sm" [style.background]="personnelFilterStatus === 'ACTIF' ? '#10B981' : 'transparent'" [style.color]="personnelFilterStatus === 'ACTIF' ? 'white' : '#64748B'" (click)="personnelFilterStatus = 'ACTIF'; onFilterChange()" style="border: none; border-radius: 0; font-weight: 600; padding: 0.4rem 1rem; border-left: 1px solid #E2E8F0; border-right: 1px solid #E2E8F0;">Actif</button>
+            <button class="btn btn-sm" [style.background]="personnelFilterStatus === 'INACTIF' ? '#EF4444' : 'transparent'" [style.color]="personnelFilterStatus === 'INACTIF' ? 'white' : '#64748B'" (click)="personnelFilterStatus = 'INACTIF'; onFilterChange()" style="border: none; border-radius: 0; font-weight: 600; padding: 0.4rem 1rem;">Inactif</button>
+          </div>
+          <!-- Mobile Filters -->
+          <div class="mobile-filters">
+            <select [(ngModel)]="personnelFilterStatus" (change)="onFilterChange()" style="padding: 0.6rem 0.8rem; border: 1px solid #E2E8F0; border-radius: 8px; outline: none; background: white; font-size: 0.85rem; color: #334155; font-weight: 600;">
+              <option value="ALL">Tous</option>
+              <option value="ACTIF">Actif</option>
+              <option value="INACTIF">Inactif</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div style="font-size: 0.85rem; font-weight: 600; color: #64748B;">
+        <span><strong>{{ totalFilteredElements }}</strong> membre(s) trouvé(s)</span>
+      </div>
+    </div>
+
+    <!-- ── Chargement (seulement si pas de cache) ───────────── -->
+    @if (loading) {
+<div class="loading-state">
+      <i class="fas fa-spinner fa-spin"></i> Chargement...
+    </div>
+}
+
+    <!-- ── Indicateur de rafraîchissement discret ───────────── -->
+    @if (refreshing && !loading) {
+<div class="refresh-hint">
+      <i class="fas fa-sync fa-spin"></i> Actualisation...
+    </div>
+}
+
+    <!-- ── Tableau du personnel ──────────────────────────────── -->
+    @if (!loading) {
+<div class="table-card">
+
+      <!-- État vide -->
+      @if (staffList.length === 0) {
+<div class="empty-state">
+        <i class="fas fa-users-slash"></i>
+        <p>Aucun personnel enregistré</p>
+        <button class="btn btn-primary" (click)="openCreateModal()">
+          <i class="fas fa-plus me-2"></i> Ajouter un personnel
+        </button>
+      </div>
+}
+
+      @if (staffList.length > 0) {
+<div class="table-responsive">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Nom Complet</th>
+              <th>Identifiant / Email</th>
+              <th class="th-centre">Poste</th>
+              <th class="th-centre">Statut</th>
+              <th>Accès</th>
+              <th class="col-actions" style="width: 140px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (staff of displayedStaff; track $index) {
+<tr class="table-row ligne-cliquable" [class.row-inactive]="!staff.active" (click)="openViewModal(staff); $event.stopPropagation()" title="Voir la fiche de l'agent">
+              <td>
+                <div class="staff-name-cell">
+                  <div class="staff-name-info">
+                    <span>{{ staff.fullName }}</span>
+                  </div>
+                </div>
+              </td>
+              <td class="username-cell">{{ staff.username }}</td>
+              <td>
+                <span class="role-badge" [ngClass]="getRoleBadgeClass(staff)">
+                  {{ getStaffDisplayBadge(staff) }}
+                </span>
+                @if (staff.departement && staff.departement !== staff.poste && getStaffDisplayBadge(staff) !== staff.departement) {
+<small class="d-block text-muted" style="font-size: 0.72rem;">
+                  {{ staff.departement }}
+                </small>
+}
+              </td>
+              <td>
+                <span class="status-badge" [ngClass]="staff.active ? 'status-active' : 'status-inactive'">
+                  <i class="fas fa-circle"></i>
+                  {{ staff.active ? 'Actif' : 'Inactif' }}
+                </span>
+              </td>
+              <td class="date-cell">
+                <!-- Lien copier pour Gestionnaire/Admin -->
+                @if (staff.loginUrl) {
+<div class="login-url-cell">
+                  <span class="login-url-text" title="{{ staff.loginUrl }}">Lien personnalisé</span>
+                  <button class="btn-copy" (click)="copyLoginUrl(staff.loginUrl!); $event.stopPropagation()" title="Copier le lien de connexion">
+                    <i class="fas fa-copy"></i>
+                  </button>
+                </div>
+}
+                @if (!staff.loginUrl) {
+<span style="color: #94a3b8; font-style: italic;">
+                  Standard
+                </span>
+}
+              </td>
+              <td class="actions-cell">
+                <!-- Voir -->
+                <button class="btn-icon" style="color: #10b981;" title="Voir les détails et l'historique" (click)="openViewModal(staff); $event.stopPropagation()">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <!-- Modifier -->
+                <button class="btn-icon btn-edit" title="Modifier" (click)="openEditModal(staff); $event.stopPropagation()">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <!-- Réinitialiser l'accès -->
+                @if (!isSuperAdmin(staff)) {
+<button class="btn-icon btn-reset" title="Réinitialiser l'accès" (click)="resetAccess(staff); $event.stopPropagation()">
+                  <i class="fas fa-redo-alt"></i>
+                </button>
+}
+                <!-- Activer / Bloquer -->
+                @if (!isSuperAdmin(staff)) {
+<button class="btn-icon" title="{{ staff.active ? 'Bloquer' : 'Activer' }}" [ngClass]="staff.active ? 'btn-block' : 'btn-activate'" (click)="toggleActive(staff); $event.stopPropagation()">
+                  <i class="fas" [ngClass]="staff.active ? 'fa-ban' : 'fa-check-circle'"></i>
+                </button>
+}
+                <!-- Supprimer -->
+                @if (!isSuperAdmin(staff)) {
+<button class="btn-icon btn-delete" title="Supprimer" (click)="deleteUser(staff)">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+}
+              </td>
+            </tr>
+}
+          </tbody>
+        </table>
+      </div>
+}
+
+      <!-- ── PAGINATION ── -->
+      @if (getTotalPages() > 1) {
+<div style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.5rem; padding-bottom: 1rem; align-items: center;">
+        <button type="button" class="btn btn-sm" style="background: white; color: #475569; border: 1px solid #CBD5E1; border-radius: 8px; font-weight: 600; font-size: 0.85rem; padding: 0 0.85rem; cursor: pointer; transition: all 0.2s; height: 34px;" [disabled]="currentPage === 1" [style.opacity]="currentPage === 1 ? '0.5' : '1'" (click)="onPageChange(currentPage - 1)">
+          <i class="fas fa-chevron-left me-1"></i> Précédent
+        </button>
+        @for (p of getPageArray(); track $index) {
+<button type="button" [style.background]="currentPage === p ? '#7A1C1C' : (p === '...' ? 'transparent' : 'white')" [style.color]="currentPage === p ? 'white' : '#475569'" [style.border]="currentPage === p ? '1px solid #7A1C1C' : (p === '...' ? 'none' : '1px solid #CBD5E1')" style="min-width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.85rem; padding: 0 0.5rem; cursor: pointer; transition: all 0.2s;" (click)="p !== '...' && onPageChange($any(p))" [disabled]="p === '...'" [style.cursor]="p === '...' ? 'default' : 'pointer'">
+          {{ p }}
+        </button>
+}
+        <button type="button" class="btn btn-sm" style="background: white; color: #475569; border: 1px solid #CBD5E1; border-radius: 8px; font-weight: 600; font-size: 0.85rem; padding: 0 0.85rem; cursor: pointer; transition: all 0.2s; height: 34px;" [disabled]="currentPage === getTotalPages()" [style.opacity]="currentPage === getTotalPages() ? '0.5' : '1'" (click)="onPageChange(currentPage + 1)">
+          Suivant <i class="fas fa-chevron-right ms-1"></i>
+        </button>
+      </div>
+}
+    </div>
+}
+
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- Modal Voir Utilisateur                                     -->
+<!-- ══════════════════════════════════════════════════════════ -->
+@if (showViewModal) {
+<div class="modal-overlay" (click)="$event.target === $event.currentTarget && closeViewModal()">
+  <div class="modal-card fiche-modale">
+
+    <!-- Bandeau d'identité Signature -->
+    @if (viewUser) {
+      <div class="fiche-bandeau">
+        <div class="fiche-identite">
+          <div class="fiche-avatar">{{ (viewUser.fullName || '?').charAt(0).toUpperCase() }}</div>
+          <div class="fiche-identite-texte">
+            <h3 class="fiche-nom">{{ viewUser.fullName }}</h3>
+            <p class="fiche-sous-titre">&#64;{{ viewUser.username }}</p>
+            <div class="fiche-etiquettes">
+              <span class="fiche-etiquette">
+                <i class="fas fa-id-badge"></i> {{ getStaffDisplayBadge(viewUser) }}
+              </span>
+              <span class="fiche-etiquette" [class.fiche-etiquette--alerte]="!viewUser.active">
+                <i class="fas" [ngClass]="viewUser.active ? 'fa-circle-check' : 'fa-ban'"></i>
+                {{ viewUser.active ? 'Actif' : 'Bloqué' }}
+              </span>
+              @if (viewUser.tempPasswordChangeRequired) {
+                <span class="fiche-etiquette">
+                  <i class="fas fa-key"></i> Mot de passe à changer
+                </span>
+              }
+            </div>
+          </div>
+        </div>
+        <button class="fiche-fermer" (click)="closeViewModal()" title="Fermer">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    }
+
+    @if (viewUser) {
+      <div class="modal-card-body">
+
+        <!-- Chiffres clés & KPIs -->
+        <div class="fiche-kpis-grid">
+          <div class="fiche-kpi-card">
+            <div class="fiche-kpi-icon" style="color: #10B981; background: #DCFCE7;">
+              <i class="fas fa-id-badge"></i>
+            </div>
+            <div class="fiche-kpi-content">
+              <span class="fiche-kpi-valeur">#{{ viewUser.id }}</span>
+              <span class="fiche-kpi-libelle">Référence Agent</span>
+              <span class="fiche-kpi-sub">Personnel Kiki</span>
+            </div>
+          </div>
+
+          <div class="fiche-kpi-card">
+            <div class="fiche-kpi-icon" style="color: #D97706; background: #FEF3C7;">
+              <i class="fas fa-briefcase"></i>
+            </div>
+            <div class="fiche-kpi-content">
+              <span class="fiche-kpi-valeur" style="font-size: 0.95rem;">{{ getStaffDisplayBadge(viewUser) }}</span>
+              <span class="fiche-kpi-libelle">Poste Occupé</span>
+              <span class="fiche-kpi-sub">{{ viewUser.departement || 'Opérations & Service' }}</span>
+            </div>
+          </div>
+
+          <div class="fiche-kpi-card">
+            <div class="fiche-kpi-icon" style="color: #2563EB; background: #DBEAFE;">
+              <i class="fas fa-clock-rotate-left"></i>
+            </div>
+            <div class="fiche-kpi-content">
+              <span class="fiche-kpi-valeur" style="font-size: 0.92rem;">{{ viewUser.lastLoginAt ? (viewUser.lastLoginAt | date:'dd/MM/yy') : 'Jamais' }}</span>
+              <span class="fiche-kpi-libelle">Dernier Accès</span>
+              <span class="fiche-kpi-sub">{{ viewUser.lastLoginAt ? (viewUser.lastLoginAt | date:'à HH:mm') : 'Aucune session' }}</span>
+            </div>
+          </div>
+
+          <div class="fiche-kpi-card fiche-kpi-card--highlight">
+            <div class="fiche-kpi-icon" style="color: #721513; background: #FAF5EA; border: 1px solid #EFE6D2;">
+              <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="fiche-kpi-content">
+              <span class="fiche-kpi-valeur fiche-kpi-valeur--gold" style="font-size: 0.92rem;">{{ viewUser.createdAt ? (viewUser.createdAt | date:'dd/MM/yyyy') : '—' }}</span>
+              <span class="fiche-kpi-libelle">Date de Création</span>
+              <span class="fiche-kpi-sub">{{ viewUser.active ? 'Compte actif' : 'Compte suspendu' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Informations du Compte dans une belle grille de cartes -->
+        <div style="margin-bottom: 1.5rem;">
+          <h5 class="fiche-section-titre"><i class="fas fa-id-card"></i> Informations du Compte</h5>
+          <div class="fiche-coords-grid">
+            
+            <!-- Identifiant -->
+            <div class="fiche-coord-item">
+              <div class="fiche-coord-icon" style="background: #EEF2FF; color: #4F46E5;">
+                <i class="fas fa-user-lock"></i>
+              </div>
+              <div class="fiche-coord-info">
+                <span class="fiche-coord-label">Identifiant de connexion</span>
+                <code class="fiche-coord-value" style="font-family: monospace; font-size: 0.9rem; font-weight: 700;">{{ viewUser.username }}</code>
+              </div>
+            </div>
+
+            <!-- Poste / Fonction -->
+            <div class="fiche-coord-item">
+              <div class="fiche-coord-icon" style="background: #FEF3C7; color: #D97706;">
+                <i class="fas fa-user-tie"></i>
+              </div>
+              <div class="fiche-coord-info">
+                <span class="fiche-coord-label">Poste & Permissions</span>
+                <strong class="fiche-coord-value">{{ getStaffDisplayBadge(viewUser) }} ({{ viewUser.role }})</strong>
+              </div>
+            </div>
+
+            <!-- État du compte -->
+            <div class="fiche-coord-item">
+              <div class="fiche-coord-icon" [style.background]="viewUser.active ? '#DCFCE7' : '#FEE2E2'" [style.color]="viewUser.active ? '#16A34A' : '#DC2626'">
+                <i class="fas" [ngClass]="viewUser.active ? 'fa-circle-check' : 'fa-ban'"></i>
+              </div>
+              <div class="fiche-coord-info">
+                <span class="fiche-coord-label">Statut du compte</span>
+                <div style="margin-top: 2px;">
+                  <span class="badge" 
+                        [style.background]="viewUser.active ? '#DCFCE7' : '#FEE2E2'" 
+                        [style.color]="viewUser.active ? '#15803D' : '#DC2626'"
+                        [style.border]="viewUser.active ? '1px solid #86EFAC' : '1px solid #FECACA'"
+                        style="font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.72rem; display: inline-flex; align-items: center; gap: 0.3rem;">
+                    <i class="fas" [ngClass]="viewUser.active ? 'fa-check' : 'fa-ban'"></i>
+                    {{ viewUser.active ? 'Compte Actif' : 'Compte Bloqué' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Lien d'accès privé personnalisé -->
+            @if (viewUser.loginUrl) {
+              <div class="fiche-coord-item" style="grid-column: 1 / -1; background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 10px; padding: 0.75rem 1rem;">
+                <div class="fiche-coord-icon" style="background: #DBEAFE; color: #1D4ED8;">
+                  <i class="fas fa-link"></i>
+                </div>
+                <div class="fiche-coord-info" style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                  <div>
+                    <span class="fiche-coord-label">Lien d'accès privé personnalisé</span>
+                    <div style="font-family: monospace; font-size: 0.78rem; color: #2563EB; word-break: break-all; margin-top: 0.15rem;">
+                      {{ viewUser.loginUrl }}
+                    </div>
+                  </div>
+                  <button type="button" class="btn btn-sm" (click)="copyLoginUrl(viewUser.loginUrl!)"
+                          style="background: #EEF2FF; color: #4F46E5; border: 1px solid #C7D2FE; border-radius: 6px; font-weight: 700; font-size: 0.78rem; padding: 0.35rem 0.75rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; flex-shrink: 0;">
+                    <i class="fas fa-copy"></i>
+                    <span>Copier le lien</span>
+                  </button>
+                </div>
+              </div>
+            }
+
+          </div>
+        </div>
+
+        <!-- Historique de connexion -->
+        <div style="margin-bottom: 1rem;">
+          <h5 class="fiche-section-titre"><i class="fas fa-clock-rotate-left"></i> Historique de connexion</h5>
+          @if (viewUser.lastLoginAt) {
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 0.85rem 1.15rem; display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div style="width: 34px; height: 34px; border-radius: 8px; background: #DCFCE7; color: #16A34A; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;">
+                  <i class="fas fa-door-open"></i>
+                </div>
+                <div>
+                  <strong style="color: #1E293B; font-size: 0.86rem; display: block;">Dernière session authentifiée</strong>
+                  <span style="color: #64748B; font-size: 0.75rem;">Accès réussi à l'application</span>
+                </div>
+              </div>
+              <span class="badge" style="background: #DCFCE7; color: #15803D; border: 1px solid #86EFAC; font-weight: 700; border-radius: 20px; font-size: 0.75rem; padding: 0.3rem 0.75rem;">
+                {{ viewUser.lastLoginAt | date:'dd MMMM yyyy à HH:mm' }}
+              </span>
+            </div>
+          }
+          @if (!viewUser.lastLoginAt) {
+            <div class="fiche-vide">
+              <i class="fas fa-clock"></i>
+              <p style="margin: 0; font-weight: 600; color: #64748B;">Aucune connexion enregistrée</p>
+              <span style="font-size: 0.78rem; color: #94A3B8;">Cet utilisateur ne s'est pas encore connecté à son espace.</span>
+            </div>
+          }
+        </div>
+
+      </div>
+    }
+
+    <!-- Footer de la modale avec actions (Bloquer, Reset, Modifier, Fermer) -->
+    @if (viewUser) {
+      <div class="modal-card-footer" style="display: flex; justify-content: flex-end; align-items: center; gap: 0.65rem; padding: 1rem 1.5rem; background: #F8FAFC; border-top: 1px solid #E2E8F0; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; flex-wrap: wrap;">
+        <!-- Bloquer / Débloquer -->
+        @if (!isSuperAdmin(viewUser)) {
+          <button type="button" class="btn btn-sm" (click)="toggleActive(viewUser)"
+                  [style.background]="viewUser.active ? '#FFFBEB' : '#DCFCE7'"
+                  [style.color]="viewUser.active ? '#D97706' : '#16A34A'"
+                  [style.border]="viewUser.active ? '1px solid #FCD34D' : '1px solid #86EFAC'"
+                  style="padding: 0.5rem 1rem; border-radius: 8px; font-weight: 700; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem;">
+            <i class="fas" [ngClass]="viewUser.active ? 'fa-ban' : 'fa-unlock'"></i>
+            {{ viewUser.active ? 'Bloquer ce personnel' : 'Débloquer ce personnel' }}
+          </button>
+        }
+
+        <!-- Réinitialiser l'accès -->
+        @if (!isSuperAdmin(viewUser)) {
+          <button type="button" class="btn btn-sm" (click)="resetAccess(viewUser)"
+                  style="background: #EEF2FF; color: #4F46E5; border: 1px solid #C7D2FE; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 700; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem;">
+            <i class="fas fa-redo-alt"></i>
+            <span>Réinitialiser l'accès</span>
+          </button>
+        }
+
+        <!-- Modifier -->
+        <button type="button" class="btn btn-sm" (click)="openEditModal(viewUser)"
+                style="background: #FEF3C7; color: #B45309; border: 1px solid #FDE68A; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 700; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem;">
+          <i class="fas fa-edit"></i>
+          <span>Modifier</span>
+        </button>
+
+        <!-- Fermer -->
+        <button type="button" class="btn btn-sm" (click)="closeViewModal()"
+                style="background: #7A1C1C; color: white; border: 1px solid #7A1C1C; padding: 0.5rem 1.25rem; border-radius: 8px; font-weight: 700; font-size: 0.82rem; cursor: pointer;">
+          Fermer
+        </button>
+      </div>
+    }
+  </div>
+</div>
+}
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- Modal Création / Modification                              -->
+<!-- ══════════════════════════════════════════════════════════ -->
+@if (showModal) {
+<div class="modal-overlay" (click)="$event.target === $event.currentTarget && !newlyCreatedUser && closeModal()">
+  <div class="modal-card">
+
+    <!-- ─ Header de la modal ─ -->
+    <div class="modal-card-header">
+      <div class="modal-title-group">
+        <div class="modal-icon">
+          <i class="fas" [ngClass]="isEditing ? 'fa-user-edit' : 'fa-user-plus'"></i>
+        </div>
+        <h3>{{ isEditing ? 'Modifier le personnel' : 'Nouveau Personnel' }}</h3>
+      </div>
+      <button class="modal-close-btn" (click)="closeModal()" title="Fermer">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- ─ Corps ─ -->
+    <div class="modal-card-body">
+
+      <!-- Succès : affichage du mot de passe généré -->
+      @if (newlyCreatedUser) {
+<div class="success-panel">
+        <div class="success-panel-header">
+          <i class="fas fa-check-circle"></i>
+          <h4>Compte créé avec succès !</h4>
+        </div>
+        <p class="success-hint">
+          Transmettez ces identifiants à la personne concernée.<br>
+          <strong>Ils ne seront affichés qu'une seule fois.</strong>
+        </p>
+        <div class="credentials-box">
+          @if (newlyCreatedUser.loginUrl) {
+<div class="cred-row">
+            <span class="cred-label"><i class="fas fa-link"></i> Lien</span>
+            <code class="cred-value link-value">{{ newlyCreatedUser.loginUrl }}</code>
+          </div>
+}
+          <div class="cred-row">
+            <span class="cred-label"><i class="fas fa-user"></i> Identifiant</span>
+            <code class="cred-value">{{ newlyCreatedUser.username }}</code>
+          </div>
+          <div class="cred-row">
+            <span class="cred-label"><i class="fas fa-key"></i> Mot de passe</span>
+            <code class="cred-value password-value">{{ newlyCreatedUser.tempPassword }}</code>
+          </div>
+        </div>
+        <button class="btn-close-success" (click)="closeModal()">
+          <i class="fas fa-check"></i> Fermer
+        </button>
+      </div>
+}
+
+      <!-- Formulaire -->
+      @if (!newlyCreatedUser) {
+<form (ngSubmit)="saveUser()" #personnelForm="ngForm">
+
+        <div class="form-row">
+          <div class="form-field">
+            <label class="field-label">NOM COMPLET <span class="required">*</span></label>
+            <div class="field-input-wrap">
+              <i class="fas fa-user field-icon"></i>
+              <input
+                type="text"
+                [(ngModel)]="formData.fullName"
+                name="fullName"
+                required
+                class="field-input"
+                style="padding-left: 2.8rem !important;"
+                placeholder="Ex: Jean Dupont"
+                [disabled]="isSubmitting">
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="field-label">IDENTIFIANT / EMAIL <span class="required">*</span></label>
+            <div class="field-input-wrap">
+              <i class="fas fa-at field-icon"></i>
+              <input
+                type="text"
+                [(ngModel)]="formData.username"
+                name="username"
+                required
+                class="field-input"
+                style="padding-left: 2.8rem !important;"
+                placeholder="Ex: jean.dupont"
+                [disabled]="isSubmitting">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label class="field-label">POSTE / RÔLE <span class="required">*</span></label>
+          <div class="field-input-wrap">
+            <i class="fas fa-briefcase field-icon"></i>
+            <select
+              [(ngModel)]="formData.role"
+              name="role"
+              required
+              class="field-input field-select"
+              style="padding-left: 2.8rem !important;"
+              [disabled]="(isEditing && formData.username === 'kiki.admin') || isSubmitting">
+              <option value="" disabled>— Sélectionner un poste —</option>
+              @for (poste of postes; track $index) {
+<option [value]="poste.value">{{ poste.label }}</option>
+}
+              @if (isEditing && formData.username === 'kiki.admin') {
+<option value="ADMIN">Administrateur</option>
+}
+            </select>
+          </div>
+        </div>
+
+
+
+        <!-- Footer du formulaire -->
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" (click)="closeModal()" [disabled]="isSubmitting">
+            Annuler
+          </button>
+          <button
+            type="button"
+            (click)="saveUser()"
+            class="btn-submit"
+            [disabled]="isSubmitting || !formData.fullName || !formData.username || !formData.role">
+            @if (!isSubmitting) {
+<span>
+              <i class="fas fa-save"></i>
+              {{ isEditing ? 'Mettre à jour' : 'Enregistrer' }}
+            </span>
+}
+            @if (isSubmitting) {
+<span>
+              <i class="fas fa-spinner fa-spin"></i> Traitement...
+            </span>
+}
+          </button>
+        </div>
+
+      </form>
+}
+    </div><!-- /modal-card-body -->
+  </div><!-- /modal-card -->
+</div>
+}<!-- /modal-overlay -->
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- Modal Réinitialisation d'accès                            -->
+<!-- ══════════════════════════════════════════════════════════ -->
+@if (showResetModal) {
+<div class="modal-overlay" (click)="$event.target === $event.currentTarget && closeResetModal()">
+  <div class="modal-card modal-card-sm">
+    <div class="modal-card-header">
+      <div class="modal-title-group">
+        <div class="modal-icon modal-icon-warning">
+          <i class="fas fa-redo-alt"></i>
+        </div>
+        <h3>Accès réinitialisé</h3>
+      </div>
+      <button class="modal-close-btn" (click)="closeResetModal()" title="Fermer">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    @if (resetResult) {
+<div class="modal-card-body">
+      <p class="success-hint">
+        Transmettez ces nouveaux identifiants à <strong>{{ resetResult.fullName }}</strong>.<br>
+        <strong>Le mot de passe ne sera affiché qu'une seule fois.</strong>
+      </p>
+      <div class="credentials-box">
+        @if (resetResult.loginUrl) {
+<div class="cred-row">
+          <span class="cred-label"><i class="fas fa-link"></i> Lien</span>
+          <code class="cred-value link-value">{{ resetResult.loginUrl }}</code>
+          <button class="btn-cred-copy" (click)="copyLoginUrl(resetResult.loginUrl!); $event.stopPropagation()" title="Copier">
+            <i class="fas fa-copy"></i>
+          </button>
+        </div>
+}
+        <div class="cred-row">
+          <span class="cred-label"><i class="fas fa-user"></i> Identifiant</span>
+          <code class="cred-value">{{ resetResult.username }}</code>
+        </div>
+        <div class="cred-row">
+          <span class="cred-label"><i class="fas fa-key"></i> Mot de passe</span>
+          <code class="cred-value password-value">{{ resetResult.tempPassword }}</code>
+        </div>
+      </div>
+      <button class="btn-close-success" (click)="closeResetModal()">
+        <i class="fas fa-check"></i> Fermer
+      </button>
+    </div>
+}
+  </div>
+</div>
+}
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- Modal Confirmation                                         -->
+<!-- ══════════════════════════════════════════════════════════ -->
+@if (showConfirmModal) {
+<div class="modal-overlay" (click)="$event.target === $event.currentTarget && !pendingAction && closeConfirmModal()">
+  <div class="modal-card modal-card-sm">
+    <div class="modal-card-header">
+      <div class="modal-title-group">
+        <div class="modal-icon" [ngClass]="confirmIconClass || 'modal-icon-warning'">
+          <i class="fas" [ngClass]="confirmIcon || 'fa-exclamation-triangle'"></i>
+        </div>
+        <h3>{{ confirmTitle }}</h3>
+      </div>
+      <button class="modal-close-btn" (click)="closeConfirmModal()" title="Fermer" [disabled]="pendingAction">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-card-body">
+      <p style="color: #475569; font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.5;" [innerHTML]="confirmMessage"></p>
+      
+      <div class="form-actions" style="margin-top: 0; padding-top: 0; border-top: none;">
+        <button type="button" class="btn-cancel" (click)="closeConfirmModal()" [disabled]="pendingAction">
+          Annuler
+        </button>
+        <button type="button" class="btn-submit" [ngClass]="confirmBtnClass" (click)="executeConfirmAction()" [disabled]="pendingAction">
+          @if (!pendingAction) {
+<span>
+            <i class="fas" [ngClass]="confirmBtnIcon || 'fa-check'"></i> {{ confirmBtnText }}
+          </span>
+}
+          @if (pendingAction) {
+<span>
+            <i class="fas fa-spinner fa-spin"></i> Traitement...
+          </span>
+}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+</div>
+
+
+

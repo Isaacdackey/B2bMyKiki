@@ -1,0 +1,156 @@
+<section class="login-wrapper">
+      <div class="login-card animate-fade">
+        <!-- Logo -->
+        <div class="login-header">
+          <img src="assets/images/logo.png" alt="Kiki Traiteur Logo" class="login-logo">
+          <h2 class="login-title">Créer votre compte MyKiki</h2>
+          <p class="login-subtitle">Rejoignez la communauté Kiki Traiteur</p>
+        </div>
+
+        <!-- Étapes -->
+        <div class="steps-container">
+          <div class="step" [class.active]="step === 1" [class.done]="step > 1">
+            <div class="step-circle">1</div>
+          </div>
+          <div class="step-line" [class.active]="step > 1"></div>
+          <div class="step" [class.active]="step === 2">
+            <div class="step-circle">2</div>
+          </div>
+        </div>
+
+        <!-- Feedback message if any -->
+        @if (error) {
+<div class="login-message msg-error" style="margin-bottom: 1.5rem;">
+          {{ error }}
+        </div>
+}
+
+        <!-- Étape 1 : Informations personnelles & Inscription directe -->
+        @if (step === 1) {
+<div class="step-content">
+          <form class="login-form" (ngSubmit)="onRegister()">
+            <div class="form-group">
+              <label for="fullName">NOM COMPLET *</label>
+              <div class="input-with-icon">
+                <i class="fa-regular fa-user input-icon"></i>
+                <input type="text" id="fullName" name="fullName" [(ngModel)]="form.fullName" placeholder="Amadou Diallo" required class="form-control" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="email">ADRESSE E-MAIL *</label>
+              <div class="input-with-icon">
+                <i class="fa-regular fa-envelope input-icon"></i>
+                <input type="email" id="email" name="email" [(ngModel)]="form.email" placeholder="exemple@gmail.com" required class="form-control" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="phone">TÉLÉPHONE</label>
+              <div class="champ-telephone-mykiki">
+                <span class="indicatif-mykiki">+221</span>
+                <input type="tel" id="phone" name="phone" inputmode="numeric"
+                       [(ngModel)]="form.phone" placeholder="77 123 45 67" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="type">TYPE DE COMPTE</label>
+              <div class="input-with-icon">
+                <i class="fa-solid fa-briefcase input-icon"></i>
+                <select id="type" name="type" [(ngModel)]="form.type" class="form-control" style="appearance: auto;">
+                  <option value="particulier">Particulier</option>
+                  <option value="entreprise">Entreprise</option>
+                </select>
+              </div>
+            </div>
+
+            @if (form.type === 'entreprise') {
+<div class="form-group">
+              <label for="organization">NOM DE L'ENTREPRISE</label>
+              <div class="input-with-icon">
+                <i class="fa-regular fa-building input-icon"></i>
+                <input type="text" id="organization" name="organization" [(ngModel)]="form.organization" placeholder="Ma Société SA" class="form-control" />
+              </div>
+            </div>
+}
+
+            <div class="form-group">
+              <label for="password">MOT DE PASSE *</label>
+              <div class="input-with-icon">
+                <i class="fas fa-key input-icon"></i>
+                <input [type]="showPwd ? 'text' : 'password'" id="password" name="password" [(ngModel)]="form.password" placeholder="••••••••" required class="form-control" />
+                <button type="button" class="pwd-toggle" (click)="showPwd = !showPwd">
+                  <i class="fas" [class.fa-eye]="!showPwd" [class.fa-eye-slash]="showPwd"></i>
+                </button>
+              </div>
+              <div class="pwd-strength" [ngClass]="getPasswordStrengthClass()">
+                <div class="strength-bar"></div>
+              </div>
+              <small class="pwd-label">{{ getPasswordStrengthLabel() }}</small>
+            </div>
+
+            <button type="submit" class="btn-login-red" [disabled]="!isStep1Valid() || loading">
+              @if (!loading) {
+<span><i class="fas fa-user-plus me-2"></i> Créer mon compte</span>
+}
+              @if (loading) {
+<span><i class="fas fa-spinner fa-spin me-2"></i> Inscription...</span>
+}
+            </button>
+          </form>
+
+          <!-- Inscription par compte Google -->
+          @if (googleDisponible) {
+<div class="separateur-google">
+            <span>ou</span>
+          </div>
+}
+
+          @if (googleDisponible) {
+<div class="zone-bouton-google">
+            <div #boutonGoogle></div>
+            <small class="note-google">
+              Votre compte sera créé automatiquement à partir de votre profil Google.
+            </small>
+          </div>
+}
+        </div>
+}
+
+        <!-- Étape 2 : Succès -->
+        @if (step === 2) {
+<div class="step-content text-center py-4">
+          <div class="success-icon mb-3">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <h3 class="step-title">Compte créé avec succès !</h3>
+          <p class="login-subtitle mb-4">Bienvenue dans votre espace MyKiki, <strong>{{ form.fullName }}</strong> !</p>
+
+          <!-- Geste de bienvenue -->
+          @if (pointsOfferts > 0) {
+<div class="carte-bienvenue">
+            <div class="cercle-points">
+              <i class="fas fa-coins"></i>
+              <strong>{{ pointsOfferts }}</strong>
+              <span>pts</span>
+            </div>
+            <h4>Vous avez gagné {{ pointsOfferts }} points de fidélité</h4>
+            <p>
+              Chaque commande et chaque prestation font grimper votre solde.
+              À partir d'un certain palier, vous débloquez des remises et bonus sur nos mets.
+            </p>
+          </div>
+}
+
+          <button type="button" class="btn-login-red" (click)="goToMykiki()">
+            <i class="fas fa-home me-2"></i> Accéder à mon espace
+          </button>
+        </div>
+}
+
+        <div class="mt-4 text-center">
+          <a routerLink="/login-client" class="forgot-pwd-link">← Retour à la connexion</a>
+        </div>
+      </div>
+    </section>

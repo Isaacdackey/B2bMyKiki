@@ -1,0 +1,474 @@
+<div class="mykiki-home-container animate-fade">
+      
+      <!-- ============================================================== -->
+      <!-- 0. MESSAGE D'ACCUEIL PERSONNALISÉ & POINTS FIDÉLITÉ À DROITE   -->
+      <!-- ============================================================== -->
+      <div class="user-greeting-banner">
+        <div class="greeting-left">
+          <span class="greeting-hello">Bonjour, <strong class="user-highlight font-serif-luxury">{{ getPrenom() }}</strong> 👋</span>
+          <span class="greeting-sub">Ravi de vous retrouver chez Kiki Traiteur</span>
+        </div>
+
+        <!-- Solde des points de fidélité À DROITE (En grand) -->
+        <div class="hero-fidelite-badge" 
+             (click)="ouvrirModaleFidelite()" 
+             role="button" 
+             tabindex="0"
+             title="Cliquer pour voir vos privilèges et avantages fidélité">
+          <div class="fidelite-badge-icon-wrap">
+            <i class="fas fa-coins"></i>
+          </div>
+          <div class="fidelite-badge-info">
+            <span class="fidelite-badge-pts font-serif-luxury">{{ pointsFidelite }}</span>
+            <span class="fidelite-badge-txt">pts fidélité</span>
+          </div>
+          <div class="fidelite-badge-sparkle">
+            <i class="fas fa-crown"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================== -->
+      <!-- 1. HERO SLIDER DYNAMIQUE (Plats & Pubs / Dégradé Progressif)   -->
+      <!-- ============================================================== -->
+      <section class="hero-slider-section" 
+               (mouseenter)="pauseAutoSlide()" 
+               (mouseleave)="reprendreAutoSlide()">
+        
+        @if (slides.length > 0) {
+<div class="slider-container" (touchstart)="onTouchStart($event)" (touchmove)="onTouchMove($event)" (touchend)="onTouchEnd($event)" (mousedown)="onMouseDown($event)" (mousemove)="onMouseMove($event)" (mouseup)="onMouseUp($event)" (mouseleave)="onMouseUp($event)">
+          <div class="slider-track" [style.transform]="'translateX(-' + (slideActuel * 100) + '%)'">
+            
+            @for (s of slides; track $index; let i = $index) {
+<div class="slide-item">
+              
+              <!-- 1. Animation Poêle & Valeurs (sur le slide Nouvelle Demande / Promo) -->
+              @if (s.isPromo) {
+<div class="slide-pan-animation-wrap">
+                <div class="pan-smoke-container">
+                  <!-- Arrière de la poêle (z-index: 1) -->
+                  <div class="mini-pan-back">
+                    <svg width="240" height="120" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+                      <!-- Manche -->
+                      <rect x="280" y="65" width="110" height="22" rx="10" fill="#2a2a2a" transform="rotate(-15 280 65)"/>
+                      <rect x="290" y="70" width="80" height="8" rx="4" fill="#111" transform="rotate(-15 280 65)"/>
+                      <circle cx="375" cy="50" r="4" fill="#555" />
+                      <!-- Contour Supérieur (Rim) -->
+                      <ellipse cx="170" cy="80" rx="120" ry="28" fill="#3a3a3a"/>
+                      <!-- Fond intérieur -->
+                      <ellipse cx="170" cy="85" rx="105" ry="20" fill="#151515"/>
+                      <!-- Reflet intérieur -->
+                      <path d="M 80 85 C 80 95, 260 95, 260 85" fill="none" stroke="#2a2a2a" stroke-width="4"/>
+                    </svg>
+                  </div>
+
+                  <!-- Valeurs en fumée animée (z-index: 2) -->
+                  <div class="mini-smoke-values">
+                    @for (val of valeursFumee; track $index; let vIdx = $index) {
+<div class="mini-smoke-pill" [style.animation-delay]="(vIdx * 2.2) + 's'">
+                      <i class="fas fa-star text-red"></i>
+                      <span>{{ val }}</span>
+                    </div>
+}
+                  </div>
+
+                  <!-- Avant de la poêle (z-index: 3) -->
+                  <div class="mini-pan-front">
+                    <svg width="240" height="120" viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+                      <!-- Corps de la poêle (moitié avant) -->
+                      <path d="M 50 80 C 50 170, 290 170, 290 80 Z" fill="#222"/>
+                      <!-- Courbe du bord avant -->
+                      <path d="M 50 80 A 120 28 0 0 0 290 80" fill="none" stroke="#3a3a3a" stroke-width="2"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+}
+
+              <!-- 2. Photo du Plat (sur les slides de plats) -->
+              @if (!s.isPromo) {
+<div class="slide-visual-bg" [style.background-image]="'url(' + s.imageUrl + ')'"></div>
+}
+              
+              <!-- Dégradé qui protège la lisibilité du texte à gauche -->
+              <div class="slide-gradient-overlay"></div>
+
+              <!-- Badge Prix placé DIRECTEMENT sur l'image du plat en haut à droite -->
+              @if (s.prix) {
+<div class="slide-price-tag">
+                <span class="price-val">{{ s.prix | number:'1.0-0' }} FCFA</span>
+              </div>
+}
+
+              <!-- Contenu à gauche : Badge, Titre, Description, 1 SEUL Bouton -->
+              <div class="slide-content-left">
+                <div class="slide-badge-row">
+                  <span class="slide-pill">
+                    <i class="fas" [ngClass]="s.isPromo ? 'fa-sparkles text-warning' : 'fa-clock text-warning'"></i>
+                    {{ s.badge }}
+                  </span>
+                </div>
+
+                <h2 class="slide-title font-serif-luxury">{{ s.titre }}</h2>
+                <p class="slide-desc">{{ s.description }}</p>
+
+                <div class="slide-actions-row">
+                  <!-- Un seul bouton principal : Nouvelle demande (sur slide promo) -->
+                  @if (s.isPromo) {
+<a routerLink="/mykiki/nouvelle-demande" class="btn-slide-cta primary">
+                    <i class="fas fa-plus"></i>
+                    <span>Nouvelle demande</span>
+                  </a>
+}
+
+                  <!-- Un seul bouton principal : Voir ce plat (sur slide plat) -->
+                  @if (s.produit) {
+<button class="btn-slide-cta primary" (click)="ouvrirProduit(s.produit)">
+                    <i class="fas fa-eye"></i>
+                    <span>Voir ce plat</span>
+                  </button>
+}
+                </div>
+              </div>
+
+            </div>
+}
+
+          </div>
+
+          <!-- Puces / Indicateurs de pagination (Uniforme desktop & mobile : Actif = Tiret, Inactifs = Points) -->
+          @if (slides.length > 1) {
+<div class="slider-dots">
+            @for (dot of slides; track $index; let idx = $index) {
+<span class="dot-indicator" [class.active]="slideActuel === idx" (click)="allerAuSlide(idx)" [attr.aria-label]="'Aller au slide ' + (idx + 1)">
+            </span>
+}
+          </div>
+}
+        </div>
+}
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 2. BARRE DE RECHERCHE DANS LE CATALOGUE    -->
+      <!-- ========================================== -->
+      <div class="search-bar-wrapper">
+        <div class="search-bar-inner">
+          <i class="fas fa-search search-icon"></i>
+          <input 
+            type="text" 
+            [(ngModel)]="searchQuery" 
+            (input)="onSearch()" 
+            placeholder="Rechercher un plat, cocktail, formule ou ingrédient..." 
+            class="search-input"
+          />
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- 3. CATÉGORIES DU CATALOGUE                 -->
+      <!-- ========================================== -->
+      @if (categories.length > 0) {
+<section class="categories-section">
+        <div class="section-head-row">
+          <h3 class="section-title font-serif-luxury">Catégories &amp; Spécialités</h3>
+        </div>
+
+        <div class="categories-scroll-row">
+          @for (cat of categories; track $index) {
+<div class="category-card" [class.active]="selectedCategory === cat.id" (click)="selectCategory(cat.id)">
+            <div class="cat-icon-box">
+              <i class="fas" [ngClass]="cat.icon"></i>
+            </div>
+            <span class="cat-name">{{ cat.name }}</span>
+          </div>
+}
+        </div>
+      </section>
+}
+
+      <!-- ========================================== -->
+      <!-- 4. MINI-CATALOGUE : NOS PLATS INCONTOURNABLES -->
+      <!-- ========================================== -->
+      <section class="recommendations-section">
+        <div class="section-head-row">
+          <h3 class="section-title font-serif-luxury">Nos plats incontournables</h3>
+        </div>
+
+        <!-- Grille des cartes de mets identiques au catalogue (sans badges "phare" côté client) -->
+        @if (produitsAffiches.length > 0) {
+<div class="dishes-grid">
+          @for (p of produitsAffiches; track $index; let i = $index) {
+<div class="dish-card" [style.animation-delay]="((i % 8) * 0.05) + 's'" (click)="ouvrirProduit(p)">
+            <div class="dish-image-wrap">
+              @if (p.imageUrl) {
+<img [src]="p.imageUrl" [alt]="p.nom" class="dish-img" loading="lazy" onerror="this.src='assets/images/table-with-delicious-sweets-covered-with-pink-silk.jpg'"/>
+}
+              @if (!p.imageUrl) {
+<div class="dish-img-placeholder">
+                <i class="fas fa-utensils"></i>
+              </div>
+}
+              @if (p.categorieNom) {
+<div class="dish-badge-overlay">
+                <span class="dish-tag">{{ p.categorieNom }}</span>
+              </div>
+}
+              <button class="dish-fav-btn" [class.in-cart]="getQuantitePanier(p.id) > 0" (click)="$event.stopPropagation(); ajouterAuPanier(p)" title="Ajouter au panier">
+                <i class="fas fa-cart-plus"></i>
+                @if (getQuantitePanier(p.id) > 0) {
+<span class="card-cart-badge">{{ getQuantitePanier(p.id) }}</span>
+}
+              </button>
+            </div>
+
+            <div class="dish-body">
+              <div class="dish-header-row">
+                <h4 class="dish-title font-serif-luxury">{{ p.nom }}</h4>
+              </div>
+
+              <p class="dish-desc">{{ p.description || 'Création traiteur raffinée préparée avec passion.' }}</p>
+
+              <div class="dish-footer-row">
+                <div class="dish-price-box">
+                  <span class="price-amount">{{ p.prix | number:'1.0-0' }} FCFA</span>
+                  @if (p.quantiteMinimale && p.quantiteMinimale > 1) {
+<span class="badge" style="background: #FAF5EA; color: #721513; font-size: 0.65rem; font-weight: 700; padding: 0.15rem 0.45rem; border-radius: 4px; margin-left: 0.35rem;">
+                    Min. {{ p.quantiteMinimale }}
+                  </span>
+}
+                </div>
+
+                <button class="btn-dish-action" [class.has-items]="getQuantitePanier(p.id) > 0" (click)="$event.stopPropagation(); ajouterAuPanier(p)" title="Ajouter au panier">
+                  @if (getQuantitePanier(p.id) > 0) {
+<span class="btn-dish-qty">{{ getQuantitePanier(p.id) }}</span>
+}
+                  <i class="fas" [ngClass]="getQuantitePanier(p.id) > 0 ? 'fa-cart-shopping' : 'fa-plus'"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+}
+        </div>
+}
+
+        @if (produitsAffiches.length === 0) {
+<div class="empty-phare-state">
+          <i class="fas fa-utensils mb-2"></i>
+          <p>Aucun plat ne correspond à vos critères actuels.</p>
+          <button class="btn-reset-filters" (click)="resetFilters()">Voir tous les plats</button>
+        </div>
+}
+
+        <!-- Bouton Voir Plus vers le Catalogue -->
+        <div class="voir-plus-catalogue-row">
+          <a [routerLink]="['/mykiki/catalogue']" [queryParams]="getVoirPlusQueryParams()" class="btn-voir-plus-catalogue">
+            <span>Voir plus{{ selectedCategory !== 'all' ? ' (' + getSelectedCategoryName() + ')' : '' }}</span>
+            <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- 5. DERNIÈRES COMMANDES & DEMANDES DU CLIENT                    -->
+      <!-- ============================================================== -->
+      @if (dernieresCommandes.length > 0 || dernieresDemandes.length > 0) {
+<section class="recent-activities-section">
+        <div class="section-head-row">
+          <h3 class="section-title font-serif-luxury">Mes Activités Récentes</h3>
+        </div>
+
+        <div class="recent-activities-grid">
+          <!-- 1. Colonne : Dernières Commandes (jusqu'à 2) -->
+          @if (dernieresCommandes.length > 0) {
+<div class="activity-column-card">
+            <div class="activity-col-header">
+              <div class="activity-col-title-wrap">
+                <div class="activity-icon-badge bg-bordeaux">
+                  <i class="fas fa-bag-shopping"></i>
+                </div>
+                <div>
+                  <h4 class="activity-col-title">Dernières Commandes</h4>
+                  <span class="activity-col-subtitle">Mets et formules du catalogue</span>
+                </div>
+              </div>
+              <a [routerLink]="['/mykiki/commandes']" [queryParams]="{tab: 'commandes'}" class="activity-col-more">
+                Voir toutes <i class="fas fa-chevron-right ms-1"></i>
+              </a>
+            </div>
+
+            <div class="activity-items-list">
+              @for (c of dernieresCommandes; track $index) {
+<div class="recent-activity-card" [routerLink]="['/mykiki/commandes']" [queryParams]="{tab: 'commandes', id: c.id}">
+                <div class="activity-card-header">
+                  <span class="activity-ref font-serif-luxury">N° {{ c.numero || c.id }}</span>
+                  <span class="activity-status-chip" [ngClass]="getBadgeClassCommande(c.statut)">
+                    <i class="fas" [ngClass]="getIconeCommande(c.statut)"></i>
+                    {{ c.statutLibelle || c.statut }}
+                  </span>
+                </div>
+
+                <div class="activity-card-body">
+                  <div class="activity-desc-line">
+                    @if (c.lignes && c.lignes.length > 0) {
+<span>
+                      {{ c.lignes[0].quantite }}x {{ c.lignes[0].produitNom }}
+                      @if (c.lignes.length > 1) {
+<small class="text-muted ms-1">(+{{ c.lignes.length - 1 }} autre{{ c.lignes.length > 2 ? 's' : '' }})</small>
+}
+                    </span>
+}
+                    @if (!c.lignes || c.lignes.length === 0) {
+<span class="text-muted">Commande de mets Kiki Traiteur</span>
+}
+                  </div>
+                  <div class="activity-date-line">
+                    <i class="far fa-calendar-alt me-1"></i>
+                    <span>Retrait/Livraison : {{ c.dateRemise | date:'dd/MM/yyyy HH:mm' }}</span>
+                  </div>
+                </div>
+
+                <div class="activity-card-footer">
+                  <span class="activity-amount">{{ c.montantTotal | number:'1.0-0' }} FCFA</span>
+                  <span class="activity-action-link">
+                    <span>Consulter</span>
+                    <i class="fas fa-chevron-right ms-1"></i>
+                  </span>
+                </div>
+              </div>
+}
+            </div>
+          </div>
+}
+
+          <!-- 2. Colonne : Dernières Demandes de Devis (jusqu'à 2) -->
+          @if (dernieresDemandes.length > 0) {
+<div class="activity-column-card">
+            <div class="activity-col-header">
+              <div class="activity-col-title-wrap">
+                <div class="activity-icon-badge bg-gold">
+                  <i class="fas fa-clipboard-list"></i>
+                </div>
+                <div>
+                  <h4 class="activity-col-title">Dernières Demandes de Devis</h4>
+                  <span class="activity-col-subtitle">Événements &amp; réceptions</span>
+                </div>
+              </div>
+              <a [routerLink]="['/mykiki/commandes']" [queryParams]="{tab: 'demandes'}" class="activity-col-more">
+                Voir toutes <i class="fas fa-chevron-right ms-1"></i>
+              </a>
+            </div>
+
+            <div class="activity-items-list">
+              @for (d of dernieresDemandes; track $index) {
+<div class="recent-activity-card" [routerLink]="['/mykiki/commandes']" [queryParams]="{tab: 'demandes', id: d.id}">
+                <div class="activity-card-header">
+                  <span class="activity-ref font-serif-luxury">{{ d.prestationTitle || 'Demande #' + d.id }}</span>
+                  <span class="activity-status-chip" [ngClass]="getBadgeClassDemande(d)">
+                    <i class="fas" [ngClass]="getIconeDemande(d)"></i>
+                    {{ getLibelleStatutDemande(d) }}
+                  </span>
+                </div>
+
+                <div class="activity-card-body">
+                  <div class="activity-desc-line">
+                    @if (d.evenementNature) {
+<span>{{ d.evenementNature }} • </span>
+}
+                    <span><i class="fas fa-users me-1 text-muted"></i>{{ d.guests }} convives</span>
+                  </div>
+                  <div class="activity-date-line">
+                    <i class="far fa-calendar-alt me-1"></i>
+                    <span>Prévu le : {{ d.date | date:'dd/MM/yyyy' }} à {{ d.time }}</span>
+                  </div>
+                </div>
+
+                <div class="activity-card-footer">
+                  @if (d.propositions && d.propositions.length > 0) {
+<span class="activity-prop-count">
+                    <i class="fas fa-sparkles text-warning me-1"></i> {{ d.propositions.length }} proposition(s)
+                  </span>
+}
+                  @if (!d.propositions || d.propositions.length === 0) {
+<span class="activity-prop-count text-muted">
+                    <i class="fas fa-clock me-1"></i> En cours d'étude
+                  </span>
+}
+                  <span class="activity-action-link">
+                    <span>Consulter</span>
+                    <i class="fas fa-chevron-right ms-1"></i>
+                  </span>
+                </div>
+              </div>
+}
+            </div>
+          </div>
+}
+        </div>
+      </section>
+}
+
+    </div>
+
+    <!-- Modal Détails du Mets (Centré par rapport à l'écran) -->
+    @if (produitSelectionne; as prodSel) {
+<div class="modal-overlay" (click)="fermerDetails()">
+      <div class="modal-card produit-details-card" (click)="$event.stopPropagation()">
+        <button class="modal-close-btn" (click)="fermerDetails()">&times;</button>
+        
+        @if (prodSel.imageUrl) {
+<div class="details-visuel">
+          <img [src]="prodSel.imageUrl" [alt]="prodSel.nom">
+        </div>
+}
+        @if (!prodSel.imageUrl) {
+<div class="details-visuel details-visuel-vide">
+          <i class="fas fa-utensils"></i>
+        </div>
+}
+
+        <div class="details-corps">
+          <div class="details-header">
+            @if (prodSel.categorieNom) {
+<span class="details-categorie">{{ prodSel.categorieNom }}</span>
+}
+            <span class="details-delai">
+              <i class="fas fa-clock"></i> Commande avant 48h
+            </span>
+          </div>
+
+          <h3 class="details-titre font-serif-luxury">{{ prodSel.nom }}</h3>
+          <p class="details-description">{{ prodSel.description || 'Spécialité traiteur d\'exception préparée sur commande.' }}</p>
+
+          @if (prodSel.quantiteMinimale && prodSel.quantiteMinimale > 1) {
+<div class="details-min-qty" style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.76rem; font-weight: 700; color: #721513; background: #FAF5EA; padding: 0.35rem 0.7rem; border-radius: 8px;">
+            <i class="fas fa-layer-group"></i>
+            <span>Quantité minimale de commande : {{ prodSel.quantiteMinimale }} portions / pièces</span>
+          </div>
+}
+
+          @if (prodSel.exigences) {
+<div class="details-exigences">
+            <i class="fas fa-info-circle"></i>
+            <span>{{ prodSel.exigences }}</span>
+          </div>
+}
+
+          <div class="details-pied">
+            <div class="details-quantite">
+              <button type="button" class="btn-qty" (click)="diminuerQuantite()" [disabled]="quantiteSelectionnee <= (prodSel.quantiteMinimale || 1)">-</button>
+              <span class="valeur-qty">{{ quantiteSelectionnee }}</span>
+              <button type="button" class="btn-qty" (click)="augmenterQuantite()">+</button>
+            </div>
+
+            <div class="details-action">
+              <button class="btn-ajouter-details" (click)="ajouterSelectionAuPanier()">
+                <i class="fas fa-cart-plus"></i>
+                <span>Ajouter • {{ (prodSel.prix * quantiteSelectionnee) | number:'1.0-0' }} FCFA</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+}

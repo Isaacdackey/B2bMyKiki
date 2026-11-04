@@ -1,0 +1,100 @@
+<div class="mykiki-devis-container animate-fade">
+      
+      <!-- Top Title & Stats Banner -->
+      <div class="devis-header-card">
+        <div class="devis-header-texts">
+          <span class="devis-kicker"><i class="fas fa-file-invoice-dollar me-1 text-danger"></i> Comptabilité &amp; Devis</span>
+          <h1 class="devis-page-title font-serif-luxury">Vos Devis &amp; Factures Confirmés</h1>
+          <p class="devis-page-desc">Consultez l'historique de vos prestations abouties et téléchargez vos récapitulatifs.</p>
+        </div>
+
+        <div class="devis-counter-badge">
+          <span class="counter-num">{{ devisList.length }}</span>
+          <span class="counter-txt">Devis Abouti(s)</span>
+        </div>
+      </div>
+
+      <!-- Loader -->
+      @if (isLoading) {
+<div class="text-center my-5">
+        <div class="spinner-border text-danger" role="status">
+          <span class="visually-hidden">Chargement de vos devis...</span>
+        </div>
+        <p class="text-muted mt-2" style="font-size: 0.85rem;">Récupération de vos documents comptables...</p>
+      </div>
+}
+
+      <!-- Empty State -->
+      @if (!isLoading && devisList.length === 0) {
+<div class="empty-devis-card">
+        <div class="empty-devis-icon">
+          <i class="fas fa-file-invoice"></i>
+        </div>
+        <h3 class="font-serif-luxury">Aucun devis finalisé pour le moment</h3>
+        <p>Vos devis validés et confirmés par notre équipe apparaîtront automatiquement ici dès qu'une proposition sera conclue.</p>
+        <a routerLink="/mykiki/nouvelle-demande" class="btn-new-devis">
+          <i class="fas fa-plus me-1"></i> Créer une demande de devis
+        </a>
+      </div>
+}
+
+      <!-- Devis List -->
+      @if (!isLoading && devisList.length > 0) {
+<div class="devis-list-grid">
+        @for (devis of devisList; track $index) {
+<div class="devis-item-card">
+          
+          <div class="devis-card-top">
+            <div class="devis-type-info">
+              <div class="devis-icon-circle">
+                <i class="fas fa-receipt"></i>
+              </div>
+              <div>
+                <h3 class="devis-title font-serif-luxury">Dossier {{ devis.prestationTitle || devis.prestationId }}</h3>
+                <span class="devis-date">
+                  <i class="far fa-calendar-check me-1"></i>Validé le {{ devis.dateSubmitted | date:'dd/MM/yyyy' }}
+                </span>
+              </div>
+            </div>
+
+            <div class="devis-badge-paye">
+              <i class="fas fa-check-double"></i> Abouti &amp; Confirmé
+            </div>
+          </div>
+
+          <div class="devis-details-box">
+            <div class="detail-col">
+              <span class="col-label">Date de l'événement</span>
+              <strong class="col-val">{{ (devis.date | date:'dd/MM/yyyy') || 'À convenir' }} @if (devis.time) {
+<span>à {{ devis.time }}</span>
+}</strong>
+            </div>
+
+            <div class="detail-col">
+              <span class="col-label">Convives</span>
+              <strong class="col-val">{{ devis.guests || 'Non spécifié' }} personnes</strong>
+            </div>
+
+            <div class="detail-col">
+              <span class="col-label">Référence Dossier</span>
+              <strong class="col-val text-bordeaux">#KT-{{ devis.id }}</strong>
+            </div>
+          </div>
+
+          <div class="devis-card-footer">
+            <button class="btn-pdf-download" (click)="downloadPdf(devis)">
+              <i class="fas fa-file-pdf text-danger"></i>
+              <span>Télécharger le récapitulatif</span>
+            </button>
+            
+            <a routerLink="/mykiki/demandes" class="btn-view-dossier">
+              <i class="fas fa-eye me-1"></i> Voir le dossier
+            </a>
+          </div>
+
+        </div>
+}
+      </div>
+}
+
+    </div>

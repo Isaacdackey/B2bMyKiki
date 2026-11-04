@@ -1,0 +1,352 @@
+        <section class="dashboard-section active">
+          <!-- Google Calendar Sync Bar & Status -->
+          <div class="panel" style="margin-bottom: 1.25rem; background: linear-gradient(135deg, #1E293B, #0F172A); color: white; border: none; box-shadow: 0 4px 14px rgba(15, 23, 42, 0.2);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+              <div style="display: flex; align-items: center; gap: 0.9rem;">
+                <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: center; color: #38BDF8; font-size: 1.2rem;">
+                  <i class="fab fa-google"></i>
+                </div>
+                <div>
+                  <h4 style="color: white; font-size: 0.92rem; font-weight: 700; margin: 0 0 0.2rem 0;">Synchronisation Google Calendar</h4>
+                  <p style="color: #94A3B8; font-size: 0.78rem; margin: 0;">
+                    <i class="fas fa-circle text-success me-1" style="font-size: 0.55rem;"></i> {{ syncStatus }}
+                  </p>
+                </div>
+              </div>
+              <button class="btn btn-sm" (click)="triggerGoogleSync()" [disabled]="synchroEnCours"
+                      style="background: #38BDF8; color: #0F172A; font-weight: 700; border: none; padding: 0.5rem 1.1rem; border-radius: 8px; display: inline-flex; align-items: center; gap: 0.45rem; cursor: pointer; transition: all 0.2s;">
+                <i class="fas" [ngClass]="synchroEnCours ? 'fa-spinner fa-spin' : 'fa-rotate'"></i>
+                <span>{{ synchroEnCours ? 'Synchronisation...' : 'Synchroniser maintenant' }}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- BARRE SUPÉRIEURE DES FILTRES & NAVIGATION MOIS -->
+          <div class="panel" style="margin-bottom: 1.25rem;">
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
+              <div style="display: flex; flex-wrap: wrap; gap: 0.65rem; align-items: center; width: 100%;">
+                <select class="form-control" [(ngModel)]="calendarPrestationFilter" style="flex: 1 1 180px; min-width: 140px; font-size: 0.78rem;">
+                  <option value="ALL">Toutes les prestations</option>
+                  <option value="salle-diva">Salle La Diva</option>
+                  <option value="traiteur">Service Traiteur Prestige</option>
+                  <option value="evenements">Organisation d'Événements</option>
+                  <option value="decoration">Design & Décoration</option>
+                  <option value="location">Location de Matériel</option>
+                  <option value="foodtruck">Food Truck Gourmet</option>
+                </select>
+
+                <input type="text" class="form-control" [(ngModel)]="calendarClientFilter" placeholder="Rechercher un client..." style="flex: 1 1 180px; min-width: 140px; font-size: 0.78rem;">
+
+                <select class="form-control" [(ngModel)]="calendarResourceFilter" style="flex: 1 1 180px; min-width: 140px; font-size: 0.78rem;">
+                  <option value="ALL">Toutes les ressources</option>
+                  <option value="Salle La Diva">Salle La Diva</option>
+                  <option value="Cuisine & Brigade">Cuisine & Brigade</option>
+                  <option value="Scénographie">Scénographie</option>
+                  <option value="Matériel & Logistique">Matériel & Logistique</option>
+                </select>
+
+                <input type="text" class="form-control" [(ngModel)]="calendarStaffFilter" placeholder="Rechercher un responsable..." style="flex: 1 1 180px; min-width: 140px; font-size: 0.78rem;">
+              </div>
+
+              <!-- MONTH PILL NAVIGATION (Image 5) -->
+              <div style="display: flex; align-items: center; background: white; border: 1px solid #E2E8F0; border-radius: 50px; padding: 0.35rem 0.85rem; box-shadow: 0 2px 6px rgba(0,0,0,0.03); margin-left: auto;">
+                <button type="button" (click)="prevCalendarMonth()" style="background: transparent; border: none; color: #7A1C1C; cursor: pointer; font-size: 0.95rem; padding: 0 0.5rem;"><i class="fas fa-chevron-left"></i></button>
+                <span style="color: #7A1C1C; font-weight: 700; font-size: 1.05rem; margin: 0 0.75rem;">{{ getCalendarHeaderLabel() }}</span>
+                <button type="button" (click)="nextCalendarMonth()" style="background: transparent; border: none; color: #7A1C1C; cursor: pointer; font-size: 0.95rem; padding: 0 0.5rem;"><i class="fas fa-chevron-right"></i></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <!-- VIEW SWITCHER (Mois / Semaine / Jour / Événements) -->
+            <div style="display: flex; gap: 0.4rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
+              <button type="button" class="btn btn-sm" [style.background]="calendarView === 'Mois' ? '#DC2626' : 'white'" [style.color]="calendarView === 'Mois' ? 'white' : '#1E293B'" [style.border]="calendarView === 'Mois' ? 'none' : '1px solid #E2E8F0'" style="border-radius: 20px; padding: 0.35rem 1rem; font-weight: 600;" (click)="calendarView = 'Mois'">Mois</button>
+              <button type="button" class="btn btn-sm" [style.background]="calendarView === 'Semaine' ? '#DC2626' : 'white'" [style.color]="calendarView === 'Semaine' ? 'white' : '#1E293B'" [style.border]="calendarView === 'Semaine' ? 'none' : '1px solid #E2E8F0'" style="border-radius: 20px; padding: 0.35rem 1rem; font-weight: 600;" (click)="calendarView = 'Semaine'">Semaine</button>
+              <button type="button" class="btn btn-sm" [style.background]="calendarView === 'Jour' ? '#DC2626' : 'white'" [style.color]="calendarView === 'Jour' ? 'white' : '#1E293B'" [style.border]="calendarView === 'Jour' ? 'none' : '1px solid #E2E8F0'" style="border-radius: 20px; padding: 0.35rem 1rem; font-weight: 600;" (click)="calendarView = 'Jour'">Jour</button>
+              <button type="button" class="btn btn-sm" [style.background]="calendarView === 'Événements' ? '#DC2626' : 'white'" [style.color]="calendarView === 'Événements' ? 'white' : '#1E293B'" [style.border]="calendarView === 'Événements' ? 'none' : '1px solid #E2E8F0'" style="border-radius: 20px; padding: 0.35rem 1rem; font-weight: 600;" (click)="calendarView = 'Événements'">Événements</button>
+            </div>
+
+            <!-- GRILLE CALENDRIER - VUE MOIS (Image 5) -->
+            @if (calendarView === 'Mois') {
+              <div class="table-responsive">
+                <div style="border: 1px solid #E2E8F0; border-radius: 8px; overflow: hidden; background: white; min-width: 650px;">
+                  <!-- EN-TÊTE JOURS DE LA SEMAINE -->
+                  <div style="display: grid; grid-template-columns: repeat(7, 1fr); background: #F8FAFC; border-bottom: 1px solid #E2E8F0; text-align: center; font-weight: 600; color: #475569; font-size: 0.8rem; padding: 0.65rem 0;">
+                    <div>Lun</div><div>Mar</div><div>Mer</div><div>Jeu</div><div>Ven</div><div>Sam</div><div>Dim</div>
+                  </div>
+                  <!-- GRILLE DES JOURS DU MOIS -->
+                  <div style="display: grid; grid-template-columns: repeat(7, 1fr); background: #E2E8F0; gap: 1px;">
+                    @for (day of getCalendarGridDays(); track $index) {
+                      <div [style.background]="day.isCurrentMonth ? 'white' : '#F8FAFC'" [style.color]="day.isCurrentMonth ? '#1E293B' : '#94A3B8'" style="min-height: 115px; padding: 0.5rem; display: flex; flex-direction: column;">
+                        <span style="font-size: 0.82rem; font-weight: 600; margin-bottom: 0.35rem;">{{ day.dayNumber }}</span>
+                        <!-- EVENTS -->
+                        <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                          @for (ev of day.events; track $index) {
+                            <div (click)="openEventDetailsModal(ev); $event.stopPropagation()" [style.background]="getEventBlockBg(ev)" [style.color]="getEventBlockColor(ev)" style="border-radius: 4px; padding: 0.3rem 0.5rem; font-size: 0.72rem; font-weight: 600; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; box-shadow: 0 1px 2px rgba(0,0,0,0.08);">
+                              <span>{{ ev.title }}</span> <span style="font-weight: 400; opacity: 0.95;">{{ ev.time }} - {{ getEndTime(ev.time) }}</span>
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+
+            <!-- GRILLE CALENDRIER - VUE SEMAINE (Image 2) -->
+            @if (calendarView === 'Semaine') {
+              <div class="table-responsive">
+                <div style="border: 1px solid #E2E8F0; border-radius: 8px; overflow: hidden; background: white; min-width: 650px;">
+                  <!-- EN-TÊTE JOURS DE LA SEMAINE -->
+                  <div style="display: grid; grid-template-columns: repeat(7, 1fr); background: #F8FAFC; border-bottom: 1px solid #E2E8F0; text-align: center; font-weight: 600; color: #475569; font-size: 0.8rem; padding: 0.65rem 0;">
+                    <div>Lun</div><div>Mar</div><div>Mer</div><div>Jeu</div><div>Ven</div><div>Sam</div><div>Dim</div>
+                  </div>
+                  <div style="display: grid; grid-template-columns: repeat(7, 1fr); background: #E2E8F0; gap: 1px;">
+                    @for (day of getCalendarWeekDays(); track $index) {
+                      <div style="min-height: 300px; background: white; padding: 0.75rem 0.5rem; display: flex; flex-direction: column;">
+                        <span style="font-size: 1rem; font-weight: 800; color: #1E293B; margin-bottom: 0.75rem;">{{ day.dayNumber }}</span>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                          @for (ev of day.events; track $index) {
+                            <div (click)="openEventDetailsModal(ev); $event.stopPropagation()" [style.background]="getEventBlockBg(ev)" [style.color]="getEventBlockColor(ev)" style="border-radius: 6px; padding: 0.5rem 0.6rem; font-size: 0.75rem; font-weight: 600; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+                              <div style="font-weight: 700; margin-bottom: 0.2rem;">{{ ev.title }}</div>
+                              <div style="font-size: 0.7rem; opacity: 0.9;">{{ ev.time }} - {{ getEndTime(ev.time) }}</div>
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+
+            <!-- GRILLE CALENDRIER - VUE JOUR (Image 3) -->
+            @if (calendarView === 'Jour') {
+<div style="border: 1px solid #E2E8F0; border-radius: 8px; overflow: hidden; background: white; min-height: 250px;">
+              <div style="background: #F8FAFC; border-bottom: 1px solid #E2E8F0; text-align: center; font-weight: 600; color: #475569; font-size: 0.85rem; padding: 0.65rem 0;">
+                Jour
+              </div>
+              <div style="padding: 1.25rem 1.5rem;">
+                <div style="font-size: 2rem; font-weight: 800; color: #DC2626; margin-bottom: 1.25rem; line-height: 1;">
+                  {{ getCalendarDayView().dayNumber }}
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                  @for (ev of getCalendarDayView().events; track $index) {
+<div (click)="openEventDetailsModal(ev); $event.stopPropagation()" [style.background]="getEventBlockBg(ev)" [style.color]="getEventBlockColor(ev)" style="border-radius: 8px; padding: 0.85rem 1.25rem; font-size: 0.88rem; font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.06);">
+                    <span>{{ ev.title }}</span>
+                    <span style="font-weight: 600; font-size: 0.85rem;">{{ ev.time }} - {{ getEndTime(ev.time) }}</span>
+                  </div>
+}
+                  @if (getCalendarDayView().events.length === 0) {
+<div style="text-align: center; padding: 2.5rem; color: #94A3B8;">
+                    Aucun événement pour cette journée.
+                  </div>
+}
+                </div>
+              </div>
+            </div>
+}
+
+            <!-- VUE EN LISTE (Événements sous forme de card + pagination) -->
+            @if (calendarView === 'Événements') {
+<div>
+              @if (getEventsForPage().length === 0) {
+<div style="text-align: center; padding: 3rem; color: #94A3B8; background: white; border: 1px solid #E2E8F0; border-radius: 12px;">
+                <i class="fas fa-calendar-times" style="font-size: 2.5rem; margin-bottom: 0.75rem; opacity: 0.6;"></i>
+                <p style="margin: 0; font-weight: 600;">Aucun événement programmé avec ces critères.</p>
+              </div>
+}
+
+              <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+                @for (ev of getEventsForPage(); track $index) {
+<div (click)="openEventDetailsModal(ev)" style="background: white; border: 1px solid #E2E8F0; border-radius: 14px; padding: 1.15rem 1.5rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.03); cursor: pointer; transition: all 0.2s ease; flex-wrap: wrap; gap: 1rem;">
+                  
+                  <div style="display: flex; align-items: center; gap: 1.5rem; flex: 1; min-width: 280px;">
+                    <!-- Date Block (Photo 4 style: JUIL. / 19 in Bordeaux) -->
+                    <div style="text-align: center; min-width: 50px;">
+                      <div style="font-size: 0.72rem; font-weight: 800; color: #7A1C1C; text-transform: uppercase; letter-spacing: 0.5px;">{{ getEventCardMonth(ev.date) }}</div>
+                      <div style="font-size: 1.75rem; font-weight: 800; color: #7A1C1C; line-height: 1.1;">{{ getEventCardDay(ev.date) }}</div>
+                    </div>
+
+                    <!-- Details Block -->
+                    <div>
+                      <h4 style="margin: 0 0 0.35rem 0; font-size: 1.05rem; font-weight: 700; color: #1E293B; font-family: 'Playfair Display', serif;">{{ ev.title }}</h4>
+                      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 1.25rem; font-size: 0.8rem; color: #64748B;">
+                        <span style="display: flex; align-items: center;"><i class="fas fa-map-marker-alt me-1" style="color: #DC2626;"></i> {{ ev.location }}</span>
+                        <span style="display: flex; align-items: center;"><i class="far fa-clock me-1" style="color: #DC2626;"></i> {{ ev.time }} - {{ getEndTime(ev.time) }}</span>
+                        @if (ev.staffIds && ev.staffIds.length > 0) {
+<span style="display: flex; align-items: center;"><i class="fas fa-user me-1" style="color: #DC2626;"></i> Resp: {{ getStaffName(ev.staffIds[0]) }}</span>
+}
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Status Badge (Photo 4 style: VALIDÉ in green pill) -->
+                  <div>
+                    <span style="background: #D1FAE5; color: #059669; font-weight: 700; padding: 0.35rem 1rem; border-radius: 50px; font-size: 0.75rem; letter-spacing: 0.5px; text-transform: uppercase;">
+                      VALIDÉ
+                    </span>
+                  </div>
+                </div>
+}
+              </div>
+
+              <!-- PAGINATION ÉVÉNEMENTS -->
+              @if (getEventTotalPages() > 1) {
+<div style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.5rem; align-items: center;">
+              <button type="button" class="btn btn-sm" style="background: white; color: #64748B; border: 1px solid #CBD5E1; border-radius: 8px; font-weight: 600; font-size: 0.85rem; padding: 0 0.75rem; cursor: pointer; transition: all 0.2s; height: 32px;" [disabled]="eventListPage === 1" [style.opacity]="eventListPage === 1 ? '0.5' : '1'" (click)="eventListPage = eventListPage - 1">
+                Précédent
+              </button>
+              @for (p of getEventPageArray(); track $index) {
+<button type="button" class="btn btn-sm" [style.background]="eventListPage === p ? '#7A1C1C' : (p === '...' ? 'transparent' : 'white')" [style.color]="eventListPage === p ? 'white' : '#64748B'" [style.border]="eventListPage === p ? '1px solid #7A1C1C' : (p === '...' ? 'none' : '1px solid #CBD5E1')" style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; padding: 0;" (click)="p !== '...' && (eventListPage = $any(p))" [disabled]="p === '...'" [style.cursor]="p === '...' ? 'default' : 'pointer'">
+                  {{ p }}
+                </button>
+}
+              <button type="button" class="btn btn-sm" style="background: white; color: #64748B; border: 1px solid #CBD5E1; border-radius: 8px; font-weight: 600; font-size: 0.85rem; padding: 0 0.75rem; cursor: pointer; transition: all 0.2s; height: 32px;" [disabled]="eventListPage === getEventTotalPages()" [style.opacity]="eventListPage === getEventTotalPages() ? '0.5' : '1'" (click)="eventListPage = eventListPage + 1">
+                Suivant
+              </button>
+              </div>
+}
+            </div>
+}
+          </div>
+        </section>
+
+
+<!-- MODAL CREATE EVENT -->
+@if (showCreateEventModal) {
+<div class="custom-modal-backdrop">
+  <div class="custom-modal-box" style="max-width: 600px; width: 95%;">
+    <div class="modal-header">
+      <h3 class="modal-title">
+        <i class="fas fa-calendar-plus me-2"></i> Créer un Événement (Agenda ERP)
+      </h3>
+      <button class="modal-close" (click)="closeCreateEventModal()" title="Fermer">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <form (ngSubmit)="submitCreateEvent()">
+        <!-- SÉLECTION DU CLIENT -->
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+          <label style="display: block; font-weight: 700; color: #334155; margin-bottom: 0.5rem; font-size: 0.85rem; text-transform: uppercase;">
+            <i class="fas fa-user" style="color: #7A1C1C; margin-right: 0.5rem;"></i> SÉLECTION DU CLIENT <span style="color: #DC2626;">*</span>
+          </label>
+          <input type="text" [(ngModel)]="clientSearchQuery" name="clientQ" placeholder="Rechercher par nom ou e-mail..." style="width: 100%; padding: 0.75rem; border: 1px solid #CBD5E1; border-radius: 4px; outline: none; margin-bottom: 0.5rem;">
+          
+          @if (clientSearchQuery) {
+<div style="max-height: 150px; overflow-y: auto; background: white; border: 1px solid #E2E8F0; border-radius: 4px;">
+            @for (c of getFilteredClients(); track $index) {
+<div style="padding: 0.75rem; border-bottom: 1px solid #F1F5F9; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-weight: 700; color: #1E293B;">{{ c.name }}</div>
+                <div style="font-size: 0.8rem; color: #64748B;">{{ c.email }} &bull; {{ c.phone || '+221 -- --- -- --' }}</div>
+              </div>
+              <button type="button" (click)="selectClientForEvent(c)" style="background: #E0E7FF; color: #3730A3; border: none; padding: 0.4rem 0.8rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700; cursor: pointer;">SÉLECTIONNER</button>
+            </div>
+}
+          </div>
+}
+
+          @if (selectedClientForEvent) {
+<div style="margin-top: 1rem; background: white; padding: 0.75rem; border-radius: 4px; border: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-weight: 700; color: #1E293B;">{{ selectedClientForEvent.name }}</div>
+              <div style="font-size: 0.8rem; color: #64748B;">{{ selectedClientForEvent.email }}</div>
+            </div>
+            <button type="button" (click)="removeSelectedClient()" style="background: none; border: none; color: #EF4444; font-size: 1.2rem; cursor: pointer;">&times;</button>
+          </div>
+}
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+          <div>
+            <label style="display: block; font-weight: 700; color: #64748B; margin-bottom: 0.5rem; font-size: 0.8rem; text-transform: uppercase;">TITRE DE L'ÉVÉNEMENT</label>
+            <input type="text" [(ngModel)]="eventForm.title" name="title" placeholder="Ex: Mariage VIP - La Diva" required style="width: 100%; padding: 0.75rem; border: 1px solid #CBD5E1; border-radius: 4px; outline: none;">
+          </div>
+          <div>
+            <label style="display: block; font-weight: 700; color: #64748B; margin-bottom: 0.5rem; font-size: 0.8rem; text-transform: uppercase;">TYPE DE PRESTATION</label>
+            <select [(ngModel)]="eventForm.type" name="type" style="width: 100%; padding: 0.75rem; border: 1px solid #CBD5E1; border-radius: 4px; outline: none; background: white;">
+              <option value="salle-diva">Salle La Diva</option>
+              <option value="traiteur">Traiteur</option>
+              <option value="evenements">Événements</option>
+              <option value="foodtruck">Food Truck</option>
+              <option value="takeaway">À Emporter</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+          <div>
+            <label style="display: block; font-weight: 700; color: #64748B; margin-bottom: 0.5rem; font-size: 0.8rem; text-transform: uppercase;">DATE</label>
+            <input type="date" [(ngModel)]="eventForm.date" name="date" required style="width: 100%; padding: 0.75rem; border: 1px solid #CBD5E1; border-radius: 4px; outline: none;">
+          </div>
+          <div>
+            <label style="display: block; font-weight: 700; color: #64748B; margin-bottom: 0.5rem; font-size: 0.8rem; text-transform: uppercase;">HEURE</label>
+            <input type="time" [(ngModel)]="eventForm.time" name="time" required style="width: 100%; padding: 0.75rem; border: 1px solid #CBD5E1; border-radius: 4px; outline: none;">
+          </div>
+          <div>
+            <label style="display: block; font-weight: 700; color: #64748B; margin-bottom: 0.5rem; font-size: 0.8rem; text-transform: uppercase;">CONVIVES</label>
+            <input type="number" [(ngModel)]="eventForm.guests" name="guests" required style="width: 100%; padding: 0.75rem; border: 1px solid #CBD5E1; border-radius: 4px; outline: none;">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; font-weight: 700; color: #64748B; margin-bottom: 0.5rem; font-size: 0.8rem; text-transform: uppercase;">LIEU DE RÉCEPTION</label>
+          <input type="text" [(ngModel)]="eventForm.location" name="location" style="width: 100%; padding: 0.75rem; border: 1px solid #CBD5E1; border-radius: 4px; outline: none;">
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; font-weight: 700; color: #64748B; margin-bottom: 0.5rem; font-size: 0.8rem; text-transform: uppercase;">
+            <i class="fas fa-utensils" style="color: #7A1C1C; margin-right: 0.5rem;"></i> SIGNATURE GASTRONOMIQUE KIKI TRAITEUR <span style="color: #DC2626;">*</span>
+          </label>
+          <input type="text" [(ngModel)]="eventForm.signatureGastronomique" name="signature" style="width: 100%; padding: 0.75rem; border: 1px solid #CBD5E1; border-radius: 4px; outline: none;">
+        </div>
+
+        <!-- ASSIGNATION DU PERSONNEL -->
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+          <label style="display: block; font-weight: 700; color: #334155; margin-bottom: 0.5rem; font-size: 0.85rem; text-transform: uppercase;">
+            <i class="fas fa-users" style="color: #7A1C1C; margin-right: 0.5rem;"></i> ASSIGNATION DU PERSONNEL TRAITEUR (RECHERCHE & SÉLECTION)
+          </label>
+          <input type="text" [(ngModel)]="staffSearchQuery" name="staffQ" placeholder="Rechercher un membre du personnel par nom ou rôle..." style="width: 100%; padding: 0.75rem; border: 1px solid #CBD5E1; border-radius: 4px; outline: none; margin-bottom: 0.5rem;">
+          
+          @if (staffSearchQuery) {
+<div style="max-height: 150px; overflow-y: auto; background: white; border: 1px solid #E2E8F0; border-radius: 4px;">
+            @for (s of getFilteredStaffForSearch(); track $index) {
+<div style="padding: 0.75rem; border-bottom: 1px solid #F1F5F9; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-weight: 700; color: #1E293B;">{{ s.name }}</div>
+                <div style="font-size: 0.8rem; color: #64748B;">{{ s.role }}</div>
+              </div>
+              <button type="button" (click)="addStaffToEvent(s)" style="background: #E0E7FF; color: #3730A3; border: none; padding: 0.4rem 0.8rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700; cursor: pointer;">+ SÉLECTIONNER</button>
+            </div>
+}
+          </div>
+}
+
+          @if (selectedStaffListForEvent.length > 0) {
+<div style="margin-top: 1rem;">
+            @for (s of selectedStaffListForEvent; track $index) {
+<div style="background: white; padding: 0.75rem; border-radius: 4px; border: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <div>
+                <div style="font-weight: 700; color: #1E293B;">{{ s.name }}</div>
+                <div style="font-size: 0.8rem; color: #64748B;">{{ s.role }}</div>
+              </div>
+              <button type="button" (click)="removeStaffFromEvent(s.id)" style="background: none; border: none; color: #EF4444; font-size: 1.2rem; cursor: pointer;">&times;</button>
+            </div>
+}
+          </div>
+}
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeCreateEventModal()">Annuler</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-check me-1"></i> Enregistrer dans le Calendrier
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+}

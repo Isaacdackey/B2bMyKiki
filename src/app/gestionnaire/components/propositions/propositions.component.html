@@ -1,0 +1,485 @@
+<section class="dashboard-section active">
+  <div class="panel">
+
+    <!-- ══════════ VUE 1 : CATALOGUE DES FORMULES & PROPOSITIONS ══════════ -->
+    @if (activeTab === 'catalogue') {
+
+      <div class="panel-header" style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 1rem;">
+        <button class="btn btn-primary" (click)="openAddModal()">
+          <i class="fas fa-plus me-2"></i> Nouvelle proposition
+        </button>
+      </div>
+
+      <!-- Barre de filtres -->
+      <div class="catalogue-barre">
+        <div class="kiki-recherche">
+          <input type="text" [(ngModel)]="searchQuery" (input)="applyFilters()" placeholder="Rechercher une formule...">
+        </div>
+
+        <select [(ngModel)]="tarifFilter" (change)="applyFilters()" class="catalogue-select">
+          <option value="ALL">Tous les tarifs</option>
+          <option value="LESS_5K">≤ 5 000 FCFA / pers.</option>
+          <option value="5K_15K">5 000 – 15 000 FCFA</option>
+          <option value="MORE_15K">> 15 000 FCFA / pers.</option>
+          <option value="SUR_DEVIS">Sur devis uniquement</option>
+        </select>
+
+        @if (searchQuery || tarifFilter !== 'ALL') {
+<button (click)="resetFilters()" class="btn-icone btn-icone--modifier" style="width: auto; padding: 0 0.75rem; gap: 0.35rem;" title="Réinitialiser les filtres">
+          <i class="fas fa-times"></i> Réinitialiser
+        </button>
+}
+      </div>
+
+      @if (loading) {
+<div class="catalogue-etat"><i class="fas fa-spinner fa-spin"></i> Chargement du catalogue...</div>
+}
+
+      @if (!loading && filteredPropositions.length > 0) {
+<div class="table-responsive">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th style="width: 60px;">Réf.</th>
+              <th>Formule / Titre</th>
+              <th>Description</th>
+              <th class="th-centre">Tarif / Convive</th>
+              <th class="th-centre">Sections</th>
+              <th class="th-centre" style="width: 140px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (prop of propositions; track $index) {
+<tr class="ligne-cliquable" (click)="openViewProposition(prop)" title="Voir les détails de la proposition">
+              <td>
+                <span class="badge" style="background: #FAF5EA; color: #721513; font-weight: 800;">#{{ prop.id }}</span>
+              </td>
+              <td>
+                <strong style="display: block; color: #1E293B;">{{ prop.titre }}</strong>
+              </td>
+              <td>
+                @if (prop.description && prop.description.trim() !== '' && prop.description !== '---') {
+<span style="color: #475569; font-size: 0.84rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                  {{ prop.description }}
+                </span>
+}
+                @if (!prop.description || prop.description.trim() === '' || prop.description === '---') {
+<span style="color: #94A3B8; font-style: italic; font-size: 0.82rem;">
+                  Aucune description
+                </span>
+}
+              </td>
+              <td style="text-align: center;">
+                @if (prop.prixUnitairePersonne && prop.prixUnitairePersonne > 0) {
+<span class="badge badge-quoted">
+                  {{ prop.prixUnitairePersonne | number:'1.0-0' }} F / pers.
+                </span>
+}
+                @if (!prop.prixUnitairePersonne || prop.prixUnitairePersonne <= 0) {
+<span class="badge" style="background: #F1F5F9; color: #64748B;">
+                  Sur devis
+                </span>
+}
+              </td>
+              <td style="text-align: center;">
+                <span class="badge" style="background: #EFF6FF; color: #1E40AF; font-weight: 700;">
+                  {{ prop.sections.length || 0 }} section(s)
+                </span>
+              </td>
+              <td>
+                <div class="catalogue-actions">
+                  <button class="btn-icone btn-icone--voir" title="Voir les détails" (click)="openViewProposition(prop); $event.stopPropagation()">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button class="btn-icone btn-icone--modifier" title="Modifier" (click)="openEditModal(prop); $event.stopPropagation()">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn-icone btn-icone--archiver" title="Supprimer" (click)="deleteProposition(prop); $event.stopPropagation()">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+}
+          </tbody>
+        </table>
+
+        <!-- Pagination -->
+        @if (getPropTotalPages() > 1) {
+<div class="catalogue-pagination">
+          <div class="pagination-actions">
+            <button class="btn-page" [disabled]="propPage === 1" (click)="onPropPageChange(propPage - 1)" title="Page précédente">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            @for (p of getPropPaginationArray(); track $index) {
+
+              @if (p !== '...') {
+<button class="btn-page" [class.actif]="+p === propPage" (click)="onPropPageChange(+p)">
+                {{ p }}
+              </button>
+}
+              @if (p === '...') {
+<span style="padding: 0 4px; color: #94A3B8;">...</span>
+}
+            
+}
+            <button class="btn-page" [disabled]="propPage === getPropTotalPages()" (click)="onPropPageChange(propPage + 1)" title="Page suivante">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+}
+      </div>
+}
+
+      @if (!loading && filteredPropositions.length === 0) {
+<div class="catalogue-etat catalogue-vide">
+        <i class="fas fa-utensils"></i>
+        <h3>Aucune formule trouvée</h3>
+        @if (searchQuery || tarifFilter !== 'ALL') {
+<p>Aucune formule ne correspond à vos critères de recherche.</p>
+}
+        @if (!searchQuery && tarifFilter === 'ALL') {
+<p>Créez votre première formule pour enrichir votre catalogue.</p>
+}
+        <button class="btn btn-primary" style="margin-top: 1rem;" (click)="searchQuery || tarifFilter !== 'ALL' ? resetFilters() : openAddModal()">
+          {{ searchQuery || tarifFilter !== 'ALL' ? 'Voir toutes les formules' : 'Créer une formule' }}
+        </button>
+      </div>
+}
+    
+}
+
+    <!-- ══════════ VUE 2 : PROPOSITIONS ENVOYÉES & TRANSMISES À L'ERP ══════════ -->
+    @if (activeTab === 'envoyees') {
+
+      @if (envoyees.length > 0) {
+<div class="table-responsive">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th style="width: 90px;">Demande N°</th>
+              <th>Formule / Proposition</th>
+              <th>Date envoi ERP</th>
+              <th class="th-centre">Statut</th>
+              <th class="th-centre" style="width: 110px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (env of envoyees; track $index) {
+<tr class="ligne-cliquable" (click)="openViewModal(env)" title="Voir les détails de l'envoi ERP">
+              <td>
+                <span class="badge" style="background: #FAF5EA; color: #721513; font-weight: 800;">#{{ env.demandeId }}</span>
+              </td>
+              <td>
+                <strong style="display: block; color: #1E293B;">{{ env.titre }}</strong>
+                <span style="color: #64748B; font-size: 0.8rem;">
+                  {{ (env.prixUnitairePersonne && env.prixUnitairePersonne > 0 ? (env.prixUnitairePersonne | number:'1.0-0') + ' FCFA / pers.' : 'Sur devis') }}
+                </span>
+              </td>
+              <td>{{ (env.gestionnaireValidatedAt || env.dateEnvoi) | date:'dd/MM/yyyy à HH:mm' }}</td>
+              <td style="text-align: center;">
+                <span class="badge"
+                      style="background: #DCFCE7; color: #15803D; font-weight: 700; border: 1px solid #BBF7D0;">
+                  <i class="fas fa-check-circle me-1"></i> Transmis ERP
+                </span>
+              </td>
+              <td>
+                <div class="catalogue-actions">
+                  <button class="btn-icone btn-icone--voir" title="Voir détails" (click)="openViewModal(env); $event.stopPropagation()">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+}
+          </tbody>
+        </table>
+      </div>
+}
+
+      @if (envoyees.length === 0) {
+<div class="catalogue-etat catalogue-vide">
+        <i class="fas fa-file-invoice-dollar" style="font-size: 2.2rem; color: #CBD5E1; margin-bottom: 0.75rem;"></i>
+        <h3>Aucun devis / proposition transmis</h3>
+      </div>
+}
+    
+}
+
+  </div>
+</section>
+
+<!-- ══════════ MODALE DÉTAILS PROPOSITION CATALOGUE ══════════ -->
+@if (viewingProposition) {
+<div class="modal-overlay" (click)="closeViewProposition()">
+  <div class="modal-card" style="max-width: 650px;" (click)="$event.stopPropagation()">
+    <div class="modal-card-header" style="background: linear-gradient(135deg, #721513, #a81c20); color: #ffffff;">
+      <div>
+        <h3 class="modal-title" style="color: #ffffff !important; margin-bottom: 0.25rem;">{{ viewingProposition.titre }}</h3>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <span class="badge" style="background: rgba(255,255,255,0.25); color: #ffffff; font-weight: 700;">
+            {{ (viewingProposition.prixUnitairePersonne && viewingProposition.prixUnitairePersonne > 0 ? (viewingProposition.prixUnitairePersonne | number:'1.0-0') + ' FCFA / pers.' : 'Sur devis') }}
+          </span>
+          <span class="badge" style="background: rgba(0,0,0,0.25); color: #f1f5f9;">Ref: #KT-{{ viewingProposition.id }}</span>
+        </div>
+      </div>
+      <button class="modal-close-btn" style="color: #ffffff; background: rgba(255,255,255,0.15); border: none;" (click)="closeViewProposition()">&times;</button>
+    </div>
+
+    <div class="modal-card-body" style="padding: 1.4rem;">
+      <!-- Tarif Card -->
+      <div style="background: #FAF5EA; border: 1.5px solid #E5DABA; border-radius: 10px; padding: 0.9rem 1.15rem; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <span style="font-size: 0.72rem; color: #721513; font-weight: 800; text-transform: uppercase;">Tarif unitaire</span>
+          <div style="font-size: 1.25rem; font-weight: 800; color: #721513;">
+            {{ (viewingProposition.prixUnitairePersonne && viewingProposition.prixUnitairePersonne > 0 ? (viewingProposition.prixUnitairePersonne | number:'1.0-0') + ' FCFA' : 'Sur devis') }}
+            <small style="font-size: 0.8rem; font-weight: 600; color: #64748B;">/ convive</small>
+          </div>
+        </div>
+        <div style="text-align: right;">
+          <span style="font-size: 0.72rem; color: #64748B; font-weight: 700; text-transform: uppercase;">Type de formule</span>
+          <div style="font-size: 0.88rem; font-weight: 700; color: #1E293B;">Catalogue Kiki Traiteur</div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div style="margin-bottom: 1.25rem;">
+        <h4 style="font-size: 0.86rem; font-weight: 700; color: #1E293B; margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.03em;">
+          <i class="fas fa-align-left me-2" style="color: #721513;"></i>Description
+        </h4>
+        <div style="background: #F8FAFC; border-left: 3px solid #721513; border-radius: 0 8px 8px 0; padding: 0.75rem 1rem; color: #475569; line-height: 1.5; font-size: 0.86rem;">
+          {{ (viewingProposition.description && viewingProposition.description.trim() !== '' && viewingProposition.description !== '---') ? viewingProposition.description : 'Aucune description détaillée renseignée.' }}
+        </div>
+      </div>
+
+      <!-- Sections & items -->
+      @if (viewingProposition.sections && viewingProposition.sections.length > 0) {
+<div>
+        <h4 style="font-size: 0.86rem; font-weight: 700; color: #1E293B; margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 0.03em;">
+          <i class="fas fa-utensils me-2" style="color: #721513;"></i>Composition &amp; Sections
+        </h4>
+        @for (section of viewingProposition.sections; track $index) {
+<div style="margin-bottom: 0.85rem; border: 1px solid #E2E8F0; border-radius: 8px; overflow: hidden;">
+          <div style="background: #FAF5EA; padding: 0.55rem 0.85rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E2E8F0;">
+            <strong style="color: #721513; font-size: 0.84rem;">{{ section.nom }}</strong>
+            <span class="badge badge-quoted" style="font-size: 0.68rem;">Max {{ section.maxChoix }} choix</span>
+          </div>
+          <ul style="list-style: none; padding: 0.45rem 0.65rem; margin: 0; display: flex; flex-direction: column; gap: 0.35rem;">
+            @for (item of section.items; track $index) {
+<li style="display: flex; justify-content: space-between; align-items: center; padding: 0.35rem 0.55rem; background: #F8FAFC; border-radius: 5px;">
+              <strong style="color: #334155; font-size: 0.82rem;">
+                <i class="fas fa-check-circle" style="font-size: 0.65rem; color: #15803D; margin-right: 0.45rem;"></i>{{ item.nom }}
+              </strong>
+              @if (item.description) {
+<span style="color: #64748B; font-size: 0.78rem; text-align: right; max-width: 55%;">{{ item.description }}</span>
+}
+            </li>
+}
+            @if (!section.items || section.items.length === 0) {
+<li style="color: #94A3B8; font-size: 0.78rem; font-style: italic; padding: 0.35rem 0.55rem;">
+              Aucun met défini
+            </li>
+}
+          </ul>
+        </div>
+}
+      </div>
+}
+      @if (!viewingProposition.sections || viewingProposition.sections.length === 0) {
+<div style="color: #94A3B8; text-align: center; padding: 1.5rem; font-style: italic; font-size: 0.82rem;">
+        <i class="fas fa-utensils fa-2x mb-2" style="display: block; margin-bottom: 0.5rem; color: #CBD5E1;"></i>
+        Aucune section de menu définie pour cette formule.
+      </div>
+}
+    </div>
+
+    <div class="modal-card-footer">
+      <button class="btn btn-fermer-rouge" (click)="closeViewProposition()">
+        <i class="fas fa-times me-1"></i> Fermer
+      </button>
+      <button class="btn btn-primary" (click)="openEditModal(viewingProposition); closeViewProposition()">
+        <i class="fas fa-edit me-1"></i> Modifier
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- ══════════ MODALE ÉDITION / AJOUT PROPOSITION ══════════ -->
+@if (isEditing && selectedProposition) {
+<div class="modal-overlay" (click)="$event.target === $event.currentTarget && closeModal()">
+  <div class="modal-card" style="max-width: 700px;" (click)="$event.stopPropagation()">
+    <div class="modal-card-header">
+      <h3 class="modal-title">{{ isAdding ? 'Créer une Proposition' : 'Modifier la Proposition' }}</h3>
+      <button class="modal-close-btn" (click)="closeModal()">&times;</button>
+    </div>
+
+    <div class="modal-card-body" style="padding: 1.4rem;">
+      <div class="formulaire-grille">
+        <div class="champ champ--large">
+          <label>Titre de la formule <span class="requis">*</span></label>
+          <input type="text" [(ngModel)]="selectedProposition.titre" placeholder="Ex : Menu Cocktail Prestige">
+        </div>
+
+        <div class="champ">
+          <label>Tarif par personne (FCFA) <span class="requis">*</span></label>
+          <input type="number" min="0" step="500" [(ngModel)]="selectedProposition.prixUnitairePersonne" placeholder="0 = Sur devis">
+        </div>
+
+        <div class="champ champ--large">
+          <label>Description</label>
+          <textarea rows="2" [(ngModel)]="selectedProposition.description" placeholder="Description de la formule..."></textarea>
+        </div>
+
+        <!-- Sections & items configuration -->
+        <div class="champ champ--large" style="margin-top: 1rem; border-top: 1px solid #E2E8F0; padding-top: 1rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <label style="margin: 0; font-size: 0.92rem; font-weight: 700; color: #1E293B;">Sections du menu</label>
+            <button type="button" class="btn btn-sm btn-outline" (click)="addSection()">
+              <i class="fas fa-plus me-1"></i> Ajouter une section
+            </button>
+          </div>
+
+          @for (sec of selectedProposition.sections; track $index; let sIdx = $index) {
+<div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 0.85rem; margin-bottom: 0.85rem;">
+            <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
+              <input type="text" [(ngModel)]="sec.nom" placeholder="Nom de la section (ex : Entrées)" style="flex: 2; padding: 0.4rem 0.6rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem;">
+              <div style="display: flex; align-items: center; gap: 0.25rem;">
+                <label style="font-size: 0.75rem; color: #64748B; margin: 0; white-space: nowrap;">Max choix :</label>
+                <input type="number" min="1" [(ngModel)]="sec.maxChoix" style="width: 50px; padding: 0.4rem; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem; text-align: center;">
+              </div>
+              <button type="button" class="btn-icone btn-icone--supprimer" (click)="removeSection(sIdx)" title="Supprimer la section">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
+
+            <!-- Items of section -->
+            <div style="padding-left: 0.75rem; border-left: 2px solid #E2E8F0; margin-top: 0.5rem;">
+              @for (item of sec.items; track $index; let iIdx = $index) {
+<div style="display: flex; gap: 0.4rem; align-items: center; margin-bottom: 0.35rem;">
+                <input type="text" [(ngModel)]="item.nom" placeholder="Nom du met (ex : Mini brochettes de lotte)" style="flex: 2; padding: 0.35rem 0.5rem; border: 1px solid #E2E8F0; border-radius: 4px; font-size: 0.82rem;">
+                <input type="text" [(ngModel)]="item.description" placeholder="Détail (ex : Sauce vierge aux agrumes)" style="flex: 2; padding: 0.35rem 0.5rem; border: 1px solid #E2E8F0; border-radius: 4px; font-size: 0.82rem;">
+                <button type="button" class="btn-icone btn-icone--supprimer" style="width: 24px; height: 24px; font-size: 0.7rem;" (click)="removeItem(sec, iIdx)" title="Supprimer">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+}
+              <button type="button" class="btn btn-sm" style="background: white; border: 1px dashed #CBD5E1; color: #64748B; font-size: 0.75rem; padding: 0.25rem 0.5rem; margin-top: 0.25rem;" (click)="addItem(sec)">
+                <i class="fas fa-plus me-1"></i> Ajouter un choix
+              </button>
+            </div>
+          </div>
+}
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-card-footer">
+      <button class="btn btn-secondary" (click)="closeModal()">Annuler</button>
+      <button class="btn btn-primary" (click)="saveProposition()" [disabled]="!selectedProposition.titre || selectedProposition.prixUnitairePersonne < 0">
+        Enregistrer la proposition
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- ══════════ MODALE DÉTAILS ENVOI CLIENT ══════════ -->
+@if (viewingEnvoyee) {
+<div class="modal-overlay" (click)="closeViewModal()">
+  <div class="modal-card" style="max-width: 600px;" (click)="$event.stopPropagation()">
+    <div class="modal-card-header">
+      <h3 class="modal-title"><i class="fas fa-paper-plane me-2" style="color: #ffffff;"></i>Détails de l'envoi</h3>
+      <button class="modal-close-btn" (click)="closeViewModal()">&times;</button>
+    </div>
+
+    <div class="modal-card-body" style="padding: 1.4rem;">
+      <div style="background: #FAF5EA; border: 1px solid #E5DABA; border-radius: 10px; padding: 1rem; margin-bottom: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+          <div>
+            <h4 style="margin: 0 0 0.2rem 0; color: #721513; font-size: 1.05rem;">{{ viewingEnvoyee.titre }}</h4>
+            <p style="margin: 0; color: #64748B; font-size: 0.84rem;">Liée à la demande <strong>#{{ viewingEnvoyee.demandeId }}</strong></p>
+          </div>
+          <span class="badge badge-quoted" style="font-size: 0.82rem;">
+            {{ viewingEnvoyee.prixUnitairePersonne | number:'1.0-0' }} FCFA / pers.
+          </span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.84rem;">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="color: #64748B; width: 100px;">Statut :</span>
+            <span class="badge"
+                  [style.background]="viewingEnvoyee.status === 'envoyee' ? '#FEF3C7' : (viewingEnvoyee.status === 'selectionnee_client' ? '#DBEAFE' : '#DCFCE7')"
+                  [style.color]="viewingEnvoyee.status === 'envoyee' ? '#92400E' : (viewingEnvoyee.status === 'selectionnee_client' ? '#1E40AF' : '#15803D')">
+              {{ viewingEnvoyee.status === 'envoyee' ? 'En attente choix' : (viewingEnvoyee.status === 'selectionnee_client' ? 'Choix client validé' : 'Validée') }}
+            </span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="color: #64748B; width: 100px;">Date d'envoi :</span>
+            <span style="color: #1E293B; font-weight: 600;">{{ viewingEnvoyee.dateEnvoi | date:'dd/MM/yyyy à HH:mm' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feedback client -->
+      @if (viewingEnvoyee.status !== 'envoyee') {
+<div>
+        <h4 style="margin: 0 0 0.75rem 0; color: #1E293B; font-size: 0.92rem; border-bottom: 2px solid #E2E8F0; padding-bottom: 0.4rem; display: flex; align-items: center; justify-content: space-between;">
+          <span><i class="fas fa-comment-check me-2" style="color: #059669;"></i>Retour &amp; Choix du client</span>
+          @if (viewingEnvoyee.clientValidatedAt) {
+<span style="font-size: 0.78rem; color: #64748B; font-weight: normal;">
+            {{ viewingEnvoyee.clientValidatedAt | date:'dd/MM/yyyy HH:mm' }}
+          </span>
+}
+        </h4>
+
+        <!-- Commentaire du client -->
+        @if (getClientCleanComment(viewingEnvoyee)) {
+<div style="background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 0.75rem 1rem; color: #92400E; font-size: 0.86rem; font-style: italic; margin-bottom: 0.85rem;">
+          <i class="fas fa-quote-left me-1 opacity-50"></i>
+          {{ getClientCleanComment(viewingEnvoyee) }}
+          <i class="fas fa-quote-right ms-1 opacity-50"></i>
+        </div>
+}
+
+        <!-- Choix des mets par section -->
+        @if (getClientChoices(viewingEnvoyee).length > 0) {
+<div style="margin-bottom: 0.85rem;">
+          <div style="font-size: 0.8rem; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 0.45rem;">
+            Mets choisis :
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 0.5rem; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 0.75rem;">
+            @for (sec of getClientChoices(viewingEnvoyee); track $index) {
+<div style="border-bottom: 1px dashed #E2E8F0; padding-bottom: 0.4rem;">
+              <strong style="font-size: 0.84rem; color: #1E293B; display: block; margin-bottom: 0.25rem;">{{ sec.sectionNom }} :</strong>
+              <div style="display: flex; flex-wrap: wrap; gap: 0.35rem;">
+                @for (it of sec.items; track $index) {
+<span style="display: inline-flex; align-items: center; gap: 0.25rem; background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; padding: 0.2rem 0.55rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 600;">
+                  <i class="fas fa-check" style="font-size: 0.65rem;"></i> {{ it }}
+                </span>
+}
+              </div>
+            </div>
+}
+          </div>
+        </div>
+}
+
+        @if (!getClientCleanComment(viewingEnvoyee) && getClientChoices(viewingEnvoyee).length === 0) {
+<div style="color: #94A3B8; font-size: 0.84rem; font-style: italic; padding: 0.5rem;">
+          Aucun détail supplémentaire retourné par le client.
+        </div>
+}
+      </div>
+}
+    </div>
+
+    <div class="modal-card-footer">
+      <button class="btn btn-fermer-rouge" (click)="closeViewModal()">
+        <i class="fas fa-times me-1"></i> Fermer
+      </button>
+    </div>
+  </div>
+</div>
+}

@@ -1,0 +1,780 @@
+<section class="section-contenu">
+  <!-- Actions de la Médiathèque -->
+  <div class="gestion-actions-barre" style="display: flex; justify-content: flex-end; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
+    <button type="button" class="btn" (click)="ouvrirCreationAlbum()"
+            style="background: #721513; color: #FFFFFF; font-weight: 700; border-radius: 8px; padding: 0.65rem 1.2rem; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 12px rgba(114, 21, 19, 0.2);">
+      <i class="fas fa-plus"></i> Créer un album
+    </button>
+  </div>
+
+  <!-- Barre de filtres par catégorie de prestations / demandes -->
+  <div class="filtres-barre-prestations" style="display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.5rem; margin-bottom: 1.5rem;">
+    @for (cat of categoriesPrestations; track $index) {
+<button type="button" class="filtre-pill" [class.active]="filtreCategorie === cat.id" (click)="filtreCategorie = cat.id" style="padding: 0.5rem 0.95rem; border-radius: 99px; font-size: 0.8rem; font-weight: 700; border: 1.5px solid; cursor: pointer; display: inline-flex; align-items: center; gap: 0.45rem; transition: all 0.2s ease; white-space: nowrap;" [style.background]="filtreCategorie === cat.id ? '#721513' : '#FFFFFF'" [style.color]="filtreCategorie === cat.id ? '#FFFFFF' : '#475569'" [style.border-color]="filtreCategorie === cat.id ? '#721513' : '#E2E8F0'">
+      <i class="fas" [ngClass]="cat.icone"></i>
+      {{ cat.label }}
+    </button>
+}
+  </div>
+
+  <!-- État de chargement -->
+  @if (chargement) {
+<div style="padding: 3rem; text-align: center; color: #721513;">
+    <i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom: 0.75rem;"></i>
+    <p style="font-weight: 600; color: #64748B;">Chargement des albums événements...</p>
+  </div>
+}
+
+  <!-- Grille des Albums d'Événements -->
+  @if (!chargement && albumsFiltres.length > 0) {
+<div class="album-grid-container">
+    @for (a of albumsFiltres; track $index) {
+<div class="album-card" (click)="ouvrirAlbum(a)">
+      
+      <!-- Couverture Album : Grille de 4 photos -->
+      <div class="album-cover-grid"
+           [class.single-cover]="a.medias.length === 1"
+           [class.two-cover]="a.medias.length === 2"
+           [class.three-cover]="a.medias.length === 3">
+
+        <!-- Badge si album masqué du site public -->
+        @if (!a.visiblePublic) {
+<div class="album-masque-cover-badge" (click)="$event.stopPropagation()">
+          <i class="fas fa-eye-slash"></i> Masqué du public
+        </div>
+}
+
+        <!-- Photo 1 -->
+        @if (a.medias.length > 0) {
+<div class="cover-cell">
+          <img [src]="a.medias[0].url" [alt]="a.medias[0].nom">
+        </div>
+}
+
+        <!-- Photo 2 -->
+        @if (a.medias.length > 1) {
+<div class="cover-cell">
+          <img [src]="a.medias[1].url" [alt]="a.medias[1].nom">
+        </div>
+}
+
+        <!-- Photo 3 -->
+        @if (a.medias.length > 2) {
+<div class="cover-cell">
+          <img [src]="a.medias[2].url" [alt]="a.medias[2].nom">
+        </div>
+}
+
+        <!-- Photo 4 (avec overlay si > 4 photos) -->
+        @if (a.medias.length >= 4) {
+<div class="cover-cell">
+          <img [src]="a.medias[3].url" [alt]="a.medias[3].nom">
+          @if (a.medias.length > 4) {
+<div class="cover-more-overlay">
+            +{{ a.medias.length - 3 }}
+          </div>
+}
+        </div>
+}
+
+        <!-- Placeholder si album sans photos -->
+        @if (a.medias.length === 0) {
+<div class="cover-placeholder-cell">
+          <i class="fas fa-images"></i>
+        </div>
+}
+      </div>
+
+      <!-- Informations de l'album -->
+      <div class="album-card-body">
+        <div class="album-card-header-meta">
+          <span class="album-cat-badge"
+                [style.background]="a.categorie.badgeBg"
+                [style.color]="a.categorie.badgeColor">
+            <i class="fas" [ngClass]="a.categorie.icone"></i>
+            {{ a.typeEvenement || a.categorie.label }}
+          </span>
+
+          <div style="display: flex; align-items: center; gap: 0.45rem; margin-left: auto;">
+            <!-- Bouton rapide 1-clic de visibilité de l'album -->
+            <button type="button"
+                    class="btn-visibilite-badge-card"
+                    [class.is-visible]="a.visiblePublic"
+                    [class.is-hidden]="!a.visiblePublic"
+                    (click)="toggleVisibiliteAlbum(a, $event)"
+                    [title]="a.visiblePublic ? 'Visible sur le site public — Cliquer pour masquer cet album' : 'Masqué du site public — Cliquer pour rendre visible cet album'">
+              <i class="fas" [ngClass]="a.visiblePublic ? 'fa-eye' : 'fa-eye-slash'"></i>
+              <span>{{ a.visiblePublic ? 'Public' : 'Masqué' }}</span>
+            </button>
+
+            <span class="album-count-badge" [title]="a.nombreVisibles + ' photo(s) visible(s)' + (a.nombreMasques > 0 ? ', ' + a.nombreMasques + ' masquée(s)' : '')">
+              <i class="fas fa-camera"></i> {{ a.medias.length }}
+            </span>
+
+            <button type="button" class="btn-edit-album-card" (click)="ouvrirEditionAlbum(a, $event)" title="Modifier les infos de cet album">
+              <i class="fas fa-pen-to-square"></i>
+            </button>
+          </div>
+        </div>
+
+        <h3 class="album-title" [title]="a.titre">{{ a.titre }}</h3>
+
+        @if (a.description) {
+<div style="font-size: 0.8rem; color: #64748B; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 0.35rem;">
+          {{ a.description }}
+        </div>
+}
+
+        <div style="display: flex; flex-wrap: wrap; gap: 0.6rem; font-size: 0.76rem; color: #64748B; margin-top: auto; padding-top: 0.35rem; border-top: 1px solid #F1F5F9;">
+          @if (a.lieu) {
+<span style="display: inline-flex; align-items: center; gap: 0.3rem;">
+            <i class="fas fa-location-dot" style="color: #721513;"></i> {{ a.lieu }}
+          </span>
+}
+          @if (a.nombreConvives) {
+<span style="display: inline-flex; align-items: center; gap: 0.3rem;">
+            <i class="fas fa-users" style="color: #721513;"></i> {{ a.nombreConvives }}
+          </span>
+}
+          <span class="album-date" style="margin-left: auto;">
+            <i class="far fa-calendar-alt"></i> {{ a.dateEvenement }}
+          </span>
+        </div>
+      </div>
+    </div>
+}
+  </div>
+}
+
+  <!-- État vide si aucun album -->
+  @if (!chargement && albumsFiltres.length === 0) {
+<div style="background: #FFFFFF; border: 1.5px dashed #CBD5E1; border-radius: 14px; padding: 3.5rem 1.5rem; text-align: center; margin-top: 1.5rem;">
+    <div style="width: 72px; height: 72px; border-radius: 50%; background: #FAF5EA; margin: 0 auto 1.25rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #721513;">
+      <i class="fas fa-folder-open"></i>
+    </div>
+    <h3 style="font-size: 1.2rem; font-weight: 800; color: #1E293B; margin-bottom: 0.5rem; font-family: 'Playfair Display', serif;">
+      Aucun événement dans cette catégorie
+    </h3>
+    <p style="font-size: 0.88rem; color: #64748B; max-width: 460px; margin: 0 auto 1.5rem;">
+      Créez un nouvel album d'événement pour classer et valoriser vos réceptions, mariages et prestations traiteur.
+    </p>
+    <button type="button" class="btn" (click)="ouvrirCreationAlbum()"
+            style="background: #721513; color: #FFFFFF; font-weight: 700; border-radius: 8px; padding: 0.65rem 1.25rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+      <i class="fas fa-plus"></i> Créer un album
+    </button>
+  </div>
+}
+</section>
+
+<!-- ══════════ MODALE VUE DÉTAILLÉE DE L'ALBUM (TOUTES LES PHOTOS) ══════════ -->
+@if (modaleAlbumVisible && albumSelectionne) {
+<div class="modal-overlay" (click)="$event.target === $event.currentTarget && fermerModaleAlbum()">
+  <div class="modal-card" style="max-width: 890px;" (click)="$event.stopPropagation()">
+    
+    <!-- En-tête de l'album -->
+    <div class="album-detail-header">
+      <div style="display: flex; flex-direction: column; gap: 0.35rem; max-width: 58%;">
+        <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
+          <span class="album-cat-badge"
+                [style.background]="albumSelectionne.categorie.badgeBg"
+                [style.color]="albumSelectionne.categorie.badgeColor">
+            <i class="fas" [ngClass]="albumSelectionne.categorie.icone"></i>
+            {{ albumSelectionne.typeEvenement || albumSelectionne.categorie.label }}
+          </span>
+          @if (albumSelectionne.lieu) {
+<span style="font-size: 0.8rem; color: #475569; font-weight: 600;">
+            <i class="fas fa-location-dot" style="color: #721513;"></i> {{ albumSelectionne.lieu }}
+          </span>
+}
+          @if (albumSelectionne.nombreConvives) {
+<span style="font-size: 0.8rem; color: #475569; font-weight: 600;">
+            <i class="fas fa-users" style="color: #721513;"></i> {{ albumSelectionne.nombreConvives }}
+          </span>
+}
+          <span style="font-size: 0.8rem; color: #64748B;">
+            <i class="far fa-calendar-alt"></i> {{ albumSelectionne.dateEvenement }}
+          </span>
+        </div>
+        <h3 class="album-detail-titre">
+          {{ albumSelectionne.titre }}
+        </h3>
+        @if (albumSelectionne.description) {
+<p style="margin: 0; font-size: 0.85rem; color: #475569; line-height: 1.45;">
+          {{ albumSelectionne.description }}
+        </p>
+}
+        <div style="display: flex; align-items: center; gap: 0.65rem; font-size: 0.78rem; color: #64748B; font-weight: 600; flex-wrap: wrap;">
+          <span>{{ albumSelectionne.medias.length }} média{{ albumSelectionne.medias.length > 1 ? 's' : '' }}</span>
+          <span>•</span>
+          <span style="color: #047857;"><i class="fas fa-eye" style="margin-right: 0.25rem;"></i>{{ albumSelectionne.nombreVisibles }} visible{{ albumSelectionne.nombreVisibles > 1 ? 's' : '' }}</span>
+          @if (albumSelectionne.nombreMasques > 0) {
+<span style="color: #DC2626;"><i class="fas fa-eye-slash" style="margin-right: 0.25rem;"></i>{{ albumSelectionne.nombreMasques }} masqué{{ albumSelectionne.nombreMasques > 1 ? 's' : '' }}</span>
+}
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
+        <!-- Bouton de Visibilité Globale de l'Album -->
+        <button type="button"
+                class="btn-visibilite-album-detail"
+                [class.is-visible]="albumSelectionne.visiblePublic"
+                [class.is-hidden]="!albumSelectionne.visiblePublic"
+                (click)="toggleVisibiliteAlbum(albumSelectionne)"
+                [title]="albumSelectionne.visiblePublic ? 'Cet album est visible sur le site public. Cliquer pour masquer tout l\'album.' : 'Cet album est masqué du site public. Cliquer pour le rendre visible.'">
+          <i class="fas" [ngClass]="albumSelectionne.visiblePublic ? 'fa-eye' : 'fa-eye-slash'"></i>
+          {{ albumSelectionne.visiblePublic ? 'Album Public' : 'Album Masqué' }}
+        </button>
+
+        <!-- Bouton Modifier l'album -->
+        <button type="button" class="btn-modifier-album-detail" (click)="ouvrirEditionAlbum(albumSelectionne, $event)" title="Modifier les informations">
+          <i class="fas fa-pen-to-square"></i> Modifier
+        </button>
+
+        <!-- Input caché pour ajout direct de photos à cet album -->
+        <input #albumDirectFileInput
+               id="albumDirectFileInput"
+               type="file"
+               multiple
+               accept="image/*,video/*,application/pdf"
+               (change)="surAjoutDirectAlbum($event)"
+               style="display: none;">
+
+        <button type="button" class="btn-ajouter-photos-detail" (click)="albumDirectFileInput.click()">
+          <i class="fas fa-plus"></i> Ajouter des photos
+        </button>
+
+        <button class="modal-close-btn" (click)="fermerModaleAlbum()" title="Fermer">&times;</button>
+      </div>
+    </div>
+
+    <!-- Barre d'actions groupées (visible dès qu'au moins 1 photo est sélectionnée) -->
+    @if (nombreMediasSelectionnes > 0) {
+<div class="album-bulk-actions-bar">
+      <div class="bulk-actions-left">
+        <span class="bulk-count-badge">
+          <i class="fas fa-check-circle" style="color: #10B981;"></i>
+          <strong>{{ nombreMediasSelectionnes }}</strong> photo{{ nombreMediasSelectionnes > 1 ? 's' : '' }} sélectionnée{{ nombreMediasSelectionnes > 1 ? 's' : '' }}
+        </span>
+        <button type="button" class="btn-bulk-select-all" (click)="toggleToutSelectionner()">
+          <i class="fas" [ngClass]="tousMediasAlbumSelectionnes ? 'fa-minus-square' : 'fa-check-double'"></i>
+          {{ tousMediasAlbumSelectionnes ? 'Tout désélectionner' : 'Tout sélectionner' }}
+        </button>
+      </div>
+
+      <div class="bulk-actions-right">
+        <button type="button" class="btn-bulk-action btn-bulk-visible" (click)="toggleVisibiliteSelection(true)" title="Rendre ces photos visibles sur le site public">
+          <i class="fas fa-eye"></i> Rendre visible
+        </button>
+        <button type="button" class="btn-bulk-action btn-bulk-hidden" (click)="toggleVisibiliteSelection(false)" title="Masquer ces photos du site public">
+          <i class="fas fa-eye-slash"></i> Masquer
+        </button>
+        <button type="button" class="btn-bulk-action btn-bulk-delete" (click)="demanderSuppressionSelection($event)" title="Supprimer les photos sélectionnées">
+          <i class="fas fa-trash-alt"></i> Retirer la sélection ({{ nombreMediasSelectionnes }})
+        </button>
+        <button type="button" class="btn-bulk-cancel" (click)="deselectionnerTout()" title="Annuler la sélection">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+}
+
+    <!-- Galerie de toutes les photos de l'album -->
+    <div class="album-detail-gallery">
+      @for (m of albumSelectionne.medias; track $index) {
+<div class="album-photo-item" [class.is-selected]="estMediaSelectionne(m)" [class.is-masked]="m.visiblePublic === false" (click)="ouvrirLightbox(m, $event)">
+        
+        <!-- Case à cocher de sélection multiple -->
+        <div class="photo-select-checkbox"
+             [class.is-selected]="estMediaSelectionne(m)"
+             (click)="toggleSelectionMedia(m, $event)"
+             [title]="estMediaSelectionne(m) ? 'Désélectionner cette photo' : 'Sélectionner cette photo'">
+          <i class="fas" [ngClass]="estMediaSelectionne(m) ? 'fa-check' : 'fa-check'" [style.opacity]="estMediaSelectionne(m) ? '1' : '0.45'"></i>
+        </div>
+
+        <!-- Badge si photo individuelle masquée -->
+        @if (m.visiblePublic === false) {
+<div class="photo-masquee-badge" title="Cette photo est masquée du site public">
+          <i class="fas fa-eye-slash"></i> Masquée
+        </div>
+}
+
+        @if ((m.type || '').toUpperCase() === 'IMAGE') {
+<img [src]="m.url" [alt]="m.nom">
+}
+        
+        @if ((m.type || '').toUpperCase() === 'VIDEO') {
+<div class="thumb-icon-box video-box" style="height: 100%;">
+          <i class="fas fa-video fa-2x"></i>
+        </div>
+}
+
+        @if ((m.type || '').toUpperCase() === 'PDF') {
+<div class="thumb-icon-box pdf-box" style="height: 100%;">
+          <i class="fas fa-file-pdf fa-2x"></i>
+        </div>
+}
+
+        <!-- Boutons d'action au survol de chaque photo -->
+        <div class="album-photo-overlay" (click)="$event.stopPropagation()">
+          <!-- Bouton visibilité individuelle photo -->
+          <button type="button"
+                  class="btn-photo-action visibility"
+                  [style.background]="m.visiblePublic === false ? 'rgba(220, 38, 38, 0.95)' : 'rgba(5, 150, 105, 0.95)'"
+                  [title]="m.visiblePublic === false ? 'Photo actuellement masquée — Cliquer pour afficher sur le site' : 'Photo actuellement visible — Cliquer pour masquer du site'"
+                  (click)="toggleVisibiliteMedia(m, $event)">
+            <i class="fas" [ngClass]="m.visiblePublic === false ? 'fa-eye-slash' : 'fa-eye'"></i>
+          </button>
+          <button type="button" class="btn-photo-action view" title="Agrandir" (click)="ouvrirLightbox(m, $event)">
+            <i class="fas fa-expand"></i>
+          </button>
+          <button type="button" class="btn-photo-action delete" title="Retirer cette photo de l'album" (click)="demanderSuppressionMediaUnique(m, $event)">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        </div>
+      </div>
+}
+    </div>
+
+    <div class="modal-card-footer" style="display: flex; justify-content: space-between; align-items: center;">
+      <button type="button" class="btn-bulk-select-all" style="color: #475569; border-color: #CBD5E1;" (click)="toggleToutSelectionner()">
+        <i class="fas" [ngClass]="tousMediasAlbumSelectionnes ? 'fa-minus-square' : 'fa-check-double'" style="color: #721513;"></i>
+        {{ tousMediasAlbumSelectionnes ? 'Tout désélectionner' : 'Sélectionner tout (' + albumSelectionne.medias.length + ')' }}
+      </button>
+
+      <button type="button" class="btn-fermer-rouge" (click)="fermerModaleAlbum()">
+        Fermer
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- ══════════ MODALE CRÉATION / MODIFICATION D'ALBUM ══════════ -->
+@if (modaleCreationOuverte) {
+<div class="modal-overlay" (click)="$event.target === $event.currentTarget && fermerModaleCreation()">
+  <div class="modal-card" style="max-width: 640px;" (click)="$event.stopPropagation()">
+    <div class="modal-card-header">
+      <h3 class="modal-title" style="color: #721513; font-family: 'Playfair Display', Georgia, serif; font-weight: 800;">
+        {{ modeEdition ? "Modifier l'album" : "Créer un album" }}
+      </h3>
+      <button class="modal-close-btn" (click)="fermerModaleCreation()">&times;</button>
+    </div>
+
+    <div class="modal-card-body">
+      
+      <!-- Choix direct depuis le Calendrier / Demandes sans photos avec barre de recherche -->
+      <div style="margin-bottom: 1.1rem; background: #FAF5EA; border: 1.5px solid #EADCC8; border-radius: 8px; padding: 0.75rem;">
+        <label style="display: block; font-weight: 700; font-size: 0.76rem; color: #721513; margin-bottom: 0.45rem; text-transform: uppercase;">
+          <i class="far fa-calendar-check" style="margin-right: 0.35rem;"></i> Lier à un événement / demande du calendrier (optionnel)
+        </label>
+        
+        <div class="event-dropdown-container" style="position: relative; width: 100%;">
+          <!-- Déclencheur du Dropdown -->
+          <div class="event-dropdown-trigger" (click)="toggleMenuEvenement($event)"
+               style="width: 100%; padding: 0.6rem 0.75rem; border: 1.5px solid #CBD5E1; border-radius: 6px; font-size: 0.85rem; background: #FFFFFF; color: #1E293B; cursor: pointer; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; user-select: none;">
+            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">
+              @if (evenementCalendrierSelectionne) {
+
+                <strong>{{ evenementCalendrierSelectionne.title || evenementCalendrierSelectionne.titre }}</strong>
+                <span style="color: #64748B; font-size: 0.78rem; margin-left: 0.4rem;">
+                  ({{ (evenementCalendrierSelectionne.date ? (evenementCalendrierSelectionne.date | date:'dd/MM/yyyy') : 'Date à convenir') }})
+                </span>
+              
+}
+              <ng-template #sansSelection>
+                <span style="color: #64748B;">-- Saisie libre manuelle (aucun événement lié) --</span>
+              </ng-template>
+            </span>
+            <div style="display: flex; align-items: center; gap: 0.4rem; margin-left: 0.5rem; flex-shrink: 0;">
+              @if (evenementCalendrierSelectionne) {
+<button type="button" (click)="reinitialiserEvenementSelectionne(); $event.stopPropagation()" style="background: transparent; border: none; color: #94A3B8; cursor: pointer; padding: 0 4px; font-size: 0.85rem;" title="Désélectionner">
+                <i class="fas fa-times"></i>
+              </button>
+}
+              <i class="fas fa-chevron-down" [style.transform]="menuEvenementOuvert ? 'rotate(180deg)' : 'rotate(0)'" style="font-size: 0.75rem; color: #64748B; transition: transform 0.2s ease;"></i>
+            </div>
+          </div>
+
+          <!-- Menu Déroulant avec Barre de Recherche -->
+          @if (menuEvenementOuvert) {
+<div class="event-dropdown-menu" (click)="$event.stopPropagation()" style="position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); z-index: 1000; overflow: hidden; animation: modalFadeIn 0.15s ease-out;">
+            
+            <!-- Barre de Recherche interne -->
+            <div style="padding: 0.5rem; background: #F8FAFC; border-bottom: 1px solid #E2E8F0; display: flex; align-items: center; gap: 0.5rem;">
+              <i class="fas fa-search" style="color: #721513; font-size: 0.8rem; margin-left: 0.25rem;"></i>
+              <input type="text" [(ngModel)]="rechercheEvenement"
+                     placeholder="Rechercher un événement sans photos..."
+                     style="flex: 1; border: 1px solid #CBD5E1; border-radius: 6px; padding: 0.4rem 0.6rem; font-size: 0.8rem; outline: none;"
+                     autofocus>
+            </div>
+
+            <!-- Liste des options filtrées -->
+            <div style="max-height: 220px; overflow-y: auto;">
+              <!-- Option Saisie libre -->
+              <div (click)="reinitialiserEvenementSelectionne()"
+                   style="padding: 0.55rem 0.75rem; font-size: 0.82rem; cursor: pointer; border-bottom: 1px solid #F1F5F9; color: #475569; display: flex; align-items: center; justify-content: space-between; transition: background 0.15s ease;"
+                   [style.background]="!evenementCalendrierSelectionne ? '#FAF5EA' : 'transparent'"
+                   [style.font-weight]="!evenementCalendrierSelectionne ? '700' : 'normal'">
+                <span>-- Saisie libre manuelle (aucun événement lié) --</span>
+                @if (!evenementCalendrierSelectionne) {
+<i class="fas fa-check" style="color: #721513; font-size: 0.75rem;"></i>
+}
+              </div>
+
+              <!-- Événements sans photos -->
+              @for (ev of evenementsFiltresRecherche; track $index) {
+<div (click)="selectionnerEvenement(ev)" style="padding: 0.55rem 0.75rem; font-size: 0.82rem; cursor: pointer; border-bottom: 1px solid #F1F5F9; display: flex; align-items: center; justify-content: space-between; transition: background 0.15s ease;" [style.background]="evenementCalendrierSelectionne === ev ? '#FAF5EA' : 'transparent'">
+                <div style="display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; flex: 1;">
+                  <span style="font-weight: 700; color: #1E293B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    {{ ev.title || ev.titre }}
+                  </span>
+                  <span style="font-size: 0.74rem; color: #64748B;">
+                    {{ (ev.date ? (ev.date | date:'dd/MM/yyyy') : 'Date à convenir') }} • {{ ev.type || 'Événement' }} @if (ev.location || ev.lieu) {
+• {{ ev.location || ev.lieu }}
+}
+                  </span>
+                </div>
+                @if (evenementCalendrierSelectionne === ev) {
+<i class="fas fa-check" style="color: #721513; font-size: 0.75rem; margin-left: 0.5rem;"></i>
+}
+              </div>
+}
+
+              <!-- Si aucun résultat -->
+              @if (evenementsFiltresRecherche.length === 0) {
+<div style="padding: 1.25rem 0.75rem; text-align: center; color: #94A3B8; font-size: 0.8rem;">
+                <i class="fas fa-info-circle" style="margin-right: 0.35rem;"></i> Aucun événement sans photos trouvé
+              </div>
+}
+            </div>
+          </div>
+}
+        </div>
+      </div>
+
+      <!-- Option de visibilité publique de l'album -->
+      <div style="margin-bottom: 1.15rem; background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 8px; padding: 0.75rem 0.9rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+        <div style="flex: 1;">
+          <label for="checkVisiblePublic" style="display: flex; align-items: center; gap: 0.4rem; font-weight: 700; font-size: 0.82rem; color: #1E293B; margin-bottom: 0.15rem; cursor: pointer;">
+            <i class="fas fa-globe" style="color: #721513;"></i> Affichage sur le site public (Page d'accueil & Réalisations)
+          </label>
+          <span style="font-size: 0.74rem; color: #64748B;">
+            {{ visiblePublicAlbum ? 'Les photos de cet album apparaîtront sur le site public dans le carrousel des réalisations.' : 'Cet album et ses photos seront masqués du site public (conservés dans votre espace de gestion).' }}
+          </span>
+        </div>
+        <label class="switch-toggle" style="margin: 0; flex-shrink: 0;" title="Activer / désactiver l'affichage public">
+          <input type="checkbox" id="checkVisiblePublic" [(ngModel)]="visiblePublicAlbum">
+          <span class="slider-switch"></span>
+        </label>
+      </div>
+
+      <!-- Formulaire d'événement complet -->
+      <div style="margin-bottom: 1.1rem;">
+        <label style="display: block; font-weight: 700; font-size: 0.76rem; color: #475569; margin-bottom: 0.35rem; text-transform: uppercase;">
+          Titre de l'événement <span style="color: #DC2626;">*</span>
+        </label>
+        <input type="text" [(ngModel)]="titreEvenement"
+               placeholder="Ex : Mariage Sophie & Marc"
+               style="width: 100%; padding: 0.65rem 0.75rem; border: 1.5px solid #CBD5E1; border-radius: 8px; outline: none; font-size: 0.88rem; box-sizing: border-box;">
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.1rem;">
+        <div>
+          <label style="display: block; font-weight: 700; font-size: 0.76rem; color: #475569; margin-bottom: 0.35rem; text-transform: uppercase;">
+            Type d'événement <span style="color: #DC2626;">*</span>
+          </label>
+          <input type="text" [(ngModel)]="typeEvenement"
+                 list="typesEvenementList"
+                 placeholder="Ex : Mariage, Restauration d'entreprise..."
+                 style="width: 100%; padding: 0.65rem 0.75rem; border: 1.5px solid #CBD5E1; border-radius: 8px; outline: none; font-size: 0.85rem; box-sizing: border-box;">
+          <datalist id="typesEvenementList">
+            <option value="Mariage">Mariage</option>
+            <option value="Restauration d'Entreprise">Restauration d'Entreprise</option>
+            <option value="Cocktail VIP & Réception">Cocktail VIP & Réception</option>
+            <option value="Baptême & Communion">Baptême & Communion</option>
+            <option value="Anniversaire & Fête privée">Anniversaire & Fête privée</option>
+            <option value="Séminaire & Conférence">Séminaire & Conférence</option>
+            <option value="Dîner de Gala & Banquet">Dîner de Gala & Banquet</option>
+            <option value="Plateaux Repas & Pauses">Plateaux Repas & Pauses</option>
+          </datalist>
+        </div>
+
+        <div>
+          <label style="display: block; font-weight: 700; font-size: 0.76rem; color: #475569; margin-bottom: 0.35rem; text-transform: uppercase;">
+            Nombre de convives (Entier)
+          </label>
+          <input type="number" min="1" step="1" [(ngModel)]="nombreConvives"
+                 placeholder="Ex : 500"
+                 style="width: 100%; padding: 0.65rem 0.75rem; border: 1.5px solid #CBD5E1; border-radius: 8px; outline: none; font-size: 0.85rem; box-sizing: border-box;">
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.1rem;">
+        <div>
+          <label style="display: block; font-weight: 700; font-size: 0.76rem; color: #475569; margin-bottom: 0.35rem; text-transform: uppercase;">
+            Lieu de l'événement
+          </label>
+          <input type="text" [(ngModel)]="lieu"
+                 placeholder="Ex : Salle La Diva, Dakar"
+                 style="width: 100%; padding: 0.65rem 0.75rem; border: 1.5px solid #CBD5E1; border-radius: 8px; outline: none; font-size: 0.85rem; box-sizing: border-box;">
+        </div>
+
+        <div>
+          <label style="display: block; font-weight: 700; font-size: 0.76rem; color: #475569; margin-bottom: 0.35rem; text-transform: uppercase;">
+            Date de l'événement
+          </label>
+          <input type="date" [(ngModel)]="dateEvenement"
+                 style="width: 100%; padding: 0.65rem 0.75rem; border: 1.5px solid #CBD5E1; border-radius: 8px; outline: none; font-size: 0.85rem; box-sizing: border-box;">
+        </div>
+      </div>
+
+      <div style="margin-bottom: 1.1rem;">
+        <label style="display: block; font-weight: 700; font-size: 0.76rem; color: #475569; margin-bottom: 0.35rem; text-transform: uppercase;">
+          Description / Détails de la prestation
+        </label>
+        <textarea [(ngModel)]="description"
+                  rows="3"
+                  placeholder="Décrivez brièvement la réception, l'ambiance, les mets et le service traiteur réalisé..."
+                  style="width: 100%; padding: 0.6rem 0.75rem; border: 1.5px solid #CBD5E1; border-radius: 8px; outline: none; font-size: 0.85rem; box-sizing: border-box; resize: vertical;"></textarea>
+      </div>
+
+      <!-- Sélection des fichiers avec bouton Parcourir W3C -->
+      <div style="margin-bottom: 1.1rem;">
+        <label style="display: block; font-weight: 700; font-size: 0.76rem; color: #475569; margin-bottom: 0.45rem; text-transform: uppercase;">
+          {{ modeEdition ? 'Ajouter des photos / médias supplémentaires (optionnel)' : 'Sélectionner les photos / médias *' }}
+        </label>
+
+        <div class="file-picker-custom-container">
+          <input #mediaFileInput
+                 id="mediaFileInputField"
+                 type="file"
+                 multiple
+                 accept="image/*,video/*,application/pdf"
+                 (change)="surSelectionFichiers($event)"
+                 class="file-input-native-hidden">
+
+          <label for="mediaFileInputField" class="file-picker-custom-label">
+            <span class="btn-parcourir-tag">
+              <i class="fas fa-folder-open"></i> Parcourir...
+            </span>
+            <span class="file-picker-text">
+              {{ fichiersSelectionnes.length > 0 ? (fichiersSelectionnes.length + ' fichier(s) sélectionné(s)') : 'Aucun fichier sélectionné.' }}
+            </span>
+          </label>
+        </div>
+
+        <small style="color: #94A3B8; font-size: 0.72rem; margin-top: 0.35rem; display: block;">
+          Vous pouvez choisir plusieurs fichiers (Images max 20 Mo, Vidéos max 50 Mo — JPEG, PNG, WebP, vidéos ou PDF).
+        </small>
+      </div>
+
+      <!-- Prévisualisation des médias avant envoi -->
+      @if (fichiersSelectionnes.length > 0) {
+<div style="margin-bottom: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span style="font-size: 0.78rem; font-weight: 700; color: #334155;">
+            Fichiers prêts pour l'album ({{ fichiersSelectionnes.length }}) :
+          </span>
+          <button type="button" class="btn-clear-all" (click)="viderSelection()">
+            Tout retirer
+          </button>
+        </div>
+
+        <div class="medias-preview-list">
+          @for (item of fichiersSelectionnes; track $index; let i = $index) {
+<div class="media-selected-row">
+            <div class="media-selected-thumb">
+              @if (item.isImage && item.previewUrl) {
+<img [src]="item.previewUrl" [alt]="item.file.name" class="thumb-preview-img">
+}
+              @if (item.isVideo) {
+<div class="thumb-icon-box video-box">
+                <i class="fas fa-video"></i>
+              </div>
+}
+              @if (item.isPdf) {
+<div class="thumb-icon-box pdf-box">
+                <i class="fas fa-file-pdf"></i>
+              </div>
+}
+              @if (!item.isImage && !item.isVideo && !item.isPdf) {
+<div class="thumb-icon-box doc-box">
+                <i class="fas fa-file"></i>
+              </div>
+}
+            </div>
+
+            <div class="media-selected-meta">
+              <span class="media-selected-title" [title]="item.file.name">{{ item.file.name }}</span>
+              <span class="media-selected-size">{{ tailleLisible(item.file.size) }}</span>
+            </div>
+
+            <button type="button" class="btn-remove-selected-media" title="Retirer ce fichier" (click)="retirerFichier(i)">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+}
+        </div>
+      </div>
+}
+    </div>
+
+    <div class="modal-card-footer" style="display: flex; justify-content: flex-end; gap: 1rem;">
+      <button type="button" class="btn-fermer-rouge" (click)="fermerModaleCreation()" style="padding: 0.55rem 1.25rem;">
+        Annuler
+      </button>
+      <button class="btn btn-primary" (click)="sauvegarderAlbum()" [disabled]="!titreEvenement || (!modeEdition && fichiersSelectionnes.length === 0)">
+        <i class="fas" [ngClass]="modeEdition ? 'fa-check' : 'fa-cloud-arrow-up'" style="margin-right: 0.4rem;"></i>
+        {{ modeEdition ? 'Enregistrer les modifications' : "Créer l'album et téléverser" }}
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- ══════════ LIGHTBOX GRAND FORMAT (AU PREMIER PLAN ABSOLU) ══════════ -->
+@if (lightboxMedia) {
+<div class="lightbox-overlay" (click)="fermerLightbox()">
+  <div class="lightbox-content" (click)="$event.stopPropagation()">
+    
+    <!-- Bouton Fermer -->
+    <button type="button" class="lightbox-close" (click)="fermerLightbox()" title="Fermer (Échap)">
+      <i class="fas fa-times"></i>
+    </button>
+
+    <!-- Flèche Précédente -->
+    @if (lightboxMediasListe.length > 1 && aPhotoPrecedente) {
+<button type="button" class="lightbox-nav-btn lightbox-nav-prev" (click)="photoPrecedente($event)" title="Photo précédente (Flèche gauche)">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+}
+
+    <!-- Conteneur média (Image / Vidéo / etc.) -->
+    <div class="lightbox-media-wrapper">
+      @if (!lightboxMedia.type || lightboxMedia.type.toUpperCase() === 'IMAGE') {
+<img [src]="lightboxMedia.url" [alt]="lightboxMedia.nom">
+}
+
+      @if (lightboxMedia.type && lightboxMedia.type.toUpperCase() === 'VIDEO') {
+<video [src]="lightboxMedia.url" controls autoplay style="max-width: 100%; max-height: 80vh; border-radius: 12px; box-shadow: 0 25px 60px rgba(0,0,0,0.7);">
+      </video>
+}
+    </div>
+
+    <!-- Flèche Suivante -->
+    @if (lightboxMediasListe.length > 1 && aPhotoSuivante) {
+<button type="button" class="lightbox-nav-btn lightbox-nav-next" (click)="photoSuivante($event)" title="Photo suivante (Flèche droite)">
+      <i class="fas fa-chevron-right"></i>
+    </button>
+}
+
+    <!-- Barre d'infos et compteur sous la photo -->
+    <div class="lightbox-footer-bar">
+      <span class="lightbox-caption-text" [title]="lightboxMedia.nom">{{ lightboxMedia.nom }}</span>
+      @if (lightboxMediasListe.length > 1) {
+<span class="lightbox-counter-badge">
+        {{ indexLightboxActuel + 1 }} / {{ lightboxMediasListe.length }}
+      </span>
+}
+      @if (lightboxMedia.url) {
+<a [href]="lightboxMedia.url" target="_blank" download class="lightbox-dl-btn" title="Télécharger l'original">
+        <i class="fas fa-download"></i> Télécharger
+      </a>
+}
+      <button type="button" class="lightbox-del-btn" (click)="demanderSuppressionMediaUnique(lightboxMedia, $event); fermerLightbox()" title="Retirer cette photo de l'album">
+        <i class="fas fa-trash-alt"></i> Retirer
+      </button>
+    </div>
+
+  </div>
+</div>
+}
+
+<!-- ══════════ MODALE PERSONNALISÉE DE CONFIRMATION DE SUPPRESSION (SINGLE & MULTI) ══════════ -->
+@if (modaleConfirmationSuppression) {
+<div class="delete-modal-overlay" (click)="$event.target === $event.currentTarget && !suppressionEnCours && annulerSuppression()">
+  <div class="delete-confirm-card" (click)="$event.stopPropagation()">
+    
+    <!-- En-tête avec Icône d'Avertissement Moderne -->
+    <div class="delete-card-header">
+      <div class="delete-icon-wrapper">
+        <i class="fas fa-trash-can"></i>
+      </div>
+      <div class="delete-header-texts">
+        <h3 class="delete-modal-title">
+          {{ mediasASupprimer.length > 1 ? 'Retirer ' + mediasASupprimer.length + ' photos de cet album ?' : 'Retirer cette photo de l\'album ?' }}
+        </h3>
+        <p class="delete-modal-subtitle">
+          Album : <strong>{{ albumSelectionne?.titre || 'Événement' }}</strong>
+        </p>
+      </div>
+      <button class="modal-close-btn" (click)="!suppressionEnCours && annulerSuppression()" [disabled]="suppressionEnCours" title="Fermer">&times;</button>
+    </div>
+
+    <!-- Corps de la modale avec miniatures des photos cibles -->
+    <div class="delete-card-body">
+      <div class="delete-warning-box">
+        <i class="fas fa-triangle-exclamation"></i>
+        <span>
+          @if (mediasASupprimer.length === 1) {
+
+            Êtes-vous sûr de vouloir retirer définitivement <strong>« {{ mediasASupprimer[0].nom }} »</strong> de cet album ? Cette action est irréversible.
+          
+}
+          @if (mediasASupprimer.length > 1) {
+
+            Êtes-vous sûr de vouloir retirer définitivement ces <strong>{{ mediasASupprimer.length }} photos</strong> de cet album ? Cette action est irréversible.
+          
+}
+        </span>
+      </div>
+
+      <!-- Ruban des photos ciblées par la suppression -->
+      @if (mediasASupprimer.length > 0) {
+<div class="delete-previews-strip">
+        @for (item of mediasASupprimer.slice(0, 6); track $index) {
+<div class="delete-preview-item">
+          @if (!item.type || (item.type || '').toUpperCase() === 'IMAGE') {
+<img [src]="item.url" [alt]="item.nom">
+}
+          @if ((item.type || '').toUpperCase() === 'VIDEO') {
+<div class="thumb-icon-box video-box">
+            <i class="fas fa-video"></i>
+          </div>
+}
+          @if ((item.type || '').toUpperCase() === 'PDF') {
+<div class="thumb-icon-box pdf-box">
+            <i class="fas fa-file-pdf"></i>
+          </div>
+}
+        </div>
+}
+        @if (mediasASupprimer.length > 6) {
+<div class="delete-preview-more">
+          +{{ mediasASupprimer.length - 6 }}
+        </div>
+}
+      </div>
+}
+    </div>
+
+    <!-- Boutons d'Action (Annuler vs Confirmer) -->
+    <div class="delete-card-footer">
+      <button type="button" class="btn-cancel-delete" (click)="annulerSuppression()" [disabled]="suppressionEnCours">
+        Annuler
+      </button>
+      <button type="button" class="btn-confirm-delete" (click)="confirmerSuppression()" [disabled]="suppressionEnCours">
+        @if (!suppressionEnCours) {
+<i class="fas fa-trash-alt me-1"></i>
+}
+        @if (suppressionEnCours) {
+<i class="fas fa-circle-notch fa-spin me-1"></i>
+}
+        {{ suppressionEnCours ? 'Suppression en cours...' : (mediasASupprimer.length > 1 ? 'Supprimer les ' + mediasASupprimer.length + ' photos' : 'Supprimer définitivement') }}
+      </button>
+    </div>
+
+  </div>
+</div>
+}
+

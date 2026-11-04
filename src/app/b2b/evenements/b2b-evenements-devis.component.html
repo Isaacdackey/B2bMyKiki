@@ -1,0 +1,338 @@
+<div class="event-wrapper">
+  
+  <!-- NAVBAR B2B UNIFIÉE KIKI TRAITEUR -->
+  <app-b2b-nav></app-b2b-nav>
+
+  <!-- CONTENU PRINCIPAL -->
+  <main style="max-width: 1350px; margin: 2rem auto; padding: 0 1.5rem;">
+
+    <!-- ============================================================== -->
+    <!-- SECTION 1 : LISTE DES DEVIS & PROPOSITIONS CLIENT             -->
+    <!-- ============================================================== -->
+    @if (activeView() === 'MES_DEVIS') {
+      <div>
+        
+        <div class="event-header-banner">
+          <div>
+            <h2 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.6rem; color: #721513; font-weight: 900;">
+              Cycle Demande <i class="fa-solid fa-arrow-right" style="font-size: 1.1rem; color: #E51D24; margin: 0 0.4rem;"></i> Devis <i class="fa-solid fa-arrow-right" style="font-size: 1.1rem; color: #E51D24; margin: 0 0.4rem;"></i> Validation Client
+            </h2>
+            <p style="margin: 0.35rem 0 0; font-size: 0.9rem; color: #332724; font-weight: 600; line-height: 1.5;">
+              Suivez l'état de vos demandes d'événements et validez en ligne vos propositions commerciales chiffrées.
+            </p>
+          </div>
+
+          <button (click)="activeView.set('NOUVELLE_DEMANDE')" class="event-btn-primary">
+            <i class="fa-solid fa-plus"></i> Créer une Demande d'Événement
+          </button>
+        </div>
+
+        <!-- GRILLE DE DEVIS (1 colonne sur mobile, 2 sur large écran) -->
+        <div class="event-cards-grid">
+          @for (d of demandes(); track d.id) {
+            <div class="b2b-devis-card">
+              
+              <!-- 1. EN-TÊTE DE LA CARTE -->
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; width: 100%; border-bottom: 1.5px solid #EDE7DC; padding-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+                <div>
+                  <span style="font-size: 0.75rem; color: #E51D24; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;">
+                    <i class="fa-solid fa-fingerprint"></i> {{ d.reference }}
+                  </span>
+                  <h3 style="margin: 0.35rem 0 0; font-family: 'Playfair Display', serif; font-size: 1.4rem; color: #721513; font-weight: 800;">
+                    @if (d.typeEvenement === 'SALLE_DIVA_PRIVATISATION') { <i class="fa-solid fa-landmark" style="color: #721513; margin-right: 0.4rem;"></i> Soirée Privatisée Salle Diva }
+                    @else if (d.typeEvenement === 'SEMINAIRE') { <i class="fa-solid fa-briefcase" style="color: #721513; margin-right: 0.4rem;"></i> Journée d'Étude & Séminaire }
+                    @else { <i class="fa-solid fa-champagne-glasses" style="color: #721513; margin-right: 0.4rem;"></i> Cocktail d'Entreprise }
+                  </h3>
+                </div>
+
+                @if (d.statut === 'PROPOSITION_ENVOYEE') {
+                  <span style="background: rgba(229, 29, 36, 0.1); color: #E51D24; border: 1.5px solid rgba(229, 29, 36, 0.3); padding: 0.4rem 0.9rem; border-radius: 9999px; font-size: 0.78rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.45rem; white-space: nowrap;">
+                    <i class="fa-solid fa-bell"></i> Proposition Kiki Disponible
+                  </span>
+                } @else if (d.statut === 'CONFIRMEE') {
+                  <span style="background: rgba(96, 108, 56, 0.12); color: #606C38; border: 1.5px solid rgba(96, 108, 56, 0.3); padding: 0.4rem 0.9rem; border-radius: 9999px; font-size: 0.78rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.45rem; white-space: nowrap;">
+                    <i class="fa-solid fa-circle-check"></i> Événement Confirmé
+                  </span>
+                } @else {
+                  <span style="background: #FAF8F4; color: #6E5A56; border: 1.5px solid #EDE7DC; padding: 0.4rem 0.9rem; border-radius: 9999px; font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.45rem; white-space: nowrap;">
+                    <i class="fa-regular fa-clock"></i> Étude de Faisabilité
+                  </span>
+                }
+              </div>
+
+              <!-- 2. CORPS : DÉTAILS DE L'ÉVÉNEMENT ET PRESTATIONS (ADAPTATIF MOBILE) -->
+              <div class="event-details-grid">
+                
+                <!-- Bloc Gauche : Caractéristiques -->
+                <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 1.15rem; font-size: 0.85rem; line-height: 1.7; color: #332724; display: flex; flex-direction: column; gap: 0.45rem;">
+                  <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 800; text-transform: uppercase; margin-bottom: 0.25rem; letter-spacing: 0.05em;">
+                    <i class="fa-solid fa-circle-info" style="color: #721513;"></i> Paramètres de l'événement
+                  </div>
+                  <div><i class="fa-regular fa-calendar" style="color: #721513; width: 18px;"></i> <strong>Date :</strong> {{ d.dateEvenement }} ({{ d.heureDebut }} à {{ d.heureFin }})</div>
+                  <div><i class="fa-solid fa-users" style="color: #721513; width: 18px;"></i> <strong>Convives :</strong> <span style="color: #721513; font-weight: 700;">{{ d.nbConvives }} personnes</span></div>
+                  <div><i class="fa-solid fa-location-dot" style="color: #E51D24; width: 18px;"></i> <strong>Lieu :</strong> {{ d.lieuChoisi === 'SALLE_DIVA' ? 'Salle Diva (Espace Kiki Privatisé)' : 'Sur site entreprise' }}</div>
+                  <div><i class="fa-solid fa-user-tie" style="color: #721513; width: 18px;"></i> <strong>Référent :</strong> {{ d.demandeurNom }} ({{ d.demandeurTelephone }})</div>
+                </div>
+
+                <!-- Bloc Droit : Prestations souhaitées -->
+                <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 1.15rem; display: flex; flex-direction: column;">
+                  <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 800; text-transform: uppercase; margin-bottom: 0.65rem; letter-spacing: 0.05em;">
+                    <i class="fa-solid fa-bell-concierge" style="color: #721513;"></i> Prestations demandées
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 0.45rem; flex: 1;">
+                    @for (besoin of d.besoinsSpecifiques; track besoin) {
+                      <div style="background: #FFFFFF; border: 1px solid #EDE7DC; color: #721513; font-size: 0.8rem; font-weight: 600; padding: 0.35rem 0.65rem; border-radius: 8px; display: flex; align-items: center; gap: 0.45rem;">
+                        <i class="fa-solid fa-check" style="color: #606C38; font-size: 0.75rem;"></i> {{ besoin }}
+                      </div>
+                    }
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- 3. FOOTER : PROPOSITION FINANCIÈRE DU CHEF & BOUTON D'ACTION (PLEINE LARGEUR) -->
+              @if (d.proposition) {
+                <div style="background: #FAF5EA; border: 1.5px solid #E6DABA; border-radius: 16px; padding: 1.15rem 1.4rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; width: 100%; box-sizing: border-box;">
+                  <div>
+                    <div style="font-size: 0.72rem; color: #721513; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">
+                      <i class="fa-solid fa-file-invoice"></i> Devis Chiffré Kiki Traiteur
+                    </div>
+                    <div style="font-size: 1.45rem; font-weight: 900; color: #721513; font-family: 'Playfair Display', serif; margin: 0.15rem 0;">
+                      {{ (d.proposition.totalTTC | number) }} FCFA TTC
+                    </div>
+                    <div style="font-size: 0.78rem; color: #6E5A56;">
+                      Acompte contractuel 50% : <strong style="color: #E51D24;">{{ (d.proposition.acompteRequis | number) }} FCFA</strong>
+                    </div>
+                  </div>
+
+                  <button 
+                    (click)="ouvrirDevis(d.proposition)"
+                    style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #721513 0%, #E51D24 100%); color: #FFFFFF; font-weight: 800; border-radius: 9999px; border: none; font-size: 0.88rem; cursor: pointer; box-shadow: 0 4px 15px rgba(114, 21, 19, 0.25); display: inline-flex; align-items: center; gap: 0.5rem; transition: transform 0.2s;">
+                    <i class="fa-solid fa-magnifying-glass"></i> Examiner le Devis
+                  </button>
+                </div>
+              }
+
+            </div>
+          }
+        </div>
+
+      </div>
+    }
+
+    <!-- ============================================================== -->
+    <!-- SECTION 2 : FORMULAIRE NOUVELLE DEMANDE / SALLE DIVA           -->
+    <!-- ============================================================== -->
+    @if (activeView() === 'NOUVELLE_DEMANDE') {
+      <div class="event-form-card">
+        
+        <div style="text-align: center; margin-bottom: 2rem;">
+          <div style="font-size: 2.5rem; color: #721513; margin-bottom: 0.5rem;">
+            <i class="fa-solid fa-landmark"></i>
+          </div>
+          <h2 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #721513; font-weight: 900;">
+            Demande de Prestation Événementielle & Salle Diva
+          </h2>
+          <p style="margin: 0.5rem 0 0; font-size: 0.9rem; color: #6E5A56;">
+            Complétez vos besoins pour recevoir sous 24h une proposition détaillée et chiffrée par nos chefs traiteurs.
+          </p>
+        </div>
+
+        @if (demandeEnvoyeeSucces()) {
+          <div style="background: rgba(96, 108, 56, 0.12); border: 1.5px solid #606C38; color: #606C38; padding: 1.5rem; border-radius: 16px; text-align: center; font-size: 0.95rem; font-weight: 700; margin-bottom: 2rem;">
+            <i class="fa-solid fa-circle-check"></i> Votre demande d'événement a été transmise avec succès à l'équipe Kiki Traiteur ! Vous allez être redirigé vers vos devis.
+          </div>
+        }
+
+        <div style="display: flex; flex-direction: column; gap: 1.35rem;">
+          
+          <div class="event-form-row two-cols">
+            <div>
+              <label style="font-size: 0.8rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.35rem;">
+                Type d'Événement :
+              </label>
+              <select [(ngModel)]="formDemande().typeEvenement" style="width: 100%; background: #FAF8F4 !important; color: #332724 !important; border: 1.5px solid #EDE7DC !important; border-radius: 12px; padding: 0.75rem; font-weight: 600;">
+                <option value="SALLE_DIVA_PRIVATISATION">Privatisation Salle Diva (Soirée / Cocktail VIP)</option>
+                <option value="COCKTAIL_DINATOIRE">Cocktail Dînatoire d'Entreprise</option>
+                <option value="SEMINAIRE">Journée Séminaire & Formations</option>
+                <option value="GALA_ENTREPRISE">Dîner de Gala de Fin d'Année</option>
+              </select>
+            </div>
+
+            <div>
+              <label style="font-size: 0.8rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.35rem;">
+                Lieu Choisi :
+              </label>
+              <select [(ngModel)]="formDemande().lieuChoisi" style="width: 100%; background: #FAF8F4 !important; color: #332724 !important; border: 1.5px solid #EDE7DC !important; border-radius: 12px; padding: 0.75rem; font-weight: 600;">
+                <option value="SALLE_DIVA">Espace Salle Diva Kiki Traiteur (Prestige)</option>
+                <option value="SITE_ENTREPRISE">Sur notre site d'entreprise (Plateau / Bel-Air / Diamniadio)</option>
+                <option value="EXTERIEUR">Lieu externe / Autre salle de réception</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="event-form-row three-cols">
+            <div>
+              <label style="font-size: 0.8rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.35rem;">Date souhaitée :</label>
+              <input type="date" [(ngModel)]="formDemande().dateEvenement" style="width: 100%; background: #FAF8F4 !important; color: #332724 !important; border: 1.5px solid #EDE7DC !important; border-radius: 12px; padding: 0.75rem;">
+            </div>
+
+            <div>
+              <label style="font-size: 0.8rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.35rem;">Horaire début :</label>
+              <input type="time" [(ngModel)]="formDemande().heureDebut" style="width: 100%; background: #FAF8F4 !important; color: #332724 !important; border: 1.5px solid #EDE7DC !important; border-radius: 12px; padding: 0.75rem;">
+            </div>
+
+            <div>
+              <label style="font-size: 0.8rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.35rem;">Horaire fin :</label>
+              <input type="time" [(ngModel)]="formDemande().heureFin" style="width: 100%; background: #FAF8F4 !important; color: #332724 !important; border: 1.5px solid #EDE7DC !important; border-radius: 12px; padding: 0.75rem;">
+            </div>
+          </div>
+
+          <div class="event-form-row two-cols">
+            <div>
+              <label style="font-size: 0.8rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.35rem;">Nombre estimé de convives :</label>
+              <input type="number" [(ngModel)]="formDemande().nbConvives" placeholder="Ex: 80" style="width: 100%; background: #FAF8F4 !important; color: #332724 !important; border: 1.5px solid #EDE7DC !important; border-radius: 12px; padding: 0.75rem;">
+            </div>
+
+            <div>
+              <label style="font-size: 0.8rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.35rem;">Budget estimé entreprise (FCFA) :</label>
+              <input type="number" [(ngModel)]="formDemande().budgetEstime" placeholder="Ex: 3500000" style="width: 100%; background: #FAF8F4 !important; color: #332724 !important; border: 1.5px solid #EDE7DC !important; border-radius: 12px; padding: 0.75rem;">
+            </div>
+          </div>
+
+          <div class="event-form-actions">
+            <button (click)="activeView.set('MES_DEVIS')" style="flex: 1; padding: 0.85rem; background: #FAF8F4; color: #6E5A56; border: 1.5px solid #EDE7DC; border-radius: 9999px; font-weight: 700; cursor: pointer;">
+              Annuler
+            </button>
+            <button (click)="soumettreNouvelleDemande()" class="event-btn-primary" style="flex: 2; justify-content: center;">
+              <i class="fa-solid fa-paper-plane"></i> Envoyer ma Demande pour Chiffrage
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    }
+
+  </main>
+
+  <!-- MODALE D'EXAMEN & VALIDATION DU DEVIS CHIFFRÉ (PROPOSITION DU CHEF) -->
+  @if (showDevisModal() && devisEnConsultation()) {
+    <div class="event-modal-overlay">
+      <div class="event-modal-card">
+        
+        <!-- En-tête Devis -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #EDE7DC; padding-bottom: 1.25rem; margin-bottom: 1.5rem;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="background: #721513; color: #FFFFFF; font-weight: 900; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.72rem; letter-spacing: 0.05em;">
+                DEVIS OFFICIEL
+              </span>
+              <strong style="color: #721513; font-family: 'Playfair Display', serif; font-size: 1.3rem;">
+                {{ devisEnConsultation()!.numeroDevis }}
+              </strong>
+            </div>
+            <div style="font-size: 0.8rem; color: #6E5A56; margin-top: 0.4rem;">
+              Émis le {{ devisEnConsultation()!.dateEmission }} par {{ devisEnConsultation()!.gestionnaireNom }}
+            </div>
+          </div>
+          <button (click)="showDevisModal.set(false)" style="background: none; border: none; color: #6E5A56; font-size: 1.25rem; cursor: pointer; padding: 0.25rem 0.5rem;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        @if (devisAccepteConfirmation()) {
+          <div style="text-align: center; padding: 2rem 0;">
+            <div style="font-size: 3.5rem; color: #606C38; margin-bottom: 1rem;">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h3 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.7rem; color: #721513; font-weight: 900;">
+              Proposition Validée avec Succès !
+            </h3>
+            <p style="margin: 0.5rem 0 0; font-size: 0.95rem; color: #332724;">
+              La réservation de la <strong>Salle Diva</strong> pour TotalEnergies est désormais confirmée.
+            </p>
+            <p style="margin: 0.75rem 0 0; font-size: 0.85rem; color: #E51D24; font-weight: 700;">
+              Le bon de commande et la facture d'acompte (50%) ont été transmis au service financier.
+            </p>
+          </div>
+        } @else {
+          <!-- Tableau Détaillé des Prestations -->
+          <div style="margin-bottom: 1.5rem; overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+              <thead>
+                <tr style="background: #FAF8F4; color: #721513; border-bottom: 1.5px solid #EDE7DC;">
+                  <th style="padding: 0.85rem; font-weight: 700; text-transform: uppercase; font-size: 0.72rem;">Désignation de la Prestation</th>
+                  <th style="padding: 0.85rem; text-align: center; font-weight: 700; text-transform: uppercase; font-size: 0.72rem;">Qté</th>
+                  <th style="padding: 0.85rem; text-align: right; font-weight: 700; text-transform: uppercase; font-size: 0.72rem;">P.U. HT</th>
+                  <th style="padding: 0.85rem; text-align: right; font-weight: 700; text-transform: uppercase; font-size: 0.72rem;">Total HT</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (ligne of devisEnConsultation()!.lignes; track ligne.id) {
+                  <tr style="border-bottom: 1px solid #EDE7DC;">
+                    <td style="padding: 0.85rem;">
+                      <strong style="color: #721513; font-size: 0.92rem;">{{ ligne.designation }}</strong>
+                      <div style="color: #6E5A56; font-size: 0.75rem; margin-top: 0.25rem;">{{ ligne.description }}</div>
+                    </td>
+                    <td style="padding: 0.85rem; text-align: center; color: #332724; font-weight: 700;">{{ ligne.quantite }} {{ ligne.unite }}</td>
+                    <td style="padding: 0.85rem; text-align: right; color: #6E5A56;">{{ (ligne.prixUnitaire | number) }} F</td>
+                    <td style="padding: 0.85rem; text-align: right; font-weight: 800; color: #721513; font-family: 'Playfair Display', serif;">{{ (ligne.totalHT | number) }} FCFA</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Totalisation Financière -->
+          <div style="background: #FAF8F4; border-radius: 16px; padding: 1.35rem; border: 1.5px solid #EDE7DC; margin-bottom: 1.5rem; font-size: 0.9rem;">
+            <div style="display: flex; justify-content: space-between; color: #6E5A56; margin-bottom: 0.4rem;">
+              <span>Sous-total HT des prestations :</span>
+              <span style="font-weight: 700; color: #332724;">{{ (devisEnConsultation()!.totalHT | number) }} FCFA</span>
+            </div>
+
+            @if (devisEnConsultation()!.remiseCommerciale > 0) {
+              <div style="display: flex; justify-content: space-between; color: #606C38; margin-bottom: 0.4rem; font-weight: 600;">
+                <span>Remise Partenaire TotalEnergies :</span>
+                <span style="font-weight: 700;">-{{ (devisEnConsultation()!.remiseCommerciale | number) }} FCFA</span>
+              </div>
+            }
+
+            <div style="display: flex; justify-content: space-between; color: #6E5A56; margin-bottom: 0.5rem;">
+              <span>TVA ({{ devisEnConsultation()!.tauxTVA }}%) :</span>
+              <span style="font-weight: 700; color: #332724;">{{ (((devisEnConsultation()!.totalHT - devisEnConsultation()!.remiseCommerciale) * 0.18) | number) }} FCFA</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; font-size: 1.35rem; font-weight: 900; color: #721513; border-top: 1.5px solid #EDE7DC; padding-top: 0.85rem; font-family: 'Playfair Display', serif;">
+              <span>TOTAL NET TTC À PAYER :</span>
+              <span style="color: #E51D24;">{{ (devisEnConsultation()!.totalTTC | number) }} FCFA</span>
+            </div>
+
+            <div style="font-size: 0.82rem; color: #721513; margin-top: 0.65rem; font-weight: 700; display: flex; align-items: center; gap: 0.4rem;">
+              <i class="fa-solid fa-credit-card" style="color: #E51D24;"></i> Acompte requis à la commande (50%) : {{ (devisEnConsultation()!.acompteRequis | number) }} FCFA
+            </div>
+          </div>
+
+          <div style="font-size: 0.82rem; color: #721513; margin-bottom: 1.5rem; background: #FAF5EA; padding: 0.85rem; border-radius: 12px; border: 1.5px solid #E6DABA; display: flex; align-items: flex-start; gap: 0.5rem;">
+            <i class="fa-solid fa-comment-dots" style="color: #E51D24; margin-top: 0.15rem;"></i>
+            <div>
+              <strong>Note du Chef Traiteur :</strong> {{ devisEnConsultation()!.commentairesChef }}
+            </div>
+          </div>
+
+          <!-- Actions de décision du client -->
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <button (click)="showDevisModal.set(false)" style="flex: 1; min-width: 180px; padding: 0.85rem; background: #FAF8F4; color: #6E5A56; border: 1.5px solid #EDE7DC; border-radius: 9999px; font-weight: 700; cursor: pointer;">
+              Demander des Ajustements
+            </button>
+            <button 
+              (click)="validerPropositionClient()"
+              class="event-btn-primary" style="flex: 1.5; min-width: 240px; justify-content: center; font-size: 0.92rem;">
+              <i class="fa-solid fa-signature"></i> Valider & Signer le Devis en Ligne
+            </button>
+          </div>
+        }
+
+      </div>
+    </div>
+  }
+
+</div>

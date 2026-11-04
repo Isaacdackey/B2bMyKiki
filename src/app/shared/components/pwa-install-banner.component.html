@@ -1,0 +1,66 @@
+<!-- 1. Bannière / Bouton flottant de MISE À JOUR DISPONIBLE (Visible uniquement si l'application est DÉJÀ installée) -->
+    @if (isInstalled && hasUpdate) {
+<div class="pwa-floating-wrapper anim-float-up">
+      <div class="pwa-update-pill">
+        <button type="button" class="pwa-dismiss-badge" (click)="ignorerMiseAJour($event)" title="Fermer">
+          <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+
+        <button type="button" class="pwa-update-btn" (click)="appliquerMiseAJour()">
+          <span class="pwa-update-icon-pulse">
+            <i class="fas fa-arrows-rotate"></i>
+          </span>
+          <div class="pwa-update-text">
+            <span class="pwa-update-title">Nouvelle mise à jour disponible</span>
+            <span class="pwa-update-sub">Télécharger la dernière version</span>
+          </div>
+        </button>
+      </div>
+    </div>
+}
+
+    <!-- 2. Bouton flottant d'INSTALLATION PWA (Visible uniquement si PAS encore installé) -->
+    @if (!isInstalled && showBanner) {
+<div class="pwa-floating-wrapper anim-float-up">
+      
+      <!-- Guide d'installation iOS Safari si activé -->
+      @if (showIosGuide) {
+<div class="pwa-ios-modal anim-fade-in">
+        <div class="pwa-ios-header">
+          <strong>Installer Mykiki sur iPhone / iPad</strong>
+          <button type="button" class="btn-guide-close" (click)="showIosGuide = false">✕</button>
+        </div>
+        <ol class="pwa-ios-steps">
+          <li>1. Touchez l'icône de partage <strong><i class="fas fa-arrow-up-from-bracket"></i></strong> en bas de Safari.</li>
+          <li>2. Faites défiler et choisissez <strong>« Sur l'écran d'accueil »</strong> <i class="fas fa-plus-square text-bordeaux"></i>.</li>
+          <li>3. Touchez <strong>Ajouter</strong> en haut à droite.</li>
+        </ol>
+      </div>
+}
+
+      <!-- Bouton flottant fond bordeaux dégradé avec badge de fermeture en indice -->
+      <div class="pwa-floating-pill">
+        <!-- Icône de fermeture en indice (collée en haut à droite) -->
+        <button type="button" class="pwa-dismiss-badge" (click)="fermer($event)" title="Fermer temporairement (réapparaît dans 10s)">
+          <svg viewBox="0 0 24 24" width="10" height="10" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+
+        <!-- Bouton principal d'installation -->
+        <button type="button" class="pwa-main-btn" (click)="installer()">
+          <span class="pwa-icon-cercle">
+            <img src="assets/images/icon-192.png" alt="Mykiki" />
+          </span>
+          <span class="pwa-btn-label">
+            <i class="fas fa-download me-1"></i>
+            Installer Mykiki
+          </span>
+        </button>
+      </div>
+    </div>
+}

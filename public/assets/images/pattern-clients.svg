@@ -1,0 +1,26 @@
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <style>
+      .pattern-fill { fill: #E8DDD7; }
+      .pattern-wave { fill: #F5F3F0; }
+    </style>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="800" class="pattern-fill"/>
+  
+  <!-- Organic wavy shapes -->
+  <path class="pattern-wave" d="M 0 150 Q 150 100, 300 150 T 600 150 T 900 150 T 1200 150 L 1200 0 L 0 0 Z"/>
+  <path class="pattern-wave" d="M 0 250 Q 200 200, 400 280 T 800 250 T 1200 280 L 1200 200 L 0 200 Z"/>
+  <path class="pattern-wave" d="M 0 380 Q 180 320, 350 380 T 700 350 T 1050 380 T 1200 340 L 1200 300 L 0 300 Z"/>
+  <path class="pattern-wave" d="M 0 500 Q 150 450, 300 520 T 600 490 T 900 530 T 1200 480 L 1200 400 L 0 400 Z"/>
+  <path class="pattern-wave" d="M 0 650 Q 200 600, 400 680 T 800 640 T 1200 680 L 1200 550 L 0 550 Z"/>
+  <path class="pattern-wave" d="M 0 800 Q 180 750, 360 800 T 720 780 T 1080 800 T 1200 770 L 1200 720 L 0 720 Z"/>
+  
+  <!-- Additional organic shapes -->
+  <ellipse cx="150" cy="100" rx="120" ry="90" class="pattern-wave" opacity="0.6"/>
+  <ellipse cx="1050" cy="200" rx="140" ry="110" class="pattern-wave" opacity="0.5"/>
+  <ellipse cx="300" cy="600" rx="110" ry="130" class="pattern-wave" opacity="0.6"/>
+  <ellipse cx="900" cy="680" rx="130" ry="100" class="pattern-wave" opacity="0.5"/>
+  <circle cx="600" cy="400" r="100" class="pattern-wave" opacity="0.4"/>
+</svg>

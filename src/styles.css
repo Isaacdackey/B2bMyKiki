@@ -1,0 +1,933 @@
+@import "tailwindcss";
+/* Official Kiki Traiteur Global Styles */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@700&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  font-family: var(--font-body), 'Poppins', sans-serif;
+  background-color: #ffffff;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.55)), url('/assets/images/kiki-brand-pattern.jpg');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  background-attachment: scroll;
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+}
+
+.toast-container {
+  position: fixed;
+  top: 75px;
+  right: 1.5rem;
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  pointer-events: none;
+  max-width: min(400px, calc(100vw - 2rem));
+}
+
+.toast-msg {
+  pointer-events: auto;
+  background-color: #FAF5EA;
+  color: #721513;
+  padding: 0.75rem 1.15rem;
+  border-radius: 12px;
+  border: 1.5px solid #E2D5BE;
+  border-left: 5px solid #721513;
+  box-shadow: 0 10px 25px -4px rgba(114, 21, 19, 0.16), 0 4px 10px rgba(0, 0, 0, 0.05);
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.35;
+  opacity: 0;
+  transform: translateY(-16px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.toast-msg.error {
+  background-color: #FFF5F5;
+  color: #991B1B;
+  border-color: #FECACA;
+  border-left-color: #DC2626;
+}
+
+.toast-msg.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 640px) {
+  .toast-container {
+    top: 65px;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    width: calc(100vw - 24px) !important;
+    max-width: 320px !important;
+    align-items: center !important;
+  }
+
+  .toast-msg {
+    width: 100% !important;
+    max-width: 100% !important;
+    font-size: 0.82rem;
+    padding: 0.6rem 0.9rem;
+    border-radius: 10px;
+    box-sizing: border-box;
+    justify-content: center;
+    text-align: center;
+    white-space: normal;
+    word-break: break-word;
+  }
+}
+
+/* =============================================
+   GLOBAL INPUT / SELECT / TEXTAREA RESET
+   Applies across ALL components (site + gestionnaire)
+   ============================================= */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]):not([type="file"]),
+select,
+textarea {
+  border-radius: 5px !important;
+  border: 1.5px solid #CBD5E1 !important;
+  padding: 0.4rem 0.7rem !important;
+  font-size: 0.875rem !important;
+  line-height: 1.4 !important;
+  background: #fff !important;
+  color: #1E293B !important;
+  font-family: 'Poppins', sans-serif !important;
+  transition: border-color 0.2s, box-shadow 0.2s !important;
+  box-sizing: border-box !important;
+  height: auto !important;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]):not([type="file"]):focus,
+select:focus,
+textarea:focus {
+  outline: none !important;
+  border-color: #7A1C1C !important;
+  box-shadow: 0 0 0 3px rgba(122, 28, 28, 0.1) !important;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+/* =============================================
+   CORRECTION DES CHEVAUCHEMENTS ICÔNES / TEXTES
+   ============================================= */
+div.input-with-icon input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]),
+.input-with-icon .form-control,
+.input-with-icon input.form-control,
+input.input-with-icon-el {
+  padding-left: 3rem !important;
+}
+
+div.password-field.input-with-icon input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]) {
+  padding-right: 3rem !important;
+}
+
+.input-with-icon {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.input-with-icon>.input-icon,
+.input-with-icon>i {
+  position: absolute !important;
+  left: 0.95rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  color: #94A3B8;
+  font-size: 1rem;
+  pointer-events: none;
+  z-index: 5;
+  margin-right: 0 !important;
+}
+
+/* Espacement global automatique pour éviter que les icônes ne touchent le texte dans tout le projet */
+button i[class*="fa-"]:not(.input-icon),
+a i[class*="fa-"]:not(.input-icon),
+span i[class*="fa-"]:not(.input-icon),
+h1 i[class*="fa-"],
+h2 i[class*="fa-"],
+h3 i[class*="fa-"],
+h4 i[class*="fa-"],
+h5 i[class*="fa-"],
+h6 i[class*="fa-"],
+label i[class*="fa-"],
+p i[class*="fa-"],
+div.badge i[class*="fa-"],
+.btn i[class*="fa-"] {
+  margin-right: 0.45rem !important;
+}
+
+/* =============================================
+   ANIMATIONS LUXURY & TRANSITIONS FLUIDES
+   ============================================= */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
+  }
+
+  70% {
+    box-shadow: 0 0 0 8px rgba(220, 38, 38, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.35s ease-out forwards;
+}
+
+.animate-fade-up {
+  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Stagger Delays */
+.stagger-1 {
+  animation-delay: 0.05s;
+}
+
+.stagger-2 {
+  animation-delay: 0.10s;
+}
+
+.stagger-3 {
+  animation-delay: 0.15s;
+}
+
+.stagger-4 {
+  animation-delay: 0.20s;
+}
+
+.stagger-5 {
+  animation-delay: 0.25s;
+}
+
+.stagger-6 {
+  animation-delay: 0.30s;
+}
+
+/* Table and Card Transitions */
+.kpi-card,
+.stat-card {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease !important;
+}
+
+.kpi-card:hover,
+.stat-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.12), 0 6px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+.admin-table tbody tr,
+.table-kiki-luxury tbody tr,
+.table-propositions-catalogue tbody tr {
+  transition: background-color 0.18s ease, transform 0.18s ease;
+}
+
+.btn,
+button,
+.btn-icon-action,
+.btn-table-action {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.btn:active,
+button:active,
+.btn-icon-action:active {
+  transform: scale(0.96) !important;
+}
+
+/* ============================================================
+   KIKI TRAITEUR — SYSTÈME UNIFIÉ DE MODALES & POPUPS LUXUEUSES
+   Appliqué à tout le projet : Client (MyKiki), Gestionnaire & Admin
+   ============================================================ */
+
+.modal-overlay,
+.fidelite-modal-overlay,
+.configurator-modal-backdrop,
+.custom-modal-backdrop,
+.modal-backdrop,
+.confirmation-overlay,
+.lightbox,
+.pwa-modal-backdrop {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  width: 100dvw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  background: rgba(15, 23, 42, 0.72) !important;
+  backdrop-filter: blur(14px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(180%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 9999999 !important;
+  padding: 1.25rem !important;
+  box-sizing: border-box !important;
+  animation: modalFadeIn 0.22s ease-out !important;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Flouttage intégral de l'arrière-plan (header, dock, navigation) lors de l'ouverture de n'importe quel popup */
+body:has(.modal-overlay) .mobile-kiki-header,
+body:has(.modal-overlay) .mobile-floating-dock-container,
+body:has(.modal-overlay) .desktop-luxury-sidebar,
+body:has(.modal-overlay) .desktop-top-bar,
+body:has(.fidelite-modal-overlay) .mobile-kiki-header,
+body:has(.fidelite-modal-overlay) .mobile-floating-dock-container,
+body:has(.fidelite-modal-overlay) .desktop-luxury-sidebar,
+body:has(.fidelite-modal-overlay) .desktop-top-bar,
+body:has(.configurator-modal-backdrop) .mobile-kiki-header,
+body:has(.configurator-modal-backdrop) .mobile-floating-dock-container,
+body:has(.confirmation-overlay) .mobile-kiki-header,
+body:has(.confirmation-overlay) .mobile-floating-dock-container,
+.mykiki-app-container:has(.modal-overlay) .mobile-kiki-header,
+.mykiki-app-container:has(.modal-overlay) .mobile-floating-dock-container,
+.mykiki-app-container:has(.modal-overlay) .desktop-luxury-sidebar,
+.mykiki-app-container:has(.modal-overlay) .desktop-top-bar,
+.mykiki-app-container:has(.fidelite-modal-overlay) .mobile-kiki-header,
+.mykiki-app-container:has(.fidelite-modal-overlay) .mobile-floating-dock-container,
+.mykiki-app-container:has(.fidelite-modal-overlay) .desktop-luxury-sidebar,
+.mykiki-app-container:has(.fidelite-modal-overlay) .desktop-top-bar {
+  filter: blur(10px) brightness(0.55) !important;
+  pointer-events: none !important;
+  user-select: none !important;
+  z-index: 0 !important;
+  transition: filter 0.2s ease, opacity 0.2s ease !important;
+}
+
+body:has(.modal-overlay) .mykiki-main-content,
+body:has(.fidelite-modal-overlay) .mykiki-main-content,
+.mykiki-app-container:has(.modal-overlay) .mykiki-main-content,
+.mykiki-app-container:has(.fidelite-modal-overlay) .mykiki-main-content {
+  z-index: 9999990 !important;
+}
+
+.modal-card,
+.modal-content,
+.configurator-modal-content,
+.custom-modal-box,
+.fiche-modale {
+  background: #ffffff !important;
+  border-radius: 20px !important;
+  border: 1px solid rgba(114, 21, 19, 0.15) !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.38), 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  animation: modalPopUp 0.26s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  margin: auto !important;
+  max-height: 90vh !important;
+  box-sizing: border-box !important;
+}
+
+@keyframes modalPopUp {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* En-tête de modale luxueux (Bordeaux dégradé signature) */
+.modal-header,
+.modal-card-header,
+.modal-header-lux,
+.fiche-bandeau {
+  flex-shrink: 0 !important;
+  background: linear-gradient(135deg, #721513 0%, #991B1B 50%, #4A0D0B 100%) !important;
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.18) !important;
+  padding: 1.25rem 1.65rem !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 20px rgba(114, 21, 19, 0.3) !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 1rem !important;
+}
+
+.modal-title-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 1rem !important;
+}
+
+.modal-title,
+.modal-lux-title,
+.modal-header h3,
+.modal-card-header h3,
+.fiche-bandeau h3 {
+  margin: 0 !important;
+  font-size: 1.25rem !important;
+  font-weight: 800 !important;
+  color: #ffffff !important;
+  font-family: 'Playfair Display', Georgia, serif !important;
+  letter-spacing: -0.01em !important;
+}
+
+.modal-lux-subtitle,
+.modal-header p,
+.modal-card-header p,
+.fiche-bandeau p {
+  display: block !important;
+  margin: 0.25rem 0 0 0 !important;
+  font-size: 0.8rem !important;
+  color: #FEF08A !important;
+  font-weight: 600 !important;
+}
+
+/* Icône de modale vitrée */
+.modal-icon,
+.modal-icon-lux,
+.fiche-icon-badge {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.25rem !important;
+  flex-shrink: 0 !important;
+  background: rgba(255, 255, 255, 0.18) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.35) !important;
+  color: #ffffff !important;
+}
+
+/* Bouton Fermer (×) rond rotatif */
+.modal-close,
+.modal-close-btn,
+.fiche-fermer {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  border-radius: 50% !important;
+  width: 36px !important;
+  height: 36px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.25rem !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  flex-shrink: 0 !important;
+  line-height: 1 !important;
+  padding: 0 !important;
+}
+
+.modal-close:hover,
+.modal-close-btn:hover,
+.fiche-fermer:hover {
+  background: rgba(255, 255, 255, 0.4) !important;
+  transform: rotate(90deg) scale(1.06) !important;
+  color: #ffffff !important;
+}
+
+/* Corps de modale scrollable */
+.modal-body,
+.modal-card-body,
+.modal-body-scroll {
+  flex: 1 1 auto !important;
+  overflow-y: auto !important;
+  padding: 1.5rem 1.65rem !important;
+  background: #faf8f5 !important;
+}
+
+/* Pied de modale moderne */
+.modal-footer,
+.modal-card-footer,
+.modal-footer-lux {
+  flex-shrink: 0 !important;
+  background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%) !important;
+  border-top: 1.5px solid #E2E8F0 !important;
+  padding: 1rem 1.65rem !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 0.85rem !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+   BOUTONS COLORÉS ET VIBRANTS DE MODALE
+   ════════════════════════════════════════════════════════════ */
+
+/* Bouton Fermer / Action Principale Bordeaux */
+.btn-close-modal-bordeaux,
+.btn-fermer-rouge {
+  background: linear-gradient(135deg, #721513 0%, #991B1B 50%, #B91C1C 100%) !important;
+  border: none !important;
+  color: #ffffff !important;
+  padding: 0.58rem 1.45rem !important;
+  border-radius: 10px !important;
+  font-size: 0.84rem !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 14px rgba(114, 21, 19, 0.35) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.45rem !important;
+  text-decoration: none !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-close-modal-bordeaux:hover,
+.btn-fermer-rouge:hover {
+  background: linear-gradient(135deg, #8B1C19 0%, #B91C1C 50%, #DC2626 100%) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 18px rgba(114, 21, 19, 0.45) !important;
+  color: #ffffff !important;
+}
+
+/* Bouton Succès / Validation / Enregistrement (Vert Émeraude Vibrant) */
+.btn-success-modal,
+.btn-submit-lux,
+.modal-footer .btn-primary,
+.modal-card-footer .btn-primary {
+  background: linear-gradient(135deg, #059669 0%, #10B981 100%) !important;
+  border: none !important;
+  color: #ffffff !important;
+  padding: 0.58rem 1.45rem !important;
+  border-radius: 10px !important;
+  font-size: 0.84rem !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.45rem !important;
+  text-decoration: none !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-success-modal:hover,
+.btn-submit-lux:hover,
+.modal-footer .btn-primary:hover,
+.modal-card-footer .btn-primary:hover {
+  background: linear-gradient(135deg, #047857 0%, #059669 100%) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.45) !important;
+  color: #ffffff !important;
+}
+
+/* Bouton Annulation / Danger Doux mais Net (Rouge pastel encadré) */
+.btn-cancel-modal-link,
+.btn-cancel-lux,
+.modal-footer .btn-secondary,
+.modal-card-footer .btn-secondary {
+  background: #FEE2E2 !important;
+  border: 1.5px solid #F87171 !important;
+  color: #DC2626 !important;
+  padding: 0.54rem 1.25rem !important;
+  border-radius: 10px !important;
+  font-size: 0.82rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.45rem !important;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.12) !important;
+}
+
+.btn-cancel-modal-link:hover,
+.btn-cancel-lux:hover,
+.modal-footer .btn-secondary:hover,
+.modal-card-footer .btn-secondary:hover {
+  background: #DC2626 !important;
+  border-color: #DC2626 !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25) !important;
+}
+
+/* Bouton Confirmation Refus / Suppression Radicale */
+.btn-confirm-refusal,
+.btn-danger-modal {
+  background: linear-gradient(135deg, #DC2626 0%, #991B1B 100%) !important;
+  border: none !important;
+  color: #ffffff !important;
+  padding: 0.58rem 1.45rem !important;
+  border-radius: 10px !important;
+  font-size: 0.84rem !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.45rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-confirm-refusal:hover,
+.btn-danger-modal:hover {
+  background: linear-gradient(135deg, #EF4444 0%, #B91C1C 100%) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 18px rgba(220, 38, 38, 0.5) !important;
+  color: #ffffff !important;
+}
+
+/* Bouton Neutre Sombre Pro (Gris ardoise / Noir chic) */
+.btn-neutral-modal {
+  background: #1E293B !important;
+  border: 1px solid #334155 !important;
+  color: #ffffff !important;
+  padding: 0.55rem 1.35rem !important;
+  border-radius: 10px !important;
+  font-size: 0.84rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15) !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-neutral-modal:hover {
+  background: #0F172A !important;
+  border-color: #0F172A !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+}
+
+/* ============================================================
+   RESPONSIVE MOBILE TYPOGRAPHY & CENTERING DES MODALES
+   ============================================================ */
+
+@media (max-width: 768px) {
+  html {
+    font-size: 14.5px;
+  }
+
+  body {
+    font-size: 0.88rem;
+    line-height: 1.45;
+  }
+
+  h1,
+  .hero-title,
+  .h1-title {
+    font-size: 1.55rem !important;
+    line-height: 1.25 !important;
+  }
+
+  h2,
+  .section-title,
+  .h2-title {
+    font-size: 1.3rem !important;
+    line-height: 1.3 !important;
+  }
+
+  h3,
+  .card-title,
+  .h3-title {
+    font-size: 1.1rem !important;
+    line-height: 1.3 !important;
+  }
+
+  h4,
+  h5,
+  h6 {
+    font-size: 0.95rem !important;
+  }
+
+  .btn,
+  .btn-primary,
+  .btn-secondary,
+  .btn-action {
+    font-size: 0.82rem !important;
+    padding: 0.5rem 1rem !important;
+  }
+
+  /* ============================================================
+     KIKI TRAITEUR — MODALES MOBILE PLEIN ÉCRAN AU-DESSUS DE TOUT
+     Couvre 100% de la fenêtre (y compris en-tête et dock de menu)
+     avec flou d'arrière-plan intégral.
+     ============================================================ */
+  .modal-overlay,
+  .fidelite-modal-overlay,
+  .configurator-modal-backdrop,
+  .custom-modal-backdrop,
+  .modal-backdrop,
+  .confirmation-overlay,
+  .lightbox,
+  .pwa-modal-backdrop {
+    position: fixed !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    width: 100dvw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-height: 100vh !important;
+    background: rgba(15, 23, 42, 0.72) !important;
+    backdrop-filter: blur(14px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(180%) !important;
+    padding: 1.25rem 1rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 9999999 !important;
+    box-sizing: border-box !important;
+  }
+
+  .modal-card,
+  .modal-content,
+  .configurator-modal-content,
+  .custom-modal-box,
+  .fiche-modale,
+  .modal-detail-lux,
+  .modal-prop-decision,
+  .modal-notation-card,
+  .produit-details-card,
+  .fidelite-modal-card,
+  .modal-succes-guest {
+    max-height: calc(100dvh - 48px) !important;
+    height: auto !important;
+    width: 100% !important;
+    max-width: 520px !important;
+    border-radius: 20px !important;
+    margin: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  .modal-header,
+  .modal-card-header,
+  .modal-header-lux,
+  .fiche-bandeau,
+  .prop-modal-header {
+    flex-shrink: 0 !important;
+    padding: 0.85rem 1rem !important;
+  }
+
+  .modal-title,
+  .modal-lux-title,
+  .modal-header h3,
+  .modal-card-header h3,
+  .fiche-bandeau h3 {
+    font-size: 1.05rem !important;
+  }
+
+  .modal-lux-subtitle,
+  .modal-header p,
+  .modal-card-header p,
+  .fiche-bandeau p {
+    font-size: 0.75rem !important;
+  }
+
+  .modal-body,
+  .modal-card-body,
+  .modal-body-scroll,
+  .fiche-corps,
+  .details-corps {
+    padding: 0.85rem 1rem !important;
+    max-height: calc(100vh - 240px) !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    flex: 1 1 auto !important;
+  }
+
+  .modal-footer,
+  .modal-card-footer,
+  .modal-footer-lux,
+  .fiche-actions,
+  .prop-modal-actions-footer,
+  .notation-footer-actions {
+    flex-shrink: 0 !important;
+    padding: 0.75rem 1rem !important;
+    background: #ffffff !important;
+    border-top: 1px solid #f1f5f9 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+    z-index: 10 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 14px;
+  }
+
+  h1,
+  .hero-title {
+    font-size: 1.4rem !important;
+  }
+
+  h2,
+  .section-title {
+    font-size: 1.2rem !important;
+  }
+
+  .modal-overlay,
+  .fidelite-modal-overlay,
+  .configurator-modal-backdrop,
+  .custom-modal-backdrop,
+  .modal-backdrop,
+  .confirmation-overlay,
+  .lightbox,
+  .pwa-modal-backdrop {
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    width: 100dvw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-height: 100vh !important;
+    background: rgba(15, 23, 42, 0.72) !important;
+    backdrop-filter: blur(14px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(180%) !important;
+    z-index: 9999999 !important;
+    padding: 0.75rem 0.5rem !important;
+  }
+
+  .modal-card,
+  .modal-content,
+  .configurator-modal-content,
+  .custom-modal-box,
+  .fiche-modale,
+  .modal-detail-lux,
+  .fidelite-modal-card {
+    max-height: calc(100dvh - 24px) !important;
+    max-width: 100% !important;
+    border-radius: 16px !important;
+  }
+}
+
+/* ══════════ LIGHTBOX OVERLAYS (PRIORITÉ ABSOLUE AU-DESSUS DE TOUTES LES MODALES) ══════════ */
+.lightbox-overlay,
+.lightbox {
+  z-index: 100000000 !important;
+}
+
+.lightbox-content,
+.lightbox-modal {
+  z-index: 100000001 !important;
+}
+
+.lightbox-close,
+.lightbox-nav-btn {
+  z-index: 100000002 !important;
+}
+/* Responsive Filters for Mobile */
+@media (max-width: 767px) {
+  .desktop-filters {
+    display: none !important;
+  }
+  .mobile-filters {
+    display: block !important;
+  }
+}
+@media (min-width: 768px) {
+  .mobile-filters {
+    display: none !important;
+  }
+}
+
+
+.table-responsive {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+

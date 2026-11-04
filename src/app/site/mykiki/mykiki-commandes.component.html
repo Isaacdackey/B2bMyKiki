@@ -1,0 +1,1094 @@
+<div class="commandes-page">
+
+      <!-- ============================================================== -->
+      <!-- 1. DEUX ONGLETS PRINCIPAUX : COMMANDES & DEMANDES DE DEVIS      -->
+      <!-- ============================================================== -->
+      <div class="commandes-navigation-onglets">
+        <button type="button" 
+                class="main-tab-btn" 
+                [class.active]="ongletPrincipal === 'COMMANDES'" 
+                (click)="changerOngletPrincipal('COMMANDES')">
+          <i class="fas fa-bag-shopping"></i>
+          <span>Commandes</span>
+        </button>
+
+        <button type="button" 
+                class="main-tab-btn" 
+                [class.active]="ongletPrincipal === 'DEMANDES'" 
+                (click)="changerOngletPrincipal('DEMANDES')">
+          <i class="fas fa-clipboard-list"></i>
+          <span>Demandes</span>
+          @if (nombrePropositionsEnAttente > 0) {
+<span class="tab-pill-badge badge-notif-propositions">
+            <i class="fas fa-bell me-1"></i> {{ nombrePropositionsEnAttente }}
+          </span>
+}
+        </button>
+      </div>
+
+      <!-- ============================================================== -->
+      <!-- SECTION A : COMMANDES DU CATALOGUE                             -->
+      <!-- ============================================================== -->
+      @if (ongletPrincipal === 'COMMANDES') {
+
+        
+        <!-- Filtres par statut (Pills au design épuré) -->
+        <div class="horizontal-filter-chips-row">
+          <button type="button" class="filter-chip-pill" [class.active]="filtreActif === 'TOUTES'" (click)="setFiltre('TOUTES')">
+            <i class="fas fa-globe"></i>
+            <span>Tous</span>
+          </button>
+          <button type="button" class="filter-chip-pill" [class.active]="filtreActif === 'EN_ATTENTE'" (click)="setFiltre('EN_ATTENTE')">
+            <i class="fas fa-clock"></i>
+            <span>En attente</span>
+            @if (compterStatut('EN_ATTENTE') > 0) {
+<span class="chip-counter-badge">{{ compterStatut('EN_ATTENTE') }}</span>
+}
+          </button>
+          <button type="button" class="filter-chip-pill" [class.active]="filtreActif === 'EN_COURS'" (click)="setFiltre('EN_COURS')">
+            <i class="fas fa-utensils"></i>
+            <span>En cuisine</span>
+            @if ((compterStatut('ACCEPTEE') + compterStatut('EN_COURS')) > 0) {
+<span class="chip-counter-badge">{{ compterStatut('ACCEPTEE') + compterStatut('EN_COURS') }}</span>
+}
+          </button>
+          <button type="button" class="filter-chip-pill" [class.active]="filtreActif === 'PRETE'" (click)="setFiltre('PRETE')">
+            <i class="fas fa-box-open"></i>
+            <span>Prêtes</span>
+            @if (compterStatut('PRETE') > 0) {
+<span class="chip-counter-badge">{{ compterStatut('PRETE') }}</span>
+}
+          </button>
+          <button type="button" class="filter-chip-pill" [class.active]="filtreActif === 'TERMINEE'" (click)="setFiltre('TERMINEE')">
+            <i class="fas fa-check-double"></i>
+            <span>Terminées</span>
+          </button>
+        </div>
+
+        <!-- Recherche discrète -->
+        @if (commandes.length > 3) {
+<div class="recherche-ligne-wrap">
+          <div class="champ-recherche-box">
+            <i class="fas fa-search"></i>
+            <input type="text" [(ngModel)]="rechercheTexte" (input)="filtrer()" placeholder="Rechercher par n° ou plat..." class="champ-recherche-input" />
+            @if (rechercheTexte) {
+<button class="btn-clear-search" (click)="rechercheTexte = ''; filtrer()">&times;</button>
+}
+          </div>
+        </div>
+}
+
+        @if (chargement) {
+<div class="commandes-etat">
+          <i class="fas fa-spinner fa-spin"></i> Chargement de vos commandes...
+        </div>
+}
+
+        <!-- Liste des commandes en cartes épurées (cliquables pour ouvrir le détail popup) -->
+        @if (!chargement && commandesFiltrees.length > 0) {
+<div class="commandes-liste">
+          @for (c of commandesFiltrees; track $index; let i = $index) {
+<article class="commande-carte" [style.animation-delay]="((i % 10) * 0.04) + 's'" (click)="ouvrirDetail(c)">
+            <!-- Ligne 1 : N° Commande à gauche + Statut à droite sur la même ligne -->
+            <div class="carte-ligne-header">
+              <span class="carte-numero">{{ c.numero }}</span>
+              <span class="carte-statut" [ngClass]="classeStatut(c.statut)">
+                <i class="fas" [ngClass]="iconeStatut(c.statut)"></i> {{ c.statutLibelle }}
+              </span>
+            </div>
+
+            <!-- Ligne 2 : Infos sur le retrait / livraison -->
+            <div class="carte-ligne-remise">
+              <span class="carte-date-reception">
+                <i class="far fa-calendar-check text-warning me-1"></i> Remise prévue le <strong>{{ c.dateRemise | date:'d MMM yyyy à HH:mm' }}</strong>
+              </span>
+              <span class="badge-remise-mode" [ngClass]="c.modeRemise === 'LIVRAISON' ? 'remise-livraison' : 'remise-retrait'">
+                <i class="fas" [ngClass]="c.modeRemise === 'LIVRAISON' ? 'fa-truck' : 'fa-store'"></i>
+                {{ c.modeRemise === 'LIVRAISON' ? 'Livraison' : 'Retrait sur place' }}
+              </span>
+            </div>
+
+            <!-- Ligne 3 : Montant total & Bouton Noter prestation si livrée -->
+            <div class="carte-ligne-footer">
+              <div class="solde-prix-box">
+                <span class="solde-label-mini">Total :</span>
+                <strong class="solde-chiffre-compact">{{ c.montantTotal | number:'1.0-0' }} FCFA</strong>
+              </div>
+
+              <!-- Action Notation pour commande livrée -->
+              @if (c.statut === 'TERMINEE') {
+<div class="action-notation-carte-wrap" (click)="$event.stopPropagation()">
+                @if (peutNoterCommande(c)) {
+<button class="btn-noter-carte-compact" (click)="ouvrirNotation(c)" title="Évaluer cette prestation">
+                  <i class="fas fa-star text-warning"></i>
+                  <span>Noter la prestation</span>
+                  @if ((configFidelite?.pointsAvisClient || 0) > 0) {
+<span class="badge-pts-avis-mini">+{{ configFidelite?.pointsAvisClient }} pts</span>
+}
+                </button>
+}
+
+                @if (estCommandeNotee(c)) {
+<span class="badge-avis-obtenu-mini">
+                  <i class="fas fa-star text-warning"></i> {{ getNoteCommande(c) }}/5 notée
+                </span>
+}
+              </div>
+}
+            </div>
+          </article>
+}
+        </div>
+}
+
+        <!-- État vide commandes -->
+        @if (!chargement && commandesFiltrees.length === 0) {
+<div class="commandes-vide">
+          <div class="vide-icone-cercle">
+            <i class="fas fa-utensils"></i>
+          </div>
+          @if (commandes.length === 0) {
+<p class="vide-texte-gris">Aucune commande pour le moment</p>
+}
+          @if (commandes.length > 0) {
+<p class="vide-texte-gris">Aucune commande ne correspond aux filtres</p>
+}
+          <div class="commandes-vide-actions">
+            <a routerLink="/mykiki/catalogue" class="btn-commandes-principal">
+              <i class="fas fa-book-open"></i> Parcourir le catalogue
+            </a>
+          </div>
+        </div>
+}
+
+      
+}
+
+      <!-- ============================================================== -->
+      <!-- SECTION B : DEMANDES DE DEVIS & ÉVÉNEMENTS                      -->
+      <!-- ============================================================== -->
+      @if (ongletPrincipal === 'DEMANDES') {
+
+
+        <!-- Barre d'outils Demandes : bouton créer -->
+        <div class="barre-outils-demandes">
+          <a routerLink="/mykiki/nouvelle-demande" class="btn-creer-demande-cta">
+            <i class="fas fa-plus"></i> Nouvelle demande
+          </a>
+        </div>
+
+        <!-- Filtres par statut Demandes (Même design que l'image 2) -->
+        <div class="horizontal-filter-chips-row">
+          <button type="button" class="filter-chip-pill" [class.active]="filtreDemandeActif === 'TOUTES'" (click)="setFiltreDemande('TOUTES')">
+            <i class="fas fa-globe"></i>
+            <span>Toutes</span>
+          </button>
+          <button type="button" class="filter-chip-pill" [class.active]="filtreDemandeActif === 'EN_ATTENTE'" (click)="setFiltreDemande('EN_ATTENTE')">
+            <i class="fas fa-hourglass-half"></i>
+            <span>En étude</span>
+            @if (compterStatutDemande('EN_ATTENTE') > 0) {
+<span class="chip-counter-badge">{{ compterStatutDemande('EN_ATTENTE') }}</span>
+}
+          </button>
+          <button type="button" class="filter-chip-pill" [class.active]="filtreDemandeActif === 'PROPOSITION_ENVOYEE'" (click)="setFiltreDemande('PROPOSITION_ENVOYEE')">
+            <i class="fas fa-bell"></i>
+            <span>Propositions</span>
+            @if (nombrePropositionsEnAttente > 0) {
+<span class="chip-counter-badge">{{ nombrePropositionsEnAttente }}</span>
+}
+          </button>
+          <button type="button" class="filter-chip-pill" [class.active]="filtreDemandeActif === 'ACCEPTEE'" (click)="setFiltreDemande('ACCEPTEE')">
+            <i class="fas fa-circle-check"></i>
+            <span>Validées</span>
+            @if (compterStatutDemande('ACCEPTEE') > 0) {
+<span class="chip-counter-badge">{{ compterStatutDemande('ACCEPTEE') }}</span>
+}
+          </button>
+          <button type="button" class="filter-chip-pill" [class.active]="filtreDemandeActif === 'ANNULEE'" (click)="setFiltreDemande('ANNULEE')">
+            <i class="fas fa-ban"></i>
+            <span>Annulées</span>
+            @if (compterStatutDemande('ANNULEE') > 0) {
+<span class="chip-counter-badge">{{ compterStatutDemande('ANNULEE') }}</span>
+}
+          </button>
+        </div>
+
+        @if (chargementDemandes) {
+<div class="commandes-etat">
+          <i class="fas fa-spinner fa-spin"></i> Chargement de vos demandes de devis...
+        </div>
+}
+
+        <!-- Liste des demandes de devis (Cards 3 lignes épurées sans bouton oeil, clic -> détails) -->
+        @if (!chargementDemandes && demandesFiltrees.length > 0) {
+<div class="commandes-liste">
+          @for (d of demandesFiltrees; track $index; let i = $index) {
+<article class="commande-carte demande-carte-item" [style.animation-delay]="((i % 10) * 0.04) + 's'" (click)="ouvrirDetailDemande(d)">
+            
+            <!-- Bandeau d'alerte si proposition en attente -->
+            @if (aNouvelleProposition(d)) {
+<div class="proposition-alert-banner" (click)="$event.stopPropagation(); examinerProposition(d)">
+              <div class="banner-left">
+                <i class="fas fa-bell fa-bounce text-warning"></i>
+                <span><strong>Proposition de menu reçue !</strong> Cliquez pour examiner.</span>
+              </div>
+              <button class="btn-consulter-prop-flash" (click)="$event.stopPropagation(); examinerProposition(d)">
+                <i class="fas fa-utensils me-1"></i> Répondre
+              </button>
+            </div>
+}
+
+            <!-- Ligne 1 : Numéro de la demande à gauche + État dynamique à droite -->
+            <div class="carte-ligne-header">
+              <span class="carte-numero">DEV-{{ d.id < 10 ? '2026-000' + d.id : (d.id < 100 ? '2026-00' + d.id : '2026-' + d.id) }}</span>
+              <span class="demande-statut-pill" [ngClass]="classeStatutDemande(d)">
+                <i class="fas" [ngClass]="iconeStatutDemande(d)"></i> {{ libelleStatutDemande(d) }}
+              </span>
+            </div>
+
+            <!-- Ligne 2 : Type de prestation -->
+            <div class="carte-ligne-presta">
+              <span class="demande-presta-type">
+                <i class="fas fa-concierge-bell me-2 text-bordeaux"></i>
+                <strong>{{ libellePrestation(d) }}</strong>
+              </span>
+            </div>
+
+            <!-- Ligne 3 : Date prévue & Convives -->
+            <div class="carte-ligne-remise">
+              <span class="carte-date-reception">
+                <i class="far fa-calendar-check text-warning me-1"></i> Date prévue le <strong>{{ d.date | date:'d MMMM yyyy' }}</strong>
+              </span>
+              @if (d.guests) {
+<span class="badge-remise-mode remise-retrait">
+                <i class="fas fa-users"></i> {{ d.guests }} pers.
+              </span>
+}
+            </div>
+
+          </article>
+}
+        </div>
+}
+
+        <!-- État vide demandes -->
+        @if (!chargementDemandes && demandesFiltrees.length === 0) {
+<div class="commandes-vide">
+          <div class="vide-icone-cercle">
+            <i class="fas fa-clipboard-list"></i>
+          </div>
+          @if (demandes.length === 0) {
+<p class="vide-texte-gris">Aucune demande pour le moment</p>
+}
+          @if (demandes.length > 0) {
+<p class="vide-texte-gris">Aucune demande ne correspond aux filtres</p>
+}
+          <div class="commandes-vide-actions">
+            <a routerLink="/mykiki/nouvelle-demande" class="btn-commandes-principal">
+              <i class="fas fa-plus"></i> Faire une demande
+            </a>
+          </div>
+        </div>
+}
+
+      
+}
+
+    </div>
+
+
+    <!-- ============================================================ -->
+    <!-- MODALE DÉTAILS DE LA COMMANDE (CLIENT — DESIGN IMAGE 3)      -->
+    <!-- ============================================================ -->
+    @if (modaleDetailOuverte && commandeDetail) {
+<div class="modal-overlay" (click)="$event.target === $event.currentTarget && fermerDetail()">
+      <div class="modal-card modal-detail-lux" (click)="$event.stopPropagation()">
+        
+        <!-- Header dégradé bordeaux premium (Image 3) -->
+        <div class="modal-card-header modal-header-lux-v3">
+          <h3 class="modal-lux-v3-title">
+            <i class="fas fa-receipt modal-title-icon"></i>
+            Commande <span class="modal-title-id">#{{ commandeDetail.numero }}</span>
+          </h3>
+          <button class="modal-close-btn-lux-v3" (click)="fermerDetail()" title="Fermer">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="modal-card-body modal-body-scroll-lux">
+
+          <!-- 1. Suivi de votre commande (Stepper Card Luxe) -->
+          @if (commandeDetail.statut !== 'ANNULEE') {
+<div class="suivi-commande-card-lux">
+            <div class="card-lux-section-header">
+              <i class="fas fa-route text-bordeaux"></i>
+              <span class="card-lux-section-title">Suivi de votre commande</span>
+            </div>
+            <ol class="detail-progression-barre-lux">
+              @for (e of etapes; track $index; let i = $index) {
+<li [class.franchie]="indiceEtape(commandeDetail.statut)>= i"
+                  [class.courante]="indiceEtape(commandeDetail.statut) === i"
+                  [class.terminee]="indiceEtape(commandeDetail.statut) > i">
+                <span class="tracker-dot-lux">
+                  @if (indiceEtape(commandeDetail.statut) > i) {
+<i class="fas fa-check"></i>
+}
+                  @if (indiceEtape(commandeDetail.statut) <= i) {
+<span>{{ i + 1 }}</span>
+}
+                </span>
+                <span class="tracker-libelle-lux">{{ e.libelle }}</span>
+              </li>
+}
+            </ol>
+          </div>
+}
+
+          @if (commandeDetail.statut === 'ANNULEE') {
+<div class="alert-annulee-lux">
+            <i class="fas fa-ban fa-lg text-red"></i>
+            <div>
+              <strong>Commande annulée</strong>
+              <p class="mb-0">{{ commandeDetail.motifAnnulation || 'Cette commande a été annulée.' }}</p>
+            </div>
+          </div>
+}
+
+          <!-- Livreur Kiki en charge si assigné -->
+          @if (getLivreur(commandeDetail.id); as liv) {
+<div class="livreur-assigne-card-lux">
+            <div class="livreur-avatar-circle-lux">
+              <i class="fas fa-motorcycle"></i>
+            </div>
+            <div class="livreur-info-col-lux">
+              <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
+                <span class="badge-livreur-pill">Livreur assigné</span>
+                @if (liv.telephone) {
+<a [href]="'tel:' + liv.telephone" class="livreur-tel-link-chip">
+                  <i class="fas fa-phone-alt text-green me-1"></i> {{ liv.telephone }}
+                </a>
+}
+              </div>
+              <h5 class="livreur-nom-titre-lux">{{ liv.chauffeurNom }}</h5>
+              @if (liv.instructions) {
+<p class="livreur-inst-lux">
+                <i class="fas fa-info-circle text-blue me-1"></i> {{ liv.instructions }}
+              </p>
+}
+            </div>
+          </div>
+}
+
+          <!-- 2. Grille 2x2 : Modalités de remise & Paiement et Solde (Image 3) -->
+          <div class="info-grid-2x2-lux">
+            
+            <!-- Card 1 : Modalités de remise -->
+            <div class="info-card-lux">
+              <span class="info-card-label-lux">MODALITÉS DE REMISE</span>
+              <div class="info-card-value-lux">
+                <i class="fas" [ngClass]="commandeDetail.modeRemise === 'LIVRAISON' ? 'fa-truck text-blue' : 'fa-store text-green'"></i>
+                <span>{{ commandeDetail.modeRemise === 'LIVRAISON' ? 'Livraison à domicile' : 'Retrait sur place' }}</span>
+              </div>
+              <div class="info-card-subvalue-lux mt-2">
+                <span class="info-card-sublabel-lux">DATE PRÉVUE :</span>
+                <span class="fw-bold text-dark d-flex align-items-center gap-1">
+                  <i class="fas fa-calendar-alt text-blue"></i>
+                  {{ commandeDetail.dateRemise | date:'d MMMM yyyy à HH:mm' }}
+                </span>
+              </div>
+              @if (commandeDetail.adresseLivraison) {
+<div class="info-card-subvalue-lux mt-2">
+                <span class="info-card-sublabel-lux">ADRESSE :</span>
+                <span class="text-dark d-flex align-items-center gap-1">
+                  <i class="fas fa-map-marker-alt text-red"></i>
+                  {{ commandeDetail.adresseLivraison }}
+                </span>
+              </div>
+}
+            </div>
+
+            <!-- Card 2 : Paiement & Solde -->
+            <div class="info-card-lux">
+              <span class="info-card-label-lux">PAIEMENT &amp; SOLDE</span>
+              <div class="info-card-value-lux total-price-lux">
+                {{ commandeDetail.montantTotal | number:'1.0-0' }} FCFA
+              </div>
+              <div class="info-card-subvalue-lux mt-2">
+                <span class="info-card-sublabel-lux">MODE DE PAIEMENT :</span>
+                <span class="fw-bold text-dark d-flex align-items-center gap-1">
+                  <i class="fas fa-credit-card text-orange"></i>
+                  {{ commandeDetail.modePaiementLibelle || commandeDetail.modePaiement }}
+                </span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 4. Notes / Instructions box (si existantes) -->
+          @if (commandeDetail.noteClient) {
+<div class="notes-encadre-lux">
+            <span class="notes-label-lux">INSTRUCTIONS / NOTES DU CLIENT :</span>
+            <p class="notes-text-lux">
+              "{{ commandeDetail.noteClient }}"
+            </p>
+          </div>
+}
+
+          <!-- 5. Articles commandés -->
+          @if (commandeDetail.lignes && commandeDetail.lignes.length > 0) {
+<div class="articles-box-card-lux">
+            <div class="card-lux-section-header">
+              <i class="fas fa-utensils text-bordeaux"></i>
+              <span class="card-lux-section-title">Articles commandés</span>
+            </div>
+            <div class="articles-table-container-lux">
+              <table class="table-lux-custom">
+                <thead>
+                  <tr>
+                    <th>Article</th>
+                    <th class="text-center">Quantité</th>
+                    <th class="text-end">Prix unitaire</th>
+                    <th class="text-end">Sous-total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (l of commandeDetail.lignes; track $index) {
+<tr>
+                    <td class="td-produit-nom"><strong>{{ l.produitNom }}</strong></td>
+                    <td class="text-center"><span class="badge-qty-lux">{{ l.quantite }}</span></td>
+                    <td class="text-end td-muted">{{ l.prixUnitaire | number:'1.0-0' }} FCFA</td>
+                    <td class="text-end td-subtotal">{{ l.sousTotal | number:'1.0-0' }} FCFA</td>
+                  </tr>
+}
+                </tbody>
+              </table>
+            </div>
+          </div>
+}
+
+        </div>
+
+        <!-- Footer : Bouton Annuler & Bouton Fermer -->
+        <div class="modal-card-footer modal-footer-lux-v3">
+          <div>
+            @if (peutAnnulerCommande(commandeDetail)) {
+<button type="button" class="btn-annuler-commande-client" (click)="demanderAnnulation(commandeDetail)">
+              <i class="fas fa-ban me-1"></i> Annuler ma commande
+            </button>
+}
+          </div>
+          <button type="button" class="btn-fermer-lux-v3" (click)="fermerDetail()">
+            Fermer
+          </button>
+        </div>
+      </div>
+    </div>
+}
+
+    <!-- Modale notation -->
+    @if (modaleNotationOuverte) {
+<div class="modal-overlay" (click)="fermerNotation()">
+      <div class="modal-card modal-notation-card" (click)="$event.stopPropagation()">
+        <button class="modal-close-btn" (click)="fermerNotation()">&times;</button>
+        <div class="notation-modal-header">
+          <div class="notation-star-circle"><i class="fas fa-star"></i></div>
+          <h3 class="notation-titre font-serif-luxury">Votre avis sur votre commande</h3>
+          <p class="notation-sub">Aidez-nous à parfaire nos mets et notre service de livraison.</p>
+        </div>
+
+        <div class="notation-etoiles-row">
+          @for (star of [1, 2, 3, 4, 5]; track $index) {
+<button type="button" class="btn-star-select" [class.active]="(survolNote || noteChoisie)>= star"
+                  (mouseenter)="survolNote = star" (mouseleave)="survolNote = 0"
+                  (click)="definirNote(star)">
+            <i class="fas fa-star"></i>
+          </button>
+}
+        </div>
+        <div class="notation-libelle-note">{{ libelleNote(survolNote || noteChoisie) }}</div>
+
+        <div class="criteres-chips-grid">
+          @for (cr of listeCriteres; track $index) {
+<button type="button" class="critere-chip" [class.selected]="critereEstSelectionne(cr)" (click)="toggleCritere(cr)">
+            {{ cr }}
+          </button>
+}
+        </div>
+
+        <div class="notation-commentaire-box">
+          <textarea [(ngModel)]="commentaireAvis" rows="3" placeholder="Un mot sur la saveur, le service ou la présentation..."></textarea>
+        </div>
+
+        <div class="notation-footer-actions">
+          <button class="btn-valider-avis" (click)="enregistrerAvis()">
+            <i class="fas fa-paper-plane me-1"></i> Publier mon avis
+          </button>
+        </div>
+      </div>
+    </div>
+}
+
+    <!-- ============================================================ -->
+    <!-- MODALE DÉTAILS DE LA DEMANDE DE DEVIS (CLIENT — IMAGE 3)     -->
+    <!-- ============================================================ -->
+    @if (modaleDetailDemandeOuverte && demandeSelectionnee) {
+<div class="modal-overlay" (click)="$event.target === $event.currentTarget && fermerDetailDemande()">
+      <div class="modal-card modal-detail-lux" (click)="$event.stopPropagation()">
+        
+        <!-- Header bordeaux dégradé premium (Image 3) -->
+        <div class="modal-card-header modal-header-lux-v3">
+          <h3 class="modal-lux-v3-title">
+            <i class="fas fa-file-alt modal-title-icon"></i>
+            Demande <span class="modal-title-id">#{{ demandeSelectionnee.id }}</span>
+          </h3>
+          <button class="modal-close-btn-lux-v3" (click)="fermerDetailDemande()" title="Fermer">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="modal-card-body modal-body-scroll-lux">
+          
+          <!-- 1. Grille 2x2 de Cartes d'Informations (Image 3) -->
+          <div class="info-grid-2x2-lux">
+            
+            <!-- Card 1 : Prestation demandée -->
+            <div class="info-card-lux">
+              <span class="info-card-label-lux">PRESTATION DEMANDÉE</span>
+              <div class="info-card-value-lux val-prestation">
+                <i class="fas fa-utensils text-bordeaux"></i>
+                <span>{{ libellePrestation(demandeSelectionnee) }}</span>
+              </div>
+            </div>
+
+            <!-- Card 2 : Nombre de convives -->
+            <div class="info-card-lux">
+              <span class="info-card-label-lux">NOMBRE DE CONVIVES</span>
+              <div class="info-card-value-lux">
+                <i class="fas fa-users text-orange"></i>
+                <span>{{ demandeSelectionnee.guests || 1 }} personnes</span>
+              </div>
+            </div>
+
+            <!-- Card 3 : Date & Heure souhaitées -->
+            <div class="info-card-lux">
+              <span class="info-card-label-lux">DATE & HEURE SOUHAITÉES</span>
+              <div class="info-card-value-lux">
+                <span class="d-inline-flex align-items-center gap-1">
+                  <i class="fas fa-calendar-alt text-blue"></i>
+                  <span>{{ demandeSelectionnee.date | date:'dd/MM/yyyy' }}</span>
+                </span>
+                <span class="coord-divider mx-1">|</span>
+                <span class="d-inline-flex align-items-center gap-1">
+                  <i class="fas fa-clock text-green"></i>
+                  <span>{{ demandeSelectionnee.time || '19:00' }}</span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Card 4 : Lieu / Adresse -->
+            <div class="info-card-lux">
+              <span class="info-card-label-lux">LIEU / ADRESSE ({{ (demandeSelectionnee.locationType || 'SALLE-DIVA') | uppercase }})</span>
+              <div class="info-card-value-lux">
+                <i class="fas fa-map-marker-alt text-red"></i>
+                <span>{{ demandeSelectionnee.locationDetails || 'Salle La Diva, Dakar' }}</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 3. Encadré Précisions / Message du client (Bordure bordeaux Image 3) -->
+          <div class="notes-encadre-lux">
+            <span class="notes-label-lux">PRÉCISIONS / MESSAGE DU CLIENT LORS DE LA DEMANDE :</span>
+            @if (demandeSelectionnee.message && demandeSelectionnee.message.trim()) {
+<p class="notes-text-lux">
+              "{{ demandeSelectionnee.message }}"
+            </p>
+}
+            @if (!demandeSelectionnee.message || !demandeSelectionnee.message.trim()) {
+<p class="notes-text-lux empty">
+              "Aucune consigne ou précision supplémentaire n'a été spécifiée."
+            </p>
+}
+          </div>
+
+          <!-- 4. Barre d'actions liées : Historique des propositions & Voir Devis -->
+          <div class="demande-actions-links-bar">
+            <button type="button" class="btn-demande-action-secondary" (click)="ouvrirHistoriquePropositions(demandeSelectionnee)">
+              <i class="fas fa-history text-danger me-2"></i>
+              <span>Voir l'historique des propositions</span>
+              @if (demandeSelectionnee.propositions && demandeSelectionnee.propositions.length > 0) {
+<span class="badge-mini-count">
+                {{ demandeSelectionnee.propositions.length }}
+              </span>
+}
+            </button>
+
+            @if (isDemandeAboutie(demandeSelectionnee)) {
+<button type="button" class="btn-demande-action-primary" (click)="ouvrirDevis(demandeSelectionnee)">
+              <i class="fas fa-file-invoice-dollar me-2"></i>
+              <span>Voir le devis</span>
+            </button>
+}
+          </div>
+
+          <!-- 5. Aperçu rapide de la proposition si disponible -->
+          @if (demandeSelectionnee.propositions && demandeSelectionnee.propositions.length > 0) {
+<div class="propositions-box-lux">
+            <span class="propositions-box-title">
+              <i class="fas fa-file-invoice-dollar me-1"></i> Formule(s) reçue(s) du Chef
+            </span>
+            @for (p of demandeSelectionnee.propositions; track $index; let i = $index) {
+<div class="prop-item-card-lux">
+              <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div>
+                  <h5 class="prop-title-lux">Proposition {{ i + 1 }} — {{ p.titre }}</h5>
+                </div>
+                <div class="d-flex gap-2 align-items-center">
+                  <!-- Cas 1 : Cette formule est celle qui a été validée -->
+                  @if (isPropSelectionnee(p)) {
+<button class="btn-consulter-prop-lux" (click)="examinerProposition(demandeSelectionnee, p)">
+                    <i class="fas fa-check-circle me-1"></i> Voir mes choix
+                  </button>
+}
+
+                  <!-- Cas 2 : Une autre formule a été sélectionnée pour cette demande -> Verrouillée -->
+                  @if (hasPropositionSelectionnee(demandeSelectionnee) && !isPropSelectionnee(p)) {
+<span class="badge-non-retenue">
+                    <i class="fas fa-ban me-1"></i> Non retenue
+                  </span>
+}
+
+                  <!-- Cas 3 : Aucune formule n'a encore été validée -> Action possible -->
+                  @if (!hasPropositionSelectionnee(demandeSelectionnee)) {
+<button class="btn-examiner-prop-lux" (click)="examinerProposition(demandeSelectionnee, p)">
+                    <i class="fas fa-eye me-1"></i> Examiner &amp; Répondre
+                  </button>
+}
+                </div>
+              </div>
+            </div>
+}
+          </div>
+}
+
+        </div>
+
+        <div class="modal-card-footer modal-footer-lux-v3">
+          <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn-footer-link" (click)="ouvrirHistoriquePropositions(demandeSelectionnee)">
+              <i class="fas fa-history me-1"></i> Propositions ({{ demandeSelectionnee.propositions?.length || 0 }})
+            </button>
+            @if (isDemandeAboutie(demandeSelectionnee)) {
+<button type="button" class="btn-footer-link text-success fw-bold" (click)="ouvrirDevis(demandeSelectionnee)">
+              <i class="fas fa-file-invoice-dollar me-1"></i> Devis
+            </button>
+}
+          </div>
+          <button type="button" class="btn-fermer-lux-v3" (click)="fermerDetailDemande()">
+            Fermer
+          </button>
+        </div>
+      </div>
+    </div>
+}
+
+    <!-- ============================================================ -->
+    <!-- MODALE HISTORIQUE DES PROPOSITIONS DU CHEF                   -->
+    <!-- ============================================================ -->
+    @if (modaleHistoriquePropositionsOuverte && demandeCourante) {
+<div class="modal-overlay" (click)="$event.target === $event.currentTarget && fermerHistoriquePropositions()">
+      <div class="modal-card modal-detail-lux modal-historique-lux" (click)="$event.stopPropagation()">
+        
+        <div class="modal-card-header modal-header-lux-v3">
+          <h3 class="modal-lux-v3-title">
+            <i class="fas fa-history modal-title-icon"></i>
+            Historique des Propositions <span class="modal-title-id">#DEV-{{ demandeCourante.id }}</span>
+          </h3>
+          <button class="modal-close-btn-lux-v3" (click)="fermerHistoriquePropositions()" title="Fermer">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="modal-card-body modal-body-scroll-lux">
+          <div class="prop-hist-intro">
+            <p>Retrouvez l'ensemble des formules et menus proposés sur-mesure par le Chef Kiki Traiteur pour ce dossier.</p>
+          </div>
+
+          @if (chargementPropositionsDemande) {
+<div class="text-center py-4">
+            <i class="fas fa-spinner fa-spin text-danger me-2"></i> Chargement des propositions...
+          </div>
+}
+
+          <!-- Liste des propositions -->
+          @if (!chargementPropositionsDemande && propositionsDemande.length > 0) {
+<div class="prop-hist-list">
+            @for (p of propositionsDemande; track $index; let i = $index) {
+<div class="prop-hist-card" [class.prop-card-accepted]="p.status === 'selectionnee_client' || p.status === 'validee_gestionnaire'">
+              
+              <div class="prop-hist-head">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                  <span class="prop-num-tag">Formule {{ i + 1 }}</span>
+                  <h4 class="prop-hist-name font-serif-luxury">{{ p.titre }}</h4>
+                </div>
+                <span class="prop-statut-badge" [ngClass]="p.status">
+                  <i class="fas" [ngClass]="p.status === 'selectionnee_client' || p.status === 'validee_gestionnaire' ? 'fa-check-circle' : (p.status === 'refusee_client' ? 'fa-rotate-left' : 'fa-bell')"></i>
+                  {{ p.status === 'selectionnee_client' || p.status === 'validee_gestionnaire' ? 'Validée par vous' : (p.status === 'refusee_client' ? 'Révision demandée' : 'Action requise') }}
+                </span>
+              </div>
+
+              @if (p.description) {
+<p class="prop-hist-desc">{{ p.description }}</p>
+}
+
+              <!-- Prix & convives -->
+              @if (p.prixUnitairePersonne) {
+<div class="prop-hist-pricing">
+                <div class="price-item">
+                  <span class="price-lbl">Tarif unitaire :</span>
+                  <strong class="price-amt">{{ p.prixUnitairePersonne | number:'1.0-0' }} FCFA / convive</strong>
+                </div>
+                @if (demandeCourante.guests) {
+<div class="price-item">
+                  <span class="price-lbl">Estimation totale ({{ demandeCourante.guests }} convives) :</span>
+                  <strong class="price-amt total">{{ (p.prixUnitairePersonne * demandeCourante.guests) | number:'1.0-0' }} FCFA</strong>
+                </div>
+}
+              </div>
+}
+
+              <!-- Menu Sections -->
+              @if (p.sections && p.sections.length > 0) {
+<div class="prop-hist-sections">
+                @for (s of p.sections; track $index) {
+<div class="prop-sec-item">
+                  <strong class="sec-lbl"><i class="fas fa-utensils me-1 text-danger"></i> {{ s.nom }}</strong>
+                  @if (s.items) {
+<ul class="sec-items">
+                    @for (it of s.items; track $index) {
+<li>
+                      <strong>{{ it.nom }}</strong> @if (it.description) {
+<span>— {{ it.description }}</span>
+}
+                    </li>
+}
+                  </ul>
+}
+                </div>
+}
+              </div>
+}
+
+              <!-- Action selon statut de la proposition -->
+              <div class="prop-hist-actions">
+                <!-- Cas 1 : Formule validée -> Voir ses choix -->
+                @if (isPropSelectionnee(p)) {
+<button type="button" class="btn-voir-choix-main" (click)="examinerProposition(demandeCourante, p)">
+                  <i class="fas fa-check-circle me-1"></i> Voir mes choix validés
+                </button>
+}
+
+                <!-- Cas 2 : Une autre proposition a été validée pour ce dossier -->
+                @if (hasPropositionSelectionnee(demandeCourante) && !isPropSelectionnee(p)) {
+<div class="prop-non-retenue-msg">
+                  <i class="fas fa-info-circle text-muted me-1"></i> Formule non retenue (une autre formule a été sélectionnée pour cette demande).
+                </div>
+}
+
+                <!-- Cas 3 : Aucune proposition encore validée et statut en attente -->
+                @if (!hasPropositionSelectionnee(demandeCourante) && (p.status === 'envoyee' || p.status === 'vue' || !p.status)) {
+<button type="button" class="btn-examiner-main" (click)="examinerProposition(demandeCourante, p)">
+                  <i class="fas fa-check-double me-1"></i> Examiner &amp; Répondre
+                </button>
+}
+              </div>
+
+            </div>
+}
+          </div>
+}
+
+          <!-- État vide -->
+          @if (!chargementPropositionsDemande && propositionsDemande.length === 0) {
+<div class="empty-state-prop-hist">
+            <i class="fas fa-utensils"></i>
+            <h4>Aucune proposition envoyée pour le moment</h4>
+            <p>Notre Chef et sa brigade étudient votre demande pour composer votre proposition gastronomique sur-mesure.</p>
+          </div>
+}
+        </div>
+
+        <div class="modal-card-footer modal-footer-lux-v3">
+          <div></div>
+          <button type="button" class="btn-fermer-lux-v3" (click)="fermerHistoriquePropositions()">
+            Fermer
+          </button>
+        </div>
+      </div>
+    </div>
+}
+
+    <!-- ============================================================ -->
+    <!-- MODALE DEVIS & RÉCAPITULATIF OFFICIEL CONFIRMÉ               -->
+    <!-- ============================================================ -->
+    @if (modaleDevisOuverte && devisCourant) {
+<div class="modal-overlay" (click)="$event.target === $event.currentTarget && fermerDevis()">
+      <div class="modal-card modal-detail-lux modal-devis-lux" (click)="$event.stopPropagation()">
+        
+        <div class="modal-card-header modal-header-lux-v3 devis-header-gold">
+          <div class="d-flex align-items-center gap-2">
+            <i class="fas fa-file-invoice-dollar modal-title-icon"></i>
+            <h3 class="modal-lux-v3-title">
+              Devis Traiteur Confirmé <span class="modal-title-id">#DEV-{{ devisCourant.id }}</span>
+            </h3>
+          </div>
+          <button class="modal-close-btn-lux-v3" (click)="fermerDevis()" title="Fermer">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="modal-card-body modal-body-scroll-lux printable-devis-body">
+          
+          <!-- En-tête officiel du Devis -->
+          <div class="devis-doc-header">
+            <div class="devis-brand-col">
+              <h2 class="devis-brand-name font-serif-luxury">KIKI TRAITEUR</h2>
+              <span class="devis-brand-sub">Gastronomie &amp; Événements d'Exception</span>
+              <p class="devis-brand-contact">Dakar, Sénégal &bull; +221 33 000 00 00 &bull; contact@kikitraiteursenegal.net</p>
+            </div>
+            <div class="devis-badge-official">
+              <span class="devis-stamp"><i class="fas fa-check-circle me-1"></i> DEVIS VALIDÉ</span>
+              <span class="devis-date-txt">Date : {{ (devisCourant.date | date:'dd/MM/yyyy') || '2026' }}</span>
+            </div>
+          </div>
+
+          <!-- Grille Client & Événement -->
+          <div class="devis-parties-grid">
+            <div class="devis-partie-box">
+              <span class="partie-lbl">CLIENT / DESTINATAIRE</span>
+              <strong class="partie-name">{{ getClientName(devisCourant) }}</strong>
+              <span class="partie-sub">{{ getClientEmail(devisCourant) }}</span>
+              <span class="partie-sub">{{ getClientPhone(devisCourant) }}</span>
+            </div>
+
+            <div class="devis-partie-box">
+              <span class="partie-lbl">DÉTAILS DE LA RÉCEPTION</span>
+              <strong class="partie-name">{{ libellePrestation(devisCourant) }}</strong>
+              <span class="partie-sub"><i class="far fa-calendar-alt me-1"></i> {{ devisCourant.date | date:'dd MMMM yyyy' }} @if (devisCourant.time) {
+<span>à {{ devisCourant.time }}</span>
+}</span>
+              <span class="partie-sub"><i class="fas fa-users me-1"></i> {{ devisCourant.guests || 1 }} convives</span>
+              <span class="partie-sub"><i class="fas fa-map-marker-alt me-1"></i> {{ devisCourant.locationDetails || 'Salle La Diva, Dakar' }}</span>
+            </div>
+          </div>
+
+          <!-- Tableau / Détail de la formule convenue -->
+          <div class="devis-items-table-wrapper">
+            <table class="devis-table">
+              <thead>
+                <tr>
+                  <th>Description de la prestation</th>
+                  <th class="text-center">Convives</th>
+                  <th class="text-end">Tarif Unitaire</th>
+                  <th class="text-end">Montant Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong>{{ getPropositionRetenue(devisCourant)?.titre || libellePrestation(devisCourant) }}</strong>
+                    @if (getPropositionRetenue(devisCourant)?.description) {
+<p class="devis-item-desc">
+                      {{ getPropositionRetenue(devisCourant)?.description }}
+                    </p>
+}
+                  </td>
+                  <td class="text-center">{{ devisCourant.guests || 1 }}</td>
+                  <td class="text-end">
+                    {{ (getPropositionRetenue(devisCourant)?.prixUnitairePersonne || 0) | number:'1.0-0' }} FCFA
+                  </td>
+                  <td class="text-end fw-bold">
+                    {{ (calculerTotalDevis(devisCourant) || (getPropositionRetenue(devisCourant)?.prixUnitairePersonne || 0) * (devisCourant.guests || 1)) | number:'1.0-0' }} FCFA
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="tfoot-total">
+                  <td colspan="3" class="text-end fw-bold">TOTAL ESTIMÉ :</td>
+                  <td class="text-end tfoot-price">
+                    {{ (calculerTotalDevis(devisCourant) || (getPropositionRetenue(devisCourant)?.prixUnitairePersonne || 0) * (devisCourant.guests || 1)) | number:'1.0-0' }} FCFA
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="devis-legal-notice">
+            <p><i class="fas fa-shield-alt text-success me-1"></i> Ce devis est validé et confirmé par Kiki Traiteur. Nos équipes prendront contact avec vous pour le protocole logistique.</p>
+          </div>
+
+        </div>
+
+        <div class="modal-card-footer modal-footer-lux-v3">
+          <button type="button" class="btn-pdf-print-action" (click)="imprimerDevis()">
+            <i class="fas fa-print me-2"></i> Imprimer / Télécharger (PDF)
+          </button>
+          <button type="button" class="btn-fermer-lux-v3" (click)="fermerDevis()">
+            Fermer
+          </button>
+        </div>
+      </div>
+    </div>
+}
+
+    <!-- ============================================================ -->
+    <!-- MODALE EXAMEN & CHOIX DE LA FORMULE (AU DESSUS DE TOUT)       -->
+    <!-- ============================================================ -->
+    @if (modalePropositionOuverte && propositionCourante) {
+<div class="modal-overlay modal-overlay-top" (click)="$event.target === $event.currentTarget && fermerModaleProposition()">
+      <div class="modal-card modal-detail-lux modal-prop-decision" (click)="$event.stopPropagation()">
+        
+        <!-- Header bordeaux dégradé premium (harmonisé avec Demande & Devis) -->
+        <div class="modal-card-header modal-header-lux-v3" [class.header-validee]="isPropSelectionnee(propositionCourante)">
+          <h3 class="modal-lux-v3-title">
+            <i class="fas" [ngClass]="isPropSelectionnee(propositionCourante) ? 'fa-check-circle text-success' : 'fa-utensils'" class="modal-title-icon"></i>
+            {{ isPropSelectionnee(propositionCourante) ? 'Vos Choix Validés' : 'Choix de la Formule' }}
+          </h3>
+          <button class="modal-close-btn-lux-v3" (click)="fermerModaleProposition()" title="Fermer">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="modal-card-body modal-body-scroll-lux">
+          
+          <!-- Titre de la formule + description + prix discret -->
+          <div class="prop-intro-section">
+            <h4 class="prop-modal-title font-serif-luxury">{{ propositionCourante.titre }}</h4>
+            @if (propositionCourante.description) {
+<p class="prop-modal-desc">{{ propositionCourante.description }}</p>
+}
+            
+            <!-- Tarif discret / convive (taille de police réduite et élégante) -->
+            @if (propositionCourante.prixUnitairePersonne) {
+<div class="prop-modal-price">
+              <span class="price-val">{{ propositionCourante.prixUnitairePersonne | number:'1.0-0' }} FCFA</span>
+              <span class="price-sub">/ convive</span>
+            </div>
+}
+          </div>
+
+          <!-- Sections du menu avec sélection interactive ou consultation -->
+          @if (propositionCourante.sections && propositionCourante.sections.length > 0) {
+<div class="prop-modal-sections">
+            <h5 class="sections-title font-serif-luxury">
+              <i class="fas fa-clipboard-check text-bordeaux me-2"></i>{{ isPropSelectionnee(propositionCourante) ? 'Récapitulatif de votre sélection' : 'Détail du Menu & Vos Choix' }}
+            </h5>
+            
+            @for (s of propositionCourante.sections; track $index) {
+<div class="section-menu-box">
+              <!-- Nom de la section et nombre de choix sur la même ligne horizontale -->
+              <div class="sec-header-row">
+                <strong class="sec-name">{{ s.nom }}</strong>
+                @if (!isPropSelectionnee(propositionCourante) && s.maxChoix && s.maxChoix > 0) {
+<span class="badge-max-choix">
+                  Max. {{ s.maxChoix }} choix
+                </span>
+}
+                @if (isPropSelectionnee(propositionCourante)) {
+<span class="badge-selectionne-count">
+                  {{ getSelectedCountForSection(s) }} sélectionné(s)
+                </span>
+}
+              </div>
+              
+              @if (s.items && s.items.length > 0) {
+<ul class="sec-items-list">
+                @for (it of s.items; track $index) {
+<li class="clickable-menu-item" [class.readonly-item]="isPropSelectionnee(propositionCourante)" [class.selected]="isItemSelected(s, it)" [class.unselected-dim]="isPropSelectionnee(propositionCourante) && !isItemSelected(s, it)" (click)="toggleChoixItem(s, it, s.maxChoix || 1)">
+                  <i class="fas" [ngClass]="isItemSelected(s, it) ? 'fa-check-circle text-success' : 'fa-circle text-muted'"></i>
+                  <div class="menu-item-text">
+                    <strong class="item-title">{{ it.nom }}</strong>
+                    @if (it.description) {
+<span class="item-desc"> — {{ it.description }}</span>
+}
+                  </div>
+                  @if (isPropSelectionnee(propositionCourante) && isItemSelected(s, it)) {
+<span class="badge-item-retenu">
+                    ✓ Retenu
+                  </span>
+}
+                </li>
+}
+              </ul>
+}
+            </div>
+}
+
+            <!-- Message d'aide sélection obligatoire -->
+            @if (!isPropSelectionnee(propositionCourante)) {
+<div class="selection-status-hint" style="margin-top: 1rem; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.88rem; background: #FFFBEB; border: 1px solid #FDE68A;">
+              @if (canValidateProposition()) {
+<span style="color: #059669; font-weight: 600; display: flex; align-items: center; gap: 0.4rem;">
+                <i class="fas fa-check-circle"></i> Sélection complète, vous pouvez envoyer votre validation.
+              </span>
+}
+              @if (!canValidateProposition()) {
+<span style="color: #D97706; font-weight: 600; display: flex; align-items: center; gap: 0.4rem;">
+                <i class="fas fa-exclamation-triangle"></i> Choix requis dans : {{ getMissingSectionsNames().join(', ') || 'chaque catégorie' }}
+              </span>
+}
+            </div>
+}
+          </div>
+}
+
+          <!-- Zone commentaire (Edition ou Affichage lecture seule) -->
+          <div class="prop-modal-feedback-zone">
+            @if (!isPropSelectionnee(propositionCourante)) {
+
+              <label class="feedback-label">Votre commentaire ou demande d'ajustement (optionnel) :</label>
+              <textarea [(ngModel)]="commentaireReponse" rows="3" class="feedback-textarea" placeholder="Ex: Menu validé, merci d'ajouter une option végétarienne pour 2 personnes..."></textarea>
+            
+}
+            @if (isPropSelectionnee(propositionCourante)) {
+
+              <label class="feedback-label">Votre commentaire transmis :</label>
+              @if (getCommentaireAffiche()) {
+<div class="feedback-display-box">
+                "{{ getCommentaireAffiche() }}"
+              </div>
+}
+              @if (!getCommentaireAffiche()) {
+<div class="feedback-display-box empty">
+                <em>Aucun commentaire particulier transmis lors de la validation.</em>
+              </div>
+}
+            
+}
+          </div>
+        </div>
+
+        <!-- Footer : 2 boutons si action en attente, bouton Fermer si déjà validée -->
+        <div class="modal-card-footer modal-footer-lux-v3 prop-footer-actions">
+          @if (!isPropSelectionnee(propositionCourante)) {
+
+            <button type="button" class="btn-refuser-prop" [disabled]="envoiReponse" (click)="refuserProposition()">
+              <i class="fas fa-times me-1"></i> Refuser
+            </button>
+            <button type="button" class="btn-accepter-prop" [disabled]="envoiReponse || !canValidateProposition()" (click)="accepterProposition()">
+              <i class="fas fa-paper-plane me-1"></i> Envoyer
+            </button>
+          
+}
+          @if (isPropSelectionnee(propositionCourante)) {
+
+            <button type="button" class="btn-fermer-lux-v3" (click)="fermerModaleProposition()">
+              Fermer
+            </button>
+          
+}
+        </div>
+
+      </div>
+    </div>
+}

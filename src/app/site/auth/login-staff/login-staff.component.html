@@ -1,0 +1,59 @@
+<section class="login-wrapper">
+      <div class="login-card animate-fade">
+        <!-- Logo -->
+        <div class="login-header">
+          <img src="assets/images/logo.png" alt="Kiki Traiteur Logo" class="login-logo">
+          <h2 class="login-title">Connectez vous</h2>
+        </div>
+
+        <!-- Form -->
+        <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="login-form">
+          <div class="form-group">
+            <label for="adminEmail">IDENTIFIANT / ADRESSE E-MAIL</label>
+            <div class="input-with-icon">
+              <i class="fa-regular fa-user input-icon"></i>
+              <input 
+                type="text" 
+                id="adminEmail" 
+                name="adminEmail" 
+                [(ngModel)]="email" 
+                placeholder="nom@kikitraiteur.sn" 
+                required 
+                class="form-control"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="adminPassword">MOT DE PASSE</label>
+            <div class="input-with-icon">
+              <i class="fas fa-key input-icon"></i>
+              <input 
+                type="password" 
+                id="adminPassword" 
+                name="adminPassword" 
+                [(ngModel)]="password" 
+                placeholder="••••••••" 
+                required 
+                class="form-control"
+              />
+            </div>
+          </div>
+
+          <div class="forgot-pwd-wrap">
+            <a href="javascript:void(0)" class="forgot-pwd-link" (click)="forgotPassword()">Mot de passe oublié ?</a>
+          </div>
+
+          <button type="submit" class="btn-login-burgundy">
+            <i class="fas fa-sign-in-alt me-2"></i> SE CONNECTER
+          </button>
+        </form>
+
+        <!-- Feedback message if any -->
+        @if (message) {
+<div class="login-message" [ngClass]="isError ? 'msg-error' : 'msg-success'">
+          {{ message }}
+        </div>
+}
+      </div>
+    </section>

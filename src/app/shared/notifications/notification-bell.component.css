@@ -1,0 +1,181 @@
+.notif-bell-wrapper {
+      position: relative;
+    }
+
+    .notif-bell-btn {
+      position: relative;
+      background: transparent;
+      border: none;
+      border-radius: 50%;
+      width: 38px; height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #721513;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 1.15rem;
+      box-shadow: none;
+    }
+
+    .notif-bell-btn:hover {
+      transform: scale(1.1);
+      color: #8e1c19;
+    }
+
+    .notif-bell-btn.has-notif {
+      color: #e51d24;
+    }
+
+
+    /* Icone statique : la couleur rouge et la pastille de comptage signalent
+       deja les notifications. Une cloche qui s'agite trois fois a chaque
+       arrivee distrait sans rien ajouter, d'autant que le service interroge
+       le serveur toutes les 30 secondes. */
+
+    .notif-badge {
+      position: absolute;
+      top: -6px; right: -6px;
+      background: #e53e3e;
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 700;
+      min-width: 18px;
+      height: 18px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+      border: 2px solid #1a0a0f;
+    }
+
+    .notif-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 340px;
+      max-width: 90vw;
+      background: #FAF5EA;
+      border: 1.5px solid #E2D5BE;
+      border-radius: 16px;
+      box-shadow: 0 15px 40px rgba(114, 21, 19, 0.18), 0 5px 15px rgba(0,0,0,0.06);
+      z-index: 100000 !important;
+      overflow: hidden;
+    }
+
+    @media (max-width: 576px) {
+      .notif-dropdown {
+        position: fixed;
+        top: 68px;
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%);
+        width: calc(100vw - 24px);
+        max-width: 340px;
+        z-index: 100000 !important;
+      }
+    }
+
+    .notif-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.9rem 1.15rem;
+      border-bottom: 1px solid #E8DCBE;
+      background: #F4ECE0;
+    }
+
+    .notif-header h4 {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #721513;
+      margin: 0;
+    }
+
+    .mark-all-read {
+      background: none;
+      border: none;
+      color: #8C2420;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0;
+      transition: color 0.2s;
+    }
+
+    .mark-all-read:hover { color: #500E0D; text-decoration: underline; }
+
+    .notif-list {
+      max-height: 350px;
+      overflow-y: auto;
+      background: #FAF5EA;
+    }
+
+    .notif-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.85rem 1.15rem;
+      cursor: pointer;
+      transition: background 0.2s;
+      border-bottom: 1px solid #EFE6D4;
+      position: relative;
+    }
+
+    .notif-item:hover { background: #F3EAD6; }
+
+    .notif-item.unread { background: #F1E5CB; }
+
+    .notif-icon {
+      width: 34px; height: 34px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .notif-icon.type-new-request { background: rgba(59, 130, 246, 0.15); color: #1D4ED8; }
+    .notif-icon.type-proposition { background: rgba(245, 158, 11, 0.18); color: #B45309; }
+    .notif-icon.type-selection { background: rgba(34, 197, 94, 0.18); color: #15803D; }
+    .notif-icon.type-aboutie { background: rgba(139, 34, 64, 0.18); color: #721513; }
+    .notif-icon.type-commande { background: rgba(229, 29, 36, 0.18); color: #B91C1C; }
+    .notif-icon.type-statut { background: rgba(16, 185, 129, 0.18); color: #047857; }
+    .notif-icon.type-mise-a-jour { background: rgba(234, 179, 8, 0.2); color: #A16207; }
+    .notif-icon.type-message-contact { background: rgba(122, 28, 28, 0.15); color: #7A1C1C; }
+    .notif-icon.type-urgent { background: rgba(239, 68, 68, 0.2); color: #DC2626; }
+    .notif-icon.type-rappel { background: rgba(249, 115, 22, 0.18); color: #EA580C; }
+
+    .notif-content { flex: 1; min-width: 0; }
+
+    .notif-message {
+      font-size: 0.82rem;
+      color: #332224;
+      line-height: 1.35;
+      margin-bottom: 0.2rem;
+      font-weight: 500;
+    }
+
+    .notif-time {
+      font-size: 0.7rem;
+      color: #8C7B76;
+    }
+
+    .notif-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #721513;
+      flex-shrink: 0;
+      margin-top: 6px;
+    }
+
+    .notif-empty {
+      padding: 2rem;
+      text-align: center;
+      color: #8C7B76;
+    }
+
+    .notif-empty i { font-size: 2rem; margin-bottom: 0.5rem; color: #15803D; }
+    .notif-empty p { font-size: 0.875rem; margin: 0; }

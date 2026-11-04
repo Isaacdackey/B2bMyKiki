@@ -1,0 +1,393 @@
+<div class="rh-wrapper">
+  
+  <!-- NAVBAR B2B UNIFIÉE KIKI TRAITEUR -->
+  <app-b2b-nav></app-b2b-nav>
+
+  <!-- CONTENU PRINCIPAL DU DASHBOARD -->
+  <main style="max-width: 1350px; margin: 2rem auto; padding: 0 1.5rem;">
+
+    <!-- ============================================================== -->
+    <!-- SECTION 1 : STATISTIQUES & SYNTHÈSE BUDGÉTAIRE                -->
+    <!-- ============================================================== -->
+    @if (activeSection() === 'STATISTIQUES') {
+      <div>
+        
+        <!-- KPIs Principaux -->
+        <div class="rh-kpi-grid">
+          
+          <div class="rh-kpi-card">
+            <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
+              <i class="fa-solid fa-bowl-food" style="color: #721513;"></i> REPAS LIVRÉS CE MOIS
+            </div>
+            <div style="font-size: 2.2rem; font-weight: 900; color: #721513; margin: 0.5rem 0 0.25rem; font-family: 'Playfair Display', serif;">
+              {{ b2b.totalRepasMois() }} <span style="font-size: 1rem; color: #606C38; font-weight: 600;">repas</span>
+            </div>
+            <div style="font-size: 0.75rem; color: #6E5A56;">Sur l'ensemble des 3 sites conventionnés</div>
+          </div>
+
+          <div class="rh-kpi-card">
+            <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
+              <i class="fa-solid fa-hand-holding-dollar" style="color: #E51D24;"></i> PRISE EN CHARGE ENTREPRISE
+            </div>
+            <div style="font-size: 2.2rem; font-weight: 900; color: #E51D24; margin: 0.5rem 0 0.25rem; font-family: 'Playfair Display', serif;">
+              {{ (b2b.totalFactureMois() | number) }} <span style="font-size: 1rem; color: #332724;">FCFA</span>
+            </div>
+            <div style="font-size: 0.75rem; color: #606C38; font-weight: 600;">Taux contractuel : {{ b2b.currentEntreprise().tauxPriseEnCharge }}% du forfait</div>
+          </div>
+
+          <div class="rh-kpi-card">
+            <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
+              <i class="fa-solid fa-chart-pie" style="color: #721513;"></i> BUDGET ALLOUÉ & CONSOMMATION
+            </div>
+            <div style="font-size: 2.2rem; font-weight: 900; color: #721513; margin: 0.5rem 0 0.25rem; font-family: 'Playfair Display', serif;">
+              {{ b2b.tauxUtilisationBudget() }}%
+            </div>
+            <div style="font-size: 0.75rem; color: #6E5A56;">
+              {{ (b2b.totalFactureMois() | number) }} F / {{ (b2b.currentEntreprise().budgetMensuelAlloue | number) }} F CFA
+            </div>
+          </div>
+
+          <div class="rh-kpi-card">
+            <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
+              <i class="fa-solid fa-user-check" style="color: #606C38;"></i> COLLABORATEURS ACTIFS
+            </div>
+            <div style="font-size: 2.2rem; font-weight: 900; color: #332724; margin: 0.5rem 0 0.25rem; font-family: 'Playfair Display', serif;">
+              {{ b2b.listeEmployes().length }} <span style="font-size: 1rem; color: #6E5A56;">bénéficiaires</span>
+            </div>
+            <div style="font-size: 0.75rem; color: #6E5A56;">Rattachés aux services RH et opérationnels</div>
+          </div>
+
+        </div>
+
+        <!-- Répartition par Site & Actions Rapides -->
+        <div class="rh-split-grid">
+          
+          <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
+              <h3 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.25rem; color: #721513; font-weight: 800;">
+                Consommation Hebdomadaire par Site
+              </h3>
+              <span style="font-size: 0.75rem; color: #6E5A56; font-weight: 600;"><i class="fa-regular fa-calendar"></i> Mois de Novembre 2026</span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+              @for (site of b2b.currentEntreprise().sites; track site.id) {
+                <div style="background: #FAF8F4; padding: 1.15rem; border-radius: 14px; border: 1.5px solid #EDE7DC;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; flex-wrap: wrap; gap: 0.5rem;">
+                    <strong style="color: #721513; font-size: 0.95rem;">{{ site.nom }}</strong>
+                    <span style="color: #E51D24; font-weight: 800; font-size: 0.8rem; white-space: nowrap;">
+                      <i class="fa-regular fa-clock"></i> Heure limite : {{ site.heureCutOff }}
+                    </span>
+                  </div>
+                  <div style="font-size: 0.8rem; color: #6E5A56; margin-bottom: 0.65rem;">
+                    <i class="fa-solid fa-location-dot" style="color: #E51D24;"></i> {{ site.adresse }} • Réf. : {{ site.contactReferent }} ({{ site.telephoneReferent }})
+                  </div>
+                  <!-- Progress Bar -->
+                  <div style="background: #EDE7DC; height: 8px; border-radius: 9999px; overflow: hidden;">
+                    <div style="height: 100%; background: linear-gradient(90deg, #721513, #E51D24); width: 68%;"></div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Actions Rapides RH -->
+          <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
+            <h3 style="margin: 0 0 1.25rem; font-family: 'Playfair Display', serif; font-size: 1.25rem; color: #721513; font-weight: 800;">
+              Actions Rapides RH
+            </h3>
+            <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+              <button (click)="ouvrirModalAjout()" class="rh-btn-primary" style="width: 100%; justify-content: center; padding: 0.85rem;">
+                <i class="fa-solid fa-user-plus"></i> Enrôler un Collaborateur
+              </button>
+              <button (click)="exporterFactureMensuelle()" style="width: 100%; padding: 0.85rem; background: #FAF8F4; border: 1.5px solid #EDE7DC; color: #721513; font-weight: 700; border-radius: 9999px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.2s;">
+                <i class="fa-solid fa-file-pdf" style="color: #E51D24;"></i> Télécharger Facture Mensuelle (PDF)
+              </button>
+              <button (click)="activeSection.set('FACTURATION')" style="width: 100%; padding: 0.85rem; background: #FAF8F4; border: 1.5px solid #EDE7DC; color: #6E5A56; font-weight: 700; border-radius: 9999px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                <i class="fa-solid fa-list-check"></i> Consulter le Détail des Livraisons
+              </button>
+            </div>
+
+            <!-- Notification succès export -->
+            @if (exportSuccess()) {
+              <div style="margin-top: 1.25rem; background: rgba(96, 108, 56, 0.12); border: 1px solid #606C38; color: #606C38; padding: 0.85rem; border-radius: 12px; font-size: 0.8rem; font-weight: 700; text-align: center;">
+                <i class="fa-solid fa-circle-check"></i> Relevé mensuel TotalEnergies_Novembre_2026.pdf généré avec succès !
+              </div>
+            }
+          </div>
+
+        </div>
+
+      </div>
+    }
+
+    <!-- ============================================================== -->
+    <!-- SECTION 2 : GESTION DES SALARIÉS & SUBVENTIONS                 -->
+    <!-- ============================================================== -->
+    @if (activeSection() === 'EMPLOYES') {
+      <div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h2 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
+              Annuaire des Salariés & Droits à la Cantine
+            </h2>
+            <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #6E5A56;">
+              Gestion des effectifs bénéficiant de la subvention repas chez Kiki Traiteur.
+            </p>
+          </div>
+
+          <button (click)="ouvrirModalAjout()" class="rh-btn-primary">
+            <i class="fa-solid fa-user-plus"></i> Ajouter un Bénéficiaire
+          </button>
+        </div>
+
+        <!-- Filtres et Recherche -->
+        <div style="display: flex; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
+          <input 
+            type="text" 
+            [ngModel]="searchQuery()"
+            (ngModelChange)="searchQuery.set($event)"
+            placeholder="Rechercher par nom, matricule ou département..." 
+            style="flex: 1; min-width: 280px; background: #FFFFFF !important; color: #332724 !important; border: 1.5px solid #EDE7DC !important; border-radius: 12px !important; padding: 0.65rem 1rem !important;">
+
+          <select 
+            [ngModel]="selectedSiteFilter()"
+            (ngModelChange)="selectedSiteFilter.set($event)"
+            style="background: #FFFFFF !important; color: #721513 !important; font-weight: 700; border: 1.5px solid #EDE7DC !important; border-radius: 12px !important; padding: 0.65rem 1rem !important;">
+            <option value="TOUS">Tous les sites</option>
+            @for (site of b2b.currentEntreprise().sites; track site.id) {
+              <option [value]="site.id">{{ site.nom }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Tableau des Employés -->
+        <div class="rh-table-wrap">
+          <table class="rh-table">
+            <thead>
+              <tr>
+                <th>Matricule</th>
+                <th>Collaborateur</th>
+                <th>Département</th>
+                <th>Site de Livraison</th>
+                <th>Statut Prise en Charge</th>
+                <th>Repas ce mois</th>
+                <th>Total Subventionné</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (emp of filteredEmployes(); track emp.id) {
+                <tr>
+                  <td><code style="color: #721513; font-weight: 800; background: #FAF5EA; padding: 0.2rem 0.5rem; border-radius: 6px;">{{ emp.matricule }}</code></td>
+                  <td>
+                    <div style="font-weight: 700; color: #332724;">{{ emp.prenom }} {{ emp.nom }}</div>
+                    <div style="font-size: 0.75rem; color: #6E5A56;">{{ emp.email }}</div>
+                  </td>
+                  <td>{{ emp.departement }}</td>
+                  <td>{{ emp.siteNom }}</td>
+                  <td>
+                    @if (emp.type === 'SUBVENTIONNE') {
+                      <span class="rh-badge-subv"><i class="fa-solid fa-check"></i> Prise en charge 100%</span>
+                    } @else {
+                      <span class="rh-badge-autonome"><i class="fa-solid fa-mobile-screen"></i> Autonome (Wave)</span>
+                    }
+                  </td>
+                  <td style="font-weight: 800; color: #332724;">{{ emp.repasConsommesMois }} repas</td>
+                  <td style="font-weight: 800; color: #606C38;">{{ (emp.montantPrisEnChargeMois | number) }} FCFA</td>
+                  <td>
+                    <button 
+                      (click)="b2b.toggleStatutEmploye(emp.id)"
+                      [style.background]="emp.actif ? '#FAF8F4' : '#EDE7DC'"
+                      style="border: 1px solid #EDE7DC; color: #721513; padding: 0.35rem 0.75rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 700; cursor: pointer;">
+                      {{ emp.actif ? 'Désactiver' : 'Activer' }}
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    }
+
+    <!-- ============================================================== -->
+    <!-- SECTION 3 : FACTURATION CONSOLIDÉE MENSUELLE                   -->
+    <!-- ============================================================== -->
+    @if (activeSection() === 'FACTURATION') {
+      <div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h2 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
+              Rapprochement & Facturation Mensuelle Kiki Traiteur
+            </h2>
+            <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #6E5A56;">
+              Relevé consolidé des repas livrés par site pour émission de la facture globale entreprise.
+            </p>
+          </div>
+
+          <button (click)="exporterFactureMensuelle()" class="rh-btn-primary">
+            <i class="fa-solid fa-file-pdf"></i> Exporter Facture Proforma (PDF)
+          </button>
+        </div>
+
+        <!-- Tableau des Livraisons Facturées -->
+        <div class="rh-table-wrap">
+          <table class="rh-table">
+            <thead>
+              <tr>
+                <th>Période / Semaine</th>
+                <th>Site de Livraison</th>
+                <th>Nombre de Repas</th>
+                <th>Prix Unitaire Contractuel</th>
+                <th>Prise en Charge RH</th>
+                <th>Montant Facturé Entreprise</th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (ligne of b2b.historiqueFacturationMois(); track ligne.id) {
+                <tr>
+                  <td style="font-weight: 700; color: #332724;">{{ ligne.date }}</td>
+                  <td>{{ ligne.siteNom }}</td>
+                  <td style="font-weight: 800; color: #721513;">{{ ligne.nbRepasSubventionnes }} repas</td>
+                  <td>{{ (ligne.prixUnitaire | number) }} FCFA</td>
+                  <td><span class="rh-badge-subv">{{ ligne.tauxSubvention }}% Entreprise</span></td>
+                  <td style="font-weight: 900; color: #E51D24; font-size: 0.95rem;">
+                    {{ (ligne.partEntreprise | number) }} FCFA
+                  </td>
+                  <td>
+                    <span style="background: rgba(96, 108, 56, 0.12); color: #606C38; padding: 0.25rem 0.6rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 700;">
+                      <i class="fa-solid fa-check-double"></i> Livré & Validé
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+            <tfoot>
+              <tr style="background: #FAF8F4; border-top: 2px solid #721513;">
+                <td colspan="2" style="font-weight: 800; color: #721513; font-size: 1rem; padding: 1.25rem; font-family: 'Playfair Display', serif;">
+                  TOTAL CONSOLIDÉ DU MOIS :
+                </td>
+                <td style="font-weight: 900; color: #721513; font-size: 1.15rem; padding: 1.25rem;">
+                  {{ b2b.totalRepasMois() }} repas
+                </td>
+                <td colspan="2"></td>
+                <td style="font-weight: 900; color: #E51D24; font-size: 1.35rem; padding: 1.25rem; font-family: 'Playfair Display', serif;">
+                  {{ (b2b.totalFactureMois() | number) }} FCFA
+                </td>
+                <td style="padding: 1.25rem;">
+                  <span style="color: #6E5A56; font-weight: 700; font-size: 0.8rem;">En attente de virement</span>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+      </div>
+    }
+
+    <!-- ============================================================== -->
+    <!-- SECTION 4 : SITES DE LIVRAISON DE L'ENTREPRISE                 -->
+    <!-- ============================================================== -->
+    @if (activeSection() === 'SITES') {
+      <div>
+        
+        <h2 style="margin: 0 0 1.5rem; font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
+          Sites Physiques de Livraison Conventionnés
+        </h2>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem;">
+          @for (site of b2b.currentEntreprise().sites; track site.id) {
+            <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                <div>
+                  <h3 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.2rem; color: #721513; font-weight: 800;">{{ site.nom }}</h3>
+                  <div style="font-size: 0.8rem; color: #6E5A56; margin-top: 0.25rem;"><i class="fa-solid fa-location-dot" style="color: #E51D24;"></i> {{ site.adresse }}</div>
+                </div>
+                <span class="rh-badge-subv">Actif</span>
+              </div>
+
+              <div style="background: #FAF8F4; border-radius: 12px; padding: 1rem; font-size: 0.85rem; line-height: 1.6; margin-bottom: 1.25rem; border: 1.5px solid #EDE7DC;">
+                <div><i class="fa-regular fa-clock" style="color: #E51D24;"></i> <strong>Heure Cut-Off :</strong> <span style="color: #E51D24; font-weight: 800;">{{ site.heureCutOff }}</span></div>
+                <div><i class="fa-solid fa-user-tie"></i> <strong>Contact Référent :</strong> {{ site.contactReferent }}</div>
+                <div><i class="fa-solid fa-phone"></i> <strong>Téléphone :</strong> {{ site.telephoneReferent }}</div>
+              </div>
+
+              <button routerLink="/b2b" style="width: 100%; padding: 0.75rem; background: #FAF8F4; color: #721513; border: 1.5px solid #EDE7DC; border-radius: 9999px; font-weight: 700; font-size: 0.82rem; cursor: pointer;">
+                <i class="fa-solid fa-utensils"></i> Commander pour ce site
+              </button>
+            </div>
+          }
+        </div>
+
+      </div>
+    }
+
+  </main>
+
+  <!-- MODAL D'AJOUT D'EMPLOYÉ -->
+  @if (showAddEmployeeModal()) {
+    <div class="rh-modal-overlay">
+      <div class="rh-modal-card">
+        <h3 style="margin: 0 0 1.25rem; font-family: 'Playfair Display', serif; font-size: 1.4rem; color: #721513; font-weight: 800;">
+          <i class="fa-solid fa-user-plus"></i> Enrôler un Nouveau Collaborateur
+        </h3>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div>
+            <label style="font-size: 0.75rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.25rem;">Matricule Salarié :</label>
+            <input type="text" [(ngModel)]="newEmp().matricule" style="width: 100%;">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+              <label style="font-size: 0.75rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.25rem;">Nom :</label>
+              <input type="text" [(ngModel)]="newEmp().nom" placeholder="Ex: Kouamé" style="width: 100%;">
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.25rem;">Prénom :</label>
+              <input type="text" [(ngModel)]="newEmp().prenom" placeholder="Ex: Marc" style="width: 100%;">
+            </div>
+          </div>
+
+          <div>
+            <label style="font-size: 0.75rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.25rem;">Email Professionnel :</label>
+            <input type="email" [(ngModel)]="newEmp().email" placeholder="m.kouame@totalenergies.ci" style="width: 100%;">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+              <label style="font-size: 0.75rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.25rem;">Site de Rattachement :</label>
+              <select [(ngModel)]="newEmp().siteId" style="width: 100%;">
+                @for (site of b2b.currentEntreprise().sites; track site.id) {
+                  <option [value]="site.id">{{ site.nom }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.25rem;">Statut Cantine :</label>
+              <select [(ngModel)]="newEmp().type" style="width: 100%;">
+                <option value="SUBVENTIONNE">Subventionné 100%</option>
+                <option value="AUTONOME">Autonome (Paiement Wave)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1.75rem;">
+          <button (click)="showAddEmployeeModal.set(false)" style="flex: 1; padding: 0.85rem; background: #FAF8F4; color: #6E5A56; border: 1.5px solid #EDE7DC; border-radius: 9999px; font-weight: 700; cursor: pointer;">
+            Annuler
+          </button>
+          <button (click)="enregistrerEmploye()" class="rh-btn-primary" style="flex: 1.5; justify-content: center;">
+            <i class="fa-solid fa-check"></i> Enregistrer
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

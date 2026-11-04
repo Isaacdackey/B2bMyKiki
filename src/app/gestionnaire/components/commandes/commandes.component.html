@@ -1,0 +1,1280 @@
+<section class="dashboard-section active">
+
+  <div class="panel">
+
+    <!-- Barre d'action et de recherche du tableau -->
+    <div class="panel-header-barre" style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+      <button type="button" class="btn-creer-commande-action" (click)="ouvrirModaleCreation()">
+        <i class="fas fa-plus-circle me-2"></i> Créer une commande
+      </button>
+
+      <!-- Recherche de commandes en direct -->
+      <div class="champ-recherche-commandes">
+        <input type="text" [(ngModel)]="rechercheTexte" (input)="appliquerFiltresLocaux()"
+               placeholder="Rechercher client, téléphone, n° commande..." class="recherche-input" />
+        @if (rechercheTexte) {
+<button class="btn-clear" (click)="rechercheTexte = ''; appliquerFiltresLocaux()">&times;</button>
+}
+      </div>
+    </div>
+
+    <!-- BOUTONS DE FILTRE PAR STATUT (Harmonisés avec le style Demandes) -->
+    <div class="commandes-filtres desktop-filters">
+      @for (f of filtres; track $index) {
+<button type="button" class="filtre-statut" [class.actif]="filtreStatut === f.valeur" (click)="selectionnerFiltre(f.valeur)">
+        {{ f.libelle }}@if (f.valeur !== 'TOUTES' && f.valeur !== 'TERMINEE') {
+<span> ({{ compteur(f.valeur) }})</span>
+}
+      </button>
+}
+    </div>
+
+    <!-- SELECT DE FILTRE PAR STATUT (Mobile) -->
+    <div class="mobile-filters" style="margin-bottom: 1.25rem; width: 100%;">
+      <select class="form-control" [ngModel]="filtreStatut" (ngModelChange)="selectionnerFiltre($event)" style="font-weight: 600; width: 100%;">
+        @for (f of filtres; track $index) {
+          <option [value]="f.valeur">
+            {{ f.libelle }} @if (f.valeur !== 'TOUTES' && f.valeur !== 'TERMINEE') { ({{ compteur(f.valeur) }}) }
+          </option>
+        }
+      </select>
+    </div>
+    
+    @if (chargement) {
+<div class="commandes-etat">
+      <i class="fas fa-spinner fa-spin text-primary"></i> Chargement des commandes...
+    </div>
+}
+
+    <!-- Tableau des Commandes Épuré & Compact (Sans Scroll Horizontal, Actions Directes) -->
+    @if (!chargement && commandes.length > 0) {
+<div class="table-responsive">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th style="width: 20%;">N° Commande</th>
+            <th style="width: 25%;">Client</th>
+            <th style="width: 22%;">Panier &amp; Total</th>
+            <th class="th-centre" style="width: 15%;">Statut</th>
+            <th class="th-centre" style="width: 18%;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of commandes; track $index) {
+<tr class="ligne-cliquable" (click)="ouvrirDetail(c)" [title]="'Cliquer pour voir le détail de ' + c.numero">
+            
+            <!-- 1. N° COMMANDE -->
+            <td>
+              <div class="col-cmd-wrap">
+                <div class="cmd-code-row">
+                  <span class="cmd-code-badge">{{ c.numero }}</span>
+                  @if (estUrgente(c)) {
+<span class="pastille-urgence-pill" title="Le délai de préparation est entamé">
+                    <i class="fas fa-bolt"></i>
+                  </span>
+}
+                </div>
+                <span class="cmd-date-sub">
+                  <i class="far fa-clock me-1"></i> {{ c.createdAt | date:'d MMM à HH:mm' }}
+                </span>
+              </div>
+            </td>
+
+            <!-- 2. CLIENT -->
+            <td>
+              <div class="col-client-wrap">
+                <strong class="client-nom-texte">{{ c.clientNom }}</strong>
+                @if (c.clientTelephone) {
+<a [href]="'tel:' + c.clientTelephone" class="client-tel-texte" (click)="$event.stopPropagation()" title="Appeler le client">
+                  <i class="fas fa-phone-alt me-1 text-success"></i> {{ c.clientTelephone }}
+                </a>
+}
+              </div>
+            </td>
+
+            <!-- 3. PANIER & TOTAL COMPACT AVEC LOGO DU MOYEN DE PAIEMENT -->
+            <td>
+              <div class="col-montant-wrap">
+                <div class="montant-paiement-row">
+                  <strong class="cmd-montant-total" style="color: #721513; font-size: 0.88rem;">{{ c.montantTotal | number:'1.0-0' }} FCFA</strong>
+                  <!-- Badge Moyen de Paiement avec Image Logo -->
+                  <span class="cmd-badge-paiement-table" [title]="'Payé via ' + getModePaiementLibelle(c.modePaiement)">
+                    <img [src]="getModePaiementLogo(c.modePaiement)" [alt]="getModePaiementLibelle(c.modePaiement)" class="cmd-paiement-mini-logo" />
+                    <span class="cmd-paiement-nom">{{ getModePaiementLibelle(c.modePaiement) }}</span>
+                  </span>
+                </div>
+                <span style="font-size: 0.74rem; color: #64748B; display: inline-flex; align-items: center; gap: 0.25rem; margin-top: 2px;">
+                  <i class="fas fa-utensils text-muted"></i>
+                  @if (c.lignes && c.lignes.length > 0) {
+<span>
+                    {{ c.lignes.length }} met{{ c.lignes.length > 1 ? 's' : '' }} ({{ compterTotalArticles(c) }} part{{ compterTotalArticles(c) > 1 ? 's' : '' }})
+                  </span>
+}
+                  @if (!c.lignes || c.lignes.length === 0) {
+<span>
+                    Voir panier
+                  </span>
+}
+                </span>
+              </div>
+            </td>
+
+            <!-- 4. STATUT -->
+            <td style="text-align: center;">
+              <span class="badge-statut-vif" [ngClass]="classeStatut(c.statut)">
+                <i class="fas" [ngClass]="iconeChangement(c.statut)"></i> {{ c.statutLibelle }}
+              </span>
+            </td>
+
+            <!-- 5. ACTIONS DIRECTES SANS SCROLL -->
+            <td>
+              <div class="commandes-actions" (click)="$event.stopPropagation()">
+                <!-- Boutons d'avancement de statut -->
+                @for (t of c.transitionsPossibles; track $index) {
+
+                  @if (t !== 'ANNULEE') {
+<button class="btn-action-icon btn-action-avancer" (click)="demanderChangement(c, t, $event)" [title]="libelleStatutCible(t)">
+                    <i class="fas" [ngClass]="iconeChangement(t)"></i>
+                  </button>
+}
+                
+}
+
+                <!-- Bouton Annuler -->
+                @for (t of c.transitionsPossibles; track $index) {
+
+                  @if (t === 'ANNULEE') {
+<button class="btn-action-icon btn-action-annuler" (click)="demanderChangement(c, t, $event)" title="Annuler la commande">
+                    <i class="fas fa-ban"></i>
+                  </button>
+}
+                
+}
+
+                <!-- Bouton Voir Panier -->
+                <button class="btn-action-icon"
+                        (click)="ouvrirModalePanier(c, $event)" title="Voir le panier (mets et quantités)">
+                  <i class="fas fa-shopping-basket"></i>
+                </button>
+
+                <!-- Bouton Détails Pop-up -->
+                <button class="btn-action-icon btn-action-detail"
+                        (click)="ouvrirDetail(c)" title="Voir la fiche détaillée">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+}
+        </tbody>
+      </table>
+    </div>
+}
+
+    <!-- État vide -->
+    @if (!chargement && commandes.length === 0) {
+<div class="commandes-etat commandes-vide">
+      <div class="vide-icone-cercle">
+        <i class="fas fa-receipt"></i>
+      </div>
+      @if (toutesCommandes.length === 0) {
+<h3>Aucune commande enregistrée</h3>
+}
+      @if (toutesCommandes.length > 0) {
+<h3>Aucune commande pour cette sélection</h3>
+}
+      <p class="vide-message-gris">
+        Les commandes passées depuis MyKiki apparaîtront ici en temps réel pour être traitées.
+      </p>
+    </div>
+}
+
+    <!-- ── BARRE DE PAGINATION CENTRÉE STYLE DEMANDES ── -->
+    @if (!chargement && totalPages > 1) {
+<div style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 1.5rem; padding-bottom: 0.5rem; align-items: center;">
+      <button type="button" class="btn btn-sm"
+              style="background: white; color: #64748B; border: 1px solid #CBD5E1; border-radius: 8px; font-weight: 600; font-size: 0.85rem; padding: 0 0.75rem; cursor: pointer; transition: all 0.2s; height: 32px;"
+              [disabled]="page === 1" [style.opacity]="page === 1 ? '0.5' : '1'"
+              (click)="changerPage(page - 1)">
+        Précédent
+      </button>
+      @for (p of pagesAffichees; track $index) {
+<button type="button" class="btn btn-sm" [style.background]="page === p ? '#721513' : (p === '...' ? 'transparent' : 'white')" [style.color]="page === p ? 'white' : '#64748B'" [style.border]="page === p ? '1px solid #721513' : (p === '...' ? 'none' : '1px solid #CBD5E1')" style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; padding: 0;" (click)="p !== '...' && changerPage($any(p))" [disabled]="p === '...'" [style.cursor]="p === '...' ? 'default' : 'pointer'">
+        {{ p }}
+      </button>
+}
+      <button type="button" class="btn btn-sm"
+              style="background: white; color: #64748B; border: 1px solid #CBD5E1; border-radius: 8px; font-weight: 600; font-size: 0.85rem; padding: 0 0.75rem; cursor: pointer; transition: all 0.2s; height: 32px;"
+              [disabled]="page === totalPages" [style.opacity]="page === totalPages ? '0.5' : '1'"
+              (click)="changerPage(page + 1)">
+        Suivant
+      </button>
+    </div>
+}
+
+  </div>
+</section>
+
+<!-- ══════════ DÉTAIL D'UNE COMMANDE ══════════ -->
+@if (commandeDetail) {
+<div class="modal-overlay" (click)="$event.target === $event.currentTarget && fermerDetail()">
+  <div class="modal-card fiche-modale">
+
+    <!-- Bandeau Haut Vibrant & Élégant avec espacement clair -->
+    <div class="fiche-bandeau">
+      <button class="fiche-fermer" (click)="fermerDetail()" title="Fermer"><i class="fas fa-times"></i></button>
+      <div class="fiche-identite">
+        <div class="fiche-icon-badge" [ngClass]="classeStatut(commandeDetail.statut)">
+          <i class="fas" [ngClass]="iconeChangement(commandeDetail.statut)"></i>
+        </div>
+        <div class="fiche-titles-block">
+          <div class="fiche-header-top-row" style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+            <span class="fiche-numero">{{ commandeDetail.numero }}</span>
+            <span class="badge-statut-vif fiche-statut-badge" [ngClass]="classeStatut(commandeDetail.statut)">
+              <i class="fas" [ngClass]="iconeChangement(commandeDetail.statut)"></i> {{ commandeDetail.statutLibelle }}
+            </span>
+          </div>
+          <span class="fiche-date"><i class="far fa-calendar-alt me-1"></i> Commandée le {{ commandeDetail.createdAt | date:'d MMMM yyyy à HH:mm' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fiche-corps">
+      <!-- Grille 2 Colonnes Pro : Client & Remise -->
+      <div class="fiche-grille-top">
+        
+        <!-- 1. Carte Client -->
+        <section class="fiche-section-card sec-client">
+          <div class="section-card-entete">
+            <div class="section-icon-cercle">
+              <i class="fas fa-user text-primary"></i>
+            </div>
+            <h4>Information Client</h4>
+          </div>
+          <div class="section-card-grille">
+            <div class="champ-info-item full-width">
+              <span class="champ-info-label">Nom complet</span>
+              <strong class="champ-info-valeur-gras">{{ commandeDetail.clientNom }}</strong>
+            </div>
+            @if (commandeDetail.clientEmail) {
+<div class="champ-info-item full-width">
+              <span class="champ-info-label">Email</span>
+              <a [href]="'mailto:' + commandeDetail.clientEmail" class="client-email-lien">
+                <i class="fas fa-envelope text-muted"></i> {{ commandeDetail.clientEmail }}
+              </a>
+            </div>
+}
+            @if (commandeDetail.clientTelephone) {
+<div class="champ-info-item full-width">
+              <span class="champ-info-label">Téléphone</span>
+              <a [href]="'tel:' + commandeDetail.clientTelephone" class="client-tel-pill">
+                <i class="fas fa-phone-alt text-success"></i> {{ commandeDetail.clientTelephone }}
+              </a>
+            </div>
+}
+          </div>
+        </section>
+
+        <!-- 2. Carte Remise & Date -->
+        <section class="fiche-section-card sec-remise">
+          <div class="section-card-entete">
+            <div class="section-icon-cercle">
+              <i class="fas fa-truck-fast text-secondary"></i>
+            </div>
+            <h4>Remise &amp; Horaires</h4>
+          </div>
+          <div class="section-card-grille">
+            <div class="champ-info-item full-width">
+              <span class="champ-info-label">Mode de retrait</span>
+              <span class="badge-mode-remise" [ngClass]="commandeDetail.modeRemise === 'LIVRAISON' ? 'mode-livraison' : 'mode-retrait'">
+                <i class="fas" [ngClass]="commandeDetail.modeRemise === 'LIVRAISON' ? 'fa-truck' : 'fa-store'"></i>
+                {{ commandeDetail.modeRemiseLibelle }}
+              </span>
+            </div>
+            <div class="champ-info-item full-width">
+              <span class="champ-info-label">Date &amp; Heure souhaitée</span>
+              <span class="date-remise-valeur">
+                <i class="far fa-clock text-muted me-1"></i>
+                <strong>{{ commandeDetail.dateRemise | date:'EEEE d MMMM yyyy à HH:mm' }}</strong>
+              </span>
+            </div>
+            @if (commandeDetail.adresseLivraison) {
+<div class="champ-info-item full-width">
+              <span class="champ-info-label">Adresse de livraison</span>
+              <div class="adresse-box-card">
+                <i class="fas fa-map-marker-alt text-danger me-2"></i>
+                <span>{{ commandeDetail.adresseLivraison }}</span>
+              </div>
+            </div>
+}
+
+            <!-- Chauffeur assigné si livraison -->
+            @if (commandeDetail.modeRemise === 'LIVRAISON') {
+<div class="champ-info-item full-width">
+              <span class="champ-info-label">Livreur assigné</span>
+              @if (getLivreur(commandeDetail.id); as liv) {
+<div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <span class="badge-livreur-assigne">
+                  <i class="fas fa-motorcycle me-1"></i> {{ liv.chauffeurNom }}
+                </span>
+                @if (commandeDetail.statut === 'PRETE') {
+<button type="button" class="btn btn-sm btn-outline-primary" (click)="ouvrirAssignationLivreur(commandeDetail)">
+                  <i class="fas fa-arrows-rotate me-1"></i> Changer
+                </button>
+}
+              </div>
+}
+              @if (!getLivreur(commandeDetail.id)) {
+<div>
+                @if (commandeDetail.statut === 'PRETE') {
+<button type="button" class="btn btn-sm btn-primary" (click)="ouvrirAssignationLivreur(commandeDetail)">
+                  <i class="fas fa-user-plus me-1"></i> Assigner un livreur
+                </button>
+}
+                @if (commandeDetail.statut !== 'PRETE') {
+<span class="badge-livreur-verrouille">
+                  <i class="fas fa-lock me-1"></i> Disponible dès prête
+                </span>
+}
+              </div>
+}
+            </div>
+}
+          </div>
+        </section>
+
+      </div><!-- /fiche-grille-top -->
+
+      <!-- 3. Carte Panier & Mets commandés (Directement visible dans la modale) -->
+      <section class="fiche-section-card sec-panier-direct">
+        <div class="section-card-entete" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+          <div style="display: flex; align-items: center; gap: 0.65rem;">
+            <div class="section-icon-cercle" style="background: #FAF5EA; color: #721513; border-color: #EFE6D2;">
+              <i class="fas fa-shopping-basket"></i>
+            </div>
+            <h4>Panier &amp; Mets commandés</h4>
+          </div>
+          <span class="badge" style="background: #FAF5EA; color: #721513; font-weight: 700; border: 1px solid #EFE6D2; padding: 0.3rem 0.65rem; border-radius: 20px; font-size: 0.78rem;">
+            <i class="fas fa-utensils me-1"></i>
+            {{ getLignesCommande(commandeDetail).length }} mets • {{ compterTotalArticles(commandeDetail) }} portion(s)
+          </span>
+        </div>
+
+        <!-- Note client si présente -->
+        @if (commandeDetail.noteClient) {
+<div style="background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 0.6rem 0.85rem; font-size: 0.84rem; color: #92400E; margin-bottom: 0.85rem; display: flex; align-items: flex-start; gap: 0.5rem;">
+          <i class="fas fa-comment-dots text-warning" style="margin-top: 2px;"></i>
+          <div>
+            <strong>Note du client :</strong> {{ commandeDetail.noteClient }}
+          </div>
+        </div>
+}
+
+        <!-- Tableau élégant des mets commandés -->
+        @if (getLignesCommande(commandeDetail).length > 0) {
+<div class="table-responsive" style="border: 1px solid #E2E8F0; border-radius: 10px; overflow: hidden; margin-bottom: 0.85rem;">
+          <table class="fiche-table-lignes" style="margin-bottom: 0;">
+            <thead>
+              <tr>
+                <th style="width: 40px; text-align: center;">#</th>
+                <th>Mets</th>
+                <th class="th-droite">Prix unit.</th>
+                <th class="th-centre" style="width: 80px;">Quantité</th>
+                <th class="th-droite">Sous-total</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (l of getLignesCommande(commandeDetail); track $index; let i = $index) {
+<tr>
+                <td style="text-align: center; font-weight: 700; color: #94A3B8; font-size: 0.8rem;">{{ i + 1 }}</td>
+                <td class="article-nom-cell">
+                  <strong>{{ getNomProduit(l) }}</strong>
+                </td>
+                <td class="th-droite">{{ getPrixUnitaire(l) | number:'1.0-0' }} FCFA</td>
+                <td class="th-centre">
+                  <span class="badge-qte-vif">{{ getQuantite(l) }}</span>
+                </td>
+                <td class="th-droite" style="font-weight: 800; color: #721513;">
+                  {{ getSousTotal(l) | number:'1.0-0' }} FCFA
+                </td>
+              </tr>
+}
+            </tbody>
+          </table>
+        </div>
+}
+
+        <!-- Fallback si aucune ligne spécifique -->
+        @if (getLignesCommande(commandeDetail).length === 0) {
+<div class="fiche-panier-vide">
+          <i class="fas fa-utensils"></i>
+          <div>
+            <strong>Commande standard Kiki Traiteur</strong>
+            <span>Montant : {{ commandeDetail.montantTotal | number:'1.0-0' }} FCFA</span>
+          </div>
+        </div>
+}
+
+        <!-- Récapitulatif Règlement & Montant Total -->
+        <div class="fiche-panier-total-box">
+          <div class="fiche-total-row">
+            <span>Moyen de paiement :</span>
+            <div class="fiche-paiement-badge">
+              <img [src]="getModePaiementLogo(commandeDetail.modePaiement)" [alt]="getModePaiementLibelle(commandeDetail.modePaiement)" class="fiche-paiement-logo" />
+              <strong>{{ getModePaiementLibelle(commandeDetail.modePaiement) }}</strong>
+              <span class="badge-payee-tag"><i class="fas fa-check-circle"></i> Payé</span>
+            </div>
+          </div>
+          @if (commandeDetail.modeRemise === 'LIVRAISON') {
+<div class="fiche-total-row">
+            <span>Frais de livraison :</span>
+            <strong style="color: #2563EB;">{{ commandeDetail.fraisLivraison ? (commandeDetail.fraisLivraison | number:'1.0-0') + ' FCFA' : 'Inclus' }}</strong>
+          </div>
+}
+          <div class="fiche-total-row total-ttc-row">
+            <span>Montant Total :</span>
+            <strong class="total-ttc-valeur">{{ commandeDetail.montantTotal | number:'1.0-0' }} FCFA</strong>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="fiche-pied">
+      <button class="btn btn-fermer-rouge" (click)="fermerDetail()">
+        <i class="fas fa-times me-1"></i> Fermer
+      </button>
+      <div class="fiche-pied-actions">
+        @for (t of commandeDetail.transitionsPossibles; track $index) {
+<button class="btn" [class.btn-transition-annuler]="t === 'ANNULEE'" [class.btn-transition-avancer]="t !== 'ANNULEE'" (click)="demanderChangement(commandeDetail, t)">
+          <i class="fas" [ngClass]="iconeChangement(t)"></i>
+          {{ libelleStatutCible(t) }}
+        </button>
+}
+      </div>
+    </div>
+
+  </div>
+</div>
+}
+
+<!-- ══════════ MODALE D'ASSIGNATION DE LIVREUR / CHAUFFEUR ══════════ -->
+@if (modaleLivreurOuverte && commandePourLivreur) {
+<div class="modal-overlay" (click)="$event.target === $event.currentTarget && fermerAssignationLivreur()">
+  <div class="modal-card modal-livreur-carte">
+    <div class="modal-card-header modal-header-lux">
+      <div class="modal-title-group">
+        <div class="modal-icon-lux">
+          <i class="fas fa-motorcycle"></i>
+        </div>
+        <div>
+          <h3 class="modal-lux-title">Assigner un livreur</h3>
+          <span class="modal-lux-subtitle">Commande {{ commandePourLivreur.numero }}</span>
+        </div>
+      </div>
+      <button class="modal-close-btn" (click)="fermerAssignationLivreur()">&times;</button>
+    </div>
+
+    <div class="modal-card-body modal-body-scroll">
+      <div class="modal-instruction-box">
+        <i class="fas fa-location-dot text-danger me-2"></i>
+        <div>
+          <span class="d-block text-muted" style="font-size: 0.76rem; font-weight: 700; text-transform: uppercase;">Adresse de destination :</span>
+          <strong class="d-block text-dark" style="font-size: 0.88rem;">{{ commandePourLivreur.adresseLivraison || 'Adresse de livraison du client' }}</strong>
+        </div>
+      </div>
+
+      <label class="form-label mb-2" style="font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #64748B;">
+        Sélectionner un coursier / livreur
+      </label>
+      <div class="liste-chauffeurs-choix">
+        @for (ch of chauffeurs; track $index) {
+<label class="option-chauffeur" [class.selectionne]="chauffeurSelectionneId === ch.id">
+          <input type="radio" name="chauffeur" [value]="ch.id" [(ngModel)]="chauffeurSelectionneId" />
+          <div class="chauffeur-avatar-lux">
+            <i class="fas fa-user"></i>
+          </div>
+          <div class="chauffeur-details-radio">
+            <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
+              <span class="chauffeur-nom-radio">{{ ch.fullName || ch.username }}</span>
+              <!-- Badge Disponibilité en direct -->
+              <span class="badge-dispo-tag"
+                    [class.tag-dispo-vert]="getDisponibiliteChauffeur(ch.id).disponible"
+                    [class.tag-dispo-orange]="!getDisponibiliteChauffeur(ch.id).disponible">
+                <i class="fas fa-circle-dot me-1"></i>
+                {{ getDisponibiliteChauffeur(ch.id).libelle }}
+              </span>
+            </div>
+            <div class="d-flex align-items-center gap-2 mt-1">
+              <span class="chauffeur-role-radio">{{ ch.poste || ch._roleLabel || ch.role || 'Chauffeur / Livreur' }}</span>
+              @if (ch.departement) {
+<span class="chauffeur-dep-radio">• {{ ch.departement }}</span>
+}
+            </div>
+          </div>
+          @if (chauffeurSelectionneId === ch.id) {
+<i class="fas fa-check-circle text-primary radio-check-icone"></i>
+}
+        </label>
+}
+      </div>
+
+      <div class="mt-3">
+        <label class="form-label" style="font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #64748B;">
+          Instructions de remise (facultatif)
+        </label>
+        <textarea [(ngModel)]="instructionsLivraison" rows="2" class="form-control pro-textarea"
+                  placeholder="Ex : Récupérer le colis chaud en cuisine avant 12h15..."></textarea>
+      </div>
+    </div>
+
+    <div class="modal-card-footer modal-footer-lux" style="display: flex; justify-content: space-between; align-items: center; gap: 1.25rem;">
+      @if (getLivreur(commandePourLivreur.id)) {
+<button type="button" class="btn btn-outline-danger btn-sm" (click)="retirerLivreur(commandePourLivreur.id); fermerAssignationLivreur()">
+        <i class="fas fa-user-xmark me-1"></i> Retirer le livreur
+      </button>
+}
+      <div class="d-flex ms-auto" style="gap: 1.25rem;">
+        <button type="button" class="btn btn-outline" (click)="fermerAssignationLivreur()">Annuler</button>
+        <button type="button" class="btn btn-primary" (click)="confirmerAssignationLivreur()" [disabled]="!chauffeurSelectionneId">
+          <i class="fas fa-check me-1"></i> Confirmer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+<!-- ══════════ MODALE DE CONFIRMATION DE STATUT ══════════ -->
+@if (confirmationOuverte && commandeCible) {
+<div class="modal-overlay" (click)="$event.target === $event.currentTarget && fermerConfirmation()">
+  <div class="modal-card modal-statut-carte">
+    <div class="modal-card-header modal-header-lux">
+      <div class="modal-title-group">
+        <div class="modal-icon-lux">
+          <i class="fas" [ngClass]="iconeChangement(statutCible)"></i>
+        </div>
+        <div>
+          <h3 class="modal-lux-title">{{ libelleStatutCible(statutCible) }}</h3>
+          <span class="modal-lux-subtitle">Commande {{ commandeCible.numero }}</span>
+        </div>
+      </div>
+      <button class="modal-close-btn" (click)="fermerConfirmation()">&times;</button>
+    </div>
+
+    <div class="modal-card-body modal-body-scroll">
+      <p class="mb-3" style="font-size: 0.88rem; color: #334155; line-height: 1.5;">
+        Confirmez-vous le passage de la commande de <strong>{{ commandeCible.clientNom }}</strong> à l'état
+        <strong>"{{ libelleStatutCible(statutCible) }}"</strong> ?
+      </p>
+
+      <!-- Saisie motif si annulation -->
+      @if (statutCible === 'ANNULEE') {
+<div class="mb-3">
+        <label class="form-label" style="font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #DC2626;">
+          Motif de l'annulation (obligatoire)
+        </label>
+        <textarea [(ngModel)]="motifAnnulation" rows="2" class="form-control pro-textarea"
+                  placeholder="Ex : Ingrédients indisponibles, demande du client..."></textarea>
+      </div>
+}
+
+      <!-- Saisie frais si acceptation d'une livraison -->
+      @if (statutCible === 'ACCEPTEE' && commandeCible.modeRemise === 'LIVRAISON') {
+<div class="mb-3">
+        <label class="form-label" style="font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #2563EB;">
+          Frais de livraison (FCFA)
+        </label>
+        <input type="number" [(ngModel)]="fraisLivraisonSaisie" class="form-control pro-input" min="0" step="500" />
+      </div>
+}
+    </div>
+
+    <div class="modal-card-footer modal-footer-lux" style="display: flex; justify-content: flex-end; gap: 1.25rem;">
+      <button type="button" class="btn btn-outline" (click)="fermerConfirmation()" [disabled]="enCoursDeTraitement">
+        Annuler
+      </button>
+      <button type="button"
+              class="btn"
+              [class.btn-transition-annuler]="statutCible === 'ANNULEE'"
+              [class.btn-primary]="statutCible !== 'ANNULEE'"
+              (click)="confirmerChangement()"
+              [disabled]="enCoursDeTraitement || (statutCible === 'ANNULEE' && !motifAnnulation.trim())">
+        @if (enCoursDeTraitement) {
+<i class="fas fa-spinner fa-spin me-1"></i>
+}
+        Confirmer
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- ══════════ POPUP MODALE : DÉTAIL DU PANIER / METS COMMANDÉS ══════════ -->
+@if (modalePanierOuverte && commandePourPanier) {
+<div class="modal-overlay" style="position: fixed !important; inset: 0 !important; width: 100vw !important; height: 100vh !important; background: rgba(15, 23, 42, 0.78) !important; z-index: 100000050 !important; display: flex !important; align-items: center !important; justify-content: center !important; backdrop-filter: blur(8px) !important;" (click)="fermerModalePanier()">
+  <div class="modal-card" 
+       style="background: white; border-radius: 16px; width: 92%; max-width: 650px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.45); overflow: hidden; animation: zoomInModale 0.25s cubic-bezier(0.16, 1, 0.3, 1); position: relative; z-index: 100000060 !important; display: flex; flex-direction: column; max-height: 88vh;" 
+       (click)="$event.stopPropagation()">
+    
+    <!-- Header Popup Panier -->
+    <div style="background: linear-gradient(135deg, #721513, #981b1e); padding: 1.25rem 1.5rem; color: white; display: flex; justify-content: space-between; align-items: center;">
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <div style="background: rgba(255,255,255,0.18); width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.15rem;">
+          <i class="fas fa-shopping-basket"></i>
+        </div>
+        <div>
+          <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: white; font-family: 'Playfair Display', serif;">Panier &amp; Mets commandés</h3>
+          <span style="font-size: 0.8rem; color: rgba(255,255,255,0.85); display: block; margin-top: 0.15rem;">
+            Commande {{ commandePourPanier.numero }} • {{ getLignesCommande(commandePourPanier).length }} met{{ getLignesCommande(commandePourPanier).length > 1 ? 's' : '' }} ({{ compterTotalArticles(commandePourPanier) }} part{{ compterTotalArticles(commandePourPanier) > 1 ? 's' : '' }})
+          </span>
+        </div>
+      </div>
+      <button class="modal-close" (click)="fermerModalePanier()" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.35); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; color: white; cursor: pointer;" title="Fermer">&times;</button>
+    </div>
+
+    <!-- Body Popup Panier -->
+    <div style="padding: 1.4rem; overflow-y: auto; flex: 1; background: #FFFFFF;">
+      
+      <!-- Liste des mets avec quantité voulue et prix -->
+      @if (getLignesCommande(commandePourPanier).length > 0) {
+<div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        @for (l of getLignesCommande(commandePourPanier); track $index; let i = $index) {
+<div style="background: #FDFBF7; border: 1.5px solid #EBE4D5; border-radius: 12px; padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+          
+          <div style="display: flex; align-items: center; gap: 0.85rem; flex: 1; min-width: 200px;">
+            <div style="background: #FAF5EA; color: #721513; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.88rem; border: 1px solid #EFE6D2; flex-shrink: 0;">
+              {{ i + 1 }}
+            </div>
+            <div>
+              <strong style="color: #1E293B; font-size: 0.98rem; display: block;">{{ getNomProduit(l) }}</strong>
+              <span style="font-size: 0.82rem; color: #64748B;">Prix unitaire : {{ getPrixUnitaire(l) | number:'1.0-0' }} FCFA</span>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 1.25rem;">
+            <!-- Quantité voulue bien mise en valeur -->
+            <div style="background: #FAF5EA; border: 1.5px solid #E5D5BA; border-radius: 8px; padding: 0.35rem 0.85rem; display: flex; align-items: center; gap: 0.35rem;">
+              <span style="font-size: 0.76rem; font-weight: 700; color: #64748B; text-transform: uppercase;">Qté :</span>
+              <strong style="color: #721513; font-size: 1.05rem; font-weight: 900;">{{ getQuantite(l) }}</strong>
+            </div>
+
+            <!-- Sous-total pour cette ligne -->
+            <div style="text-align: right; min-width: 100px;">
+              <span style="font-size: 0.72rem; color: #64748B; display: block; text-transform: uppercase; font-weight: 600;">Sous-total</span>
+              <strong style="color: #721513; font-size: 1.05rem; font-weight: 800;">{{ getSousTotal(l) | number:'1.0-0' }} FCFA</strong>
+            </div>
+          </div>
+
+        </div>
+}
+      </div>
+}
+
+      <!-- Cas où aucune ligne spécifique n'est trouvée -->
+      @if (getLignesCommande(commandePourPanier).length === 0) {
+<div style="text-align: center; padding: 2.5rem 1rem; background: #F8FAFC; border: 1.5px dashed #CBD5E1; border-radius: 12px; color: #64748B;">
+        <i class="fas fa-utensils fa-2x mb-2" style="display: block; color: #CBD5E1; margin-bottom: 0.5rem;"></i>
+        <strong style="color: #1E293B; display: block; margin-bottom: 0.25rem;">Commande standard Kiki Traiteur</strong>
+        <span>Montant de la commande : {{ commandePourPanier.montantTotal | number:'1.0-0' }} FCFA</span>
+      </div>
+}
+
+      <!-- Récapitulatif Total & Frais -->
+      <div style="margin-top: 1.25rem; background: #FAF5EA; border: 1.5px solid #EFE6D2; border-radius: 12px; padding: 1rem 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; font-size: 0.85rem; color: #64748B;">
+          <span>Sous-total articles :</span>
+          <strong style="color: #1E293B;">{{ (commandePourPanier.montantProduits || commandePourPanier.montantTotal) | number:'1.0-0' }} FCFA</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; font-size: 0.85rem; color: #64748B;">
+          <span>Moyen de paiement :</span>
+          <div style="display: inline-flex; align-items: center; gap: 0.45rem;">
+            <img [src]="getModePaiementLogo(commandePourPanier.modePaiement)" [alt]="getModePaiementLibelle(commandePourPanier.modePaiement)" style="width: 22px; height: 22px; object-fit: contain; border-radius: 4px; background: white; border: 1px solid #E2E8F0; padding: 2px;" />
+            <strong style="color: #1E293B;">{{ getModePaiementLibelle(commandePourPanier.modePaiement) }}</strong>
+            <span style="background: #DCFCE7; color: #15803D; font-size: 0.72rem; font-weight: 700; padding: 0.15rem 0.45rem; border-radius: 12px; border: 1px solid #86EFAC;">Payé</span>
+          </div>
+        </div>
+        @if (commandePourPanier.modeRemise === 'LIVRAISON') {
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; font-size: 0.85rem; color: #64748B;">
+          <span>Frais de livraison :</span>
+          <strong style="color: #2563EB;">{{ commandePourPanier.fraisLivraison ? (commandePourPanier.fraisLivraison | number:'1.0-0') + ' FCFA' : 'Inclus' }}</strong>
+        </div>
+}
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1.5px solid #E5D5BA; padding-top: 0.65rem; margin-top: 0.5rem;">
+          <strong style="color: #721513; font-size: 0.95rem; text-transform: uppercase;">Total de la commande :</strong>
+          <strong style="color: #721513; font-size: 1.25rem; font-weight: 900;">{{ commandePourPanier.montantTotal | number:'1.0-0' }} FCFA</strong>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer Popup Panier -->
+    <div style="padding: 1rem 1.5rem; background: #F8FAFC; border-top: 1px solid #E2E8F0; display: flex; justify-content: flex-end;">
+      <button type="button" class="btn btn-fermer-rouge" (click)="fermerModalePanier()">
+        <i class="fas fa-times me-1"></i> Fermer
+      </button>
+    </div>
+
+  </div>
+</div>
+}
+
+<!-- ══════════ MODALE CRÉER UNE COMMANDE (GESTIONNAIRE) ══════════ -->
+@if (modaleCreationOuverte) {
+<div class="modal-overlay" (click)="$event.target === $event.currentTarget && fermerModaleCreation()">
+  <div class="modal-card modal-creer-commande-card" (click)="$event.stopPropagation()">
+
+    <!-- 1. BANDEAU ENTÊTE BORDEAUX ÉLÉGANT -->
+    <div class="fiche-bandeau" style="display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.75rem;">
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center; font-size: 1.35rem; border: 1px solid rgba(255,255,255,0.3); color: #FFFFFF;">
+          <i class="fas fa-cart-plus"></i>
+        </div>
+        <div>
+          <h3 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: #FFFFFF; letter-spacing: -0.01em;">Créer une commande de mets</h3>
+          <p style="margin: 0.15rem 0 0 0; font-size: 0.82rem; color: #FEE2E2; opacity: 0.95;">Enregistrement direct au comptoir, par téléphone ou sur place</p>
+        </div>
+      </div>
+      <button class="fiche-fermer" (click)="fermerModaleCreation()" title="Fermer"><i class="fas fa-times"></i></button>
+    </div>
+
+    <!-- 2. CORPS DU FORMULAIRE SCROLLABLE -->
+    <div class="modal-creer-corps">
+
+      <!-- BLOC 1: ATTRIBUTION OU CRÉATION DU CLIENT -->
+      <div class="creer-section-carte">
+        <div class="creer-section-titre">
+          <span class="creer-section-numero">1</span>
+          <h4>Informations du client</h4>
+        </div>
+
+        <!-- Onglets Choix Client -->
+        <div class="client-mode-selecteur">
+          <button type="button" class="btn-mode-client"
+                  [class.actif]="modeClientCreation === 'EXISTANT'"
+                  (click)="changerModeClient('EXISTANT')">
+            <i class="fas fa-user-check me-2"></i> Client existant
+          </button>
+          <button type="button" class="btn-mode-client"
+                  [class.actif]="modeClientCreation === 'NOUVEAU'"
+                  (click)="changerModeClient('NOUVEAU')">
+            <i class="fas fa-user-plus me-2"></i> Nouveau client
+          </button>
+        </div>
+
+        <!-- CAS A: CLIENT EXISTANT -->
+        @if (modeClientCreation === 'EXISTANT') {
+<div class="client-existant-box">
+          <!-- Si client déjà sélectionné -->
+          @if (clientSelectionne) {
+<div class="client-selectionne-badge">
+            <div style="display: flex; align-items: center; gap: 0.85rem;">
+              <div class="client-avatar-rond">
+                {{ clientSelectionne.name?.slice(0, 2)?.toUpperCase() || 'CL' }}
+              </div>
+              <div>
+                <strong class="client-nom-titre">{{ clientSelectionne.name }}</strong>
+                <div class="client-infos-meta">
+                  <span><i class="fas fa-phone me-1"></i> {{ clientSelectionne.phone || clientSelectionne.telephone || 'Non renseigné' }}</span>
+                  @if (clientSelectionne.email) {
+<span><i class="fas fa-envelope me-1"></i> {{ clientSelectionne.email }}</span>
+}
+                  <span class="badge-type-client" [class.entreprise]="clientSelectionne.type === 'entreprise'">
+                    {{ clientSelectionne.type === 'entreprise' ? ('Entreprise: ' + (clientSelectionne.organization || 'Société')) : 'Particulier' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <button type="button" class="btn-changer-client" (click)="clientSelectionne = null" title="Changer de client">
+              <i class="fas fa-pen me-1"></i> Modifier
+            </button>
+          </div>
+}
+
+          <!-- Si aucun client sélectionné : recherche instantanée -->
+          @if (!clientSelectionne) {
+<div class="client-recherche-box">
+            <div class="champ-recherche-client-wrap">
+              <input type="text" [(ngModel)]="rechercheClientTexte"
+                     placeholder="Rechercher par nom, téléphone, email ou entreprise..."
+                     class="input-recherche-client-field" />
+              @if (rechercheClientTexte) {
+<button class="btn-clear-client" (click)="rechercheClientTexte = ''">&times;</button>
+}
+            </div>
+
+            <!-- Liste des suggestions -->
+            <div class="suggestions-clients-liste">
+              @for (c of clientsFiltresCreation; track $index) {
+<div class="suggestion-client-item" (click)="selectionnerClient(c)">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <div class="client-avatar-mini">{{ c.name?.slice(0, 2)?.toUpperCase() || 'CL' }}</div>
+                  <div>
+                    <strong style="color: #1E293B; font-size: 0.92rem; display: block;">{{ c.name }}</strong>
+                    <div style="font-size: 0.78rem; color: #64748B; display: flex; gap: 0.75rem;">
+                      <span><i class="fas fa-phone me-1"></i>{{ c.phone || c.telephone }}</span>
+                      @if (c.email) {
+<span><i class="fas fa-envelope me-1"></i>{{ c.email }}</span>
+}
+                    </div>
+                  </div>
+                </div>
+                <span class="badge-type-client-mini" [class.entreprise]="c.type === 'entreprise'">
+                  {{ c.type === 'entreprise' ? (c.organization || 'Entreprise') : 'Particulier' }}
+                </span>
+              </div>
+}
+
+              @if (clientsFiltresCreation.length === 0) {
+<div class="aucun-client-trouve">
+                <span>Aucun client correspondant trouvé.</span>
+                <button type="button" class="btn-creer-ce-client" (click)="changerModeClient('NOUVEAU'); nouveauClient.nom = rechercheClientTexte">
+                  <i class="fas fa-plus-circle me-1"></i> Enregistrer comme nouveau client
+                </button>
+              </div>
+}
+            </div>
+          </div>
+}
+        </div>
+}
+
+        <!-- CAS B: NOUVEAU CLIENT -->
+        @if (modeClientCreation === 'NOUVEAU') {
+<div class="nouveau-client-form">
+          <!-- Type particulier ou entreprise -->
+          <div class="form-champ-group" style="margin-bottom: 0.85rem;">
+            <label class="creer-label">Type de client *</label>
+            <div class="radio-pills-wrap">
+              <label class="radio-pill" [class.actif]="nouveauClient.type === 'particulier'">
+                <input type="radio" [(ngModel)]="nouveauClient.type" value="particulier" name="nouveauClientType" />
+                <i class="fas fa-user me-1"></i> Particulier
+              </label>
+              <label class="radio-pill" [class.actif]="nouveauClient.type === 'entreprise'">
+                <input type="radio" [(ngModel)]="nouveauClient.type" value="entreprise" name="nouveauClientType" />
+                <i class="fas fa-building me-1"></i> Entreprise / Organisation
+              </label>
+            </div>
+          </div>
+
+          <!-- Si entreprise, nom de la société -->
+          @if (nouveauClient.type === 'entreprise') {
+<div class="form-champ-group" style="margin-bottom: 0.85rem;">
+            <label class="creer-label">Nom de l'entreprise ou institution *</label>
+            <input type="text" [(ngModel)]="nouveauClient.organization"
+                   placeholder="Ex: Orange Sénégal, Ministère, etc." class="creer-input" />
+          </div>
+}
+
+          <div class="champs-grille-2">
+            <div class="form-champ-group">
+              <label class="creer-label">Nom &amp; Prénoms *</label>
+              <input type="text" [(ngModel)]="nouveauClient.nom"
+                     placeholder="Ex: Awa Diop" class="creer-input" />
+            </div>
+
+            <div class="form-champ-group">
+              <label class="creer-label">Numéro de téléphone *</label>
+              <input type="tel" [(ngModel)]="nouveauClient.telephone"
+                     placeholder="Ex: 77 123 45 67 ou +221..." class="creer-input" />
+            </div>
+          </div>
+
+          <div class="form-champ-group" style="margin-top: 0.85rem;">
+            <label class="creer-label">Adresse email (optionnel)</label>
+            <input type="email" [(ngModel)]="nouveauClient.email"
+                   placeholder="Ex: client@exemple.sn" class="creer-input" />
+          </div>
+        </div>
+}
+      </div>
+
+      <!-- BLOC 2: CHOIX DES METS & PANIER -->
+      <div class="creer-section-carte">
+        <div class="creer-section-titre">
+          <span class="creer-section-numero">2</span>
+          <h4>Sélection des mets &amp; quantités</h4>
+        </div>
+
+        <!-- Filtres et Recherche de Mets -->
+        <div class="mets-filtre-bar">
+          <div class="champ-recherche-met-wrap">
+            <input type="text" [(ngModel)]="rechercheMetTexte"
+                   placeholder="Filtrer un met, entrée, plat chaud, boisson..."
+                   class="input-recherche-client-field" />
+            @if (rechercheMetTexte) {
+<button class="btn-clear-client" (click)="rechercheMetTexte = ''">&times;</button>
+}
+          </div>
+
+          <select [(ngModel)]="categorieMetFiltre" class="select-categorie-met">
+            <option value="TOUTES">Toutes les catégories</option>
+            @for (c of categoriesCatalogue; track $index) {
+<option [value]="c.id">{{ c.nom }}</option>
+}
+          </select>
+        </div>
+
+        <!-- Grille des mets disponibles -->
+        <div class="grille-produits-catalogue">
+          @for (p of metsFiltresCreation; track $index) {
+<div class="carte-met-catalogue" (click)="ajouterMetAuPanier(p)">
+            <div class="met-thumb-wrap">
+              @if (p.imageUrl) {
+<img [src]="p.imageUrl" [alt]="p.nom" class="met-thumb-img" />
+}
+              @if (!p.imageUrl) {
+<div class="met-thumb-placeholder">
+                <i class="fas fa-bowl-food"></i>
+              </div>
+}
+            </div>
+            <div class="met-info-wrap">
+              <strong class="met-nom-texte" [title]="p.nom">{{ p.nom }}</strong>
+              <span class="met-cat-tag">{{ p.categorieNom || 'Catalogue' }}</span>
+              <div class="met-prix-action">
+                <span class="met-prix-tag">{{ p.prix | number:'1.0-0' }} FCFA</span>
+                <button type="button" class="btn-ajouter-met" (click)="$event.stopPropagation(); ajouterMetAuPanier(p)">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+}
+
+          @if (metsFiltresCreation.length === 0) {
+<div class="aucun-met-trouve">
+            <i class="fas fa-search mb-2" style="font-size: 1.5rem; color: #CBD5E1;"></i>
+            <span>Aucun plat ou met trouvé avec ces critères.</span>
+          </div>
+}
+        </div>
+
+        <!-- Panier actuel de la commande -->
+        <div class="panier-creation-container">
+          <div class="panier-creation-entete">
+            <strong style="color: #1E293B; font-size: 0.95rem;">
+              <i class="fas fa-shopping-basket me-2" style="color: #721513;"></i>
+              Mets retenus pour cette commande ({{ lignesCreation.length }})
+            </strong>
+            @if (lignesCreation.length > 0) {
+<span class="badge-total-mets">
+              Sous-total mets : {{ totalMetsCreation | number:'1.0-0' }} FCFA
+            </span>
+}
+          </div>
+
+          <!-- Si aucun article sélectionné -->
+          @if (lignesCreation.length === 0) {
+<div class="panier-creation-vide">
+            <i class="fas fa-hand-pointer me-2"></i>
+            Cliquez sur un met ci-dessus pour l'ajouter à la commande.
+          </div>
+}
+
+          <!-- Liste des lignes du panier -->
+          @if (lignesCreation.length > 0) {
+<div class="lignes-creation-liste">
+            @for (l of lignesCreation; track $index; let idx = $index) {
+<div class="ligne-creation-item">
+              <div class="ligne-numero-bulle">{{ idx + 1 }}</div>
+              <div class="ligne-info-met">
+                <strong style="color: #1E293B; font-size: 0.92rem; display: block;">{{ l.produitNom }}</strong>
+                <span style="font-size: 0.78rem; color: #64748B;">{{ l.prixUnitaire | number:'1.0-0' }} FCFA / part</span>
+              </div>
+
+              <!-- Stepper Quantité -->
+              <div class="stepper-quantite">
+                <button type="button" class="btn-step" (click)="modifierQuantiteLigneCreation(l, -1)">-</button>
+                <span class="valeur-step">{{ l.quantite }}</span>
+                <button type="button" class="btn-step" (click)="modifierQuantiteLigneCreation(l, 1)">+</button>
+              </div>
+
+              <!-- Sous-total -->
+              <div class="ligne-soustotal">
+                {{ l.sousTotal | number:'1.0-0' }} FCFA
+              </div>
+
+              <!-- Bouton suppression -->
+              <button type="button" class="btn-suppr-ligne" (click)="supprimerLigneCreation(l)" title="Retirer">
+                <i class="fas fa-trash-can"></i>
+              </button>
+            </div>
+}
+          </div>
+}
+        </div>
+      </div>
+
+      <!-- BLOC 3: GARNITURES & ACCOMPAGNEMENTS (POUR ENTRÉES & PLATS CHAUDS) -->
+      @if (quotaGarnituresOffertesCreation > 0 && garnituresCompatiblesCreation.length > 0) {
+<div class="creer-section-carte">
+        <div class="creer-section-titre" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+          <div style="display: flex; align-items: center; gap: 0.65rem;">
+            <span class="creer-section-numero">3</span>
+            <h4>Garnitures &amp; Accompagnements au choix</h4>
+          </div>
+          <div class="badge-quota-garniture" [class.quota-plein]="totalGarnituresChoisiesCreation >= quotaGarnituresOffertesCreation">
+            <i class="fas fa-gift me-1"></i>
+            <strong>{{ nombreGarnituresOffertesUtiliseesCreation }} / {{ quotaGarnituresOffertesCreation }}</strong>&nbsp;offerte(s)
+            @if (surplusGarnituresPayantesCreation > 0) {
+<span class="badge-surplus ms-1">
+              +{{ surplusGarnituresPayantesCreation }} suppl. (+{{ coutSurplusGarnituresCreation | number:'1.0-0' }} F)
+            </span>
+}
+          </div>
+        </div>
+
+        <!-- Filtre rapide si plusieurs garnitures -->
+        @if (garnituresCompatiblesCreation.length > 4) {
+<div class="garniture-recherche-bar" style="margin-bottom: 0.75rem;">
+          <div class="champ-recherche-met-wrap">
+            <input type="text" [(ngModel)]="rechercheGarnitureTexte"
+                   placeholder="Filtrer une garniture (Riz, Alloco, Frites, Salade...)"
+                   class="input-recherche-client-field" />
+            @if (rechercheGarnitureTexte) {
+<button class="btn-clear-client" (click)="rechercheGarnitureTexte = ''">&times;</button>
+}
+          </div>
+        </div>
+}
+
+        <!-- Grille des garnitures compatibles -->
+        <div class="garnitures-scroll-container-creation">
+          <div class="garnitures-creation-cards-grid">
+            @for (g of garnituresCompatiblesFiltreesCreation; track $index) {
+<div class="garniture-card-creation" [class.selected]="getQuantiteGarnitureCreation(g.id)> 0">
+              <div class="garniture-card-img">
+                @if (g.imageUrl) {
+<img [src]="g.imageUrl" [alt]="g.nom" loading="lazy" />
+}
+                @if (!g.imageUrl) {
+<div class="garniture-card-placeholder">
+                  <i class="fas fa-bowl-rice"></i>
+                </div>
+}
+              </div>
+              <div class="garniture-card-body">
+                <div class="garniture-card-info">
+                  <h5 class="garniture-card-nom" [title]="g.nom">{{ g.nom }}</h5>
+                  <span class="garniture-card-tarif">
+                    <span class="tarif-offert"><i class="fas fa-gift me-1"></i>Inclus</span>
+                    @if (g.prix) {
+<small class="tarif-standard">({{ g.prix | number:'1.0-0' }} F au-delà)</small>
+}
+                  </span>
+                </div>
+                <div class="garniture-card-actions">
+                  <button type="button" class="btn-garniture-action" (click)="modifierQuantiteGarnitureCreation(g, -1)"
+                          [disabled]="getQuantiteGarnitureCreation(g.id) === 0">
+                    <i class="fas fa-minus"></i>
+                  </button>
+                  <span class="garniture-card-qte">{{ getQuantiteGarnitureCreation(g.id) }}</span>
+                  <button type="button" class="btn-garniture-action" (click)="modifierQuantiteGarnitureCreation(g, 1)">
+                    <i class="fas fa-plus"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+}
+          </div>
+        </div>
+
+        <!-- Récapitulatif des garnitures sélectionnées -->
+        @if (garnituresChoisiesCreation.length > 0) {
+<div class="garnitures-choisies-recap">
+          <span class="recap-label"><i class="fas fa-check-circle me-1" style="color: #15803D;"></i> Sélectionnées :</span>
+          <div class="chips-garnitures-wrap">
+            @for (item of garnituresChoisiesCreation; track $index) {
+<span class="chip-garniture-item">
+              {{ item.quantite }}× {{ item.garniture.nom }}
+            </span>
+}
+          </div>
+        </div>
+}
+      </div>
+}
+
+      <!-- BLOC MODALITÉS DE REMISE & DATE -->
+      <div class="creer-section-carte">
+        <div class="creer-section-titre">
+          <span class="creer-section-numero">{{ (quotaGarnituresOffertesCreation > 0 && garnituresCompatiblesCreation.length > 0) ? 4 : 3 }}</span>
+          <h4>Mode de retrait &amp; Date</h4>
+        </div>
+
+        <div class="champs-grille-2">
+          <!-- Choix mode de remise -->
+          <div class="form-champ-group">
+            <label class="creer-label">Moyen de remise *</label>
+            <div class="remise-cartes-select">
+              <div class="remise-carte" [class.actif]="modeRemiseCreation === 'RETRAIT'"
+                   (click)="changerModeRemiseCreation('RETRAIT')">
+                <i class="fas fa-store remise-icon"></i>
+                <strong class="remise-nom">Retrait sur place</strong>
+              </div>
+              <div class="remise-carte" [class.actif]="modeRemiseCreation === 'LIVRAISON'"
+                   (click)="changerModeRemiseCreation('LIVRAISON')">
+                <i class="fas fa-motorcycle remise-icon"></i>
+                <strong class="remise-nom">Livraison</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Date et Heure de retrait / livraison -->
+          <div class="form-champ-group">
+            <label class="creer-label">Date et heure de retrait / livraison *</label>
+            <input type="datetime-local" [(ngModel)]="dateRemiseCreation" class="creer-input" />
+          </div>
+        </div>
+
+        <!-- Si livraison sélectionnée -->
+        @if (modeRemiseCreation === 'LIVRAISON') {
+<div class="livraison-details-box" style="margin-top: 1rem;">
+          <div class="champs-grille-2">
+            <div class="form-champ-group">
+              <label class="creer-label">Adresse complète de livraison *</label>
+              <textarea [(ngModel)]="adresseLivraisonCreation" rows="2"
+                        placeholder="Ex: Almadies, en face de la pharmacie, Villa n°..." class="creer-input"></textarea>
+            </div>
+            <div class="form-champ-group">
+              <label class="creer-label">Frais de livraison (FCFA)</label>
+              <input type="number" [(ngModel)]="fraisLivraisonCreation" min="0" step="500" class="creer-input" />
+            </div>
+          </div>
+        </div>
+}
+      </div>
+
+      <!-- BLOC PAIEMENT (AVEC IMAGES OFFICIELLES CLIENT) -->
+      <div class="creer-section-carte">
+        <div class="creer-section-titre">
+          <span class="creer-section-numero">{{ (quotaGarnituresOffertesCreation > 0 && garnituresCompatiblesCreation.length > 0) ? 5 : 4 }}</span>
+          <h4>Moyen de paiement &amp; Règlement</h4>
+        </div>
+
+        <label class="creer-label" style="margin-bottom: 0.5rem; display: block;">Moyen de paiement sélectionné *</label>
+        <div class="paiement-modes-grille">
+          <!-- ESPÈCES -->
+          <div class="paiement-mode-carte" [class.actif]="modePaiementCreation === 'ESPECES'"
+               (click)="modePaiementCreation = 'ESPECES'">
+            <div class="pm-icone especes">
+              <img src="https://cdn-icons-png.flaticon.com/512/2489/2489756.png" alt="Espèces" class="pm-logo-img" />
+            </div>
+            <strong class="pm-nom-court">Espèces</strong>
+            @if (modePaiementCreation === 'ESPECES') {
+<i class="fas fa-circle-check pm-check-icon"></i>
+}
+          </div>
+
+          <!-- WAVE -->
+          <div class="paiement-mode-carte" [class.actif]="modePaiementCreation === 'WAVE'"
+               (click)="modePaiementCreation = 'WAVE'">
+            <div class="pm-icone wave">
+              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZaeFi3xAkC86Ui29AojMASpYfFMPLDzf-1hTcDVS-0Q&s=10" alt="Wave" class="pm-logo-img" />
+            </div>
+            <strong class="pm-nom-court">Wave</strong>
+            @if (modePaiementCreation === 'WAVE') {
+<i class="fas fa-circle-check pm-check-icon"></i>
+}
+          </div>
+
+          <!-- ORANGE MONEY -->
+          <div class="paiement-mode-carte" [class.actif]="modePaiementCreation === 'ORANGE_MONEY'"
+               (click)="modePaiementCreation = 'ORANGE_MONEY'">
+            <div class="pm-icone orange">
+              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkuwenMWEMEqLrjTBw59HU3cAqXn5JcznidoH8agbSKg&s=10" alt="Orange Money" class="pm-logo-img" />
+            </div>
+            <strong class="pm-nom-court">Orange Money</strong>
+            @if (modePaiementCreation === 'ORANGE_MONEY') {
+<i class="fas fa-circle-check pm-check-icon"></i>
+}
+          </div>
+
+          <!-- CARTE BANCAIRE -->
+          <div class="paiement-mode-carte" [class.actif]="modePaiementCreation === 'CARTE_BANCAIRE'"
+               (click)="modePaiementCreation = 'CARTE_BANCAIRE'">
+            <div class="pm-icone carte">
+              <img src="https://cdn-icons-png.flaticon.com/512/633/633611.png" alt="Carte bancaire" class="pm-logo-img" />
+            </div>
+            <strong class="pm-nom-court">Carte bancaire</strong>
+            @if (modePaiementCreation === 'CARTE_BANCAIRE') {
+<i class="fas fa-circle-check pm-check-icon"></i>
+}
+          </div>
+        </div>
+      </div>
+
+      <!-- BLOC REMARQUES & STATUT INITIAL -->
+      <div class="creer-section-carte">
+        <div class="creer-section-titre">
+          <span class="creer-section-numero">{{ (quotaGarnituresOffertesCreation > 0 && garnituresCompatiblesCreation.length > 0) ? 6 : 5 }}</span>
+          <h4>Instructions &amp; Validation</h4>
+        </div>
+
+        <div class="champs-grille-2">
+          <div class="form-champ-group">
+            <label class="creer-label">Remarques client / Instructions cuisine (optionnel)</label>
+            <textarea [(ngModel)]="noteCommandeCreation" rows="2"
+                      placeholder="Ex: Sans piment, sauces à part, emballage hermétique..." class="creer-input"></textarea>
+          </div>
+
+          <div class="form-champ-group">
+            <label class="creer-label">Statut initial de la commande</label>
+            <select [(ngModel)]="statutCommandeCreation" class="creer-input">
+              <option value="ACCEPTEE">Acceptée directement (En attente de cuisine)</option>
+              <option value="EN_ATTENTE">En attente de validation</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 3. FOOTER AVEC RÉCAPITULATIF TOTAL ET BOUTONS -->
+    <div class="modal-creer-pied">
+      <div class="recap-totaux-bandeau">
+        <div class="recap-item">
+          <span>Mets :</span>
+          <strong>{{ totalMetsCreation | number:'1.0-0' }} FCFA</strong>
+        </div>
+        @if (quotaGarnituresOffertesCreation > 0 && totalGarnituresChoisiesCreation > 0) {
+<div class="recap-item">
+          <span>Garnitures :</span>
+          <strong style="color: #15803D;">
+            {{ nombreGarnituresOffertesUtiliseesCreation }} incluse(s)
+            @if (surplusGarnituresPayantesCreation > 0) {
+<span style="color: #721513; font-weight: 700;">
+              (+{{ coutSurplusGarnituresCreation | number:'1.0-0' }} F)
+            </span>
+}
+          </strong>
+        </div>
+}
+        @if (modeRemiseCreation === 'LIVRAISON') {
+<div class="recap-item">
+          <span>Livraison :</span>
+          <strong style="color: #2563EB;">{{ (fraisLivraisonCreation || 0) | number:'1.0-0' }} FCFA</strong>
+        </div>
+}
+        <div class="recap-item total-final">
+          <span>Total à payer :</span>
+          <strong>{{ totalGlobalCreation | number:'1.0-0' }} FCFA</strong>
+        </div>
+      </div>
+
+      <div class="actions-creer-wrap">
+        <button type="button" class="btn btn-annuler-creer" (click)="fermerModaleCreation()" [disabled]="creationEnCours">
+          Annuler
+        </button>
+        <button type="button" class="btn btn-valider-creer" (click)="validerCreationCommande()" [disabled]="creationEnCours">
+          <i class="fas" [ngClass]="creationEnCours ? 'fa-spinner fa-spin' : 'fa-check-circle'"></i>
+          {{ creationEnCours ? 'Création en cours...' : 'Enregistrer la commande' }}
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+}
+
+

@@ -1,0 +1,87 @@
+<div class="login-page-container">
+      <div class="login-card animate-fade">
+        <!-- Header / Logo -->
+        <div class="login-header">
+          <img src="assets/images/logo.png" alt="Kiki Traiteur Logo" class="login-logo">
+          <h2 class="login-title">Espace Client MyKiki</h2>
+          <p class="login-subtitle">Connectez-vous pour commander et suivre vos devis</p>
+        </div>
+
+        <!-- Formulaire de connexion -->
+        <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="login-form">
+          <div class="form-group">
+            <label for="email">ADRESSE E-MAIL</label>
+            <div class="input-with-icon">
+              <i class="fa-regular fa-envelope input-icon"></i>
+              <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                [(ngModel)]="email" 
+                placeholder="exemple@gmail.com" 
+                required 
+                class="form-control"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="password">MOT DE PASSE</label>
+            <div class="password-field input-with-icon">
+              <i class="fas fa-key input-icon"></i>
+              <input 
+                [type]="showPassword ? 'text' : 'password'" 
+                id="password" 
+                name="password" 
+                [(ngModel)]="password" 
+                placeholder="••••••••" 
+                required 
+                class="form-control"
+              />
+              <button type="button" class="toggle-pwd" (click)="showPassword = !showPassword" [title]="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'">
+                <i class="fas" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="forgot-pwd-row">
+            <a href="javascript:void(0)" class="forgot-pwd-link" (click)="forgotPassword()">Mot de passe oublié ?</a>
+            <a routerLink="/mykiki/register" class="create-account-link">Créer un compte</a>
+          </div>
+
+          <button type="submit" class="btn-login-red" [disabled]="isLoading">
+            @if (!isLoading) {
+<span><i class="fas fa-sign-in-alt me-2"></i> SE CONNECTER</span>
+}
+            @if (isLoading) {
+<span><i class="fas fa-spinner fa-spin me-2"></i> Connexion en cours...</span>
+}
+          </button>
+        </form>
+
+        @if (googleDisponible) {
+<div class="login-separator"><span>ou</span></div>
+}
+        @if (googleDisponible) {
+<div class="zone-bouton-google">
+          <div #boutonGoogle></div>
+        </div>
+}
+
+        <!-- Message d'erreur ou succès -->
+        @if (message) {
+<div class="login-message" [ngClass]="isError ? 'msg-error' : 'msg-success'">
+          {{ message }}
+        </div>
+}
+
+        <!-- Retour au site uniquement si l'utilisateur est sur navigateur web classique -->
+        @if (!isStandalone) {
+<div class="back-site-box">
+          <a routerLink="/" class="back-site-link">
+            <i class="fas fa-arrow-left me-1"></i> Retour au site vitrine
+          </a>
+        </div>
+}
+      </div>
+    </div>
