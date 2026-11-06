@@ -10,7 +10,7 @@
   top: 0;
   left: 0;
   bottom: 0;
-  width: 280px;
+  width: var(--b2b-sidebar-w, 280px);
   background-color: #FFFFFF;
   border-right: 1.5px solid #EDE7DC;
   display: flex;
@@ -20,11 +20,7 @@
   transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* MODE RÉDUIT (COLLAPSED : 80px) */
-.b2b-sidebar.collapsed {
-  width: 80px;
-}
-
+/* MODE RÉDUIT (COLLAPSED) */
 .b2b-sidebar.collapsed .b2b-sidebar-nav {
   padding: 0.75rem 0;
   align-items: center;
@@ -33,21 +29,22 @@
 }
 
 .b2b-sidebar.collapsed .b2b-sidebar-link {
-  justify-content: center !important;
-  align-items: center !important;
-  padding: 0 !important;
-  margin: 0.45rem auto !important;
-  width: 48px !important;
-  max-width: 48px !important;
-  height: 48px !important;
-  border-radius: 14px !important;
-  flex: 0 0 48px !important;
-  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  margin: 0.45rem auto;
+  width: 48px;
+  max-width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  flex: 0 0 48px;
+  display: flex;
+  box-sizing: border-box;
 }
 
 .b2b-sidebar.collapsed .b2b-sidebar-link.active {
-  width: 48px !important;
-  max-width: 48px !important;
+  width: 48px;
+  max-width: 48px;
 }
 
 /* En-tête avec Logo et bouton Toggle */
@@ -313,17 +310,17 @@
 
 .b2b-sidebar.collapsed .b2b-sidebar-link,
 .b2b-sidebar.collapsed .b2b-sidebar-link.active {
-  width: 48px !important;
-  min-width: 48px !important;
-  max-width: 48px !important;
-  height: 48px !important;
-  margin: 0.45rem auto !important;
-  padding: 0 !important;
-  border-radius: 14px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  box-sizing: border-box !important;
+  width: 48px;
+  min-width: 48px;
+  max-width: 48px;
+  height: 48px;
+  margin: 0.45rem auto;
+  padding: 0;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
 .b2b-link-icon-wrap {

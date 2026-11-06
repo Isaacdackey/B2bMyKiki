@@ -1,4 +1,4 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, effect } from '@angular/core';
 import { EntrepriseB2B, SiteB2B, PlatB2B, FormuleRegle, EmployeB2B, SelectionRepas, CommandeHistoriqueB2B, LignePanierAutonome } from './b2b.models';
 
 @Injectable({
@@ -10,6 +10,23 @@ export class B2bStateService {
 
   // État de la Sidebar rétractable (Collapsed / Expanded) persisté
   isSidebarCollapsed = signal<boolean>(localStorage.getItem('b2b_sidebar_collapsed') === 'true');
+
+  constructor() {
+    // Définition immédiate dès le premier rendu
+    this.updateSidebarCssVar(this.isSidebarCollapsed());
+
+    // Réaction réactive aux changements d'état
+    effect(() => {
+      const collapsed = this.isSidebarCollapsed();
+      this.updateSidebarCssVar(collapsed);
+    });
+  }
+
+  private updateSidebarCssVar(collapsed: boolean) {
+    if (typeof document !== 'undefined' && document.documentElement) {
+      document.documentElement.style.setProperty('--b2b-sidebar-w', collapsed ? '80px' : '280px');
+    }
+  }
 
   toggleSidebar() {
     this.isSidebarCollapsed.update(v => {

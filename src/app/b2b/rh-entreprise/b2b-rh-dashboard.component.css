@@ -18,17 +18,12 @@
   width: auto;
   min-width: 0;
   box-sizing: border-box;
-  margin-left: 280px;
+  margin-left: var(--b2b-sidebar-w, 280px);
   transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.rh-wrapper.collapsed-layout {
-  margin-left: 80px;
-}
-
 @media (max-width: 991px) {
-  .rh-wrapper,
-  .rh-wrapper.collapsed-layout {
+  .rh-wrapper {
     margin-left: 0 !important;
     width: 100% !important;
   }
