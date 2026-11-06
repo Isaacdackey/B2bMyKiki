@@ -646,10 +646,19 @@
           <button (click)="showBLModal.set(false)" style="background: none; border: none; color: #6E5A56; font-size: 1.25rem; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
-        <div style="background: #FAF8F4; border-radius: 14px; padding: 1rem; font-size: 0.82rem; line-height: 1.6; margin-bottom: 1.25rem; border: 1.5px solid #EDE7DC;">
-          <div><i class="fa-solid fa-truck"></i> <strong>Livreur :</strong> {{ selectedBL()!.chauffeurLivreur }} • Départ {{ selectedBL()!.heureDepartPrevue }}</div>
-          <div><i class="fa-solid fa-location-dot"></i> <strong>Lieu de livraison :</strong> {{ selectedBL()!.adresseLivraison }}</div>
-          <div><i class="fa-solid fa-box"></i> <strong>Total plateaux :</strong> {{ selectedBL()!.nbPlateauxTotal }} plateaux individuels étiquetés</div>
+        <div style="background: #FAF8F4; border-radius: 14px; padding: 1.15rem; font-size: 0.85rem; line-height: 2; margin-bottom: 1.25rem; border: 1.5px solid #EDE7DC;">
+          <div style="display: flex; align-items: center; gap: 0.65rem;">
+            <i class="fa-solid fa-truck" style="color: #721513; width: 18px; text-align: center;"></i>
+            <span><strong>Livreur :</strong> {{ selectedBL()!.chauffeurLivreur }} • Départ {{ selectedBL()!.heureDepartPrevue }}</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.65rem;">
+            <i class="fa-solid fa-location-dot" style="color: #E51D24; width: 18px; text-align: center;"></i>
+            <span><strong>Lieu de livraison :</strong> {{ selectedBL()!.adresseLivraison }}</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.65rem;">
+            <i class="fa-solid fa-box" style="color: #721513; width: 18px; text-align: center;"></i>
+            <span><strong>Total plateaux :</strong> {{ selectedBL()!.nbPlateauxTotal }} plateaux individuels étiquetés</span>
+          </div>
         </div>
 
         <!-- Tableau d'émargement nominatif -->
