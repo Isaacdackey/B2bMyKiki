@@ -311,6 +311,21 @@
   border-color: transparent !important;
 }
 
+.b2b-sidebar.collapsed .b2b-sidebar-link,
+.b2b-sidebar.collapsed .b2b-sidebar-link.active {
+  width: 48px !important;
+  min-width: 48px !important;
+  max-width: 48px !important;
+  height: 48px !important;
+  margin: 0.45rem auto !important;
+  padding: 0 !important;
+  border-radius: 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+}
+
 .b2b-link-icon-wrap {
   width: 36px;
   height: 36px;
