@@ -541,10 +541,19 @@
                 <span class="rh-badge-subv">Actif</span>
               </div>
 
-              <div style="background: #FAF8F4; border-radius: 12px; padding: 1rem; font-size: 0.85rem; line-height: 1.6; margin-bottom: 1.25rem; border: 1.5px solid #EDE7DC;">
-                <div><i class="fa-regular fa-clock" style="color: #E51D24;"></i> <strong>Heure Cut-Off :</strong> <span style="color: #E51D24; font-weight: 800;">{{ site.heureCutOff }}</span></div>
-                <div><i class="fa-solid fa-user-tie"></i> <strong>Contact Référent :</strong> {{ site.contactReferent }}</div>
-                <div><i class="fa-solid fa-phone"></i> <strong>Téléphone :</strong> {{ site.telephoneReferent }}</div>
+              <div style="background: #FAF8F4; border-radius: 12px; padding: 1rem; font-size: 0.85rem; line-height: 2; margin-bottom: 1.25rem; border: 1.5px solid #EDE7DC;">
+                <div style="display: flex; align-items: center; gap: 0.65rem;">
+                  <i class="fa-regular fa-clock" style="color: #E51D24; width: 18px; text-align: center;"></i>
+                  <span><strong>Heure Cut-Off :</strong> <span style="color: #E51D24; font-weight: 800;">{{ site.heureCutOff }}</span></span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.65rem;">
+                  <i class="fa-solid fa-user-tie" style="color: #6E5A56; width: 18px; text-align: center;"></i>
+                  <span><strong>Contact Référent :</strong> {{ site.contactReferent }}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.65rem;">
+                  <i class="fa-solid fa-phone" style="color: #6E5A56; width: 18px; text-align: center;"></i>
+                  <span><strong>Téléphone :</strong> {{ site.telephoneReferent }}</span>
+                </div>
               </div>
 
               <button routerLink="/b2b" style="width: 100%; padding: 0.75rem; background: #FAF8F4; color: #721513; border: 1.5px solid #EDE7DC; border-radius: 9999px; font-weight: 700; font-size: 0.82rem; cursor: pointer;">

@@ -554,18 +554,34 @@
                 }
               </div>
 
-              <div style="background: #FAF8F4; border-radius: 14px; padding: 1.15rem; font-size: 0.85rem; line-height: 1.7; margin-bottom: 1.25rem; border: 1.5px solid #EDE7DC;">
-                <div><i class="fa-solid fa-box" style="color: #721513;"></i> <strong>Nombre de plateaux :</strong> <span style="color: #721513; font-weight: 900; font-size: 1.05rem;">{{ bl.nbPlateauxTotal }}</span></div>
-                <div><i class="fa-solid fa-location-dot" style="color: #E51D24;"></i> <strong>Adresse :</strong> {{ bl.adresseLivraison }}</div>
-                <div><i class="fa-regular fa-clock"></i> <strong>Créneau distribution :</strong> <span style="color: #E51D24; font-weight: 800;">{{ bl.creneau }}</span></div>
-                <div><i class="fa-solid fa-truck"></i> <strong>Livreur :</strong> {{ bl.chauffeurLivreur }}</div>
-                <div><i class="fa-solid fa-user-tie"></i> <strong>Contact sur site :</strong> {{ bl.contactReferent }} ({{ bl.telephoneReferent }})</div>
+              <div style="background: #FAF8F4; border-radius: 14px; padding: 1.15rem; font-size: 0.85rem; line-height: 2; margin-bottom: 1.25rem; border: 1.5px solid #EDE7DC;">
+                <div style="display: flex; align-items: center; gap: 0.65rem;">
+                  <i class="fa-solid fa-box" style="color: #721513; width: 18px; text-align: center;"></i>
+                  <span><strong>Nombre de plateaux :</strong> <span style="color: #721513; font-weight: 900; font-size: 1.05rem;">{{ bl.nbPlateauxTotal }}</span></span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.65rem;">
+                  <i class="fa-solid fa-location-dot" style="color: #E51D24; width: 18px; text-align: center;"></i>
+                  <span><strong>Adresse :</strong> {{ bl.adresseLivraison }}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.65rem;">
+                  <i class="fa-regular fa-clock" style="color: #E51D24; width: 18px; text-align: center;"></i>
+                  <span><strong>Créneau distribution :</strong> <span style="color: #E51D24; font-weight: 800;">{{ bl.creneau }}</span></span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.65rem;">
+                  <i class="fa-solid fa-truck" style="color: #6E5A56; width: 18px; text-align: center;"></i>
+                  <span><strong>Livreur :</strong> {{ bl.chauffeurLivreur }}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.65rem;">
+                  <i class="fa-solid fa-user-tie" style="color: #6E5A56; width: 18px; text-align: center;"></i>
+                  <span><strong>Contact sur site :</strong> {{ bl.contactReferent }} ({{ bl.telephoneReferent }})</span>
+                </div>
               </div>
 
               <button 
                 (click)="ouvrirBordereau(bl)"
-                style="width: 100%; padding: 0.85rem; background: linear-gradient(135deg, #721513, #E51D24); color: #FFFFFF; border: none; border-radius: 9999px; font-weight: 700; font-size: 0.82rem; cursor: pointer; box-shadow: 0 4px 15px rgba(114, 21, 19, 0.25);">
-                <i class="fa-solid fa-clipboard-list"></i> Consulter la Fiche d'Émargement
+                style="width: 100%; padding: 0.85rem; background: linear-gradient(135deg, #721513, #E51D24); color: #FFFFFF; border: none; border-radius: 9999px; font-weight: 700; font-size: 0.82rem; cursor: pointer; box-shadow: 0 4px 15px rgba(114, 21, 19, 0.25); display: flex; align-items: center; justify-content: center; gap: 0.65rem;">
+                <i class="fa-solid fa-clipboard-list"></i>
+                <span>Consulter la Fiche d'Émargement</span>
               </button>
             </div>
           }
