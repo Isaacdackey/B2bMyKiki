@@ -71,14 +71,18 @@ export interface LignePanierAutonome {
   quantite: number;
 }
 
-export interface FactureLigneB2B {
+export interface CommandeHistoriqueB2B {
   id: string;
-  date: string;
+  date: string; // YYYY-MM-DD
+  heure: string;
+  matricule: string;
+  employeNom: string;
+  siteId: string;
   siteNom: string;
-  nbRepasSubventionnes: number;
-  prixUnitaire: number;
-  totalHT: number;
-  tauxSubvention: number;
+  formuleNom: string;
+  platNom: string;
+  prixTotal: number;
   partEntreprise: number;
-  partEmployes: number;
+  partEmploye: number;
+  statut: 'LIVRE' | 'VALIDE' | 'EN_PREPARATION';
 }

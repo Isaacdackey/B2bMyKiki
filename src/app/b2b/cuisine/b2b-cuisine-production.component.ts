@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { B2bStateService } from '../shared/b2b-state.service';
-import { LigneProductionCuisine, BonLivraisonSite } from './b2b-cuisine.models';
+import { LigneProductionCuisine, BonLivraisonSite, CommandePersonnelleAutonome } from './b2b-cuisine.models';
 
 @Component({
   selector: 'app-b2b-cuisine-production',
@@ -16,8 +16,62 @@ import { LigneProductionCuisine, BonLivraisonSite } from './b2b-cuisine.models';
 export class B2bCuisineProductionComponent {
   b2b = inject(B2bStateService);
 
-  // Onglet actif : 'PRODUCTION' | 'BORDEREAUX' | 'PLANNING_SEMAINE'
-  activeTab = signal<'PRODUCTION' | 'BORDEREAUX' | 'PLANNING_SEMAINE'>('PRODUCTION');
+  // Onglet actif : 'PRODUCTION' | 'SCAN_QR' | 'AUTONOME' | 'BORDEREAUX' | 'PLANNING_SEMAINE'
+  activeTab = signal<'PRODUCTION' | 'SCAN_QR' | 'AUTONOME' | 'BORDEREAUX' | 'PLANNING_SEMAINE'>('PRODUCTION');
+
+  // SCANNER QR CODE RETRAIT (Exigé par le mentor)
+  codeScanneInput = signal<string>('');
+  dernierScanValide = signal<{ matricule: string; nom: string; site: string; plat: string; heure: string } | null>(null);
+  scanMessage = signal<string | null>(null);
+  nbTotalScannesAujourdhui = signal<number>(142);
+
+  // COMMANDES PERSONNELLES AUTONOMES (Wave / Carte Bancaire) avec gestion des statuts
+  commandesAutonomes = signal<CommandePersonnelleAutonome[]>([
+    {
+      id: 'cmd-aut-1',
+      codeCommande: 'CMD-PERS-2041',
+      clientNom: 'Nafi Diallo',
+      telephone: '+221 77 450 11 22',
+      siteNom: 'Siège Plateau - Dakar',
+      articles: 'Thiéboudienne Penda Mbaye + Jus de Bouye',
+      montantTotal: 3200,
+      heurePrevue: '12h15',
+      statut: 'EN_PREPARATION'
+    },
+    {
+      id: 'cmd-aut-2',
+      codeCommande: 'CMD-PERS-2042',
+      clientNom: 'Amadou Bamba Diouf',
+      telephone: '+221 78 510 33 44',
+      siteNom: 'Siège Plateau - Dakar',
+      articles: 'Poulet Yassa Braisé + Fondant Chocolat + Bissap',
+      montantTotal: 4400,
+      heurePrevue: '12h30',
+      statut: 'PRET_AU_RETRAIT'
+    },
+    {
+      id: 'cmd-aut-3',
+      codeCommande: 'CMD-PERS-2043',
+      clientNom: 'Khady Cissé',
+      telephone: '+221 70 820 99 88',
+      siteNom: 'Dépôt Bel-Air / Port',
+      articles: 'Pastels au Thon + Capitaine Braisé Riz Jasmin',
+      montantTotal: 4400,
+      heurePrevue: '12h45',
+      statut: 'EN_PREPARATION'
+    },
+    {
+      id: 'cmd-aut-4',
+      codeCommande: 'CMD-PERS-2039',
+      clientNom: 'Ibrahima Gueye',
+      telephone: '+221 76 612 87 65',
+      siteNom: 'Siège Plateau - Dakar',
+      articles: 'Salade Niçoise + Eau Kirène',
+      montantTotal: 1600,
+      heurePrevue: '12h00',
+      statut: 'LIVRE'
+    }
+  ]);
 
   // Filtre par site
   selectedSiteId = signal<string>('site-1');
@@ -235,6 +289,43 @@ export class B2bCuisineProductionComponent {
       }));
       this.showBLModal.set(false);
     }
+  }
+
+  // MÉTHODES SCANNER QR CODE RETRAIT AU FOOD TRUCK / RÉFECTOIRE
+  traiterScanQr(code?: string) {
+    const raw = (code || this.codeScanneInput()).trim();
+    if (!raw) return;
+
+    // Simulation de validation d'un QR code KT-TOT-XXXX-SITE-DATE
+    const parts = raw.split('-');
+    const matricule = parts.length >= 3 ? `${parts[1]}-${parts[2]}` : 'TOT-9842';
+    const siteNom = this.b2b.currentEntreprise().sites[0]?.nom || 'Siège Plateau - Dakar';
+
+    this.dernierScanValide.set({
+      matricule,
+      nom: 'Collaborateur Enrôlé TotalEnergies',
+      site: siteNom,
+      plat: 'Formule Midi Complète (1E + 1P + 1D + 1B)',
+      heure: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+    });
+
+    this.nbTotalScannesAujourdhui.update(n => n + 1);
+    this.scanMessage.set(`Plateau validé avec succès pour le matricule ${matricule} !`);
+    this.codeScanneInput.set('');
+
+    setTimeout(() => {
+      this.scanMessage.set(null);
+    }, 4000);
+  }
+
+  // GESTION DU STATUT DES COMMANDES PERSONNELLES (AUTONOMES)
+  changerStatutAutonome(cmdId: string, nouveauStatut: 'EN_PREPARATION' | 'PRET_AU_RETRAIT' | 'LIVRE') {
+    this.commandesAutonomes.update(list => list.map(cmd => {
+      if (cmd.id === cmdId) {
+        return { ...cmd, statut: nouveauStatut };
+      }
+      return cmd;
+    }));
   }
 }
 

@@ -6,8 +6,238 @@
   <!-- CONTENU PRINCIPAL DU DASHBOARD -->
   <main style="max-width: 1350px; margin: 2rem auto; padding: 0 1.5rem;">
 
+    <!-- BARRE D'ONGLETS RH UNIFIÉE -->
+    <div style="display: flex; gap: 0.5rem; border-bottom: 2px solid #EDE7DC; padding-bottom: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+      <button 
+        (click)="activeSection.set('COMMANDES_SITE')"
+        [style.background]="activeSection() === 'COMMANDES_SITE' ? '#721513' : '#FFFFFF'"
+        [style.color]="activeSection() === 'COMMANDES_SITE' ? '#FFFFFF' : '#6E5A56'"
+        [style.border-color]="activeSection() === 'COMMANDES_SITE' ? '#721513' : '#EDE7DC'"
+        style="padding: 0.65rem 1.25rem; border: 1.5px solid; border-radius: 9999px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
+        <i class="fa-solid fa-list-check"></i> Commandes & Rapprochement par Site
+      </button>
+
+      <button 
+        (click)="activeSection.set('EMPLOYES')"
+        [style.background]="activeSection() === 'EMPLOYES' ? '#721513' : '#FFFFFF'"
+        [style.color]="activeSection() === 'EMPLOYES' ? '#FFFFFF' : '#6E5A56'"
+        [style.border-color]="activeSection() === 'EMPLOYES' ? '#721513' : '#EDE7DC'"
+        style="padding: 0.65rem 1.25rem; border: 1.5px solid; border-radius: 9999px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
+        <i class="fa-solid fa-users"></i> Annuaire & Quotas Salariés
+      </button>
+
+      <button 
+        (click)="activeSection.set('STATISTIQUES')"
+        [style.background]="activeSection() === 'STATISTIQUES' ? '#721513' : '#FFFFFF'"
+        [style.color]="activeSection() === 'STATISTIQUES' ? '#FFFFFF' : '#6E5A56'"
+        [style.border-color]="activeSection() === 'STATISTIQUES' ? '#721513' : '#EDE7DC'"
+        style="padding: 0.65rem 1.25rem; border: 1.5px solid; border-radius: 9999px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
+        <i class="fa-solid fa-chart-pie"></i> Vue Globale Entreprise
+      </button>
+    </div>
+
     <!-- ============================================================== -->
-    <!-- SECTION 1 : STATISTIQUES & SYNTHÈSE BUDGÉTAIRE                -->
+    <!-- SECTION 1 (EXIGÉE PAR LE MENTOR) : COMMANDES & FACTURE PAR SITE-->
+    <!-- ============================================================== -->
+    @if (activeSection() === 'COMMANDES_SITE') {
+      <div>
+        
+        <!-- EN-TÊTE DE PILOTAGE : SÉLECTEUR DE SITE & PÉRIODE -->
+        <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 20px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
+          
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+            <div>
+              <span style="font-size: 0.72rem; color: #E51D24; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">
+                <i class="fa-solid fa-building"></i> ESPACE RH • {{ b2b.currentEntreprise().nom }}
+              </span>
+              <h2 style="margin: 0.25rem 0 0; font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
+                Rapprochement des Commandes & Facturation par Site
+              </h2>
+            </div>
+
+            <!-- Bouton Télécharger Facture Mensuelle (Lié à la sélection de dates) -->
+            <button (click)="genererFacturePDF()" class="rh-btn-primary">
+              <i class="fa-solid fa-file-invoice-dollar"></i> Télécharger la Facture (PDF)
+            </button>
+          </div>
+
+          <!-- FILTRES DYNAMIQUES DU MENTOR : SITE + DATE DE DÉBUT + DATE DE FIN -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; align-items: end; background: #FAF8F4; padding: 1.25rem; border-radius: 14px; border: 1.5px solid #EDE7DC;">
+            
+            <!-- 1. Sélection du Site -->
+            <div>
+              <label style="font-size: 0.76rem; color: #721513; font-weight: 800; display: block; margin-bottom: 0.35rem;">
+                <i class="fa-solid fa-location-dot"></i> Site de Livraison :
+              </label>
+              <select 
+                [ngModel]="selectedSiteId()"
+                (ngModelChange)="selectedSiteId.set($event)"
+                style="width: 100%; background: #FFFFFF; color: #332724; font-weight: 700; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.6rem 0.85rem; font-size: 0.85rem;">
+                <option value="TOUS">Tous les sites conventionnés</option>
+                @for (site of b2b.currentEntreprise().sites; track site.id) {
+                  <option [value]="site.id">{{ site.nom }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- 2. Date de Début -->
+            <div>
+              <label style="font-size: 0.76rem; color: #721513; font-weight: 800; display: block; margin-bottom: 0.35rem;">
+                <i class="fa-regular fa-calendar"></i> Date de Début :
+              </label>
+              <input 
+                type="date" 
+                [ngModel]="dateDebut()"
+                (ngModelChange)="dateDebut.set($event)"
+                style="width: 100%; background: #FFFFFF; color: #332724; font-weight: 700; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.55rem 0.85rem; font-size: 0.85rem;">
+            </div>
+
+            <!-- 3. Date de Fin -->
+            <div>
+              <label style="font-size: 0.76rem; color: #721513; font-weight: 800; display: block; margin-bottom: 0.35rem;">
+                <i class="fa-regular fa-calendar-check"></i> Date de Fin :
+              </label>
+              <input 
+                type="date" 
+                [ngModel]="dateFin()"
+                (ngModelChange)="dateFin.set($event)"
+                style="width: 100%; background: #FFFFFF; color: #332724; font-weight: 700; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.55rem 0.85rem; font-size: 0.85rem;">
+            </div>
+
+            <!-- 4. Raccourcis Rapides de Période -->
+            <div style="display: flex; gap: 0.35rem;">
+              <button 
+                type="button"
+                (click)="definirPeriode('AUJOURDHUI')"
+                style="flex: 1; padding: 0.6rem 0.4rem; background: #FFFFFF; border: 1px solid #EDE7DC; border-radius: 8px; font-size: 0.72rem; font-weight: 700; color: #6E5A56; cursor: pointer;">
+                Aujourd'hui
+              </button>
+              <button 
+                type="button"
+                (click)="definirPeriode('MOIS_EN_COURS')"
+                style="flex: 1; padding: 0.6rem 0.4rem; background: #FAF5EA; border: 1px solid #721513; border-radius: 8px; font-size: 0.72rem; font-weight: 800; color: #721513; cursor: pointer;">
+                Mois en cours
+              </button>
+              <button 
+                type="button"
+                (click)="definirPeriode('MOIS_PRECEDENT')"
+                style="flex: 1; padding: 0.6rem 0.4rem; background: #FFFFFF; border: 1px solid #EDE7DC; border-radius: 8px; font-size: 0.72rem; font-weight: 700; color: #6E5A56; cursor: pointer;">
+                Octobre
+              </button>
+            </div>
+
+          </div>
+
+          <!-- MINI RÉCAPITULATIF FINANCIER POUR LA PÉRIODE SÉLECTIONNÉE -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.25rem;">
+            <div style="background: #FAF8F4; padding: 0.85rem 1.15rem; border-radius: 12px; border: 1px solid #EDE7DC;">
+              <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">Repas sur la Période</div>
+              <div style="font-size: 1.6rem; font-weight: 900; color: #721513; font-family: 'Playfair Display', serif;">
+                {{ totalRepasPeriode() }} <span style="font-size: 0.85rem; color: #606C38;">plateaux</span>
+              </div>
+            </div>
+
+            <div style="background: #FAF8F4; padding: 0.85rem 1.15rem; border-radius: 12px; border: 1px solid #EDE7DC;">
+              <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">Total Facturé Entreprise (100%)</div>
+              <div style="font-size: 1.6rem; font-weight: 900; color: #E51D24; font-family: 'Playfair Display', serif;">
+                {{ (totalPriseEnChargePeriode() | number) }} <span style="font-size: 0.85rem; color: #332724;">FCFA</span>
+              </div>
+            </div>
+
+            <div style="background: #FAF8F4; padding: 0.85rem 1.15rem; border-radius: 12px; border: 1px solid #EDE7DC;">
+              <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">Reste à Charge Salariés</div>
+              <div style="font-size: 1.6rem; font-weight: 900; color: #606C38; font-family: 'Playfair Display', serif;">
+                0 <span style="font-size: 0.85rem; color: #332724;">FCFA</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- TABLEAU DU DÉTAIL DES COMMANDES PAR SALARIÉ POUR LE SITE & LA PÉRIODE -->
+        <div class="rh-table-wrap">
+          <div style="padding: 1rem 1.25rem; background: #FAF8F4; border-bottom: 1.5px solid #EDE7DC; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+            <strong style="color: #721513; font-size: 0.95rem;">
+              <i class="fa-solid fa-list-ul"></i> Détail Nominatif des Commandes Déjeuner ({{ totalRepasPeriode() }} repas)
+            </strong>
+            <span style="font-size: 0.75rem; color: #6E5A56; font-weight: 600;">
+              Période : {{ dateDebut() }} au {{ dateFin() }}
+            </span>
+          </div>
+
+          @if (commandesFiltrees().length === 0) {
+            <div style="padding: 3rem 1.5rem; text-align: center; color: #6E5A56;">
+              <i class="fa-solid fa-calendar-xmark" style="font-size: 2.5rem; color: #EDE7DC; margin-bottom: 1rem;"></i>
+              <p style="margin: 0; font-weight: 700;">Aucune commande trouvée pour ce site sur la période sélectionnée.</p>
+              <button (click)="definirPeriode('MOIS_EN_COURS')" style="margin-top: 0.75rem; background: #721513; color: #fff; border: none; padding: 0.4rem 1rem; border-radius: 9999px; font-size: 0.78rem; font-weight: 700; cursor: pointer;">
+                Afficher tout le mois de Novembre
+              </button>
+            </div>
+          } @else {
+            <table class="rh-table">
+              <thead>
+                <tr>
+                  <th>Date & Heure</th>
+                  <th>Matricule & Collaborateur</th>
+                  <th>Site de Retrait</th>
+                  <th>Plat Chaud Servi</th>
+                  <th>Formule Conventionnée</th>
+                  <th>Prise en Charge RH</th>
+                  <th>Statut Retrait</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (c of commandesFiltrees(); track c.id) {
+                  <tr>
+                    <td>
+                      <div style="font-weight: 800; color: #332724;">{{ c.date }}</div>
+                      <div style="font-size: 0.72rem; color: #6E5A56;"><i class="fa-regular fa-clock"></i> {{ c.heure }}</div>
+                    </td>
+                    <td>
+                      <div style="font-weight: 700; color: #721513;">{{ c.employeNom }}</div>
+                      <code style="font-size: 0.72rem; color: #6E5A56; background: #FAF5EA; padding: 0.1rem 0.4rem; border-radius: 4px;">{{ c.matricule }}</code>
+                    </td>
+                    <td style="font-size: 0.82rem; color: #332724;">{{ c.siteNom }}</td>
+                    <td style="font-weight: 600; color: #332724;">{{ c.platNom }}</td>
+                    <td>
+                      <span style="font-size: 0.75rem; color: #6E5A56; background: #FAF8F4; border: 1px solid #EDE7DC; padding: 0.2rem 0.55rem; border-radius: 9999px;">
+                        1E + 1P + 1D + 1B
+                      </span>
+                    </td>
+                    <td style="font-weight: 900; color: #E51D24;">
+                      {{ (c.partEntreprise | number) }} FCFA
+                    </td>
+                    <td>
+                      <span style="background: rgba(96, 108, 56, 0.12); color: #606C38; padding: 0.2rem 0.55rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.3rem;">
+                        <i class="fa-solid fa-qrcode"></i> Livré & Scanné
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+              <tfoot>
+                <tr style="background: #FAF8F4; border-top: 2px solid #721513;">
+                  <td colspan="4" style="font-weight: 800; color: #721513; font-size: 0.95rem; padding: 1rem 1.25rem; font-family: 'Playfair Display', serif;">
+                    TOTAL FACTURÉ POUR CETTE PÉRIODE :
+                  </td>
+                  <td style="font-weight: 900; color: #721513; font-size: 1.05rem;">
+                    {{ totalRepasPeriode() }} repas
+                  </td>
+                  <td style="font-weight: 900; color: #E51D24; font-size: 1.2rem; font-family: 'Playfair Display', serif;">
+                    {{ (totalPriseEnChargePeriode() | number) }} FCFA
+                  </td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          }
+        </div>
+
+      </div>
+    }
+
+    <!-- ============================================================== -->
+    <!-- SECTION VUE GLOBALE ENTREPRISE                                 -->
     <!-- ============================================================== -->
     @if (activeSection() === 'STATISTIQUES') {
       <div>
@@ -328,6 +558,100 @@
     }
 
   </main>
+
+  <!-- MODAL FACTURE PDF OFFICIELLE KIKI TRAITEUR -->
+  @if (showFactureModal()) {
+    <div class="rh-modal-overlay">
+      <div class="rh-modal-card" style="max-width: 680px; width: 100%; padding: 2rem;">
+        
+        <!-- En-tête Facture Proforma -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #721513; padding-bottom: 1.25rem; margin-bottom: 1.5rem;">
+          <div style="display: flex; align-items: center; gap: 0.85rem;">
+            <img src="assets/images/logo.png" alt="Kiki Traiteur" style="height: 52px; object-fit: contain;">
+            <div>
+              <div style="font-family: 'Playfair Display', serif; font-size: 1.35rem; font-weight: 900; color: #721513;">Kiki Traiteur B2B</div>
+              <div style="font-size: 0.72rem; color: #6E5A56;">Restauration Entreprise & Traiteur Agréé</div>
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <span style="background: #FAF5EA; color: #721513; border: 1px solid #E2D5BE; padding: 0.25rem 0.65rem; border-radius: 6px; font-size: 0.75rem; font-weight: 800;">
+              RELEVÉ MENSUEL B2B
+            </span>
+            <div style="font-size: 0.75rem; color: #6E5A56; margin-top: 0.35rem;">Réf : FAC-{{ b2b.currentEntreprise().codeEntreprise }}-{{ dateFin().slice(0, 7) }}</div>
+          </div>
+        </div>
+
+        <!-- Coordonnées Facturation -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; background: #FAF8F4; padding: 1.25rem; border-radius: 14px; border: 1.5px solid #EDE7DC; margin-bottom: 1.5rem; font-size: 0.82rem; line-height: 1.5;">
+          <div>
+            <strong style="color: #721513; text-transform: uppercase; font-size: 0.72rem; display: block; margin-bottom: 0.25rem;">ENTREPRISE CLIENTE</strong>
+            <div style="font-weight: 800; font-size: 0.95rem; color: #332724;">{{ b2b.currentEntreprise().nom }}</div>
+            <div style="color: #6E5A56;">Site : <strong>{{ siteActif().nom }}</strong></div>
+            <div style="color: #6E5A56;">Réf. RH : {{ siteActif().contactReferent }}</div>
+          </div>
+          <div>
+            <strong style="color: #721513; text-transform: uppercase; font-size: 0.72rem; display: block; margin-bottom: 0.25rem;">PÉRIODE FACTURÉE</strong>
+            <div>Du <strong>{{ dateDebut() }}</strong> au <strong>{{ dateFin() }}</strong></div>
+            <div style="color: #606C38; font-weight: 700; margin-top: 0.25rem;">Prise en charge contractuelle : {{ b2b.currentEntreprise().tauxPriseEnCharge }}%</div>
+          </div>
+        </div>
+
+        <!-- Détail du Décompte Financier -->
+        <div style="border: 1px solid #EDE7DC; border-radius: 12px; overflow: hidden; margin-bottom: 1.5rem;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.84rem; text-align: left;">
+            <thead style="background: #FAF8F4; color: #721513; border-bottom: 1.5px solid #EDE7DC;">
+              <tr>
+                <th style="padding: 0.75rem 1rem;">Désignation</th>
+                <th style="padding: 0.75rem 1rem; text-align: center;">Nombre</th>
+                <th style="padding: 0.75rem 1rem; text-align: right;">Prix Unitaire</th>
+                <th style="padding: 0.75rem 1rem; text-align: right;">Total HT</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid #EDE7DC;">
+                <td style="padding: 0.75rem 1rem;">
+                  <strong style="color: #332724;">Plateaux Repas Conventionnés MIDI</strong>
+                  <div style="font-size: 0.72rem; color: #6E5A56;">Formule 4 composantes livrée et scannée sur site</div>
+                </td>
+                <td style="padding: 0.75rem 1rem; text-align: center; font-weight: 800;">{{ totalRepasPeriode() }}</td>
+                <td style="padding: 0.75rem 1rem; text-align: right;">5 000 F</td>
+                <td style="padding: 0.75rem 1rem; text-align: right; font-weight: 800;">{{ (totalMontantBrutPeriode() | number) }} F</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #EDE7DC; background: #FAF5EA;">
+                <td colspan="3" style="padding: 0.75rem 1rem; font-weight: 700; color: #606C38;">
+                  Subvention Entreprise ({{ b2b.currentEntreprise().tauxPriseEnCharge }}%) :
+                </td>
+                <td style="padding: 0.75rem 1rem; text-align: right; font-weight: 800; color: #606C38;">
+                  - {{ (totalPriseEnChargePeriode() | number) }} F
+                </td>
+              </tr>
+            </tbody>
+            <tfoot style="background: #FAF8F4;">
+              <tr>
+                <td colspan="3" style="padding: 1rem; font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 900; color: #721513;">
+                  NET À PAYER PAR L'ENTREPRISE :
+                </td>
+                <td style="padding: 1rem; text-align: right; font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 900; color: #E51D24;">
+                  {{ (totalPriseEnChargePeriode() | number) }} FCFA
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- Actions Modal -->
+        <div style="display: flex; gap: 1rem;">
+          <button (click)="showFactureModal.set(false)" style="flex: 1; padding: 0.85rem; background: #FAF8F4; color: #6E5A56; border: 1.5px solid #EDE7DC; border-radius: 9999px; font-weight: 700; cursor: pointer;">
+            Fermer
+          </button>
+          <button (click)="imprimerFacture()" class="rh-btn-primary" style="flex: 1.5; justify-content: center;">
+            <i class="fa-solid fa-print"></i> Imprimer / Télécharger PDF
+          </button>
+        </div>
+
+      </div>
+    </div>
+  }
 
   <!-- MODAL D'AJOUT D'EMPLOYÉ -->
   @if (showAddEmployeeModal()) {

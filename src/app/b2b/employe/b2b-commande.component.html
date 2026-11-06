@@ -714,42 +714,66 @@
             </div>
           </div>
         } @else {
-          <!-- ÉCRAN DE SUCCÈS & CODE DE RETRAIT NOMINATIF -->
-          <div style="text-align: center; padding: 1.5rem 0;">
-            <div style="width: 68px; height: 68px; border-radius: 50%; background: rgba(96, 108, 56, 0.15); color: #606C38; font-size: 2.2rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+          <!-- ÉCRAN DE SUCCÈS & QR CODE OFFICIEL DU MENTOR -->
+          <div style="text-align: center; padding: 0.5rem 0;">
+            <div style="width: 54px; height: 54px; border-radius: 50%; background: rgba(96, 108, 56, 0.15); color: #606C38; font-size: 1.8rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
               <i class="fa-solid fa-check"></i>
             </div>
             
-            <h3 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.6rem; color: #721513; font-weight: 800;">
-              Commande Validée avec Succès !
+            <h3 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.45rem; color: #721513; font-weight: 800;">
+              Commande Enregistrée !
             </h3>
             
             @if (b2b.modeProfil() === 'SUBVENTIONNE') {
-              <p style="margin: 0.5rem 0 0; font-size: 0.85rem; color: #6E5A56;">
-                Bon de commande <strong>#B2B-TOT-{{ b2b.currentEmploye().matricule }}</strong> imputé à l'entreprise.
+              <p style="margin: 0.35rem 0 0; font-size: 0.82rem; color: #6E5A56;">
+                Formule 100% prise en charge • Imputée au compte <strong>{{ b2b.currentEntreprise().nom }}</strong>
               </p>
             } @else {
-              <p style="margin: 0.5rem 0 0; font-size: 0.85rem; color: #1D4ED8; font-weight: 700;">
-                <i class="fa-solid fa-circle-check"></i> Paiement Wave de {{ b2b.totalPanierAutonome() }} FCFA confirmé par webhook.
+              <p style="margin: 0.35rem 0 0; font-size: 0.82rem; color: #1D4ED8; font-weight: 700;">
+                <i class="fa-solid fa-circle-check"></i> Règlement Wave validé instantanément
               </p>
             }
 
-            <!-- Code de retrait / QR Code -->
-            <div style="background: #FAF8F4; border: 2px dashed #721513; border-radius: 16px; padding: 1.25rem; margin: 1.25rem auto; max-width: 280px;">
-              <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
-                Code de retrait réfectoire
+            <!-- QR Code Dynamique Kiki Traiteur -->
+            <div style="background: #FFFFFF; border: 2px solid #EDE7DC; border-radius: 18px; padding: 1.25rem; margin: 1rem auto; max-width: 260px; box-shadow: 0 8px 25px rgba(114, 21, 19, 0.08);">
+              <div style="font-size: 0.7rem; color: #721513; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.65rem;">
+                <i class="fa-solid fa-qrcode"></i> QR CODE DE RETRAIT RÉFECTOIRE
               </div>
-              <div style="font-size: 1.8rem; font-weight: 900; color: #721513; letter-spacing: 4px; margin: 0.25rem 0;">
-                KT-{{ b2b.currentEmploye().matricule }}
+
+              <!-- Rendu SVG haute définition du QR Code -->
+              <div style="display: flex; justify-content: center; align-items: center; margin: 0 auto; background: #FAF8F4; padding: 0.65rem; border-radius: 12px; border: 1px solid #EDE7DC;">
+                <svg viewBox="0 0 25 25" width="160" height="160" shape-rendering="crispEdges">
+                  <rect width="25" height="25" fill="#FAF8F4"/>
+                  @for (row of qrMatrix(); track $index; let r = $index) {
+                    @for (cell of row; track $index; let c = $index) {
+                      @if (cell) {
+                        <rect [attr.x]="c" [attr.y]="r" width="1" height="1" fill="#721513"/>
+                      }
+                    }
+                  }
+                </svg>
               </div>
-              <div style="font-size: 0.75rem; color: #606C38; font-weight: 700;">
-                <i class="fa-solid fa-qrcode"></i> À présenter à la camionnette Kiki
+
+              <!-- Matricule et code de secours -->
+              <div style="margin-top: 0.75rem;">
+                <span style="font-family: monospace; font-size: 0.82rem; font-weight: 800; color: #721513; background: #FAF5EA; padding: 0.2rem 0.6rem; border-radius: 6px; border: 1px solid #E2D5BE;">
+                  {{ qrDataString() }}
+                </span>
+              </div>
+              <div style="font-size: 0.72rem; color: #606C38; font-weight: 700; margin-top: 0.4rem;">
+                <i class="fa-solid fa-camera"></i> À scanner par la brigade cuisine Kiki
               </div>
             </div>
 
-            <p style="margin: 0; font-size: 0.82rem; color: #6E5A56;">
-              Distribution prévue sur votre site entre <strong>{{ b2b.creneauLivraison() }}</strong>.
+            <p style="margin: 0.5rem 0 1.25rem; font-size: 0.82rem; color: #6E5A56;">
+              Distribution au réfectoire <strong>{{ b2b.siteActuel().nom }}</strong> : créneau <strong>{{ b2b.creneauLivraison() }}</strong>
             </p>
+
+            <button 
+              (click)="fermerModalSucces()"
+              style="padding: 0.75rem 2rem; border-radius: 9999px; background: #721513; color: #FFFFFF; border: none; font-weight: 800; font-size: 0.88rem; cursor: pointer; box-shadow: 0 4px 15px rgba(114, 21, 19, 0.25);">
+              <i class="fa-solid fa-check"></i> Terminer
+            </button>
           </div>
         }
 

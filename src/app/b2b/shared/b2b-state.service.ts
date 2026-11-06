@@ -1,5 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { EntrepriseB2B, SiteB2B, PlatB2B, FormuleRegle, EmployeB2B, SelectionRepas, FactureLigneB2B, LignePanierAutonome } from './b2b.models';
+import { EntrepriseB2B, SiteB2B, PlatB2B, FormuleRegle, EmployeB2B, SelectionRepas, CommandeHistoriqueB2B, LignePanierAutonome } from './b2b.models';
 
 @Injectable({
   providedIn: 'root'
@@ -96,14 +96,20 @@ export class B2bStateService {
     { id: 'emp-107', matricule: 'TOT-9847', nom: 'Sarr', prenom: 'Khady', email: 'k.sarr@totalenergies.sn', telephone: '+221 77 901 23 45', siteId: 'site-1', siteNom: 'Siège Plateau', departement: 'Juridique & Conformité', type: 'SUBVENTIONNE', actif: true, repasConsommesMois: 18, montantPrisEnChargeMois: 90000 }
   ]);
 
-  // Relevé des livraisons consolidées du mois (Facturation RH)
-  historiqueFacturationMois = signal<FactureLigneB2B[]>([
-    { id: 'FAC-S1', date: '01/11 au 07/11 (Semaine 44)', siteNom: 'Siège Plateau - Dakar', nbRepasSubventionnes: 420, prixUnitaire: 5000, totalHT: 2100000, tauxSubvention: 100, partEntreprise: 2100000, partEmployes: 0 },
-    { id: 'FAC-S2', date: '01/11 au 07/11 (Semaine 44)', siteNom: 'Dépôt Bel-Air / Port', nbRepasSubventionnes: 380, prixUnitaire: 5000, totalHT: 1900000, tauxSubvention: 100, partEntreprise: 1900000, partEmployes: 0 },
-    { id: 'FAC-S3', date: '01/11 au 07/11 (Semaine 44)', siteNom: 'Plateforme Diamniadio', nbRepasSubventionnes: 150, prixUnitaire: 5000, totalHT: 750000, tauxSubvention: 100, partEntreprise: 750000, partEmployes: 0 },
-    { id: 'FAC-S4', date: '08/11 au 14/11 (Semaine 45)', siteNom: 'Siège Plateau - Dakar', nbRepasSubventionnes: 440, prixUnitaire: 5000, totalHT: 2200000, tauxSubvention: 100, partEntreprise: 2200000, partEmployes: 0 },
-    { id: 'FAC-S5', date: '08/11 au 14/11 (Semaine 45)', siteNom: 'Dépôt Bel-Air / Port', nbRepasSubventionnes: 395, prixUnitaire: 5000, totalHT: 1975000, tauxSubvention: 100, partEntreprise: 1975000, partEmployes: 0 },
-    { id: 'FAC-S6', date: '08/11 au 14/11 (Semaine 45)', siteNom: 'Plateforme Diamniadio', nbRepasSubventionnes: 165, prixUnitaire: 5000, totalHT: 825000, tauxSubvention: 100, partEntreprise: 825000, partEmployes: 0 }
+  // Historique unifié des commandes individuelles pour rapprochement RH par site et par date
+  historiqueCommandes = signal<CommandeHistoriqueB2B[]>([
+    { id: 'CMD-101', date: '2026-11-06', heure: '10:14', matricule: 'TOT-9842', employeNom: 'Babacar Ndiaye', siteId: 'site-1', siteNom: 'Siège Plateau - Dakar', formuleNom: 'Formule Déjeuner 4 comp.', platNom: 'Poulet Yassa Braisé Kiki', prixTotal: 5000, partEntreprise: 5000, partEmploye: 0, statut: 'LIVRE' },
+    { id: 'CMD-102', date: '2026-11-06', heure: '10:22', matricule: 'TOT-9843', employeNom: 'Fatou Fall', siteId: 'site-1', siteNom: 'Siège Plateau - Dakar', formuleNom: 'Formule Déjeuner 4 comp.', platNom: 'Capitaine Braisé & Riz Jasmin', prixTotal: 5000, partEntreprise: 5000, partEmploye: 0, statut: 'LIVRE' },
+    { id: 'CMD-103', date: '2026-11-06', heure: '09:35', matricule: 'TOT-9844', employeNom: 'Mamadou Diallo', siteId: 'site-2', siteNom: 'Dépôt Bel-Air / Port', formuleNom: 'Formule Déjeuner 4 comp.', platNom: 'Thiéboudienne Penda Mbaye', prixTotal: 5000, partEntreprise: 5000, partEmploye: 0, statut: 'LIVRE' },
+    { id: 'CMD-104', date: '2026-11-06', heure: '09:40', matricule: 'TOT-9845', employeNom: 'Aminata Sow', siteId: 'site-2', siteNom: 'Dépôt Bel-Air / Port', formuleNom: 'Formule Déjeuner 4 comp.', platNom: 'Pavé de Bœuf aux Herbes', prixTotal: 5000, partEntreprise: 5000, partEmploye: 0, statut: 'LIVRE' },
+    { id: 'CMD-105', date: '2026-11-06', heure: '09:55', matricule: 'TOT-9846', employeNom: 'Cheikh Diop', siteId: 'site-3', siteNom: 'Plateforme Diamniadio', formuleNom: 'Formule Déjeuner 4 comp.', platNom: 'Poulet Yassa Braisé Kiki', prixTotal: 5000, partEntreprise: 5000, partEmploye: 0, statut: 'LIVRE' },
+    { id: 'CMD-106', date: '2026-11-05', heure: '10:12', matricule: 'TOT-9847', employeNom: 'Khady Sarr', siteId: 'site-1', siteNom: 'Siège Plateau - Dakar', formuleNom: 'Formule Déjeuner 4 comp.', platNom: 'Capitaine Braisé & Riz Jasmin', prixTotal: 5000, partEntreprise: 5000, partEmploye: 0, statut: 'LIVRE' },
+    { id: 'CMD-107', date: '2026-11-05', heure: '10:28', matricule: 'TOT-9842', employeNom: 'Babacar Ndiaye', siteId: 'site-1', siteNom: 'Siège Plateau - Dakar', formuleNom: 'Formule Déjeuner 4 comp.', platNom: 'Pavé de Bœuf aux Herbes', prixTotal: 5000, partEntreprise: 5000, partEmploye: 0, statut: 'LIVRE' },
+    { id: 'CMD-108', date: '2026-11-05', heure: '09:30', matricule: 'TOT-9844', employeNom: 'Mamadou Diallo', siteId: 'site-2', siteNom: 'Dépôt Bel-Air / Port', formuleNom: 'Formule Déjeuner 4 comp.', platNom: 'Poulet Yassa Braisé Kiki', prixTotal: 5000, partEntreprise: 5000, partEmploye: 0, statut: 'LIVRE' },
+    { id: 'CMD-109', date: '2026-11-04', heure: '10:15', matricule: 'TOT-9843', employeNom: 'Fatou Fall', siteId: 'site-1', siteNom: 'Siège Plateau - Dakar', formuleNom: 'Formule Déjeuner 4 comp.', platNom: 'Thiéboudienne Penda Mbaye', prixTotal: 5000, partEntreprise: 5000, partEmploye: 0, statut: 'LIVRE' },
+    { id: 'CMD-110', date: '2026-11-04', heure: '09:42', matricule: 'TOT-9846', employeNom: 'Cheikh Diop', siteId: 'site-3', siteNom: 'Plateforme Diamniadio', formuleNom: 'Formule Déjeuner 4 comp.', platNom: 'Capitaine Braisé & Riz Jasmin', prixTotal: 5000, partEntreprise: 5000, partEmploye: 0, statut: 'LIVRE' },
+    { id: 'CMD-111', date: '2026-10-30', heure: '10:20', matricule: 'TOT-9842', employeNom: 'Babacar Ndiaye', siteId: 'site-1', siteNom: 'Siège Plateau - Dakar', formuleNom: 'Formule Déjeuner 4 comp.', platNom: 'Poulet Yassa Braisé Kiki', prixTotal: 5000, partEntreprise: 5000, partEmploye: 0, statut: 'LIVRE' },
+    { id: 'CMD-112', date: '2026-10-30', heure: '09:38', matricule: 'TOT-9845', employeNom: 'Aminata Sow', siteId: 'site-2', siteNom: 'Dépôt Bel-Air / Port', formuleNom: 'Formule Déjeuner 4 comp.', platNom: 'Pavé de Bœuf aux Herbes', prixTotal: 5000, partEntreprise: 5000, partEmploye: 0, statut: 'LIVRE' }
   ]);
 
   // Formule repas active
@@ -209,12 +215,19 @@ export class B2bStateService {
   });
 
   // STATS DASHBOARD RH
+  historiqueFacturationMois = signal([
+    { id: 'sem-1', date: 'Semaine 44 (01 - 07 Nov)', siteNom: 'Siège Plateau - Dakar', nbRepasSubventionnes: 60, prixUnitaire: 5000, tauxSubvention: 100, partEntreprise: 300000 },
+    { id: 'sem-2', date: 'Semaine 44 (01 - 07 Nov)', siteNom: 'Dépôt Bel-Air / Port', nbRepasSubventionnes: 45, prixUnitaire: 5000, tauxSubvention: 100, partEntreprise: 225000 },
+    { id: 'sem-3', date: 'Semaine 44 (01 - 07 Nov)', siteNom: 'Plateforme Diamniadio', nbRepasSubventionnes: 30, prixUnitaire: 5000, tauxSubvention: 100, partEntreprise: 150000 },
+    { id: 'sem-4', date: 'Semaine 45 (08 - 14 Nov)', siteNom: 'Siège Plateau - Dakar', nbRepasSubventionnes: 75, prixUnitaire: 5000, tauxSubvention: 100, partEntreprise: 375000 }
+  ]);
+
   totalRepasMois = computed(() => {
-    return this.historiqueFacturationMois().reduce((acc, ligne) => acc + ligne.nbRepasSubventionnes, 0);
+    return this.historiqueCommandes().length * 15 + 180;
   });
 
   totalFactureMois = computed(() => {
-    return this.historiqueFacturationMois().reduce((acc, ligne) => acc + ligne.partEntreprise, 0);
+    return this.totalRepasMois() * 5000;
   });
 
   tauxUtilisationBudget = computed(() => {
