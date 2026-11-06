@@ -7,10 +7,13 @@ html {
   scroll-behavior: smooth;
 }
 
-body {
+html, body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
+}
+
+body {
   font-family: var(--font-body), 'Poppins', sans-serif;
   background-color: #FAF8F4;
   background-image: radial-gradient(circle at 50% 0%, rgba(230, 218, 186, 0.22) 0%, rgba(250, 248, 244, 0) 75%);

@@ -22,6 +22,15 @@ export class App implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // Réinitialisation stricte du scroll horizontal au niveau de la fenêtre
+    if (typeof window !== 'undefined') {
+      window.addEventListener('scroll', () => {
+        if (window.scrollX !== 0) {
+          window.scrollTo(0, window.scrollY);
+        }
+      }, { passive: true });
+    }
+
     // Vérification du routage spécifique au lancement PWA / application installée
     this.verifierRoutagePwaInitial();
 
