@@ -1,4 +1,4 @@
-<div class="b2b-wrapper">
+<div class="b2b-wrapper" [style.padding-left]="b2b.isSidebarCollapsed() ? '80px' : '280px'" style="transition: padding-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);">
   <app-b2b-nav></app-b2b-nav>
 
   <!-- SELECTEUR DE PROFIL SALARIÉ (SUBVENTIONNÉ VS AUTONOME / FRAIS PERSONNELS) -->

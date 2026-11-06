@@ -8,12 +8,6 @@
   box-sizing: border-box;
 }
 
-@media (min-width: 992px) {
-  :host {
-    padding-left: 280px;
-  }
-}
-
 .rh-wrapper {
   background-color: transparent !important;
   color: #332724 !important;

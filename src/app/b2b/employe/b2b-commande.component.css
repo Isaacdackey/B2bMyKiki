@@ -15,12 +15,6 @@
   box-sizing: border-box;
 }
 
-@media (min-width: 992px) {
-  :host {
-    padding-left: 280px;
-  }
-}
-
 .b2b-wrapper {
   background-color: transparent;
   color: #332724;

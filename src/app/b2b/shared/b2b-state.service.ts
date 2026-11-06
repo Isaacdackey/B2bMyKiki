@@ -8,6 +8,13 @@ export class B2bStateService {
   // Mode profil employé simulé : SUBVENTIONNE (prise en charge RH 100%) ou AUTONOME (frais personnels, panier libre, Wave)
   modeProfil = signal<'SUBVENTIONNE' | 'AUTONOME'>('SUBVENTIONNE');
 
+  // État de la Sidebar rétractable (Collapsed / Expanded)
+  isSidebarCollapsed = signal<boolean>(false);
+
+  toggleSidebar() {
+    this.isSidebarCollapsed.update(v => !v);
+  }
+
   // Panier libre pour le salarié autonome / prestataire
   panierAutonome = signal<LignePanierAutonome[]>([]);
 

@@ -1,78 +1,107 @@
-<!-- SIDEBAR FIXE À GAUCHE B2B KIKI TRAITEUR -->
-<aside class="b2b-sidebar">
+<!-- SIDEBAR FIXE À GAUCHE B2B KIKI TRAITEUR (RÉTRACTABLE) -->
+<aside class="b2b-sidebar" [class.collapsed]="b2b.isSidebarCollapsed()">
   
-  <!-- En-tête Sidebar : Brand Logo & Titre -->
+  <!-- En-tête Sidebar : Brand Logo + Bouton de Réduction -->
   <div class="b2b-sidebar-header">
-    <a routerLink="/b2b" class="b2b-sidebar-brand">
+    <a routerLink="/b2b" class="b2b-sidebar-brand" [title]="'Kiki Traiteur B2B Pro'">
       <img src="assets/images/logo.png" 
            alt="Kiki Traiteur" 
            class="b2b-sidebar-logo"
            onerror="this.src='assets/images/KIKI TRAITEUR Logo Picto Rouge bordeau.png'">
-      <div class="b2b-sidebar-brand-info">
-        <div class="b2b-sidebar-brand-name">
-          Kiki Traiteur
+      @if (!b2b.isSidebarCollapsed()) {
+        <div class="b2b-sidebar-brand-info">
+          <div class="b2b-sidebar-brand-name">
+            Kiki Traiteur
+          </div>
+          <span class="b2b-sidebar-pro-badge">B2B Pro</span>
         </div>
-        <span class="b2b-sidebar-pro-badge">B2B Pro</span>
-      </div>
+      }
     </a>
+
+    <!-- Bouton Toggle Réduire / Agrandir -->
+    <button 
+      type="button"
+      (click)="b2b.toggleSidebar()"
+      class="b2b-sidebar-toggle-btn"
+      [title]="b2b.isSidebarCollapsed() ? 'Agrandir le menu' : 'Réduire le menu'">
+      <i class="fa-solid" [class.fa-angles-left]="!b2b.isSidebarCollapsed()" [class.fa-angles-right]="b2b.isSidebarCollapsed()"></i>
+    </button>
   </div>
 
   <!-- Fiche Entreprise Conventionnée -->
-  <div class="b2b-sidebar-enterprise">
-    <div class="b2b-enterprise-icon">
+  @if (!b2b.isSidebarCollapsed()) {
+    <div class="b2b-sidebar-enterprise">
+      <div class="b2b-enterprise-icon">
+        <i class="fa-solid fa-building"></i>
+      </div>
+      <div class="b2b-enterprise-meta">
+        <span class="b2b-enterprise-tag">Convention Active</span>
+        <strong class="b2b-enterprise-name">TotalEnergies Sénégal</strong>
+      </div>
+    </div>
+  } @else {
+    <div class="b2b-sidebar-enterprise-mini" title="TotalEnergies Sénégal (Convention active)">
       <i class="fa-solid fa-building"></i>
     </div>
-    <div class="b2b-enterprise-meta">
-      <span class="b2b-enterprise-tag">Convention Active</span>
-      <strong class="b2b-enterprise-name">TotalEnergies Sénégal</strong>
-    </div>
-  </div>
+  }
 
   <!-- Navigation Principale Verticale -->
   <nav class="b2b-sidebar-nav">
-    <div class="b2b-nav-section-title">ESPACES DE GESTION</div>
+    @if (!b2b.isSidebarCollapsed()) {
+      <div class="b2b-nav-section-title">ESPACES DE GESTION</div>
+    }
 
-    <a routerLink="/b2b/commande" routerLinkActive="active" class="b2b-sidebar-link">
+    <a routerLink="/b2b/commande" routerLinkActive="active" class="b2b-sidebar-link" [title]="'Commande Midi'">
       <div class="b2b-link-icon-wrap">
         <i class="fa-solid fa-utensils"></i>
       </div>
-      <div class="b2b-link-text">
-        <span class="b2b-link-title">Commande Midi</span>
-        <span class="b2b-link-subtitle">Plateaux repas collaborateurs</span>
-      </div>
+      @if (!b2b.isSidebarCollapsed()) {
+        <div class="b2b-link-text">
+          <span class="b2b-link-title">Commande Midi</span>
+          <span class="b2b-link-subtitle">Plateaux repas collaborateurs</span>
+        </div>
+      }
     </a>
 
-    <a routerLink="/b2b/rh" routerLinkActive="active" class="b2b-sidebar-link">
+    <a routerLink="/b2b/rh" routerLinkActive="active" class="b2b-sidebar-link" [title]="'Espace RH'">
       <div class="b2b-link-icon-wrap">
         <i class="fa-solid fa-chart-pie"></i>
       </div>
-      <div class="b2b-link-text">
-        <span class="b2b-link-title">Espace RH</span>
-        <span class="b2b-link-subtitle">Rapprochement & Facturation</span>
-      </div>
+      @if (!b2b.isSidebarCollapsed()) {
+        <div class="b2b-link-text">
+          <span class="b2b-link-title">Espace RH</span>
+          <span class="b2b-link-subtitle">Rapprochement & Facturation</span>
+        </div>
+      }
     </a>
 
-    <a routerLink="/b2b/cuisine" routerLinkActive="active" class="b2b-sidebar-link">
+    <a routerLink="/b2b/cuisine" routerLinkActive="active" class="b2b-sidebar-link" [title]="'Cuisine & Dispatch'">
       <div class="b2b-link-icon-wrap">
         <i class="fa-solid fa-fire-burner"></i>
       </div>
-      <div class="b2b-link-text">
-        <span class="b2b-link-title">Cuisine & Dispatch</span>
-        <span class="b2b-link-subtitle">Production, Scanner & BL</span>
-      </div>
+      @if (!b2b.isSidebarCollapsed()) {
+        <div class="b2b-link-text">
+          <span class="b2b-link-title">Cuisine & Dispatch</span>
+          <span class="b2b-link-subtitle">Production, Scanner & BL</span>
+        </div>
+      }
     </a>
   </nav>
 
   <!-- Bas de Sidebar : Info Traiteur & Lien Retour Site Public -->
   <div class="b2b-sidebar-footer">
-    <div class="b2b-footer-contact">
-      <div><i class="fa-solid fa-location-dot"></i> Hann Maristes, Dakar</div>
-      <div><i class="fa-solid fa-phone"></i> +221 33 832 29 66</div>
-    </div>
+    @if (!b2b.isSidebarCollapsed()) {
+      <div class="b2b-footer-contact">
+        <div><i class="fa-solid fa-location-dot"></i> Hann Maristes, Dakar</div>
+        <div><i class="fa-solid fa-phone"></i> +221 33 832 29 66</div>
+      </div>
+    }
 
-    <a routerLink="/" class="b2b-sidebar-back-link">
+    <a routerLink="/" class="b2b-sidebar-back-link" [title]="'Retour au Site Public'">
       <i class="fa-solid fa-arrow-left"></i>
-      <span>Retour au Site Public</span>
+      @if (!b2b.isSidebarCollapsed()) {
+        <span>Retour au Site Public</span>
+      }
     </a>
   </div>
 

@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { B2bStateService } from './b2b-state.service';
 
 @Component({
   selector: 'app-b2b-nav',
@@ -9,5 +10,7 @@ import { RouterModule } from '@angular/router';
   templateUrl: './b2b-nav.component.html',
   styleUrls: ['./b2b-nav.component.css']
 })
-export class B2bNavComponent {}
+export class B2bNavComponent {
+  b2b = inject(B2bStateService);
+}
 
