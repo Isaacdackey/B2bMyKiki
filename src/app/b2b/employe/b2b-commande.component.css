@@ -190,9 +190,9 @@
 
 /* BANNIÈRE CUT-OFF (FOND BEIGE DOUX + ACCENTS BORDEAUX & ROUGE) */
 .b2b-banner {
-  max-width: 1280px;
+  max-width: 1350px;
   margin: 1.5rem auto 0;
-  padding: 0 1rem;
+  padding: 0 1.5rem;
 }
 
 .b2b-banner-card {
@@ -262,9 +262,9 @@
 
 /* MAIN LAYOUT */
 .b2b-main {
-  max-width: 1280px;
+  max-width: 1350px;
   margin: 2rem auto;
-  padding: 0 1rem;
+  padding: 0 1.5rem;
   display: grid;
   grid-template-columns: 1fr;
   gap: 2rem;
@@ -536,7 +536,7 @@
 }
 
 .b2b-profile-bar-inner {
-  max-width: 1280px;
+  max-width: 1350px;
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -822,7 +822,7 @@
    EXPERIENCE COMPTOIR MYKIKI POUR SALARIE AUTONOME (LUXE B2B)
    ============================================================== */
 .mykiki-b2b-experience {
-  max-width: 1360px;
+  max-width: 1350px;
   margin: 1.5rem auto 0;
   padding: 0 1.5rem;
   display: flex;

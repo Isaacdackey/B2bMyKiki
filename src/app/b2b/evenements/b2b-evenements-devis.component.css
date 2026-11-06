@@ -17,6 +17,22 @@
   max-width: 100%;
   width: 100%;
   box-sizing: border-box;
+  margin-left: 280px;
+  width: calc(100% - 280px) !important;
+  transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.event-wrapper.collapsed-layout {
+  margin-left: 80px;
+  width: calc(100% - 80px) !important;
+}
+
+@media (max-width: 991px) {
+  .event-wrapper,
+  .event-wrapper.collapsed-layout {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
 }
 
 /* EN-TÊTE BANNIÈRE ÉVÉNEMENTS */
