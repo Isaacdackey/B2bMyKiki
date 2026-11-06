@@ -26,6 +26,14 @@ export class B2bCommandeComponent {
   // Numéro Wave pour le salarié autonome
   wavePhone = signal<string>('+221 77 654 32 10');
 
+  // GESTION DU CUT-OFF 10H30 (Exigence Mentor)
+  // Permet de simuler ou vérifier si la commande est pour aujourd'hui ou demain
+  isAfterCutOff = signal<boolean>(false);
+  
+  toggleSimulerApresCutOff() {
+    this.isAfterCutOff.update(v => !v);
+  }
+
   // Modal de confirmation / checkout
   showConfirmationModal = signal(false);
   orderPlaced = signal(false);

@@ -50,14 +50,38 @@
             <i class="fa-regular fa-clock"></i>
           </div>
           <div>
-            <h2 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 800; color: #721513;">
-              Commande du Déjeuner • {{ b2b.siteActuel().nom }}
+            <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
+              <h2 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 800; color: #721513;">
+                Commande du Déjeuner • {{ b2b.siteActuel().nom }}
+              </h2>
               <span class="b2b-cutoff-pill"><i class="fa-solid fa-hourglass-half"></i> Cut-Off : {{ b2b.siteActuel().heureCutOff }}</span>
-            </h2>
+              
+              <!-- Badge dynamique de Cut-Off -->
+              @if (!isAfterCutOff()) {
+                <span style="background: rgba(96, 108, 56, 0.15); color: #606C38; border: 1px solid #606C38; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem;">
+                  <i class="fa-solid fa-circle" style="font-size: 0.5rem;"></i> Commandes Ouvertes pour ce midi
+                </span>
+              } @else {
+                <span style="background: rgba(229, 29, 36, 0.15); color: #E51D24; border: 1px solid #E51D24; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem;">
+                  <i class="fa-solid fa-triangle-exclamation"></i> Cut-off 10h30 dépassé : Enregistré pour Demain Midi
+                </span>
+              }
+            </div>
+
             <p style="margin: 0.35rem 0 0; font-size: 0.82rem; color: #6E5A56;">
               Formule obligatoire conventionnée : <strong style="color: #721513;">1 Entrée + 1 Plat Chaud + 1 Dessert + 1 Boisson</strong>. 
               Prise en charge à 100% par TotalEnergies Sénégal.
             </p>
+          </div>
+
+          <!-- Bouton de test démo du Cut-off -->
+          <div style="margin-left: auto;">
+            <button 
+              type="button" 
+              (click)="toggleSimulerApresCutOff()"
+              style="background: #FAF8F4; border: 1px solid #EDE7DC; color: #6E5A56; padding: 0.35rem 0.65rem; border-radius: 8px; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+              <i class="fa-solid fa-clock-rotate-left"></i> Simuler {{ isAfterCutOff() ? 'Avant 10h30' : 'Après 10h30' }}
+            </button>
           </div>
         </div>
 
