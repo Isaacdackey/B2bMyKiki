@@ -258,9 +258,19 @@
   background: transparent !important;
   border-radius: 14px;
   margin: 0 !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.b2b-sidebar.collapsed .b2b-link-icon-wrap i,
+.b2b-sidebar.collapsed .b2b-sidebar-enterprise-mini i,
+.b2b-sidebar.collapsed .b2b-sidebar-back-link i {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+  line-height: 1 !important;
+  text-align: center !important;
 }
 
 .b2b-sidebar-link:hover {
