@@ -1,0 +1,128 @@
+<div class="b2b-login-page">
+  <div class="b2b-login-container">
+    
+    <!-- Carte Principale Style Charte Kiki Traiteur -->
+    <div class="b2b-login-card">
+      <div class="card-top-accent"></div>
+
+      <!-- En-tête avec Brand & Logo Officiel -->
+      <div class="login-brand">
+        <div class="brand-logo-img">
+          <img src="assets/images/logo.png" alt="Kiki Traiteur" onerror="this.src='assets/images/KIKI TRAITEUR Logo Picto Rouge bordeau.png'">
+        </div>
+        <h1 class="brand-name font-serif-luxury">Kiki Traiteur <span class="badge-pro">B2B Pro</span></h1>
+        <p class="brand-tagline">Portail Restauration d'Entreprise & Conventions Salariés</p>
+      </div>
+
+      <!-- Bandeau Entreprise Active -->
+      <div class="enterprise-banner">
+        <div class="ent-icon">
+          <i class="fa-solid fa-building"></i>
+        </div>
+        <div class="ent-info">
+          <span class="ent-tag">CONVENTION ENTREPRISE ACTIVE</span>
+          <strong class="ent-name">{{ b2b.currentEntreprise().nom }}</strong>
+          <span class="ent-sites">{{ b2b.currentEntreprise().sites.length }} sites de distribution • Dakar & Régions</span>
+        </div>
+      </div>
+
+      <!-- ACCÈS DÉMO RAPIDE EN 1 CLIC (CONFORME AUX DEMANDES DU MENTOR) -->
+      <div class="demo-profiles-section">
+        <div class="section-divider">
+          <span>ACCÈS DÉMO DIRECT PAR RÔLE</span>
+        </div>
+        <p class="demo-notice">
+          Cliquez sur un profil ci-dessous pour tester immédiatement le parcours sans saisie :
+        </p>
+
+        <div class="demo-profiles-grid">
+          @for (p of profilsDemo; track p.id) {
+            <button 
+              type="button" 
+              class="demo-profile-card"
+              (click)="selectionnerProfilDemo(p)"
+              [disabled]="loading()">
+              <div class="demo-card-icon" [style.color]="p.badgeColor" [style.background]="p.badgeColor + '15'">
+                <i [class]="p.icone"></i>
+              </div>
+              <div class="demo-card-content">
+                <div class="demo-card-head">
+                  <span class="demo-role-name">{{ p.nom }}</span>
+                  <span class="demo-badge-pill" [style.color]="p.badgeColor" [style.border-color]="p.badgeColor" [style.background]="p.badgeColor + '10'">
+                    {{ p.badge }}
+                  </span>
+                </div>
+                <div class="demo-role-title">{{ p.roleTitre }}</div>
+                <div class="demo-role-desc">{{ p.description }}</div>
+              </div>
+              <div class="demo-arrow">
+                <i class="fa-solid fa-chevron-right"></i>
+              </div>
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- OU FORMULAIRE CLASSIQUE IDENTIFIANT / MOT DE PASSE -->
+      <div class="section-divider">
+        <span>OU CONNEXION AVEC VOS IDENTIFIANTS</span>
+      </div>
+
+      <form class="login-form" (ngSubmit)="seConnecter()">
+        <div class="form-group">
+          <label for="username">IDENTIFIANT PRO OU EMAIL ENTREPRISE</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-envelope input-icon"></i>
+            <input
+              id="username"
+              type="text"
+              [ngModel]="username()"
+              (ngModelChange)="username.set($event)"
+              name="username"
+              placeholder="ex: prenom.nom@entreprise.sn"
+              required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">MOT DE PASSE OU CODE ACCÈS</label>
+          <div class="password-field input-with-icon">
+            <i class="fa-solid fa-lock input-icon"></i>
+            <input
+              id="password"
+              [type]="showPassword() ? 'text' : 'password'"
+              [ngModel]="password()"
+              (ngModelChange)="password.set($event)"
+              name="password"
+              placeholder="••••••••"
+              required>
+            <button type="button" class="toggle-pwd" (click)="showPassword.set(!showPassword())">
+              <i class="fa-solid" [class.fa-eye]="!showPassword()" [class.fa-eye-slash]="showPassword()"></i>
+            </button>
+          </div>
+        </div>
+
+        <button 
+          type="submit" 
+          class="btn-submit-b2b" 
+          [disabled]="loading()">
+          @if (loading()) {
+            <i class="fa-solid fa-spinner fa-spin me-2"></i> Connexion au portail B2B...
+          } @else {
+            <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Accéder à l'Espace B2B
+          }
+        </button>
+      </form>
+
+      <!-- Lien Retour au site Vitrine Public -->
+      <div class="login-footer">
+        <a routerLink="/" class="back-to-public">
+          <i class="fa-solid fa-arrow-left"></i> Retour au site public Kiki Traiteur (B2C)
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+

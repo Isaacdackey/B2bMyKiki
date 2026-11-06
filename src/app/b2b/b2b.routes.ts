@@ -3,8 +3,12 @@ import { Routes } from '@angular/router';
 export const B2B_ROUTES: Routes = [
   {
     path: '',
-    redirectTo: 'commande',
+    redirectTo: 'login',
     pathMatch: 'full'
+  },
+  {
+    path: 'login',
+    loadComponent: () => import('./auth/b2b-login.component').then(m => m.B2bLoginComponent)
   },
   {
     path: 'commande',

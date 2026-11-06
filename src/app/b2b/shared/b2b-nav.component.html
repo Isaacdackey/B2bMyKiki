@@ -97,6 +97,13 @@
       </div>
     }
 
+    <a routerLink="/b2b/login" class="b2b-sidebar-back-link b2b-login-switch-link" [title]="'Changer de Rôle Démo'">
+      <i class="fa-solid fa-user-lock"></i>
+      @if (!b2b.isSidebarCollapsed()) {
+        <span>Changer de Compte / Rôle</span>
+      }
+    </a>
+
     <a routerLink="/" class="b2b-sidebar-back-link" [title]="'Retour au Site Public'">
       <i class="fa-solid fa-arrow-left"></i>
       @if (!b2b.isSidebarCollapsed()) {

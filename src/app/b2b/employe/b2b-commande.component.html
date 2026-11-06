@@ -1,38 +1,36 @@
 <div class="b2b-wrapper" [class.collapsed-layout]="b2b.isSidebarCollapsed()">
   <app-b2b-nav></app-b2b-nav>
 
-  <!-- SELECTEUR DE PROFIL SALARIÉ (SUBVENTIONNÉ VS AUTONOME / FRAIS PERSONNELS) -->
+  <!-- BANDEAU PROFIL SALARIÉ CONNECTÉ AVEC BOUTON DÉCONNEXION/CHANGER DE PROFIL -->
   <section class="b2b-profile-bar">
     <div class="b2b-profile-bar-inner">
       <div class="b2b-profile-info">
         <span class="b2b-profile-label">
-          <i class="fa-solid fa-user-gear"></i> Profil Actif :
+          <i class="fa-solid fa-circle-user" style="color: #721513;"></i> Connecté en tant que :
         </span>
         <span class="b2b-profile-user">
           <strong>{{ b2b.currentEmploye().prenom }} {{ b2b.currentEmploye().nom }}</strong>
           <span class="b2b-profile-meta">({{ b2b.currentEmploye().matricule }} • {{ b2b.currentEmploye().departement }})</span>
         </span>
+        <span class="b2b-badge-statut-pill" 
+              [style.background]="b2b.modeProfil() === 'SUBVENTIONNE' ? 'rgba(96, 108, 56, 0.12)' : 'rgba(29, 78, 216, 0.1)'"
+              [style.color]="b2b.modeProfil() === 'SUBVENTIONNE' ? '#606C38' : '#1D4ED8'"
+              [style.border]="b2b.modeProfil() === 'SUBVENTIONNE' ? '1px solid #606C38' : '1px solid #1D4ED8'"
+              style="padding: 0.2rem 0.65rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem;">
+          <i class="fa-solid" [class.fa-building-shield]="b2b.modeProfil() === 'SUBVENTIONNE'" [class.fa-wallet]="b2b.modeProfil() === 'AUTONOME'"></i>
+          {{ b2b.modeProfil() === 'SUBVENTIONNE' ? 'Conventionné 100% RH (0 F)' : 'Autonome (Frais personnels Wave)' }}
+        </span>
       </div>
 
-      <!-- Bascule entre les 2 parcours -->
-      <div class="b2b-profile-toggle-group">
-        <button 
-          type="button"
-          (click)="b2b.setModeProfil('SUBVENTIONNE')"
-          [class.active]="b2b.modeProfil() === 'SUBVENTIONNE'"
-          class="b2b-toggle-pill subventionne">
-          <i class="fa-solid fa-building-shield"></i>
-          <span>1. Salarié Conventionné (Pris en charge 100% RH • 0 F)</span>
-        </button>
-
-        <button 
-          type="button"
-          (click)="b2b.setModeProfil('AUTONOME')"
-          [class.active]="b2b.modeProfil() === 'AUTONOME'"
-          class="b2b-toggle-pill autonome">
-          <i class="fa-solid fa-wallet"></i>
-          <span>2. Salarié Non Pris en Charge (Frais personnels • Wave)</span>
-        </button>
+      <!-- Actions Profil & Déconnexion Démo -->
+      <div style="display: flex; align-items: center; gap: 0.65rem;">
+        <a 
+          routerLink="/b2b/login" 
+          class="b2b-change-account-btn"
+          title="Changer de profil ou tester un autre rôle"
+          style="background: #FAF8F4; border: 1.5px solid #EDE7DC; color: #721513; padding: 0.4rem 0.85rem; border-radius: 9999px; font-size: 0.76rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.45rem; transition: all 0.2s;">
+          <i class="fa-solid fa-right-left"></i> Changer de Profil / Déconnexion
+        </a>
       </div>
     </div>
   </section>
