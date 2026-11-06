@@ -498,13 +498,12 @@
 
 .b2b-modal-card {
   background-color: #FFFFFF;
-  border: 1px solid #EDE7DC;
-  border-top: 6px solid #E51D24;
+  border: 1.5px solid #EDE7DC;
   border-radius: 24px;
   max-width: 540px;
   width: 100%;
   padding: 2.25rem;
-  box-shadow: 0 25px 60px rgba(114, 21, 19, 0.2);
+  box-shadow: 0 25px 60px rgba(114, 21, 19, 0.15);
   color: #332724;
 }
 
