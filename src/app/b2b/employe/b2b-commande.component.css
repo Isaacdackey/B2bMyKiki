@@ -25,6 +25,19 @@
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
+  padding-left: 280px;
+  transition: padding-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.b2b-wrapper.collapsed-layout {
+  padding-left: 80px;
+}
+
+@media (max-width: 991px) {
+  .b2b-wrapper,
+  .b2b-wrapper.collapsed-layout {
+    padding-left: 0 !important;
+  }
 }
 
 /* TOPBAR OFFICIELLE KIKI */
