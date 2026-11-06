@@ -104,9 +104,26 @@
 }
 
 .b2b-sidebar.collapsed .b2b-sidebar-header {
+  display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding: 1rem 0.5rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  padding: 1.25rem 0.5rem;
+}
+
+.b2b-sidebar.collapsed .b2b-sidebar-brand {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.b2b-sidebar.collapsed .b2b-sidebar-toggle-btn {
+  margin: 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
 }
 
 /* Fiche Entreprise Conventionnée */
