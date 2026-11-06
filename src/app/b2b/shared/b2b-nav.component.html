@@ -1,63 +1,79 @@
-<!-- NAVBAR UNIFIÉE B2B KIKI TRAITEUR -->
-<header class="b2b-unified-header">
+<!-- SIDEBAR FIXE À GAUCHE B2B KIKI TRAITEUR -->
+<aside class="b2b-sidebar">
   
-  <!-- TOPBAR LUXE -->
-  <div class="b2b-unified-topbar">
-    <div style="display: flex; align-items: center; gap: 1.25rem;">
-      <span><i class="fa-solid fa-location-dot"></i> Hann Maristes, Dakar, Sénégal</span>
-      <span><i class="fa-solid fa-phone"></i> +221 33 832 29 66 / +221 33 832 11 50</span>
-      <span><i class="fa-solid fa-envelope"></i> contact@kikitraiteursenegal.net</span>
-    </div>
-    <div style="display: flex; align-items: center; gap: 1rem;">
-      <span class="b2b-topbar-pill"><i class="fa-solid fa-certificate"></i> TRAITEUR AGRÉÉ ENTREPRISE</span>
-      <a routerLink="/" style="color: #fff; text-decoration: none; font-weight: 600;">
-        <i class="fa-solid fa-arrow-left"></i> Retour au Site Public
-      </a>
-    </div>
-  </div>
-
-  <!-- NAVIGATION BAR PRINCIPALE -->
-  <div class="b2b-unified-nav">
-    <div class="b2b-unified-nav-inner">
-      
-      <!-- Brand Logo -->
-      <a routerLink="/b2b" class="b2b-brand-logo">
-        <img src="assets/images/logo.png" 
-             alt="Kiki Traiteur" 
-             class="b2b-logo-img"
-             onerror="this.src='assets/images/KIKI TRAITEUR Logo Picto Rouge bordeau.png'">
-        <div>
-          <div class="b2b-brand-text">
-            Kiki Traiteur <span class="b2b-brand-badge">B2B Pro</span>
-          </div>
-          <div style="font-size: 0.72rem; color: #6E5A56;">Restauration d'Entreprise & Multi-Sites</div>
+  <!-- En-tête Sidebar : Brand Logo & Titre -->
+  <div class="b2b-sidebar-header">
+    <a routerLink="/b2b" class="b2b-sidebar-brand">
+      <img src="assets/images/logo.png" 
+           alt="Kiki Traiteur" 
+           class="b2b-sidebar-logo"
+           onerror="this.src='assets/images/KIKI TRAITEUR Logo Picto Rouge bordeau.png'">
+      <div class="b2b-sidebar-brand-info">
+        <div class="b2b-sidebar-brand-name">
+          Kiki Traiteur
         </div>
-      </a>
-
-      <!-- 3 Onglets de navigation principale (Pilules Kiki Traiteur B2B) -->
-      <nav class="b2b-nav-pill-group">
-        <a routerLink="/b2b/commande" routerLinkActive="active" class="b2b-nav-pill-link">
-          <i class="fa-solid fa-utensils"></i> Commande Midi
-        </a>
-        <a routerLink="/b2b/rh" routerLinkActive="active" class="b2b-nav-pill-link">
-          <i class="fa-solid fa-chart-pie"></i> Espace RH & Facturation
-        </a>
-        <a routerLink="/b2b/cuisine" routerLinkActive="active" class="b2b-nav-pill-link">
-          <i class="fa-solid fa-fire-burner"></i> Cuisine & Dispatch
-        </a>
-      </nav>
-
-      <!-- Badge Entreprise Active -->
-      <div class="b2b-header-enterprise-badge">
-        <i class="fa-solid fa-building" style="color: #E51D24;"></i>
-        <div>
-          <div style="font-size: 0.7rem; color: #6E5A56; font-weight: 600;">ENTREPRISE</div>
-          <strong style="color: #721513; font-size: 0.82rem;">TotalEnergies Sénégal</strong>
-        </div>
+        <span class="b2b-sidebar-pro-badge">B2B Pro</span>
       </div>
+    </a>
+  </div>
 
+  <!-- Fiche Entreprise Conventionnée -->
+  <div class="b2b-sidebar-enterprise">
+    <div class="b2b-enterprise-icon">
+      <i class="fa-solid fa-building"></i>
+    </div>
+    <div class="b2b-enterprise-meta">
+      <span class="b2b-enterprise-tag">Convention Active</span>
+      <strong class="b2b-enterprise-name">TotalEnergies Sénégal</strong>
     </div>
   </div>
 
-</header>
+  <!-- Navigation Principale Verticale -->
+  <nav class="b2b-sidebar-nav">
+    <div class="b2b-nav-section-title">ESPACES DE GESTION</div>
 
+    <a routerLink="/b2b/commande" routerLinkActive="active" class="b2b-sidebar-link">
+      <div class="b2b-link-icon-wrap">
+        <i class="fa-solid fa-utensils"></i>
+      </div>
+      <div class="b2b-link-text">
+        <span class="b2b-link-title">Commande Midi</span>
+        <span class="b2b-link-subtitle">Plateaux repas collaborateurs</span>
+      </div>
+    </a>
+
+    <a routerLink="/b2b/rh" routerLinkActive="active" class="b2b-sidebar-link">
+      <div class="b2b-link-icon-wrap">
+        <i class="fa-solid fa-chart-pie"></i>
+      </div>
+      <div class="b2b-link-text">
+        <span class="b2b-link-title">Espace RH</span>
+        <span class="b2b-link-subtitle">Rapprochement & Facturation</span>
+      </div>
+    </a>
+
+    <a routerLink="/b2b/cuisine" routerLinkActive="active" class="b2b-sidebar-link">
+      <div class="b2b-link-icon-wrap">
+        <i class="fa-solid fa-fire-burner"></i>
+      </div>
+      <div class="b2b-link-text">
+        <span class="b2b-link-title">Cuisine & Dispatch</span>
+        <span class="b2b-link-subtitle">Production, Scanner & BL</span>
+      </div>
+    </a>
+  </nav>
+
+  <!-- Bas de Sidebar : Info Traiteur & Lien Retour Site Public -->
+  <div class="b2b-sidebar-footer">
+    <div class="b2b-footer-contact">
+      <div><i class="fa-solid fa-location-dot"></i> Hann Maristes, Dakar</div>
+      <div><i class="fa-solid fa-phone"></i> +221 33 832 29 66</div>
+    </div>
+
+    <a routerLink="/" class="b2b-sidebar-back-link">
+      <i class="fa-solid fa-arrow-left"></i>
+      <span>Retour au Site Public</span>
+    </a>
+  </div>
+
+</aside>
