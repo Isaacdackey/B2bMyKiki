@@ -25,6 +25,31 @@
   width: 80px;
 }
 
+.b2b-sidebar.collapsed .b2b-sidebar-nav {
+  padding: 0.75rem 0;
+  align-items: center;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.b2b-sidebar.collapsed .b2b-sidebar-link {
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 0 !important;
+  margin: 0.45rem auto !important;
+  width: 48px !important;
+  max-width: 48px !important;
+  height: 48px !important;
+  border-radius: 14px !important;
+  flex: 0 0 48px !important;
+  display: flex !important;
+}
+
+.b2b-sidebar.collapsed .b2b-sidebar-link.active {
+  width: 48px !important;
+  max-width: 48px !important;
+}
+
 /* En-tête avec Logo et bouton Toggle */
 .b2b-sidebar-header {
   padding: 1.25rem 1rem;
