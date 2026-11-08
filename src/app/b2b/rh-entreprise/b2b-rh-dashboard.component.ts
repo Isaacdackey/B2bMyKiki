@@ -92,6 +92,10 @@ export class B2bRhDashboardComponent {
     this.periodeActive.set('PERSONNALISE');
   }
 
+  // Pagination Annuaire Employés
+  pageEmployes = signal<number>(1);
+  pageSizeEmployes = signal<number>(5);
+
   // Employés filtrés
   filteredEmployes = computed(() => {
     const query = this.searchQuery().toLowerCase().trim();
@@ -108,6 +112,31 @@ export class B2bRhDashboardComponent {
       return matchQuery && matchSite;
     });
   });
+
+  totalEmployes = computed(() => this.filteredEmployes().length);
+  totalEmployesPages = computed(() => Math.max(1, Math.ceil(this.totalEmployes() / this.pageSizeEmployes())));
+
+  pagesArray = computed(() => {
+    const total = this.totalEmployesPages();
+    return Array.from({ length: total }, (_, i) => i + 1);
+  });
+
+  mathMin(a: number, b: number): number {
+    return Math.min(a, b);
+  }
+
+  paginatedEmployes = computed(() => {
+    const page = this.pageEmployes();
+    const size = this.pageSizeEmployes();
+    const start = (page - 1) * size;
+    return this.filteredEmployes().slice(start, start + size);
+  });
+
+  changerPageEmployes(nouvellePage: number) {
+    if (nouvellePage >= 1 && nouvellePage <= this.totalEmployesPages()) {
+      this.pageEmployes.set(nouvellePage);
+    }
+  }
 
   ouvrirModalAjout() {
     this.newEmp.set({

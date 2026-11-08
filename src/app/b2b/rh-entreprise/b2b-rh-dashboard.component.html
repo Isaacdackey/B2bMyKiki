@@ -420,7 +420,7 @@
               </tr>
             </thead>
             <tbody>
-              @for (emp of filteredEmployes(); track emp.id) {
+              @for (emp of paginatedEmployes(); track emp.id) {
                 <tr>
                   <td><code style="color: #721513; font-weight: 800; background: #FAF5EA; padding: 0.2rem 0.5rem; border-radius: 6px;">{{ emp.matricule }}</code></td>
                   <td>
@@ -448,8 +448,59 @@
                   </td>
                 </tr>
               }
+              @if (paginatedEmployes().length === 0) {
+                <tr>
+                  <td colspan="8" style="text-align: center; padding: 2.5rem; color: #6E5A56;">
+                    <i class="fa-solid fa-user-slash" style="font-size: 1.5rem; color: #EDE7DC; margin-bottom: 0.5rem; display: block;"></i>
+                    Aucun collaborateur trouvé pour ces critères.
+                  </td>
+                </tr>
+              }
             </tbody>
           </table>
+        </div>
+
+        <!-- BARRE DE PAGINATION MODERNE STYLE KIKI TRAITEUR -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; flex-wrap: wrap; gap: 1rem; padding: 0 0.5rem;">
+          <div style="font-size: 0.8rem; color: #6E5A56;">
+            Affichage de <strong>{{ totalEmployes() === 0 ? 0 : (pageEmployes() - 1) * pageSizeEmployes() + 1 }}</strong> à 
+            <strong>{{ mathMin(pageEmployes() * pageSizeEmployes(), totalEmployes()) }}</strong> sur 
+            <strong>{{ totalEmployes() }}</strong> collaborateurs
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.4rem;">
+            <button 
+              type="button"
+              (click)="changerPageEmployes(pageEmployes() - 1)"
+              [disabled]="pageEmployes() === 1"
+              style="padding: 0.45rem 0.85rem; background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 8px; font-size: 0.75rem; font-weight: 700; color: #721513; cursor: pointer; display: flex; align-items: center; gap: 0.35rem; transition: all 0.2s;"
+              [style.opacity]="pageEmployes() === 1 ? '0.4' : '1'"
+              [style.cursor]="pageEmployes() === 1 ? 'not-allowed' : 'pointer'">
+              <i class="fa-solid fa-chevron-left"></i> Précédent
+            </button>
+
+            @for (p of pagesArray(); track p) {
+              <button 
+                type="button"
+                (click)="changerPageEmployes(p)"
+                [style.background]="pageEmployes() === p ? '#721513' : '#FFFFFF'"
+                [style.color]="pageEmployes() === p ? '#FFFFFF' : '#332724'"
+                [style.border-color]="pageEmployes() === p ? '#721513' : '#EDE7DC'"
+                style="width: 34px; height: 34px; border: 1.5px solid; border-radius: 8px; font-size: 0.78rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                {{ p }}
+              </button>
+            }
+
+            <button 
+              type="button"
+              (click)="changerPageEmployes(pageEmployes() + 1)"
+              [disabled]="pageEmployes() === totalEmployesPages()"
+              style="padding: 0.45rem 0.85rem; background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 8px; font-size: 0.75rem; font-weight: 700; color: #721513; cursor: pointer; display: flex; align-items: center; gap: 0.35rem; transition: all 0.2s;"
+              [style.opacity]="pageEmployes() === totalEmployesPages() ? '0.4' : '1'"
+              [style.cursor]="pageEmployes() === totalEmployesPages() ? 'not-allowed' : 'pointer'">
+              Suivant <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
         </div>
 
       </div>
