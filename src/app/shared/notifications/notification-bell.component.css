@@ -54,8 +54,8 @@
       position: absolute;
       top: calc(100% + 8px);
       right: 0;
-      width: 340px;
-      max-width: 90vw;
+      width: min(340px, calc(100vw - 1.5rem));
+      max-width: calc(100vw - 1.5rem);
       background: #FAF5EA;
       border: 1.5px solid #E2D5BE;
       border-radius: 16px;
