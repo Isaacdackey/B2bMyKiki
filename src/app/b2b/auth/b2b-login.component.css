@@ -7,13 +7,13 @@
 }
 
 .b2b-login-page {
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: #FAF8F4;
   position: relative;
-  padding: 2.5rem 1rem;
+  padding: clamp(1rem, 3vw, 2.5rem) 1rem;
 }
 
 .b2b-login-container {
@@ -28,8 +28,8 @@
 .b2b-login-card {
   width: 100%;
   background: #FFFFFF;
-  border-radius: 24px;
-  padding: 2.5rem 2.25rem;
+  border-radius: clamp(16px, 3vw, 24px);
+  padding: clamp(1.25rem, 4vw, 2.5rem) clamp(1rem, 3.5vw, 2.25rem);
   border: 1.5px solid #EDE7DC;
   box-shadow: 0 15px 45px rgba(114, 21, 19, 0.06), 0 2px 8px rgba(0, 0, 0, 0.03);
   position: relative;
@@ -373,5 +373,29 @@
 
 .back-to-public:hover {
   color: #721513;
+}
+
+/* =============================================
+   RESPONSIVE MOBILE-FIRST BREAKPOINTS (LOGIN)
+   ============================================= */
+@media (max-width: 479px) {
+  .brand-name {
+    font-size: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .role-selector-tabs {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .role-tab-btn {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .demo-account-chip {
+    padding: 0.6rem 0.75rem;
+  }
 }
 

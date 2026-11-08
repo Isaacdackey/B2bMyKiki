@@ -31,7 +31,7 @@
 /* CARDS STATS KPI */
 .rh-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 1.25rem;
   margin-bottom: 2rem;
 }
@@ -139,18 +139,24 @@
   margin-top: 1.5rem;
 }
 
-@media (max-width: 991px) {
+@media (max-width: 1023px) {
   .rh-split-grid {
     grid-template-columns: 1fr !important;
   }
 
   .rh-kpi-grid {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
   }
 
   main {
     padding: 0 0.85rem !important;
     margin: 1.25rem auto !important;
+  }
+}
+
+@media (max-width: 479px) {
+  .rh-kpi-grid {
+    grid-template-columns: 1fr !important;
   }
 }
 

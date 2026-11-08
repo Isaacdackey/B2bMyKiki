@@ -31,9 +31,15 @@
 /* CARDS KPI CUISINE */
 .cuisine-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 1.25rem;
   margin-bottom: 2rem;
+}
+
+@media (max-width: 479px) {
+  .cuisine-kpi-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .cuisine-kpi-card {
