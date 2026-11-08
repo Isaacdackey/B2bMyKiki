@@ -88,7 +88,7 @@
               <input 
                 type="date" 
                 [ngModel]="dateDebut()"
-                (ngModelChange)="dateDebut.set($event)"
+                (ngModelChange)="dateDebut.set($event); surChangementDateManuel()"
                 style="width: 100%; background: #FFFFFF; color: #332724; font-weight: 700; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.55rem 0.85rem; font-size: 0.85rem;">
             </div>
 
@@ -100,7 +100,7 @@
               <input 
                 type="date" 
                 [ngModel]="dateFin()"
-                (ngModelChange)="dateFin.set($event)"
+                (ngModelChange)="dateFin.set($event); surChangementDateManuel()"
                 style="width: 100%; background: #FFFFFF; color: #332724; font-weight: 700; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.55rem 0.85rem; font-size: 0.85rem;">
             </div>
 
@@ -109,19 +109,31 @@
               <button 
                 type="button"
                 (click)="definirPeriode('AUJOURDHUI')"
-                style="flex: 1; padding: 0.6rem 0.4rem; background: #FFFFFF; border: 1px solid #EDE7DC; border-radius: 8px; font-size: 0.72rem; font-weight: 700; color: #6E5A56; cursor: pointer;">
+                [style.background]="periodeActive() === 'AUJOURDHUI' ? '#FAF5EA' : '#FFFFFF'"
+                [style.border-color]="periodeActive() === 'AUJOURDHUI' ? '#721513' : '#EDE7DC'"
+                [style.color]="periodeActive() === 'AUJOURDHUI' ? '#721513' : '#6E5A56'"
+                [style.font-weight]="periodeActive() === 'AUJOURDHUI' ? '800' : '700'"
+                style="flex: 1; padding: 0.6rem 0.4rem; border: 1px solid; border-radius: 8px; font-size: 0.72rem; cursor: pointer; transition: all 0.2s;">
                 Aujourd'hui
               </button>
               <button 
                 type="button"
                 (click)="definirPeriode('MOIS_EN_COURS')"
-                style="flex: 1; padding: 0.6rem 0.4rem; background: #FAF5EA; border: 1px solid #721513; border-radius: 8px; font-size: 0.72rem; font-weight: 800; color: #721513; cursor: pointer;">
+                [style.background]="periodeActive() === 'MOIS_EN_COURS' ? '#FAF5EA' : '#FFFFFF'"
+                [style.border-color]="periodeActive() === 'MOIS_EN_COURS' ? '#721513' : '#EDE7DC'"
+                [style.color]="periodeActive() === 'MOIS_EN_COURS' ? '#721513' : '#6E5A56'"
+                [style.font-weight]="periodeActive() === 'MOIS_EN_COURS' ? '800' : '700'"
+                style="flex: 1; padding: 0.6rem 0.4rem; border: 1px solid; border-radius: 8px; font-size: 0.72rem; cursor: pointer; transition: all 0.2s;">
                 Mois en cours
               </button>
               <button 
                 type="button"
                 (click)="definirPeriode('MOIS_PRECEDENT')"
-                style="flex: 1; padding: 0.6rem 0.4rem; background: #FFFFFF; border: 1px solid #EDE7DC; border-radius: 8px; font-size: 0.72rem; font-weight: 700; color: #6E5A56; cursor: pointer;">
+                [style.background]="periodeActive() === 'MOIS_PRECEDENT' ? '#FAF5EA' : '#FFFFFF'"
+                [style.border-color]="periodeActive() === 'MOIS_PRECEDENT' ? '#721513' : '#EDE7DC'"
+                [style.color]="periodeActive() === 'MOIS_PRECEDENT' ? '#721513' : '#6E5A56'"
+                [style.font-weight]="periodeActive() === 'MOIS_PRECEDENT' ? '800' : '700'"
+                style="flex: 1; padding: 0.6rem 0.4rem; border: 1px solid; border-radius: 8px; font-size: 0.72rem; cursor: pointer; transition: all 0.2s;">
                 Octobre
               </button>
             </div>

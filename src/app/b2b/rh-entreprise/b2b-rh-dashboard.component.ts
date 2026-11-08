@@ -24,6 +24,9 @@ export class B2bRhDashboardComponent {
   dateDebut = signal<string>('2026-11-01');
   dateFin = signal<string>('2026-11-30');
 
+  // Période active sélectionnée
+  periodeActive = signal<'AUJOURDHUI' | 'MOIS_EN_COURS' | 'MOIS_PRECEDENT' | 'PERSONNALISE'>('MOIS_EN_COURS');
+
   // Filtre recherche employé
   searchQuery = signal<string>('');
   selectedSiteFilter = signal<string>('TOUS');
@@ -72,6 +75,7 @@ export class B2bRhDashboardComponent {
 
   // Raccourcis de dates
   definirPeriode(type: 'AUJOURDHUI' | 'MOIS_EN_COURS' | 'MOIS_PRECEDENT') {
+    this.periodeActive.set(type);
     if (type === 'AUJOURDHUI') {
       this.dateDebut.set('2026-11-06');
       this.dateFin.set('2026-11-06');
@@ -82,6 +86,10 @@ export class B2bRhDashboardComponent {
       this.dateDebut.set('2026-10-01');
       this.dateFin.set('2026-10-31');
     }
+  }
+
+  surChangementDateManuel() {
+    this.periodeActive.set('PERSONNALISE');
   }
 
   // Employés filtrés
