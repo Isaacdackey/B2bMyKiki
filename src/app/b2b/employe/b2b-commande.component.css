@@ -18,10 +18,8 @@
 .b2b-wrapper {
   background-color: transparent;
   color: #332724;
-  min-height: 100vh;
+  min-height: 100dvh;
   padding-bottom: 8rem;
-  overflow-y: visible;
-  overflow-x: clip;
   width: auto;
   min-width: 0;
   max-width: 100%;
@@ -30,7 +28,7 @@
   transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@media (max-width: 991px) {
+@media (max-width: 1023px) {
   .b2b-wrapper {
     margin-left: 0 !important;
     width: 100% !important;

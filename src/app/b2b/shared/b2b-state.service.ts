@@ -11,6 +11,9 @@ export class B2bStateService {
   // État de la Sidebar rétractable (Collapsed / Expanded) persisté
   isSidebarCollapsed = signal<boolean>(localStorage.getItem('b2b_sidebar_collapsed') === 'true');
 
+  // État du Drawer Mobile (< 1024px)
+  isMobileDrawerOpen = signal<boolean>(false);
+
   constructor() {
     // Définition immédiate dès le premier rendu
     this.updateSidebarCssVar(this.isSidebarCollapsed());
@@ -34,6 +37,31 @@ export class B2bStateService {
       localStorage.setItem('b2b_sidebar_collapsed', String(next));
       return next;
     });
+  }
+
+  toggleMobileDrawer() {
+    this.isMobileDrawerOpen.update(v => {
+      const next = !v;
+      this.handleBodyScrollLock(next);
+      return next;
+    });
+  }
+
+  closeMobileDrawer() {
+    this.isMobileDrawerOpen.set(false);
+    this.handleBodyScrollLock(false);
+  }
+
+  private handleBodyScrollLock(lock: boolean) {
+    if (typeof document !== 'undefined' && document.body) {
+      if (lock) {
+        document.body.style.overflow = 'hidden';
+        document.body.style.touchAction = 'none';
+      } else {
+        document.body.style.removeProperty('overflow');
+        document.body.style.removeProperty('touch-action');
+      }
+    }
   }
 
   // Panier libre pour le salarié autonome / prestataire

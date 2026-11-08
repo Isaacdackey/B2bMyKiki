@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { B2bStateService } from './b2b-state.service';
@@ -12,5 +12,12 @@ import { B2bStateService } from './b2b-state.service';
 })
 export class B2bNavComponent {
   b2b = inject(B2bStateService);
+
+  @HostListener('window:keydown.escape')
+  onEscape() {
+    if (this.b2b.isMobileDrawerOpen()) {
+      this.b2b.closeMobileDrawer();
+    }
+  }
 }
 

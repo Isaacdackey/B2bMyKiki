@@ -1,9 +1,47 @@
-<!-- SIDEBAR FIXE À GAUCHE B2B KIKI TRAITEUR (RÉTRACTABLE) -->
-<aside class="b2b-sidebar" [class.collapsed]="b2b.isSidebarCollapsed()">
+<!-- TOP BAR MOBILE (< 1024px) -->
+<header class="b2b-mobile-topbar" role="banner">
+  <button 
+    type="button" 
+    class="b2b-mobile-menu-btn" 
+    (click)="b2b.toggleMobileDrawer()"
+    [attr.aria-expanded]="b2b.isMobileDrawerOpen()"
+    aria-label="Ouvrir le menu de navigation B2B">
+    <i class="fa-solid fa-bars" aria-hidden="true"></i>
+  </button>
+
+  <a routerLink="/b2b" class="b2b-mobile-brand" title="Kiki Traiteur B2B">
+    <img src="assets/images/logo.png" 
+         alt="Kiki Traiteur" 
+         class="b2b-mobile-logo"
+         onerror="this.src='assets/images/KIKI TRAITEUR Logo Picto Rouge bordeau.png'">
+    <span class="b2b-mobile-brand-title">Kiki Traiteur</span>
+    <span class="b2b-sidebar-pro-badge">B2B Pro</span>
+  </a>
+
+  <a routerLink="/b2b/login" class="b2b-mobile-account-link" title="Changer de Profil">
+    <i class="fa-solid fa-circle-user" aria-hidden="true"></i>
+  </a>
+</header>
+
+<!-- OVERLAY BACKDROP MOBILE (< 1024px) -->
+<div 
+  class="b2b-drawer-overlay" 
+  [class.active]="b2b.isMobileDrawerOpen()" 
+  (click)="b2b.closeMobileDrawer()"
+  aria-hidden="true">
+</div>
+
+<!-- SIDEBAR FIXE À GAUCHE (DESKTOP) / OFF-CANVAS DRAWER (MOBILE) -->
+<aside 
+  class="b2b-sidebar" 
+  [class.collapsed]="b2b.isSidebarCollapsed()"
+  [class.mobile-open]="b2b.isMobileDrawerOpen()"
+  [attr.aria-hidden]="!b2b.isMobileDrawerOpen() && false"
+  role="navigation">
   
-  <!-- En-tête Sidebar : Brand Logo + Bouton de Réduction -->
+  <!-- En-tête Sidebar : Brand Logo + Bouton de Réduction / Fermeture Mobile -->
   <div class="b2b-sidebar-header">
-    <a routerLink="/b2b" class="b2b-sidebar-brand" [title]="'Kiki Traiteur B2B Pro'">
+    <a routerLink="/b2b" class="b2b-sidebar-brand" [title]="'Kiki Traiteur B2B Pro'" (click)="b2b.closeMobileDrawer()">
       <img src="assets/images/logo.png" 
            alt="Kiki Traiteur" 
            class="b2b-sidebar-logo"
@@ -18,13 +56,24 @@
       }
     </a>
 
-    <!-- Bouton Toggle Réduire / Agrandir -->
+    <!-- Bouton Toggle Desktop -->
     <button 
       type="button"
       (click)="b2b.toggleSidebar()"
-      class="b2b-sidebar-toggle-btn"
+      class="b2b-sidebar-toggle-btn desktop-only"
+      [attr.aria-label]="b2b.isSidebarCollapsed() ? 'Agrandir le menu' : 'Réduire le menu'"
       [title]="b2b.isSidebarCollapsed() ? 'Agrandir le menu' : 'Réduire le menu'">
-      <i class="fa-solid" [class.fa-angles-left]="!b2b.isSidebarCollapsed()" [class.fa-angles-right]="b2b.isSidebarCollapsed()"></i>
+      <i class="fa-solid" [class.fa-angles-left]="!b2b.isSidebarCollapsed()" [class.fa-angles-right]="b2b.isSidebarCollapsed()" aria-hidden="true"></i>
+    </button>
+
+    <!-- Bouton Fermer Mobile -->
+    <button 
+      type="button"
+      (click)="b2b.closeMobileDrawer()"
+      class="b2b-sidebar-toggle-btn mobile-only"
+      aria-label="Fermer le menu de navigation"
+      title="Fermer le menu">
+      <i class="fa-solid fa-xmark" aria-hidden="true"></i>
     </button>
   </div>
 
@@ -32,7 +81,7 @@
   @if (!b2b.isSidebarCollapsed()) {
     <div class="b2b-sidebar-enterprise">
       <div class="b2b-enterprise-icon">
-        <i class="fa-solid fa-building"></i>
+        <i class="fa-solid fa-building" aria-hidden="true"></i>
       </div>
       <div class="b2b-enterprise-meta">
         <span class="b2b-enterprise-tag">Convention Active</span>
@@ -41,19 +90,19 @@
     </div>
   } @else {
     <div class="b2b-sidebar-enterprise-mini" title="TotalEnergies Sénégal (Convention active)">
-      <i class="fa-solid fa-building"></i>
+      <i class="fa-solid fa-building" aria-hidden="true"></i>
     </div>
   }
 
   <!-- Navigation Principale Verticale -->
-  <nav class="b2b-sidebar-nav">
+  <nav class="b2b-sidebar-nav" aria-label="Menu principal B2B">
     @if (!b2b.isSidebarCollapsed()) {
       <div class="b2b-nav-section-title">ESPACES DE GESTION</div>
     }
 
-    <a routerLink="/b2b/commande" routerLinkActive="active" class="b2b-sidebar-link" [title]="'Commande Midi'">
+    <a routerLink="/b2b/commande" routerLinkActive="active" class="b2b-sidebar-link" [title]="'Commande Midi'" (click)="b2b.closeMobileDrawer()">
       <div class="b2b-link-icon-wrap">
-        <i class="fa-solid fa-utensils"></i>
+        <i class="fa-solid fa-utensils" aria-hidden="true"></i>
       </div>
       @if (!b2b.isSidebarCollapsed()) {
         <div class="b2b-link-text">
@@ -63,9 +112,9 @@
       }
     </a>
 
-    <a routerLink="/b2b/rh" routerLinkActive="active" class="b2b-sidebar-link" [title]="'Espace RH'">
+    <a routerLink="/b2b/rh" routerLinkActive="active" class="b2b-sidebar-link" [title]="'Espace RH'" (click)="b2b.closeMobileDrawer()">
       <div class="b2b-link-icon-wrap">
-        <i class="fa-solid fa-chart-pie"></i>
+        <i class="fa-solid fa-chart-pie" aria-hidden="true"></i>
       </div>
       @if (!b2b.isSidebarCollapsed()) {
         <div class="b2b-link-text">
@@ -75,14 +124,26 @@
       }
     </a>
 
-    <a routerLink="/b2b/cuisine" routerLinkActive="active" class="b2b-sidebar-link" [title]="'Cuisine & Dispatch'">
+    <a routerLink="/b2b/cuisine" routerLinkActive="active" class="b2b-sidebar-link" [title]="'Cuisine & Dispatch'" (click)="b2b.closeMobileDrawer()">
       <div class="b2b-link-icon-wrap">
-        <i class="fa-solid fa-fire-burner"></i>
+        <i class="fa-solid fa-fire-burner" aria-hidden="true"></i>
       </div>
       @if (!b2b.isSidebarCollapsed()) {
         <div class="b2b-link-text">
           <span class="b2b-link-title">Cuisine & Dispatch</span>
           <span class="b2b-link-subtitle">Production, Scanner & BL</span>
+        </div>
+      }
+    </a>
+
+    <a routerLink="/b2b/evenements" routerLinkActive="active" class="b2b-sidebar-link" [title]="'Événements & Devis'" (click)="b2b.closeMobileDrawer()">
+      <div class="b2b-link-icon-wrap">
+        <i class="fa-solid fa-champagne-glasses" aria-hidden="true"></i>
+      </div>
+      @if (!b2b.isSidebarCollapsed()) {
+        <div class="b2b-link-text">
+          <span class="b2b-link-title">Événements Pro</span>
+          <span class="b2b-link-subtitle">Cocktails, pauses & séminaires</span>
         </div>
       }
     </a>
@@ -92,20 +153,20 @@
   <div class="b2b-sidebar-footer">
     @if (!b2b.isSidebarCollapsed()) {
       <div class="b2b-footer-contact">
-        <div><i class="fa-solid fa-location-dot"></i> Hann Maristes, Dakar</div>
-        <div><i class="fa-solid fa-phone"></i> +221 33 832 29 66</div>
+        <div><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Hann Maristes, Dakar</div>
+        <div><i class="fa-solid fa-phone" aria-hidden="true"></i> +221 33 832 29 66</div>
       </div>
     }
 
-    <a routerLink="/b2b/login" class="b2b-sidebar-back-link b2b-login-switch-link" [title]="'Changer de Rôle Démo'">
-      <i class="fa-solid fa-user-lock"></i>
+    <a routerLink="/b2b/login" class="b2b-sidebar-back-link b2b-login-switch-link" [title]="'Changer de Rôle Démo'" (click)="b2b.closeMobileDrawer()">
+      <i class="fa-solid fa-user-lock" aria-hidden="true"></i>
       @if (!b2b.isSidebarCollapsed()) {
         <span>Changer de Compte / Rôle</span>
       }
     </a>
 
-    <a routerLink="/" class="b2b-sidebar-back-link" [title]="'Retour au Site Public'">
-      <i class="fa-solid fa-arrow-left"></i>
+    <a routerLink="/" class="b2b-sidebar-back-link" [title]="'Retour au Site Public'" (click)="b2b.closeMobileDrawer()">
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
       @if (!b2b.isSidebarCollapsed()) {
         <span>Retour au Site Public</span>
       }

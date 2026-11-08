@@ -3,35 +3,170 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@700&display=swap');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
 
+/* =============================================
+   DESIGN TOKENS & RESPONSIVE FOUNDATIONS
+   Breakpoints: xs 360 | sm 480 | md 768 | lg 1024 | xl 1280 | 2xl 1536
+   ============================================= */
+:root {
+  /* Colors */
+  --b2b-primary: #721513;
+  --b2b-primary-dark: #4A0D0B;
+  --b2b-primary-light: #991B1B;
+  --b2b-bg-cream: #FAF8F4;
+  --b2b-bg-card: #FAF5EA;
+  --b2b-gold: #C5A880;
+  --b2b-gold-light: #EDE7DC;
+  --b2b-text-dark: #2C1810;
+  --b2b-text-muted: #8C7E74;
+  --b2b-border: #E8DFD1;
+  --b2b-accent-red: #E51D24;
+
+  /* Typography */
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-body: 'Poppins', sans-serif;
+  --font-script: 'Dancing Script', cursive;
+
+  /* Responsive Fluid Font Sizes */
+  --fs-xs: clamp(0.72rem, 0.7rem + 0.2vw, 0.8rem);
+  --fs-sm: clamp(0.82rem, 0.8rem + 0.25vw, 0.9rem);
+  --fs-base: clamp(0.92rem, 0.88rem + 0.3vw, 1.02rem);
+  --fs-md: clamp(1.05rem, 1rem + 0.4vw, 1.2rem);
+  --fs-lg: clamp(1.25rem, 1.15rem + 0.6vw, 1.5rem);
+  --fs-xl: clamp(1.5rem, 1.35rem + 1vw, 2rem);
+  --fs-2xl: clamp(1.85rem, 1.6rem + 1.6vw, 2.75rem);
+  --fs-3xl: clamp(2.2rem, 1.9rem + 2.2vw, 3.5rem);
+
+  /* Named Z-Index Scale */
+  --z-base: 1;
+  --z-badge: 10;
+  --z-sticky: 100;
+  --z-nav: 500;
+  --z-topbar: 600;
+  --z-drawer: 1000;
+  --z-drawer-overlay: 990;
+  --z-modal: 99999;
+  --z-modal-backdrop: 99990;
+  --z-toast: 100000;
+  --z-lightbox: 1000000;
+
+  /* Safe Area Variables with Fallbacks */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+
+  /* Touch Targets */
+  --touch-target-min: 44px;
+
+  /* Layout */
+  --b2b-sidebar-w: 280px;
+}
+
 html {
   scroll-behavior: smooth;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
 }
 
 html, body {
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
+  min-height: 100dvh;
 }
 
 body {
-  font-family: var(--font-body), 'Poppins', sans-serif;
-  background-color: #FAF8F4;
+  font-family: var(--font-body), sans-serif;
+  background-color: var(--b2b-bg-cream);
   background-image: radial-gradient(circle at 50% 0%, rgba(230, 218, 186, 0.22) 0%, rgba(250, 248, 244, 0) 75%);
   background-repeat: no-repeat;
-  color: var(--text-main);
+  color: var(--b2b-text-dark);
   -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
 }
 
+/* =============================================
+   RESPONSIVE UTILITIES (.container-fluid, .table-scroll, touch)
+   ============================================= */
+.container-kiki {
+  width: 100%;
+  max-width: 1440px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(1rem, 3vw, 2.5rem);
+  padding-right: clamp(1rem, 3vw, 2.5rem);
+}
+
+.table-scroll,
+.table-responsive {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  border-radius: 14px;
+}
+
+/* Scrollbar discrète et élégante */
+.table-scroll::-webkit-scrollbar,
+.table-responsive::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-scroll::-webkit-scrollbar-thumb,
+.table-responsive::-webkit-scrollbar-thumb {
+  background: #E2D5BE;
+  border-radius: 999px;
+}
+
+/* Cibles tactiles accessibles */
+button, 
+.btn, 
+a.btn,
+.nav-link, 
+.touch-target {
+  min-height: var(--touch-target-min);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Focus visible uniforme pour clavier */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--b2b-primary);
+  outline-offset: 2px;
+}
+
+/* =============================================
+   TOAST SYSTEM (FLUID & MOBILE-FIRST)
+   ============================================= */
 .toast-container {
   position: fixed;
-  top: 75px;
-  right: 1.5rem;
-  z-index: 999999;
+  top: calc(1rem + var(--safe-top));
+  right: calc(1rem + var(--safe-right));
+  z-index: var(--z-toast);
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
   pointer-events: none;
-  max-width: min(400px, calc(100vw - 2rem));
+  width: min(420px, calc(100vw - 2rem));
+}
+
+@media (max-width: 767px) {
+  .toast-container {
+    top: auto;
+    bottom: calc(1rem + var(--safe-bottom));
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: min(380px, calc(100vw - 1.5rem));
+  }
 }
 
 .toast-msg {
