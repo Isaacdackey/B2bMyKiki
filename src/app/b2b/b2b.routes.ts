@@ -21,10 +21,6 @@ export const B2B_ROUTES: Routes = [
   {
     path: 'cuisine',
     loadComponent: () => import('./cuisine/b2b-cuisine-production.component').then(m => m.B2bCuisineProductionComponent)
-  },
-  {
-    path: 'evenements',
-    loadComponent: () => import('./evenements/b2b-evenements-devis.component').then(m => m.B2bEvenementsDevisComponent)
   }
 ];
 
