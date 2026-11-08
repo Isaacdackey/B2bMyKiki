@@ -113,14 +113,18 @@
 
     .pwa-dismiss-badge {
       position: absolute;
-      top: -6px;
-      right: -6px;
+      top: -7px;
+      right: -7px;
       background: #4B5563;
-      border: 1.5px solid #ffffff;
+      border: 2px solid #ffffff;
       color: #ffffff;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
+      width: 22px;
+      min-width: 22px;
+      max-width: 22px;
+      height: 22px;
+      min-height: 22px !important;
+      max-height: 22px;
+      border-radius: 50% !important;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -130,6 +134,9 @@
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
       transition: all 0.2s ease;
       z-index: 10;
+      box-sizing: border-box;
+      flex-shrink: 0;
+      aspect-ratio: 1 / 1;
     }
 
     .pwa-dismiss-badge:hover {
