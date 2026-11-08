@@ -214,8 +214,8 @@
                   <button 
                     [style.background]="b2b.isSupplementSelected(plat.id) ? '#E51D24' : '#EDE7DC'"
                     [style.color]="b2b.isSupplementSelected(plat.id) ? '#FFFFFF' : '#721513'"
-                    style="width: 32px; height: 32px; border-radius: 9999px; border: none; font-weight: 800; cursor: pointer;">
-                    <i [class]="b2b.isSupplementSelected(plat.id) ? 'fa-solid fa-check' : 'fa-solid fa-plus'"></i>
+                    style="width: 32px; min-width: 32px; max-width: 32px; height: 32px; min-height: 32px !important; max-height: 32px; border-radius: 50% !important; border: none; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; aspect-ratio: 1 / 1;">
+                    <i [class]="b2b.isSupplementSelected(plat.id) ? 'fa-solid fa-check' : 'fa-solid fa-plus'" style="margin: 0 !important;"></i>
                   </button>
                 </div>
               }

@@ -473,10 +473,11 @@
               type="button"
               (click)="changerPageEmployes(pageEmployes() - 1)"
               [disabled]="pageEmployes() === 1"
-              style="padding: 0.45rem 0.85rem; background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 8px; font-size: 0.75rem; font-weight: 700; color: #721513; cursor: pointer; display: flex; align-items: center; gap: 0.35rem; transition: all 0.2s;"
               [style.opacity]="pageEmployes() === 1 ? '0.4' : '1'"
-              [style.cursor]="pageEmployes() === 1 ? 'not-allowed' : 'pointer'">
-              <i class="fa-solid fa-chevron-left"></i> Précédent
+              [style.cursor]="pageEmployes() === 1 ? 'not-allowed' : 'pointer'"
+              style="width: 34px; min-width: 34px; max-width: 34px; height: 34px; min-height: 34px !important; max-height: 34px; border-radius: 50% !important; border: 1.5px solid #EDE7DC; background: #FFFFFF; color: #721513; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; padding: 0; flex-shrink: 0; aspect-ratio: 1 / 1;"
+              title="Page précédente">
+              <i class="fa-solid fa-chevron-left" style="margin: 0 !important;"></i>
             </button>
 
             @for (p of pagesArray(); track p) {
@@ -486,7 +487,7 @@
                 [style.background]="pageEmployes() === p ? '#721513' : '#FFFFFF'"
                 [style.color]="pageEmployes() === p ? '#FFFFFF' : '#332724'"
                 [style.border-color]="pageEmployes() === p ? '#721513' : '#EDE7DC'"
-                style="width: 34px; height: 34px; border: 1.5px solid; border-radius: 8px; font-size: 0.78rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                style="width: 34px; min-width: 34px; max-width: 34px; height: 34px; min-height: 34px !important; max-height: 34px; border-radius: 50% !important; border: 1.5px solid; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; aspect-ratio: 1 / 1;">
                 {{ p }}
               </button>
             }
@@ -495,10 +496,11 @@
               type="button"
               (click)="changerPageEmployes(pageEmployes() + 1)"
               [disabled]="pageEmployes() === totalEmployesPages()"
-              style="padding: 0.45rem 0.85rem; background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 8px; font-size: 0.75rem; font-weight: 700; color: #721513; cursor: pointer; display: flex; align-items: center; gap: 0.35rem; transition: all 0.2s;"
               [style.opacity]="pageEmployes() === totalEmployesPages() ? '0.4' : '1'"
-              [style.cursor]="pageEmployes() === totalEmployesPages() ? 'not-allowed' : 'pointer'">
-              Suivant <i class="fa-solid fa-chevron-right"></i>
+              [style.cursor]="pageEmployes() === totalEmployesPages() ? 'not-allowed' : 'pointer'"
+              style="width: 34px; min-width: 34px; max-width: 34px; height: 34px; min-height: 34px !important; max-height: 34px; border-radius: 50% !important; border: 1.5px solid #EDE7DC; background: #FFFFFF; color: #721513; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; padding: 0; flex-shrink: 0; aspect-ratio: 1 / 1;"
+              title="Page suivante">
+              <i class="fa-solid fa-chevron-right" style="margin: 0 !important;"></i>
             </button>
           </div>
         </div>

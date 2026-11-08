@@ -222,8 +222,8 @@
                 [disabled]="pageIndex() === 1"
                 [style.opacity]="pageIndex() === 1 ? '0.4' : '1'"
                 [style.cursor]="pageIndex() === 1 ? 'not-allowed' : 'pointer'"
-                style="width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid #EDE7DC; background: #FFFFFF; color: #721513; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
-                <i class="fa-solid fa-chevron-left"></i>
+                style="width: 34px; min-width: 34px; max-width: 34px; height: 34px; min-height: 34px !important; max-height: 34px; border-radius: 50% !important; border: 1.5px solid #EDE7DC; background: #FFFFFF; color: #721513; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; padding: 0; flex-shrink: 0; aspect-ratio: 1 / 1;">
+                <i class="fa-solid fa-chevron-left" style="margin: 0 !important;"></i>
               </button>
 
               @for (p of pagesArray(); track p) {
@@ -232,7 +232,7 @@
                   [style.background]="pageIndex() === p ? '#721513' : '#FFFFFF'"
                   [style.color]="pageIndex() === p ? '#FFFFFF' : '#332724'"
                   [style.border-color]="pageIndex() === p ? '#721513' : '#EDE7DC'"
-                  style="width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center;">
+                  style="width: 34px; min-width: 34px; max-width: 34px; height: 34px; min-height: 34px !important; max-height: 34px; border-radius: 50% !important; border: 1.5px solid; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; aspect-ratio: 1 / 1;">
                   {{ p }}
                 </button>
               }
@@ -242,8 +242,8 @@
                 [disabled]="pageIndex() === totalPages()"
                 [style.opacity]="pageIndex() === totalPages() ? '0.4' : '1'"
                 [style.cursor]="pageIndex() === totalPages() ? 'not-allowed' : 'pointer'"
-                style="width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid #EDE7DC; background: #FFFFFF; color: #721513; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
-                <i class="fa-solid fa-chevron-right"></i>
+                style="width: 34px; min-width: 34px; max-width: 34px; height: 34px; min-height: 34px !important; max-height: 34px; border-radius: 50% !important; border: 1.5px solid #EDE7DC; background: #FFFFFF; color: #721513; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; padding: 0; flex-shrink: 0; aspect-ratio: 1 / 1;">
+                <i class="fa-solid fa-chevron-right" style="margin: 0 !important;"></i>
               </button>
             </div>
 
