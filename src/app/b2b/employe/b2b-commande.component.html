@@ -24,6 +24,16 @@
 
       <!-- Actions Profil & Déconnexion Démo -->
       <div style="display: flex; align-items: center; gap: 0.65rem;">
+        @if (derniereCommande()) {
+          <button 
+            type="button" 
+            (click)="ouvrirQrCodeModal()" 
+            class="b2b-btn-voir-qr-header"
+            title="Afficher le QR code de retrait pour la cantine"
+            style="background: #721513; border: 1.5px solid #721513; color: #FFFFFF; padding: 0.4rem 0.95rem; border-radius: 9999px; font-size: 0.78rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.45rem; box-shadow: 0 4px 12px rgba(114, 21, 19, 0.25); transition: all 0.2s;">
+            <i class="fa-solid fa-qrcode"></i> Revoir mon QR Code
+          </button>
+        }
         <a 
           routerLink="/b2b/login" 
           class="b2b-change-account-btn"
@@ -185,6 +195,27 @@
               <i class="fa-solid fa-trash-can"></i> Réinitialiser
             </button>
           </div>
+
+          <!-- CARTE D'ACCÈS PERMANENT AU QR CODE DU MIDI -->
+          @if (derniereCommande()) {
+            <div style="background: #FAF5EA; border: 1.5px dashed #721513; border-radius: 12px; padding: 0.75rem; margin-bottom: 1.15rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+              <div style="display: flex; align-items: center; gap: 0.55rem;">
+                <div style="width: 34px; height: 34px; border-radius: 50%; background: #721513; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0;">
+                  <i class="fa-solid fa-qrcode"></i>
+                </div>
+                <div>
+                  <div style="font-size: 0.76rem; font-weight: 800; color: #721513;">Repas Midi Validé</div>
+                  <div style="font-size: 0.68rem; color: #6E5A56;">Code : <strong style="font-family: monospace; color: #721513;">{{ derniereCommande()?.qrCode }}</strong></div>
+                </div>
+              </div>
+              <button 
+                type="button" 
+                (click)="ouvrirQrCodeModal()" 
+                style="background: #721513; color: #FFFFFF; border: none; padding: 0.35rem 0.75rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; cursor: pointer; white-space: nowrap;">
+                Voir QR
+              </button>
+            </div>
+          }
 
           <!-- 4 Slots Formule -->
           <div class="b2b-plateau-slot" [class.filled]="!!b2b.selection().entree">

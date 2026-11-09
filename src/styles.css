@@ -121,8 +121,8 @@ body {
   border-radius: 999px;
 }
 
-/* Cibles tactiles accessibles (hors boutons compacts de pagination/badges/icônes) */
-button:not(.btn-icon):not(.btn-page):not(.pwa-dismiss-badge):not(.toggle-pwd):not(.btn-close):not(.modal-close):not(.modal-close-btn):not(.pagination-btn):not([class*="pagination"]):not([style*="border-radius: 50%"]):not([style*="border-radius:50%"]), 
+/* Cibles tactiles accessibles (hors boutons compacts de pagination/badges/icônes/steppers) */
+button:not(.btn-icon):not(.btn-page):not(.pwa-dismiss-badge):not(.toggle-pwd):not(.btn-close):not(.modal-close):not(.modal-close-btn):not(.pagination-btn):not([class*="pagination"]):not(.stepper-btn):not([class*="stepper"]):not([style*="border-radius: 50%"]):not([style*="border-radius:50%"]), 
 .btn, 
 a.btn,
 .nav-link, 
