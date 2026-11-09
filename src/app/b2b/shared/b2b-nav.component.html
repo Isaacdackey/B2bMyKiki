@@ -77,64 +77,84 @@
     </button>
   </div>
 
-  <!-- Fiche Entreprise Conventionnée -->
+  <!-- Fiche Session / Rôle Actif Dynamique -->
   @if (!b2b.isSidebarCollapsed()) {
-    <div class="b2b-sidebar-enterprise">
-      <div class="b2b-enterprise-icon">
-        <i class="fa-solid fa-building" aria-hidden="true"></i>
+    <div class="b2b-sidebar-enterprise" [style.border-left-color]="b2b.currentSession().badgeColor">
+      <div class="b2b-enterprise-icon" [style.color]="b2b.currentSession().badgeColor" [style.background]="b2b.currentSession().badgeColor + '15'">
+        <i class="fa-solid" 
+           [class.fa-briefcase]="b2b.currentSession().role === 'RESPONSABLE_ENTREPRISE'"
+           [class.fa-clipboard-check]="b2b.currentSession().role === 'RESPONSABLE_SITE_KIKI'"
+           [class.fa-user-shield]="b2b.currentSession().role === 'SALARIE_CONVENTIONNE'"
+           [class.fa-mobile-screen-button]="b2b.currentSession().role === 'SALARIE_AUTONOME'">
+        </i>
       </div>
       <div class="b2b-enterprise-meta">
-        <span class="b2b-enterprise-tag">Convention Active</span>
-        <strong class="b2b-enterprise-name">TotalEnergies Sénégal</strong>
+        <span class="b2b-enterprise-tag" [style.color]="b2b.currentSession().badgeColor">{{ b2b.currentSession().badge }}</span>
+        <strong class="b2b-enterprise-name">{{ b2b.currentSession().nomComplet }}</strong>
+        <span style="font-size: 0.7rem; color: #8A7268; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ b2b.currentSession().entite }}</span>
       </div>
     </div>
   } @else {
-    <div class="b2b-sidebar-enterprise-mini" title="TotalEnergies Sénégal (Convention active)">
-      <i class="fa-solid fa-building" aria-hidden="true"></i>
+    <div class="b2b-sidebar-enterprise-mini" [title]="b2b.currentSession().nomComplet + ' • ' + b2b.currentSession().badge" [style.color]="b2b.currentSession().badgeColor">
+      <i class="fa-solid" 
+         [class.fa-briefcase]="b2b.currentSession().role === 'RESPONSABLE_ENTREPRISE'"
+         [class.fa-clipboard-check]="b2b.currentSession().role === 'RESPONSABLE_SITE_KIKI'"
+         [class.fa-user-shield]="b2b.currentSession().role === 'SALARIE_CONVENTIONNE'"
+         [class.fa-mobile-screen-button]="b2b.currentSession().role === 'SALARIE_AUTONOME'">
+      </i>
     </div>
   }
 
-  <!-- Navigation Principale Verticale -->
+  <!-- Navigation Principale Verticale : Étanche et Spécifique au Rôle Connecté -->
   <nav class="b2b-sidebar-nav" aria-label="Menu principal B2B">
     @if (!b2b.isSidebarCollapsed()) {
-      <div class="b2b-nav-section-title">ESPACES DE GESTION</div>
+      <div class="b2b-nav-section-title">ESPACE DÉDIÉ</div>
     }
 
-    <a routerLink="/b2b/commande" routerLinkActive="active" class="b2b-sidebar-link" [title]="'Commande Midi'" (click)="b2b.closeMobileDrawer()">
-      <div class="b2b-link-icon-wrap">
-        <i class="fa-solid fa-utensils" aria-hidden="true"></i>
-      </div>
-      @if (!b2b.isSidebarCollapsed()) {
-        <div class="b2b-link-text">
-          <span class="b2b-link-title">Commande Midi</span>
-          <span class="b2b-link-subtitle">Plateaux repas collaborateurs</span>
+    <!-- 1. CAS DU RESPONSABLE ENTREPRISE (RH / DAF) -->
+    @if (b2b.currentSession().role === 'RESPONSABLE_ENTREPRISE') {
+      <a routerLink="/b2b/rh" routerLinkActive="active" class="b2b-sidebar-link" title="Espace Responsable Entreprise" (click)="b2b.closeMobileDrawer()">
+        <div class="b2b-link-icon-wrap" style="color: #721513;">
+          <i class="fa-solid fa-briefcase" aria-hidden="true"></i>
         </div>
-      }
-    </a>
+        @if (!b2b.isSidebarCollapsed()) {
+          <div class="b2b-link-text">
+            <span class="b2b-link-title">Responsable Entreprise</span>
+            <span class="b2b-link-subtitle">Quotas, Sites & Facturation</span>
+          </div>
+        }
+      </a>
+    }
 
-    <a routerLink="/b2b/rh" routerLinkActive="active" class="b2b-sidebar-link" [title]="'Espace RH'" (click)="b2b.closeMobileDrawer()">
-      <div class="b2b-link-icon-wrap">
-        <i class="fa-solid fa-chart-pie" aria-hidden="true"></i>
-      </div>
-      @if (!b2b.isSidebarCollapsed()) {
-        <div class="b2b-link-text">
-          <span class="b2b-link-title">Espace RH</span>
-          <span class="b2b-link-subtitle">Rapprochement & Facturation</span>
+    <!-- 2. CAS DU RESPONSABLE DE SITE KIKI (Gérant Cantine & Dispatch) -->
+    @if (b2b.currentSession().role === 'RESPONSABLE_SITE_KIKI') {
+      <a routerLink="/b2b/cuisine" routerLinkActive="active" class="b2b-sidebar-link" title="Responsable de Site Kiki" (click)="b2b.closeMobileDrawer()">
+        <div class="b2b-link-icon-wrap" style="color: #C05621;">
+          <i class="fa-solid fa-clipboard-check" aria-hidden="true"></i>
         </div>
-      }
-    </a>
+        @if (!b2b.isSidebarCollapsed()) {
+          <div class="b2b-link-text">
+            <span class="b2b-link-title">Responsable Site Kiki</span>
+            <span class="b2b-link-subtitle">Exploitation, Portions & Scanner</span>
+          </div>
+        }
+      </a>
+    }
 
-    <a routerLink="/b2b/cuisine" routerLinkActive="active" class="b2b-sidebar-link" [title]="'Cuisine & Dispatch'" (click)="b2b.closeMobileDrawer()">
-      <div class="b2b-link-icon-wrap">
-        <i class="fa-solid fa-fire-burner" aria-hidden="true"></i>
-      </div>
-      @if (!b2b.isSidebarCollapsed()) {
-        <div class="b2b-link-text">
-          <span class="b2b-link-title">Cuisine & Dispatch</span>
-          <span class="b2b-link-subtitle">Production, Scanner & BL</span>
+    <!-- 3. CAS DU SALARIÉ (CONVENTIONNÉ OU AUTONOME) -->
+    @if (b2b.currentSession().role === 'SALARIE_CONVENTIONNE' || b2b.currentSession().role === 'SALARIE_AUTONOME') {
+      <a routerLink="/b2b/commande" routerLinkActive="active" class="b2b-sidebar-link" title="Ma Commande Déjeuner" (click)="b2b.closeMobileDrawer()">
+        <div class="b2b-link-icon-wrap" [style.color]="b2b.currentSession().role === 'SALARIE_CONVENTIONNE' ? '#2E7D32' : '#1D4ED8'">
+          <i class="fa-solid fa-utensils" aria-hidden="true"></i>
         </div>
-      }
-    </a>
+        @if (!b2b.isSidebarCollapsed()) {
+          <div class="b2b-link-text">
+            <span class="b2b-link-title">Ma Commande Déjeuner</span>
+            <span class="b2b-link-subtitle">{{ b2b.currentSession().role === 'SALARIE_CONVENTIONNE' ? 'Formule 100% Subventionnée' : 'À la carte • Paiement Wave' }}</span>
+          </div>
+        }
+      </a>
+    }
   </nav>
 
   <!-- Bas de Sidebar : Info Traiteur & Lien Retour Site Public -->

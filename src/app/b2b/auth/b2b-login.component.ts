@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { B2bStateService } from '../shared/b2b-state.service';
+import { UserRoleB2B } from '../shared/b2b.models';
 
 export interface ProfilDemo {
   id: string;
@@ -13,7 +14,7 @@ export interface ProfilDemo {
   identifiant: string;
   description: string;
   icone: string;
-  type: 'SUBVENTIONNE' | 'AUTONOME' | 'RH' | 'CUISINE';
+  role: UserRoleB2B;
   destinationUrl: string;
 }
 
@@ -29,81 +30,90 @@ export class B2bLoginComponent {
   private router = inject(Router);
 
   // Identifiants formulaire libre
-  username = signal('b.ndiaye@totalenergies.sn');
+  username = signal('rh@totalenergies.sn');
   password = signal('••••••••');
   showPassword = signal(false);
   loading = signal(false);
 
-  // Profils démo 1-Clic
+  // 4 PROFILS OFFICIELS EXIGÉS PAR LE MENTOR TONTON FUFU
   profilsDemo: ProfilDemo[] = [
     {
-      id: 'subventionne',
-      nom: 'Babacar Ndiaye',
-      roleTitre: 'Salarié Conventionné (Subventionné 100%)',
-      badge: 'Prise en charge RH • 0 F',
-      badgeColor: '#606C38',
-      identifiant: 'TOT-9842 • Finance & Comptabilité',
-      description: 'Accède directement au menu du jour avec formule 4 composantes 100% prise en charge par TotalEnergies.',
-      icone: 'fa-solid fa-building-shield',
-      type: 'SUBVENTIONNE',
-      destinationUrl: '/b2b/commande'
-    },
-    {
-      id: 'autonome',
-      nom: 'Ousmane Ba (Prestataire IT)',
-      roleTitre: 'Salarié Autonome (Frais Personnels)',
-      badge: 'Règlement Wave direct',
-      badgeColor: '#1D4ED8',
-      identifiant: 'TOT-EXT-01 • Direction Projet IT',
-      description: 'Accède au comptoir digital avec commande à la carte et paiement direct par Wave Mobile Money.',
-      icone: 'fa-solid fa-wallet',
-      type: 'AUTONOME',
-      destinationUrl: '/b2b/commande'
-    },
-    {
-      id: 'rh',
-      nom: 'Fatou Fall (Responsable RH)',
-      roleTitre: 'Espace RH & Rapprochement',
-      badge: 'Pilotage & Facturation B2B',
+      id: 'responsable-entreprise',
+      nom: 'Mme Fatou Fall',
+      roleTitre: 'Responsable de l’Entreprise',
+      badge: 'Admin RH & Moyens Généraux',
       badgeColor: '#721513',
-      identifiant: 'RH-DIR • Siège Dakar Plateau',
-      description: 'Pilote les quotas, suit les consommations par site et génère les factures mensuelles proforma.',
-      icone: 'fa-solid fa-chart-pie',
-      type: 'RH',
+      identifiant: 'TotalEnergies Sénégal • RH Siège',
+      description: 'Gère la liste des salariés, active/bloque les droits de subvention, suit les consommations par site et valide la facture mensuelle proforma.',
+      icone: 'fa-solid fa-briefcase',
+      role: 'RESPONSABLE_ENTREPRISE',
       destinationUrl: '/b2b/rh'
     },
     {
-      id: 'cuisine',
-      nom: 'Chef Mamadou Seck (Brigade)',
-      roleTitre: 'Cuisine Centrale & Dispatch',
-      badge: 'Production & Scanner BL',
-      badgeColor: '#E51D24',
-      identifiant: 'CHEF-01 • Cuisine Centrale Hann',
-      description: 'Consolidation des portions du jour, scanner de retrait QR code et émargement des bordereaux.',
-      icone: 'fa-solid fa-fire-burner',
-      type: 'CUISINE',
+      id: 'responsable-site-kiki',
+      nom: 'M. Babacar Samb',
+      roleTitre: 'Responsable de Site Kiki',
+      badge: 'Exploitation & Cantine Traiteur',
+      badgeColor: '#C05621',
+      identifiant: 'Kiki Traiteur • Gérant de Site & Dispatch',
+      description: 'Supervise la cantine sur site, contrôle les réceptions de plats chauds, suit les portions prévues, valide les BL et scanne les QR codes de retrait.',
+      icone: 'fa-solid fa-clipboard-check',
+      role: 'RESPONSABLE_SITE_KIKI',
       destinationUrl: '/b2b/cuisine'
+    },
+    {
+      id: 'salarie-conventionne',
+      nom: 'Babacar Ndiaye',
+      roleTitre: 'Salarié Conventionné (Pris en charge)',
+      badge: 'Subventionné 100% • 0 FCFA',
+      badgeColor: '#2E7D32',
+      identifiant: 'TOT-9842 • Finance & Comptabilité',
+      description: 'Choisit sa formule déjeuner 4 composantes 100% prise en charge par TotalEnergies, valide sa commande et obtient son QR Code personnel de retrait.',
+      icone: 'fa-solid fa-user-shield',
+      role: 'SALARIE_CONVENTIONNE',
+      destinationUrl: '/b2b/commande'
+    },
+    {
+      id: 'salarie-autonome',
+      nom: 'Ousmane Ba (Prestataire IT)',
+      roleTitre: 'Salarié Autonome (Frais Personnels)',
+      badge: 'Paiement direct Wave',
+      badgeColor: '#1D4ED8',
+      identifiant: 'TOT-EXT-01 • Consultant IT Externe',
+      description: 'Commande librement ses plats à la carte sur le comptoir digital et règle directement par Wave Mobile Money avant retrait.',
+      icone: 'fa-solid fa-mobile-screen-button',
+      role: 'SALARIE_AUTONOME',
+      destinationUrl: '/b2b/commande'
     }
   ];
 
   selectionnerProfilDemo(p: ProfilDemo) {
     this.loading.set(true);
-    if (p.type === 'SUBVENTIONNE' || p.type === 'AUTONOME') {
-      this.b2b.setModeProfil(p.type);
-    }
+
+    this.b2b.setSessionRole({
+      role: p.role,
+      nomComplet: p.nom,
+      titrePoste: p.roleTitre,
+      entite: p.role === 'RESPONSABLE_SITE_KIKI' ? 'Kiki Traiteur Exploitation' : 'TotalEnergies Sénégal',
+      badge: p.badge,
+      badgeColor: p.badgeColor,
+      siteId: 'site-1',
+      siteNom: 'Siège Plateau - Dakar'
+    });
+
     setTimeout(() => {
       this.loading.set(false);
       this.router.navigateByUrl(p.destinationUrl);
-    }, 400);
+    }, 350);
   }
 
   seConnecter() {
     this.loading.set(true);
     setTimeout(() => {
       this.loading.set(false);
-      this.b2b.setModeProfil('SUBVENTIONNE');
-      this.router.navigateByUrl('/b2b/commande');
-    }, 500);
+      // Connexion par défaut Responsable Entreprise
+      this.selectionnerProfilDemo(this.profilsDemo[0]);
+    }, 450);
   }
 }
 

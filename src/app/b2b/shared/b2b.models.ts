@@ -1,3 +1,17 @@
+export type UserRoleB2B = 'RESPONSABLE_ENTREPRISE' | 'RESPONSABLE_SITE_KIKI' | 'SALARIE_CONVENTIONNE' | 'SALARIE_AUTONOME';
+
+export interface UserSessionB2B {
+  role: UserRoleB2B;
+  nomComplet: string;
+  titrePoste: string;
+  entite: string; // Ex: "TotalEnergies Sénégal" ou "Kiki Traiteur Exploitation"
+  siteId?: string;
+  siteNom?: string;
+  matricule?: string;
+  badge: string;
+  badgeColor: string;
+}
+
 export interface SiteB2B {
   id: string;
   nom: string;

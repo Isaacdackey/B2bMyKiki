@@ -1,10 +1,22 @@
 import { Injectable, signal, computed, effect } from '@angular/core';
-import { EntrepriseB2B, SiteB2B, PlatB2B, FormuleRegle, EmployeB2B, SelectionRepas, CommandeHistoriqueB2B, LignePanierAutonome } from './b2b.models';
+import { EntrepriseB2B, SiteB2B, PlatB2B, FormuleRegle, EmployeB2B, SelectionRepas, CommandeHistoriqueB2B, LignePanierAutonome, UserRoleB2B, UserSessionB2B } from './b2b.models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class B2bStateService {
+  // Session utilisateur B2B active (conformité stricte aux 4 rôles exigés par le Mentor Tonton Fufu)
+  currentSession = signal<UserSessionB2B>({
+    role: 'RESPONSABLE_ENTREPRISE',
+    nomComplet: 'Mme Fatou Fall',
+    titrePoste: 'Responsable RH & Moyens Généraux',
+    entite: 'TotalEnergies Sénégal',
+    siteId: 'site-1',
+    siteNom: 'Siège Plateau - Dakar',
+    badge: 'Responsable Entreprise',
+    badgeColor: '#721513'
+  });
+
   // Mode profil employé simulé : SUBVENTIONNE (prise en charge RH 100%) ou AUTONOME (frais personnels, panier libre, Wave)
   modeProfil = signal<'SUBVENTIONNE' | 'AUTONOME'>('SUBVENTIONNE');
 
@@ -366,6 +378,16 @@ export class B2bStateService {
       boisson: undefined,
       supplements: []
     });
+  }
+
+  // Mutation de la session de rôle actif
+  setSessionRole(session: UserSessionB2B) {
+    this.currentSession.set(session);
+    if (session.role === 'SALARIE_CONVENTIONNE') {
+      this.setModeProfil('SUBVENTIONNE');
+    } else if (session.role === 'SALARIE_AUTONOME') {
+      this.setModeProfil('AUTONOME');
+    }
   }
 
   // ACTIONS PANIER AUTONOME (Employé non pris en charge / Wave direct)
