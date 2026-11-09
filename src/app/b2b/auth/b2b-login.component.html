@@ -112,6 +112,19 @@
             <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Accéder à l'Espace B2B
           }
         </button>
+
+        <!-- NOUVEAU COLLABORATEUR NON SUBVENTIONNÉ : AUTO-INSCRIPTION (EXIGENCE CDCF §3.4) -->
+        <div style="margin-top: 1.25rem; text-align: center; padding-top: 1rem; border-top: 1px dashed #EDE7DC;">
+          <p style="font-size: 0.8rem; color: #6E5A56; margin-bottom: 0.5rem;">
+            Vous êtes collaborateur ou prestataire non subventionné ?
+          </p>
+          <button 
+            type="button"
+            (click)="ouvrirModalInscriptionAutonome()"
+            style="background: #FFFFFF; border: 1.5px solid #1D4ED8; color: #1D4ED8; font-weight: 700; font-size: 0.82rem; padding: 0.55rem 1.25rem; border-radius: 9999px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
+            <i class="fa-solid fa-user-plus"></i> Créer mon Compte Autonome (Paiement Wave)
+          </button>
+        </div>
       </form>
 
       <!-- Lien Retour au site Vitrine Public -->
@@ -124,5 +137,82 @@
     </div>
 
   </div>
+
+  <!-- MODAL AUTO-INSCRIPTION SALARIÉ AUTONOME (CDCF §3.4) -->
+  @if (showRegisterAutonomeModal()) {
+    <div style="position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1.5rem; backdrop-filter: blur(4px);">
+      <div style="background: #FFFFFF; border: 2px solid #EDE7DC; border-radius: 20px; max-width: 480px; width: 100%; padding: 1.75rem; box-shadow: 0 10px 40px rgba(0,0,0,0.2); border-top: 5px solid #1D4ED8;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1.5px solid #EDE7DC; padding-bottom: 0.75rem;">
+          <div>
+            <span style="font-size: 0.7rem; color: #1D4ED8; font-weight: 800; text-transform: uppercase;">AUTO-INSCRIPTION COLLABORATEUR</span>
+            <h3 style="margin: 0.2rem 0 0; font-family: 'Playfair Display', serif; font-size: 1.35rem; color: #721513; font-weight: 800;">
+              Créer mon Compte Cantine
+            </h3>
+          </div>
+          <button type="button" (click)="fermerModalInscriptionAutonome()" style="background: none; border: none; font-size: 1.2rem; color: #6E5A56; cursor: pointer;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <p style="font-size: 0.8rem; color: #6E5A56; margin-bottom: 1.25rem;">
+          Rattachez votre compte au site de votre entreprise pour commander au menu du jour et régler directement par Wave.
+        </p>
+
+        @if (registerSuccess()) {
+          <div style="background: rgba(96, 108, 56, 0.12); border: 1.5px solid #606C38; color: #606C38; padding: 1rem; border-radius: 12px; font-weight: 700; font-size: 0.85rem; text-align: center;">
+            <i class="fa-solid fa-circle-check"></i> Compte créé avec succès ! Connexion en cours...
+          </div>
+        } @else {
+          <div style="display: flex; flex-direction: column; gap: 0.9rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+              <div>
+                <label style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.25rem;">Prénom * :</label>
+                <input type="text" [(ngModel)]="newAutonome().prenom" placeholder="Ex: Moussa" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.5rem; font-size: 0.85rem;">
+              </div>
+              <div>
+                <label style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.25rem;">Nom * :</label>
+                <input type="text" [(ngModel)]="newAutonome().nom" placeholder="Ex: Diagne" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.5rem; font-size: 0.85rem;">
+              </div>
+            </div>
+
+            <div>
+              <label style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.25rem;">Numéro Téléphone / Wave * :</label>
+              <input type="text" [(ngModel)]="newAutonome().telephone" placeholder="+221 77 000 00 00" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.5rem; font-size: 0.85rem;">
+            </div>
+
+            <div>
+              <label style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.25rem;">Email Professionnel :</label>
+              <input type="email" [(ngModel)]="newAutonome().email" placeholder="moussa.diagne@entreprise.sn" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.5rem; font-size: 0.85rem;">
+            </div>
+
+            <div>
+              <label style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.25rem;">Site Entreprise de Distribution * :</label>
+              <select [(ngModel)]="newAutonome().siteId" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.55rem; font-size: 0.85rem; font-weight: 700; color: #721513;">
+                @for (site of b2b.currentEntreprise().sites; track site.id) {
+                  <option [value]="site.id">{{ b2b.currentEntreprise().nom }} • {{ site.nom }}</option>
+                }
+              </select>
+            </div>
+
+            <div>
+              <label style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.25rem;">Mot de Passe :</label>
+              <input type="password" [(ngModel)]="newAutonome().password" placeholder="••••••••" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.5rem; font-size: 0.85rem;">
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+            <button type="button" (click)="fermerModalInscriptionAutonome()" style="flex: 1; padding: 0.75rem; background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 9999px; font-weight: 700; color: #6E5A56; cursor: pointer;">
+              Annuler
+            </button>
+            <button type="button" (click)="inscrireAutonome()" style="flex: 1.5; padding: 0.75rem; background: #1D4ED8; border: none; border-radius: 9999px; font-weight: 800; color: #FFFFFF; cursor: pointer; box-shadow: 0 4px 12px rgba(29, 78, 216, 0.25);">
+              <i class="fa-solid fa-check"></i> Créer et Accéder
+            </button>
+          </div>
+        }
+
+      </div>
+    </div>
+  }
 </div>
 

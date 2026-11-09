@@ -87,6 +87,71 @@ export class B2bLoginComponent {
     }
   ];
 
+  // Modal d'auto-inscription Salarié Non Subventionné (Autonome)
+  showRegisterAutonomeModal = signal(false);
+  newAutonome = signal({
+    prenom: '',
+    nom: '',
+    telephone: '+221 ',
+    email: '',
+    entrepriseId: 'ent-001',
+    siteId: 'site-1',
+    password: ''
+  });
+  registerSuccess = signal(false);
+
+  ouvrirModalInscriptionAutonome() {
+    this.showRegisterAutonomeModal.set(true);
+    this.registerSuccess.set(false);
+  }
+
+  fermerModalInscriptionAutonome() {
+    this.showRegisterAutonomeModal.set(false);
+  }
+
+  inscrireAutonome() {
+    const val = this.newAutonome();
+    if (!val.nom || !val.prenom || !val.telephone) {
+      alert('Veuillez renseigner votre prénom, nom et numéro de téléphone.');
+      return;
+    }
+
+    const matricule = `AUTO-${Date.now().toString().slice(-4)}`;
+    const site = this.b2b.currentEntreprise().sites.find(s => s.id === val.siteId);
+
+    // Enrôler l'employé en mode Autonome (0% subvention)
+    this.b2b.ajouterEmploye({
+      matricule,
+      nom: val.nom,
+      prenom: val.prenom,
+      email: val.email || `${val.prenom.toLowerCase()}.${val.nom.toLowerCase()}@collaborateur.sn`,
+      telephone: val.telephone,
+      siteId: val.siteId,
+      siteNom: site ? site.nom : 'Siège Plateau',
+      departement: 'Collaborateur Autonome',
+      type: 'AUTONOME',
+      tauxSubvention: 0
+    });
+
+    this.registerSuccess.set(true);
+
+    setTimeout(() => {
+      this.showRegisterAutonomeModal.set(false);
+      // Connecter directement l'utilisateur
+      this.b2b.setSessionRole({
+        role: 'SALARIE_AUTONOME',
+        nomComplet: `${val.prenom} ${val.nom}`,
+        titrePoste: 'Salarié Autonome (Frais Personnels)',
+        entite: this.b2b.currentEntreprise().nom,
+        badge: 'Paiement direct Wave',
+        badgeColor: '#1D4ED8',
+        siteId: val.siteId,
+        siteNom: site ? site.nom : 'Siège Plateau'
+      });
+      this.router.navigateByUrl('/b2b/commande');
+    }, 1200);
+  }
+
   selectionnerProfilDemo(p: ProfilDemo) {
     this.loading.set(true);
 
