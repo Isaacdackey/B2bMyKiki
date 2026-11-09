@@ -1,11 +1,19 @@
 :host { display: block; }
 
+.nav-toggle {
+  display: none !important;
+}
+
     /* ─── Disposition Header & Navbar Desktop (Espacement aéré sans collision) ─── */
-    @media (min-width: 1181px) {
+    @media (min-width: 1024px) {
+      .nav-toggle {
+        display: none !important;
+      }
+
       .nav-container {
         max-width: 1400px !important;
-        padding: 0 2rem !important;
-        gap: 2rem !important;
+        padding: 0 1.5rem !important;
+        gap: 1.25rem !important;
       }
 
       header nav {
@@ -13,28 +21,28 @@
         align-items: center !important;
         justify-content: space-between !important;
         flex: 1 1 auto !important;
-        margin-left: 1.5rem !important;
+        margin-left: 1rem !important;
       }
 
       header nav ul.nav-links {
         display: flex !important;
         align-items: center !important;
-        gap: 1.6rem !important;
+        gap: 1.25rem !important;
         margin: 0 !important;
         padding: 0 !important;
       }
 
       header nav ul.nav-links li a {
-        font-size: 0.92rem !important;
+        font-size: 0.88rem !important;
         white-space: nowrap !important;
       }
 
       .nav-actions {
         display: flex !important;
         align-items: center !important;
-        gap: 0.85rem !important;
+        gap: 0.65rem !important;
         margin-left: auto !important;
-        padding-left: 1.5rem !important;
+        padding-left: 1rem !important;
         flex-shrink: 0 !important;
       }
 
@@ -44,10 +52,10 @@
         gap: 0.45rem !important;
         background: #721513 !important;
         color: #FFFFFF !important;
-        padding: 0.55rem 1.15rem !important;
+        padding: 0.5rem 1rem !important;
         border-radius: 9999px !important;
         font-weight: 600 !important;
-        font-size: 0.82rem !important;
+        font-size: 0.8rem !important;
         letter-spacing: 0.3px !important;
         text-decoration: none !important;
         transition: all 0.25s ease !important;
@@ -70,8 +78,8 @@
         display: inline-flex !important;
         align-items: center !important;
         gap: 0.45rem !important;
-        padding: 0.55rem 1.1rem !important;
-        font-size: 0.82rem !important;
+        padding: 0.5rem 0.95rem !important;
+        font-size: 0.8rem !important;
         white-space: nowrap !important;
       }
 
@@ -79,8 +87,8 @@
         display: inline-flex !important;
         align-items: center !important;
         gap: 0.45rem !important;
-        padding: 0.55rem 1.25rem !important;
-        font-size: 0.82rem !important;
+        padding: 0.5rem 1.05rem !important;
+        font-size: 0.8rem !important;
         white-space: nowrap !important;
       }
     }
@@ -119,7 +127,7 @@
     }
 
     /* ─── Menu mobile plein écran (100% couverture, fond blanc, z-index maximal) ─── */
-    @media (max-width: 1180px) {
+    @media (max-width: 1023px) {
       header.menu-open {
         z-index: 1000000;
       }
