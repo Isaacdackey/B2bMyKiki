@@ -76,6 +76,30 @@ export class B2bRhDashboardComponent {
   totalPriseEnChargePeriode = computed(() => this.commandesFiltrees().reduce((acc, c) => acc + c.partEntreprise, 0));
   totalResteAChargePeriode = computed(() => this.commandesFiltrees().reduce((acc, c) => acc + c.partEmploye, 0));
 
+  // Pagination Commandes Déjeuner Rapprochement
+  pageCommandes = signal<number>(1);
+  pageSizeCommandes = signal<number>(5);
+
+  totalCommandesPages = computed(() => Math.max(1, Math.ceil(this.totalRepasPeriode() / this.pageSizeCommandes())));
+
+  pagesCommandesArray = computed(() => {
+    const total = this.totalCommandesPages();
+    return Array.from({ length: total }, (_, i) => i + 1);
+  });
+
+  paginatedCommandes = computed(() => {
+    const page = this.pageCommandes();
+    const size = this.pageSizeCommandes();
+    const start = (page - 1) * size;
+    return this.commandesFiltrees().slice(start, start + size);
+  });
+
+  changerPageCommandes(nouvellePage: number) {
+    if (nouvellePage >= 1 && nouvellePage <= this.totalCommandesPages()) {
+      this.pageCommandes.set(nouvellePage);
+    }
+  }
+
   // Raccourcis de dates
   definirPeriode(type: 'AUJOURDHUI' | 'MOIS_EN_COURS' | 'MOIS_PRECEDENT') {
     this.periodeActive.set(type);

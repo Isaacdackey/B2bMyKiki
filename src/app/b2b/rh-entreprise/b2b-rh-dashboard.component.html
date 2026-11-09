@@ -169,7 +169,7 @@
                 </tr>
               </thead>
               <tbody>
-                @for (c of commandesFiltrees(); track c.id) {
+                @for (c of paginatedCommandes(); track c.id) {
                   <tr>
                     <td>
                       <div style="font-weight: 800; color: #332724;">{{ c.date }}</div>
@@ -212,6 +212,51 @@
                 </tr>
               </tfoot>
             </table>
+
+            <!-- BARRE DE PAGINATION HARMONISÉE KIKI TRAITEUR -->
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; background: #FAF8F4; border-top: 1.5px solid #EDE7DC; flex-wrap: wrap; gap: 1rem;">
+              <div style="font-size: 0.8rem; color: #6E5A56;">
+                Affichage de <strong>{{ totalRepasPeriode() === 0 ? 0 : (pageCommandes() - 1) * pageSizeCommandes() + 1 }}</strong> à 
+                <strong>{{ mathMin(pageCommandes() * pageSizeCommandes(), totalRepasPeriode()) }}</strong> sur 
+                <strong>{{ totalRepasPeriode() }}</strong> commandes
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 0.4rem;">
+                <button 
+                  type="button"
+                  (click)="changerPageCommandes(pageCommandes() - 1)"
+                  [disabled]="pageCommandes() === 1"
+                  [style.opacity]="pageCommandes() === 1 ? '0.4' : '1'"
+                  [style.cursor]="pageCommandes() === 1 ? 'not-allowed' : 'pointer'"
+                  style="width: 34px; min-width: 34px; max-width: 34px; height: 34px; min-height: 34px !important; max-height: 34px; border-radius: 50% !important; border: 1.5px solid #EDE7DC; background: #FFFFFF; color: #721513; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; padding: 0; flex-shrink: 0; aspect-ratio: 1 / 1;"
+                  title="Page précédente">
+                  <i class="fa-solid fa-chevron-left" style="margin: 0 !important;"></i>
+                </button>
+
+                @for (p of pagesCommandesArray(); track p) {
+                  <button 
+                    type="button"
+                    (click)="changerPageCommandes(p)"
+                    [style.background]="pageCommandes() === p ? '#721513' : '#FFFFFF'"
+                    [style.color]="pageCommandes() === p ? '#FFFFFF' : '#332724'"
+                    [style.border-color]="pageCommandes() === p ? '#721513' : '#EDE7DC'"
+                    style="width: 34px; min-width: 34px; max-width: 34px; height: 34px; min-height: 34px !important; max-height: 34px; border-radius: 50% !important; border: 1.5px solid; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; aspect-ratio: 1 / 1;">
+                    {{ p }}
+                  </button>
+                }
+
+                <button 
+                  type="button"
+                  (click)="changerPageCommandes(pageCommandes() + 1)"
+                  [disabled]="pageCommandes() === totalCommandesPages()"
+                  [style.opacity]="pageCommandes() === totalCommandesPages() ? '0.4' : '1'"
+                  [style.cursor]="pageCommandes() === totalCommandesPages() ? 'not-allowed' : 'pointer'"
+                  style="width: 34px; min-width: 34px; max-width: 34px; height: 34px; min-height: 34px !important; max-height: 34px; border-radius: 50% !important; border: 1.5px solid #EDE7DC; background: #FFFFFF; color: #721513; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; padding: 0; flex-shrink: 0; aspect-ratio: 1 / 1;"
+                  title="Page suivante">
+                  <i class="fa-solid fa-chevron-right" style="margin: 0 !important;"></i>
+                </button>
+              </div>
+            </div>
           }
         </div>
 
