@@ -1,0 +1,585 @@
+<div class="super-admin-wrapper">
+  
+  <!-- NAVBAR B2B UNIFIÉE KIKI TRAITEUR -->
+  <app-b2b-nav></app-b2b-nav>
+
+  <!-- CONTENU PRINCIPAL CENTRÉ -->
+  <main style="max-width: 1320px; width: 100%; margin: auto; padding: 1.5rem 0;">
+
+    <!-- BANDEAU OFFICIEL DIRECTION SUPER ADMIN KIKI TRAITEUR -->
+    <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 20px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <span style="font-size: 0.72rem; color: #721513; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(114, 21, 19, 0.08); padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.4rem;">
+          <i class="fa-solid fa-crown"></i> DIRECTION GÉNÉRALE • SUPER ADMIN KIKI TRAITEUR
+        </span>
+        <h1 style="margin: 0.35rem 0 0; font-family: 'Playfair Display', serif; font-size: 1.6rem; color: #721513; font-weight: 900;">
+          Supervision Globale : Entreprises, Sites, Menus & Facturation
+        </h1>
+        <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #6E5A56;">
+          Pilotage centralisé multi-entreprises, conventions tarifaires, dispatch logistique et catalogue des chefs.
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <button (click)="ouvrirModalNouvelleEntreprise()" class="sa-btn-primary">
+          <i class="fa-solid fa-plus"></i> Conventionner une Entreprise
+        </button>
+        <button (click)="ouvrirModalAjoutPlat()" class="sa-btn-action" style="padding: 0.65rem 1.15rem; font-size: 0.82rem; border-radius: 9999px;">
+          <i class="fa-solid fa-bowl-food"></i> Ajouter un Plat au Catalogue
+        </button>
+      </div>
+    </div>
+
+    <!-- KPIS STRATÉGIQUES GLOBAUX -->
+    <div class="sa-kpi-grid">
+      <div class="sa-kpi-card">
+        <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
+          <i class="fa-solid fa-building" style="color: #721513;"></i> ENTREPRISES SOUS CONTRAT
+        </div>
+        <div style="font-size: 2.2rem; font-weight: 900; color: #721513; margin: 0.4rem 0 0.2rem; font-family: 'Playfair Display', serif;">
+          {{ b2b.listeEntreprises().length }} <span style="font-size: 1rem; color: #606C38; font-weight: 600;">partenaires</span>
+        </div>
+        <div style="font-size: 0.75rem; color: #6E5A56;">Grands comptes (Total, Orange, Bolloré...)</div>
+      </div>
+
+      <div class="sa-kpi-card">
+        <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
+          <i class="fa-solid fa-location-dot" style="color: #E51D24;"></i> SITES PHYSIQUES DESSERVIS
+        </div>
+        <div style="font-size: 2.2rem; font-weight: 900; color: #E51D24; margin: 0.4rem 0 0.2rem; font-family: 'Playfair Display', serif;">
+          {{ totalSitesActifs() }} <span style="font-size: 1rem; color: #332724;">sites</span>
+        </div>
+        <div style="font-size: 0.75rem; color: #6E5A56;">Sièges, dépôts & usines avec points de retrait</div>
+      </div>
+
+      <div class="sa-kpi-card">
+        <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
+          <i class="fa-solid fa-utensils" style="color: #606C38;"></i> RECETTES CATALOGUE CENTRAL
+        </div>
+        <div style="font-size: 2.2rem; font-weight: 900; color: #606C38; margin: 0.4rem 0 0.2rem; font-family: 'Playfair Display', serif;">
+          {{ totalPlatsCatalogue() }} <span style="font-size: 1rem; color: #6E5A56;">spécialités</span>
+        </div>
+        <div style="font-size: 0.75rem; color: #6E5A56;">Entrées, plats chauds, desserts & boissons</div>
+      </div>
+
+      <div class="sa-kpi-card">
+        <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
+          <i class="fa-solid fa-coins" style="color: #721513;"></i> VOLUME CONVENTIONNÉ MENSUEL
+        </div>
+        <div style="font-size: 1.8rem; font-weight: 900; color: #721513; margin: 0.4rem 0 0.2rem; font-family: 'Playfair Display', serif;">
+          {{ (totalVolumeMensuelPrevu() | number) }} <span style="font-size: 0.85rem; color: #332724;">F CFA</span>
+        </div>
+        <div style="font-size: 0.75rem; color: #606C38; font-weight: 600;">Facturation B2B garantie</div>
+      </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- SECTION 1 : GESTION DES ENTREPRISES & DES SITES                -->
+    <!-- ============================================================== -->
+    @if (activeSection() === 'ENTREPRISES' || activeSection() === 'SITES') {
+      <div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+          <div style="display: flex; gap: 0.75rem; flex: 1; max-width: 500px;">
+            <input 
+              type="text" 
+              [ngModel]="searchEntreprise()"
+              (ngModelChange)="searchEntreprise.set($event)"
+              placeholder="Rechercher une entreprise par nom ou code..."
+              style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 12px; padding: 0.65rem 1rem; font-size: 0.85rem; background: #FFFFFF; color: #332724;">
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.5rem; background: #FFFFFF; border: 1.5px solid #EDE7DC; padding: 0.35rem 0.5rem; border-radius: 9999px;">
+            <span style="font-size: 0.75rem; font-weight: 800; color: #721513; padding-left: 0.5rem;">Filtre Statut :</span>
+            <button 
+              type="button" 
+              (click)="filtreArchiveEntreprise.set('ACTIVES')"
+              [style.background]="filtreArchiveEntreprise() === 'ACTIVES' ? '#721513' : 'transparent'"
+              [style.color]="filtreArchiveEntreprise() === 'ACTIVES' ? '#FFFFFF' : '#6E5A56'"
+              style="border: none; border-radius: 9999px; padding: 0.35rem 0.75rem; font-size: 0.72rem; font-weight: 800; cursor: pointer;">
+              Actives ({{ b2b.listeEntreprises().length }})
+            </button>
+            <button 
+              type="button" 
+              (click)="filtreArchiveEntreprise.set('ARCHIVEES')"
+              [style.background]="filtreArchiveEntreprise() === 'ARCHIVEES' ? '#721513' : 'transparent'"
+              [style.color]="filtreArchiveEntreprise() === 'ARCHIVEES' ? '#FFFFFF' : '#6E5A56'"
+              style="border: none; border-radius: 9999px; padding: 0.35rem 0.75rem; font-size: 0.72rem; font-weight: 800; cursor: pointer;">
+              Archivées
+            </button>
+          </div>
+        </div>
+
+        <!-- LISTE DÉTAILLÉE DES ENTREPRISES ET LEURS SITES DÉDIÉS -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+          @for (ent of entreprisesFiltrees(); track ent.id) {
+            <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
+              
+              <!-- En-tête de l'Entreprise -->
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1.5px solid #EDE7DC; padding-bottom: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 0.65rem;">
+                    <h2 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.4rem; color: #721513; font-weight: 800;">
+                      {{ ent.nom }}
+                    </h2>
+                    <span style="font-family: monospace; font-size: 0.75rem; font-weight: 800; background: #FAF5EA; color: #721513; border: 1px solid #E2D5BE; padding: 0.2rem 0.5rem; border-radius: 6px;">
+                      {{ ent.codeEntreprise }}
+                    </span>
+                    <span [style.background]="!ent.isArchivee ? 'rgba(96, 108, 56, 0.15)' : 'rgba(229, 29, 36, 0.12)'"
+                          [style.color]="!ent.isArchivee ? '#606C38' : '#E51D24'"
+                          style="font-size: 0.72rem; font-weight: 800; padding: 0.2rem 0.65rem; border-radius: 9999px;">
+                      {{ !ent.isArchivee ? 'Contrat Actif' : 'Archivée' }}
+                    </span>
+                  </div>
+
+                  <div style="font-size: 0.8rem; color: #6E5A56; margin-top: 0.35rem; display: flex; gap: 1.25rem; flex-wrap: wrap;">
+                    <span><i class="fa-solid fa-id-card"></i> NINEA : <strong>{{ ent.ninea || 'Non renseigné' }}</strong></span>
+                    <span><i class="fa-solid fa-envelope"></i> Contact : <strong>{{ ent.emailContact || 'contact@client.sn' }}</strong></span>
+                    <span><i class="fa-solid fa-calendar-check"></i> Cadence Facture : <strong style="color: #721513;">{{ ent.cadenceFacturation || 'MENSUELLE' }}</strong></span>
+                    <span><i class="fa-solid fa-hand-holding-dollar"></i> Prise en charge : <strong style="color: #606C38;">{{ ent.tauxPriseEnCharge }}% (Plf. {{ (ent.plafondJournalier | number) }} F)</strong></span>
+                  </div>
+                </div>
+
+                <!-- Actions sur l'entreprise -->
+                <div style="display: flex; gap: 0.5rem;">
+                  <button (click)="ouvrirModalModifierEntreprise(ent)" class="sa-btn-action" title="Modifier les conditions de l'entreprise">
+                    <i class="fa-regular fa-pen-to-square"></i> Modifier
+                  </button>
+                  <button (click)="ouvrirModalAjoutSite(ent.id)" class="sa-btn-action" style="background: #721513; color: #FFFFFF; border-color: #721513;" title="Ajouter un site de livraison">
+                    <i class="fa-solid fa-plus"></i> Ajouter un Site
+                  </button>
+                  <button (click)="b2b.toggleArchiverEntreprise(ent.id)" class="sa-btn-action" [style.color]="ent.isArchivee ? '#606C38' : '#E51D24'">
+                    <i class="fa-solid" [class.fa-box-archive]="!ent.isArchivee" [class.fa-rotate-left]="ent.isArchivee"></i>
+                    {{ ent.isArchivee ? 'Restaurer' : 'Archiver' }}
+                  </button>
+                </div>
+              </div>
+
+              <!-- Sites Physiques de l'entreprise -->
+              <div>
+                <div style="font-size: 0.8rem; font-weight: 800; color: #721513; text-transform: uppercase; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.4rem;">
+                  <i class="fa-solid fa-truck-ramp-box"></i> Sites de Restauration Déclarés ({{ ent.sites ? ent.sites.length : 0 }})
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem;">
+                  @for (site of ent.sites; track site.id) {
+                    <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 1.15rem; display: flex; flex-direction: column; justify-content: space-between;">
+                      <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                          <strong style="color: #332724; font-size: 0.95rem;">{{ site.nom }}</strong>
+                          <span style="font-size: 0.72rem; font-weight: 800; color: #E51D24; background: #FFFFFF; border: 1px solid #EDE7DC; padding: 0.2rem 0.5rem; border-radius: 6px;">
+                            <i class="fa-regular fa-clock"></i> Cut-off : {{ site.heureCutOff }}
+                          </span>
+                        </div>
+                        <div style="font-size: 0.8rem; color: #6E5A56; margin-bottom: 0.5rem;">
+                          <i class="fa-solid fa-location-dot" style="color: #721513;"></i> {{ site.adresse }}
+                        </div>
+                        <div style="font-size: 0.75rem; color: #6E5A56;">
+                          <i class="fa-solid fa-user-tie"></i> Référent : <strong>{{ site.contactReferent }}</strong> ({{ site.telephoneReferent }})
+                        </div>
+                      </div>
+
+                      <div style="border-top: 1px solid #EDE7DC; padding-top: 0.65rem; margin-top: 0.85rem; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.7rem; color: #606C38; font-weight: 700;">
+                          <i class="fa-solid fa-circle-check"></i> Point de distribution actif
+                        </span>
+                        <button (click)="ouvrirModalModifierSite(ent.id, site)" style="background: none; border: none; color: #721513; font-size: 0.75rem; font-weight: 800; cursor: pointer;">
+                          <i class="fa-regular fa-pen-to-square"></i> Configurer Site
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+
+            </div>
+          }
+        </div>
+
+      </div>
+    }
+
+    <!-- ============================================================== -->
+    <!-- SECTION 2 : CATALOGUE GLOBAL (MODIF, ARCHIVAGE, AJOUT)        -->
+    <!-- ============================================================== -->
+    @if (activeSection() === 'CATALOGUE') {
+      <div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h2 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
+              Catalogue Gastronomique Global Kiki Traiteur
+            </h2>
+            <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #6E5A56;">
+              Gestion des spécialités, tarifs unitaires et archivage des recettes proposées aux entreprises.
+            </p>
+          </div>
+
+          <!-- Filtres Catégorie & Archivage -->
+          <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+            <select 
+              [ngModel]="filtreCategorieCatalogue()"
+              (ngModelChange)="filtreCategorieCatalogue.set($event)"
+              style="background: #FFFFFF; color: #721513; font-weight: 700; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.55rem 0.85rem; font-size: 0.8rem;">
+              <option value="TOUS">Toutes les Catégories</option>
+              <option value="PLAT">Plats Chauds & Spécialités</option>
+              <option value="ENTREE">Entrées & Salades</option>
+              <option value="DESSERT">Desserts & Douceurs</option>
+              <option value="BOISSON">Boissons & Jus Frais</option>
+            </select>
+
+            <select 
+              [ngModel]="filtreArchivePlat()"
+              (ngModelChange)="filtreArchivePlat.set($event)"
+              style="background: #FFFFFF; color: #332724; font-weight: 700; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.55rem 0.85rem; font-size: 0.8rem;">
+              <option value="ACTIFS">Plats Actifs</option>
+              <option value="ARCHIVES">Plats Archivés</option>
+              <option value="TOUS">Tout le Répertoire</option>
+            </select>
+
+            <button (click)="ouvrirModalAjoutPlat()" class="sa-btn-primary">
+              <i class="fa-solid fa-plus"></i> Créer une Recette
+            </button>
+          </div>
+        </div>
+
+        <!-- Grille du Catalogue Central -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 1.25rem;">
+          @for (plat of platsFiltres(); track plat.id) {
+            <div [style.opacity]="plat.isArchive ? '0.6' : '1'"
+                 style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(114, 21, 19, 0.04); display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="position: relative; height: 160px; overflow: hidden; background: #FAF8F4;">
+                  <img [src]="plat.image" [alt]="plat.nom" style="width: 100%; height: 100%; object-fit: cover;">
+                  <span style="position: absolute; top: 10px; left: 10px; background: rgba(51, 39, 36, 0.85); color: #FAF8F4; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 800;">
+                    {{ plat.categorie }}
+                  </span>
+                  @if (plat.isArchive) {
+                    <span style="position: absolute; top: 10px; right: 10px; background: #E51D24; color: #FFFFFF; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 800;">
+                      Archivé
+                    </span>
+                  }
+                </div>
+
+                <div style="padding: 1.15rem;">
+                  <h3 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.15rem; color: #721513; font-weight: 800; line-height: 1.35;">
+                    {{ plat.nom }}
+                  </h3>
+                  <p style="margin: 0.35rem 0 0.85rem; font-size: 0.78rem; color: #6E5A56; line-height: 1.5;">
+                    {{ plat.description }}
+                  </p>
+                  <div style="font-size: 1.1rem; font-weight: 900; color: #721513;">
+                    {{ (plat.prixUnitaire | number) }} <span style="font-size: 0.75rem;">FCFA</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Actions Plat -->
+              <div style="border-top: 1px solid #EDE7DC; padding: 0.85rem 1.15rem; background: #FAF8F4; display: flex; justify-content: space-between; align-items: center;">
+                <button (click)="ouvrirModalModifierPlat(plat)" class="sa-btn-action">
+                  <i class="fa-regular fa-pen-to-square"></i> Modifier
+                </button>
+                <button (click)="b2b.toggleArchiverPlat(plat.id)" class="sa-btn-action" [style.color]="plat.isArchive ? '#606C38' : '#E51D24'">
+                  <i class="fa-solid" [class.fa-box-archive]="!plat.isArchive" [class.fa-rotate-left]="plat.isArchive"></i>
+                  {{ plat.isArchive ? 'Restaurer' : 'Archiver' }}
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+
+      </div>
+    }
+
+    <!-- ============================================================== -->
+    <!-- SECTION 3 : PLANNING GLOBAL DE PRODUCTION (SUPERVISION HEBDO)   -->
+    <!-- ============================================================== -->
+    @if (activeSection() === 'PLANNING') {
+      <div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h2 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
+              Planning Centralisé des Menus & Supervision Hebdomadaire
+            </h2>
+            <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #6E5A56;">
+              Planification des thèmes, volumes prévisionnels et dispatch vers l'ensemble des sites clients.
+            </p>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+          @for (item of planningSemaineGlobal(); track item.id) {
+            <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.25rem; box-shadow: 0 4px 18px rgba(114, 21, 19, 0.04); display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
+                  <strong style="color: #721513; font-size: 1rem;">{{ item.jour }}</strong>
+                  <span style="font-size: 0.75rem; color: #6E5A56; background: #FAF8F4; border: 1px solid #EDE7DC; padding: 0.2rem 0.5rem; border-radius: 6px;">{{ item.date }}</span>
+                </div>
+
+                <div style="font-size: 0.72rem; color: #606C38; font-weight: 800; text-transform: uppercase;">{{ item.theme }}</div>
+                <div style="font-size: 0.88rem; font-weight: 700; color: #332724; margin: 0.45rem 0 1rem; line-height: 1.4;">
+                  {{ item.platVedette }}
+                </div>
+                
+                <div style="font-size: 0.78rem; color: #6E5A56; line-height: 1.8;">
+                  <div><i class="fa-solid fa-store" style="color: #721513;"></i> Sites desservis : <strong>{{ item.sitesCouverts }} sites</strong></div>
+                  <div><i class="fa-solid fa-box" style="color: #E51D24;"></i> Portions prévues : <strong>{{ item.totalPrevu }} repas</strong></div>
+                </div>
+              </div>
+
+              <div style="border-top: 1px solid #EDE7DC; padding-top: 0.85rem; margin-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                <span [style.background]="item.statut === 'EN_PRODUCTION' ? 'rgba(229, 29, 36, 0.12)' : 'rgba(96, 108, 56, 0.12)'"
+                      [style.color]="item.statut === 'EN_PRODUCTION' ? '#E51D24' : '#606C38'"
+                      style="font-size: 0.7rem; font-weight: 800; padding: 0.25rem 0.55rem; border-radius: 9999px;">
+                  {{ item.statut }}
+                </span>
+                <button (click)="ouvrirModalEditPlanningGlobal(item)" class="sa-btn-action">
+                  <i class="fa-regular fa-pen-to-square"></i> Modifier
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+
+      </div>
+    }
+
+  </main>
+
+  <!-- ============================================================== -->
+  <!-- MODAL NOUVELLE / MODIFICATION ENTREPRISE                      -->
+  <!-- ============================================================== -->
+  @if (showModalEntreprise()) {
+    <div class="sa-modal-overlay">
+      <div class="sa-modal-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #EDE7DC; padding-bottom: 0.85rem; margin-bottom: 1.25rem;">
+          <h3 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.35rem; color: #721513; font-weight: 800;">
+            <i class="fa-solid fa-building"></i> {{ isEditModeEntreprise() ? 'Modifier la Convention Entreprise' : 'Conventionner une Nouvelle Entreprise' }}
+          </h3>
+          <button (click)="showModalEntreprise.set(false)" style="background: none; border: none; font-size: 1.25rem; color: #6E5A56; cursor: pointer;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div style="grid-column: span 2;">
+            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Raison Sociale de l'Entreprise</label>
+            <input type="text" [(ngModel)]="entrepriseEnEdition().nom" placeholder="Ex: TotalEnergies Sénégal" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700;">
+          </div>
+
+          <div>
+            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Code Entreprise (Réf.)</label>
+            <input type="text" [(ngModel)]="entrepriseEnEdition().codeEntreprise" placeholder="Ex: TOT-SN" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700;">
+          </div>
+
+          <div>
+            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">NINEA Entreprise</label>
+            <input type="text" [(ngModel)]="entrepriseEnEdition().ninea" placeholder="Ex: 001294829 2V1" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700;">
+          </div>
+
+          <div>
+            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Email Contact Référent</label>
+            <input type="email" [(ngModel)]="entrepriseEnEdition().emailContact" placeholder="Ex: rh@client.sn" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem;">
+          </div>
+
+          <div>
+            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Téléphone Référent</label>
+            <input type="text" [(ngModel)]="entrepriseEnEdition().telephone" placeholder="+221 ..." style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem;">
+          </div>
+
+          <div>
+            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Taux Prise en Charge (%)</label>
+            <input type="number" [(ngModel)]="entrepriseEnEdition().tauxPriseEnCharge" min="0" max="100" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 800; color: #606C38;">
+          </div>
+
+          <div>
+            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Cadence de Facturation</label>
+            <select [(ngModel)]="entrepriseEnEdition().cadenceFacturation" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700; color: #721513;">
+              <option value="HEBDOMADAIRE">Hebdomadaire (Chaque semaine)</option>
+              <option value="MENSUELLE">Mensuelle (Fin de mois)</option>
+              <option value="BIMESTRIELLE">Bimestrielle</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1.75rem;">
+          <button (click)="showModalEntreprise.set(false)" style="flex: 1; padding: 0.85rem; background: #FAF8F4; color: #6E5A56; border: 1.5px solid #EDE7DC; border-radius: 9999px; font-weight: 700; cursor: pointer;">
+            Annuler
+          </button>
+          <button (click)="enregistrerEntreprise()" class="sa-btn-primary" style="flex: 1.5; justify-content: center;">
+            <i class="fa-solid fa-check"></i> Enregistrer l'Entreprise
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ============================================================== -->
+  <!-- MODAL AJOUT / MODIF SITE PHYSIQUE                             -->
+  <!-- ============================================================== -->
+  @if (showModalSite()) {
+    <div class="sa-modal-overlay">
+      <div class="sa-modal-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #EDE7DC; padding-bottom: 0.85rem; margin-bottom: 1.25rem;">
+          <h3 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.35rem; color: #721513; font-weight: 800;">
+            <i class="fa-solid fa-location-dot"></i> {{ isEditModeSite() ? 'Configurer le Site de Livraison' : 'Ajouter un Site de Livraison' }}
+          </h3>
+          <button (click)="showModalSite.set(false)" style="background: none; border: none; font-size: 1.25rem; color: #6E5A56; cursor: pointer;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div>
+            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Nom du Site Physique</label>
+            <input type="text" [(ngModel)]="siteEnEdition().nom" placeholder="Ex: Siège Plateau - Dakar" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700;">
+          </div>
+
+          <div>
+            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Adresse Exacte de Livraison</label>
+            <input type="text" [(ngModel)]="siteEnEdition().adresse" placeholder="Ex: Boulevard de la République, Dakar" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem;">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Heure Cut-Off (Clôture)</label>
+              <input type="text" [(ngModel)]="siteEnEdition().heureCutOff" placeholder="10:30" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 800; color: #E51D24;">
+            </div>
+
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Contact Référent Site</label>
+              <input type="text" [(ngModel)]="siteEnEdition().contactReferent" placeholder="Ex: M. Ndiaye (RH)" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem;">
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1.75rem;">
+          <button (click)="showModalSite.set(false)" style="flex: 1; padding: 0.85rem; background: #FAF8F4; color: #6E5A56; border: 1.5px solid #EDE7DC; border-radius: 9999px; font-weight: 700; cursor: pointer;">
+            Annuler
+          </button>
+          <button (click)="enregistrerSite()" class="sa-btn-primary" style="flex: 1.5; justify-content: center;">
+            <i class="fa-solid fa-check"></i> Enregistrer le Site
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ============================================================== -->
+  <!-- MODAL AJOUT / MODIF PLAT CATALOGUE                            -->
+  <!-- ============================================================== -->
+  @if (showModalPlat()) {
+    <div class="sa-modal-overlay">
+      <div class="sa-modal-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #EDE7DC; padding-bottom: 0.85rem; margin-bottom: 1.25rem;">
+          <h3 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.35rem; color: #721513; font-weight: 800;">
+            <i class="fa-solid fa-bowl-food"></i> {{ isEditModePlat() ? 'Modifier la Recette du Catalogue' : 'Ajouter un Met au Catalogue Central' }}
+          </h3>
+          <button (click)="showModalPlat.set(false)" style="background: none; border: none; font-size: 1.25rem; color: #6E5A56; cursor: pointer;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div>
+            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Nom du Plat / Spécialité</label>
+            <input type="text" [(ngModel)]="platEnEdition().nom" placeholder="Ex: Poulet Yassa Braisé au Feu de Bois" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700;">
+          </div>
+
+          <div>
+            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Description des Ingrédients</label>
+            <textarea [(ngModel)]="platEnEdition().description" rows="2" placeholder="Oignons caramélisés, citron vert, riz parfumé..." style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem;"></textarea>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Catégorie Alimentaire</label>
+              <select [(ngModel)]="platEnEdition().categorie" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700; color: #721513;">
+                <option value="PLAT">Plat Chaud Principal</option>
+                <option value="ENTREE">Entrée & Cocktail</option>
+                <option value="DESSERT">Dessert & Douceur</option>
+                <option value="BOISSON">Boisson & Nectar</option>
+              </select>
+            </div>
+
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Tarif Unitaire (FCFA)</label>
+              <input type="number" [(ngModel)]="platEnEdition().prixUnitaire" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 800; color: #721513;">
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1.75rem;">
+          <button (click)="showModalPlat.set(false)" style="flex: 1; padding: 0.85rem; background: #FAF8F4; color: #6E5A56; border: 1.5px solid #EDE7DC; border-radius: 9999px; font-weight: 700; cursor: pointer;">
+            Annuler
+          </button>
+          <button (click)="enregistrerPlat()" class="sa-btn-primary" style="flex: 1.5; justify-content: center;">
+            <i class="fa-solid fa-check"></i> Enregistrer le Plat
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ============================================================== -->
+  <!-- MODAL ÉDITION PLANNING CENTRALISÉ                            -->
+  <!-- ============================================================== -->
+  @if (showModalPlanning() && planningEnEdition()) {
+    <div class="sa-modal-overlay">
+      <div class="sa-modal-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #EDE7DC; padding-bottom: 0.85rem; margin-bottom: 1.25rem;">
+          <h3 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.35rem; color: #721513; font-weight: 800;">
+            <i class="fa-regular fa-calendar"></i> Supervision Menu : {{ planningEnEdition().jour }}
+          </h3>
+          <button (click)="showModalPlanning.set(false)" style="background: none; border: none; font-size: 1.25rem; color: #6E5A56; cursor: pointer;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div>
+            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Thème Central</label>
+            <input type="text" [(ngModel)]="planningEnEdition().theme" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700;">
+          </div>
+
+          <div>
+            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Plats Vedettes Recommandés</label>
+            <input type="text" [(ngModel)]="planningEnEdition().platVedette" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700;">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Statut de Production</label>
+              <select [(ngModel)]="planningEnEdition().statut" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700; color: #721513;">
+                <option value="PROGRAMME">Programmé</option>
+                <option value="VALIDE">Validé Direction</option>
+                <option value="EN_PRODUCTION">En Production</option>
+                <option value="CLOTURE">Clôturé</option>
+              </select>
+            </div>
+
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Cadence Menu</label>
+              <select [(ngModel)]="planningEnEdition().cadence" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700;">
+                <option value="HEBDO">Hebdomadaire</option>
+                <option value="MENSUEL">Mensuel</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1.75rem;">
+          <button (click)="showModalPlanning.set(false)" style="flex: 1; padding: 0.85rem; background: #FAF8F4; color: #6E5A56; border: 1.5px solid #EDE7DC; border-radius: 9999px; font-weight: 700; cursor: pointer;">
+            Annuler
+          </button>
+          <button (click)="enregistrerPlanningGlobal()" class="sa-btn-primary" style="flex: 1.5; justify-content: center;">
+            <i class="fa-solid fa-check"></i> Enregistrer
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>
+

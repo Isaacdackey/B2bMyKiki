@@ -21,6 +21,10 @@ export const B2B_ROUTES: Routes = [
   {
     path: 'cuisine',
     loadComponent: () => import('./cuisine/b2b-cuisine-production.component').then(m => m.B2bCuisineProductionComponent)
+  },
+  {
+    path: 'super-admin',
+    loadComponent: () => import('./super-admin/b2b-super-admin.component').then(m => m.B2bSuperAdminComponent)
   }
 ];
 

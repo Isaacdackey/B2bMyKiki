@@ -97,6 +97,7 @@
   } @else {
     <div class="b2b-sidebar-enterprise-mini" [title]="b2b.currentSession().nomComplet + ' • ' + b2b.currentSession().badge" [style.color]="b2b.currentSession().badgeColor">
       <i class="fa-solid" 
+         [class.fa-crown]="b2b.currentSession().role === 'SUPER_ADMIN'"
          [class.fa-briefcase]="b2b.currentSession().role === 'RESPONSABLE_ENTREPRISE'"
          [class.fa-clipboard-check]="b2b.currentSession().role === 'RESPONSABLE_SITE_KIKI'"
          [class.fa-user-shield]="b2b.currentSession().role === 'SALARIE_CONVENTIONNE'"
@@ -109,6 +110,54 @@
   <nav class="b2b-sidebar-nav" aria-label="Menu principal B2B">
     @if (!b2b.isSidebarCollapsed()) {
       <div class="b2b-nav-section-title">ESPACE DÉDIÉ</div>
+    }
+
+    <!-- 0. CAS DU SUPER ADMIN KIKI TRAITEUR (DIRECTION GLOBALE) -->
+    @if (b2b.currentSession().role === 'SUPER_ADMIN') {
+      <div class="b2b-nav-group">
+        <a routerLink="/b2b/super-admin" class="b2b-sidebar-link group-header" title="Super Admin Kiki" (click)="b2b.closeMobileDrawer()">
+          <div class="b2b-link-icon-wrap" style="color: #721513;">
+            <i class="fa-solid fa-crown" aria-hidden="true"></i>
+          </div>
+          @if (!b2b.isSidebarCollapsed()) {
+            <div class="b2b-link-text">
+              <span class="b2b-link-title">Super Admin Kiki</span>
+              <span class="b2b-link-subtitle">Direction & Multi-Entreprises</span>
+            </div>
+          }
+        </a>
+
+        @if (!b2b.isSidebarCollapsed()) {
+          <div class="b2b-submenu-list">
+            <button 
+              type="button" 
+              class="b2b-submenu-item"
+              [class.active]="b2b.superAdminActiveSection() === 'ENTREPRISES'"
+              (click)="b2b.superAdminActiveSection.set('ENTREPRISES'); b2b.closeMobileDrawer()">
+              <i class="fa-solid fa-building submenu-icon"></i>
+              <span>Entreprises & Sites</span>
+            </button>
+
+            <button 
+              type="button" 
+              class="b2b-submenu-item"
+              [class.active]="b2b.superAdminActiveSection() === 'CATALOGUE'"
+              (click)="b2b.superAdminActiveSection.set('CATALOGUE'); b2b.closeMobileDrawer()">
+              <i class="fa-solid fa-bowl-food submenu-icon"></i>
+              <span>Catalogue des Chefs</span>
+            </button>
+
+            <button 
+              type="button" 
+              class="b2b-submenu-item"
+              [class.active]="b2b.superAdminActiveSection() === 'PLANNING'"
+              (click)="b2b.superAdminActiveSection.set('PLANNING'); b2b.closeMobileDrawer()">
+              <i class="fa-regular fa-calendar-days submenu-icon"></i>
+              <span>Planning & Production</span>
+            </button>
+          </div>
+        }
+      </div>
     }
 
     <!-- 1. CAS DU RESPONSABLE ENTREPRISE (RH / DAF) : AVEC SOUS-MENUS -->
@@ -126,9 +175,18 @@
           }
         </a>
 
-        <!-- SOUS-MENUS RH DÉDIÉS DANS LA NAVBAR -->
+        <!-- SOUS-MENUS RH DÉDIÉS DANS LA NAVBAR (Vue Globale Dashboard en Premier) -->
         @if (!b2b.isSidebarCollapsed()) {
           <div class="b2b-submenu-list">
+            <button 
+              type="button" 
+              class="b2b-submenu-item"
+              [class.active]="b2b.rhActiveSection() === 'STATISTIQUES'"
+              (click)="b2b.rhActiveSection.set('STATISTIQUES'); b2b.closeMobileDrawer()">
+              <i class="fa-solid fa-chart-pie submenu-icon"></i>
+              <span>Vue Globale (Dashboard)</span>
+            </button>
+
             <button 
               type="button" 
               class="b2b-submenu-item"
@@ -145,15 +203,6 @@
               (click)="b2b.rhActiveSection.set('EMPLOYES'); b2b.closeMobileDrawer()">
               <i class="fa-solid fa-users submenu-icon"></i>
               <span>Annuaire & Quotas Salariés</span>
-            </button>
-
-            <button 
-              type="button" 
-              class="b2b-submenu-item"
-              [class.active]="b2b.rhActiveSection() === 'STATISTIQUES'"
-              (click)="b2b.rhActiveSection.set('STATISTIQUES'); b2b.closeMobileDrawer()">
-              <i class="fa-solid fa-chart-pie submenu-icon"></i>
-              <span>Vue Globale Entreprise</span>
             </button>
           </div>
         }
@@ -190,6 +239,15 @@
             <button 
               type="button" 
               class="b2b-submenu-item"
+              [class.active]="b2b.cuisineActiveTab() === 'PLANNING_SEMAINE'"
+              (click)="b2b.cuisineActiveTab.set('PLANNING_SEMAINE'); b2b.closeMobileDrawer()">
+              <i class="fa-regular fa-calendar-days submenu-icon"></i>
+              <span>Planning & Menus Semaine</span>
+            </button>
+
+            <button 
+              type="button" 
+              class="b2b-submenu-item"
               [class.active]="b2b.cuisineActiveTab() === 'SCAN_QR'"
               (click)="b2b.cuisineActiveTab.set('SCAN_QR'); b2b.closeMobileDrawer()">
               <i class="fa-solid fa-qrcode submenu-icon"></i>
@@ -212,15 +270,6 @@
               (click)="b2b.cuisineActiveTab.set('BORDEREAUX'); b2b.closeMobileDrawer()">
               <i class="fa-solid fa-truck-ramp-box submenu-icon"></i>
               <span>Bordereaux de Livraison (BL)</span>
-            </button>
-
-            <button 
-              type="button" 
-              class="b2b-submenu-item"
-              [class.active]="b2b.cuisineActiveTab() === 'PLANNING_SEMAINE'"
-              (click)="b2b.cuisineActiveTab.set('PLANNING_SEMAINE'); b2b.closeMobileDrawer()">
-              <i class="fa-regular fa-calendar-days submenu-icon"></i>
-              <span>Planning Hebdomadaire</span>
             </button>
           </div>
         }

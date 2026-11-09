@@ -26,8 +26,8 @@ export class B2bRhDashboardComponent {
   dateDebut = signal<string>('2026-11-01');
   dateFin = signal<string>('2026-11-30');
 
-  // Période active sélectionnée
-  periodeActive = signal<'AUJOURDHUI' | 'MOIS_EN_COURS' | 'MOIS_PRECEDENT' | 'PERSONNALISE'>('MOIS_EN_COURS');
+  // Période active sélectionnée selon la convention RH : Aujourd’hui, Semaine, Mois, Personnalisé
+  periodeActive = signal<'AUJOURDHUI' | 'SEMAINE' | 'MOIS' | 'PERSONNALISE'>('MOIS');
 
   // Filtre recherche employé
   searchQuery = signal<string>('');
@@ -100,18 +100,18 @@ export class B2bRhDashboardComponent {
     }
   }
 
-  // Raccourcis de dates
-  definirPeriode(type: 'AUJOURDHUI' | 'MOIS_EN_COURS' | 'MOIS_PRECEDENT') {
+  // Raccourcis de dates : Aujourd'hui, Semaine, Mois, Personnalisé
+  definirPeriode(type: 'AUJOURDHUI' | 'SEMAINE' | 'MOIS' | 'PERSONNALISE') {
     this.periodeActive.set(type);
     if (type === 'AUJOURDHUI') {
       this.dateDebut.set('2026-11-06');
       this.dateFin.set('2026-11-06');
-    } else if (type === 'MOIS_EN_COURS') {
+    } else if (type === 'SEMAINE') {
+      this.dateDebut.set('2026-11-03');
+      this.dateFin.set('2026-11-07');
+    } else if (type === 'MOIS') {
       this.dateDebut.set('2026-11-01');
       this.dateFin.set('2026-11-30');
-    } else if (type === 'MOIS_PRECEDENT') {
-      this.dateDebut.set('2026-10-01');
-      this.dateFin.set('2026-10-31');
     }
   }
 

@@ -1,4 +1,4 @@
-export type UserRoleB2B = 'RESPONSABLE_ENTREPRISE' | 'RESPONSABLE_SITE_KIKI' | 'SALARIE_CONVENTIONNE' | 'SALARIE_AUTONOME';
+export type UserRoleB2B = 'SUPER_ADMIN' | 'RESPONSABLE_ENTREPRISE' | 'RESPONSABLE_SITE_KIKI' | 'SALARIE_CONVENTIONNE' | 'SALARIE_AUTONOME';
 
 export interface UserSessionB2B {
   role: UserRoleB2B;
@@ -26,9 +26,15 @@ export interface EntrepriseB2B {
   id: string;
   nom: string;
   codeEntreprise: string;
+  ninea?: string;
+  emailContact?: string;
+  telephone?: string;
   tauxPriseEnCharge: number; // ex: 100 ou 70 (%)
   plafondJournalier: number; // en FCFA
   budgetMensuelAlloue: number; // ex: 15 000 000 FCFA
+  tarifNegocieHtva?: number; // ex: 4500 FCFA
+  cadenceFacturation?: 'HEBDOMADAIRE' | 'MENSUELLE' | 'BIMESTRIELLE';
+  isArchivee?: boolean;
   sites: SiteB2B[];
 }
 
@@ -41,6 +47,8 @@ export interface PlatB2B {
   image: string;
   allergene?: string;
   calories?: number;
+  disponible?: boolean; // Activable / désactivable par le Responsable de Site selon le stock
+  isArchive?: boolean; // Archivage du catalogue par le Super Admin
 }
 
 export interface FormuleRegle {

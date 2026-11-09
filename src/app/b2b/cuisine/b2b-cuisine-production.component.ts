@@ -170,14 +170,39 @@ export class B2bCuisineProductionComponent {
     }
   ]);
 
-  // Planning Semaine
+  // Planning Semaine modifiable par le Responsable Site
   planningSemaine = signal([
-    { jour: 'Lundi', date: '03 Nov', theme: 'Tradition Sénégalaise', platVedette: 'Thiéboudienne Penda Mbaye / Poulet Yassa Braisé', statut: 'SERVI' },
-    { jour: 'Mardi (Aujourd\'hui)', date: '04 Nov', theme: 'Grillades & Fraîcheur Dakaroise', platVedette: 'Poulet Yassa Braisé / Capitaine au Feu de Bois', statut: 'EN_COURS' },
-    { jour: 'Mercredi', date: '05 Nov', theme: 'Saveurs de l\'Atlantique', platVedette: 'Filet de Mérou Sauce Tomate Épicée / Riz Jasmin', statut: 'VALIDE' },
-    { jour: 'Jeudi', date: '06 Nov', theme: 'Spécial Teranga & Rôtisserie', platVedette: 'Mafé de Bœuf Mijoté / Cuisse de Pintade', statut: 'PROGRAMME' },
-    { jour: 'Vendredi', date: '07 Nov', theme: 'Street Food Gourmet Sénégalais', platVedette: 'Dibi d\'Agneau Kiki & Frites de Patate Douce', statut: 'PROGRAMME' }
+    { id: 'sem-1', jour: 'Lundi', date: '03 Nov', theme: 'Tradition Sénégalaise', platVedette: 'Thiéboudienne Penda Mbaye / Poulet Yassa Braisé', statut: 'SERVI' },
+    { id: 'sem-2', jour: 'Mardi (Aujourd\'hui)', date: '04 Nov', theme: 'Grillades & Fraîcheur Dakaroise', platVedette: 'Poulet Yassa Braisé / Capitaine au Feu de Bois', statut: 'EN_COURS' },
+    { id: 'sem-3', jour: 'Mercredi', date: '05 Nov', theme: 'Saveurs de l\'Atlantique', platVedette: 'Filet de Mérou Sauce Tomate Épicée / Riz Jasmin', statut: 'VALIDE' },
+    { id: 'sem-4', jour: 'Jeudi', date: '06 Nov', theme: 'Spécial Teranga & Rôtisserie', platVedette: 'Mafé de Bœuf Mijoté / Cuisse de Pintade', statut: 'PROGRAMME' },
+    { id: 'sem-5', jour: 'Vendredi', date: '07 Nov', theme: 'Street Food Gourmet Sénégalais', platVedette: 'Dibi d\'Agneau Kiki & Frites de Patate Douce', statut: 'PROGRAMME' }
   ]);
+
+  // Modal d'édition du planning
+  showEditPlanningModal = signal<boolean>(false);
+  planningEnEdition = signal<{ id: string; jour: string; date: string; theme: string; platVedette: string; statut: string } | null>(null);
+
+  ouvrirModalEditPlanning(item: any) {
+    this.planningEnEdition.set({ ...item });
+    this.showEditPlanningModal.set(true);
+  }
+
+  enregistrerModifPlanning() {
+    const edit = this.planningEnEdition();
+    if (edit) {
+      this.planningSemaine.update(list => list.map(item => item.id === edit.id ? { ...item, theme: edit.theme, platVedette: edit.platVedette, statut: edit.statut } : item));
+      this.showEditPlanningModal.set(false);
+    }
+  }
+
+  // Filtre de période sur les commandes autonomes
+  periodeAutonome = signal<'TOUT' | 'AUJOURDHUI' | 'SEMAINE' | 'MOIS'>('TOUT');
+
+  // Commandes autonomes filtrées
+  commandesAutonomesFiltrees = computed(() => {
+    return this.commandesAutonomes();
+  });
 
   // Calculs totaux
   totalPortionsPlats = computed(() => {

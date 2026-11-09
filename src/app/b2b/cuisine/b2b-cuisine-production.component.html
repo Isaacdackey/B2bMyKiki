@@ -402,8 +402,41 @@
             </p>
           </div>
 
-          <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 700; color: #721513;">
-            <i class="fa-solid fa-clock"></i> Heure limite : 10h30 • Dispatch Cuisine
+          <!-- Filtres sur période (Aujourd'hui, Semaine, Mois, Tout) -->
+          <div style="display: flex; align-items: center; gap: 0.5rem; background: #FFFFFF; border: 1.5px solid #EDE7DC; padding: 0.35rem 0.5rem; border-radius: 9999px;">
+            <span style="font-size: 0.75rem; font-weight: 800; color: #721513; padding-left: 0.5rem;"><i class="fa-regular fa-calendar"></i> Période :</span>
+            <button 
+              type="button"
+              (click)="periodeAutonome.set('TOUT')"
+              [style.background]="periodeAutonome() === 'TOUT' ? '#721513' : 'transparent'"
+              [style.color]="periodeAutonome() === 'TOUT' ? '#FFFFFF' : '#6E5A56'"
+              style="border: none; border-radius: 9999px; padding: 0.35rem 0.75rem; font-size: 0.72rem; font-weight: 800; cursor: pointer;">
+              Tout
+            </button>
+            <button 
+              type="button"
+              (click)="periodeAutonome.set('AUJOURDHUI')"
+              [style.background]="periodeAutonome() === 'AUJOURDHUI' ? '#721513' : 'transparent'"
+              [style.color]="periodeAutonome() === 'AUJOURDHUI' ? '#FFFFFF' : '#6E5A56'"
+              style="border: none; border-radius: 9999px; padding: 0.35rem 0.75rem; font-size: 0.72rem; font-weight: 800; cursor: pointer;">
+              Aujourd'hui
+            </button>
+            <button 
+              type="button"
+              (click)="periodeAutonome.set('SEMAINE')"
+              [style.background]="periodeAutonome() === 'SEMAINE' ? '#721513' : 'transparent'"
+              [style.color]="periodeAutonome() === 'SEMAINE' ? '#FFFFFF' : '#6E5A56'"
+              style="border: none; border-radius: 9999px; padding: 0.35rem 0.75rem; font-size: 0.72rem; font-weight: 800; cursor: pointer;">
+              Semaine
+            </button>
+            <button 
+              type="button"
+              (click)="periodeAutonome.set('MOIS')"
+              [style.background]="periodeAutonome() === 'MOIS' ? '#721513' : 'transparent'"
+              [style.color]="periodeAutonome() === 'MOIS' ? '#FFFFFF' : '#6E5A56'"
+              style="border: none; border-radius: 9999px; padding: 0.35rem 0.75rem; font-size: 0.72rem; font-weight: 800; cursor: pointer;">
+              Mois
+            </button>
           </div>
         </div>
 
@@ -564,37 +597,103 @@
     <!-- ============================================================== -->
     @if (activeTab() === 'PLANNING_SEMAINE') {
       <div>
-        <h2 style="margin: 0 0 1.5rem; font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
-          Planning Hebdomadaire des Menus (Lun - Ven)
-        </h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h2 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
+              Planning Hebdomadaire & Personnalisation Menus (Lun - Ven)
+            </h2>
+            <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #6E5A56;">
+              En tant que Responsable de Site, ajustez les thèmes, plats vedettes et validez le calendrier des menus de votre site.
+            </p>
+          </div>
+        </div>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
           @for (p of planningSemaine(); track p.jour) {
-            <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.25rem; box-shadow: 0 4px 15px rgba(114, 21, 19, 0.03);">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                <span style="font-weight: 800; color: #721513; font-size: 0.95rem;">{{ p.jour }}</span>
-                <span style="font-size: 0.75rem; color: #6E5A56;">{{ p.date }}</span>
+            <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.25rem; box-shadow: 0 4px 15px rgba(114, 21, 19, 0.03); display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                  <span style="font-weight: 800; color: #721513; font-size: 0.95rem;">{{ p.jour }}</span>
+                  <span style="font-size: 0.75rem; color: #6E5A56;">{{ p.date }}</span>
+                </div>
+
+                <div style="font-size: 0.72rem; color: #606C38; font-weight: 700; text-transform: uppercase;">{{ p.theme }}</div>
+                <div style="font-size: 0.9rem; font-weight: 700; color: #332724; margin: 0.5rem 0 1rem; min-height: 44px; line-height: 1.4;">
+                  {{ p.platVedette }}
+                </div>
               </div>
 
-              <div style="font-size: 0.72rem; color: #606C38; font-weight: 700; text-transform: uppercase;">{{ p.theme }}</div>
-              <div style="font-size: 0.9rem; font-weight: 700; color: #332724; margin: 0.5rem 0 1rem; min-height: 44px; line-height: 1.4;">
-                {{ p.platVedette }}
-              </div>
+              <div>
+                <div style="border-top: 1px solid #EDE7DC; padding-top: 0.75rem; font-size: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
+                  @if (p.statut === 'EN_COURS') {
+                    <span style="color: #E51D24; font-weight: 700;"><i class="fa-solid fa-circle" style="font-size: 0.5rem;"></i> Service en cours</span>
+                  } @else if (p.statut === 'VALIDE') {
+                    <span style="color: #606C38; font-weight: 700;"><i class="fa-solid fa-check"></i> Validé par le chef</span>
+                  } @else if (p.statut === 'SERVI') {
+                    <span style="color: #6E5A56;"><i class="fa-solid fa-check-double"></i> Clôturé</span>
+                  } @else {
+                    <span style="color: #721513;"><i class="fa-regular fa-clock"></i> À préparer</span>
+                  }
 
-              <div style="border-top: 1px solid #EDE7DC; padding-top: 0.75rem; font-size: 0.75rem;">
-                @if (p.statut === 'EN_COURS') {
-                  <span style="color: #E51D24; font-weight: 700;"><i class="fa-solid fa-circle" style="font-size: 0.5rem;"></i> Service en cours</span>
-                } @else if (p.statut === 'VALIDE') {
-                  <span style="color: #606C38; font-weight: 700;"><i class="fa-solid fa-check"></i> Validé par le chef</span>
-                } @else if (p.statut === 'SERVI') {
-                  <span style="color: #6E5A56;"><i class="fa-solid fa-check-double"></i> Clôturé</span>
-                } @else {
-                  <span style="color: #721513;"><i class="fa-regular fa-clock"></i> À préparer</span>
-                }
+                  <button 
+                    type="button"
+                    (click)="ouvrirModalEditPlanning(p)"
+                    style="background: #FAF8F4; border: 1.5px solid #EDE7DC; color: #721513; border-radius: 9999px; padding: 0.25rem 0.65rem; font-size: 0.72rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem;">
+                    <i class="fa-regular fa-pen-to-square"></i> Modifier
+                  </button>
+                </div>
               </div>
             </div>
           }
         </div>
+
+        <!-- SÉLECTION DES PLATS PROPOSÉS SUR LE SITE (RÉCUPÉRATION DU CATALOGUE CENTRAL) -->
+        <div style="margin-top: 2.5rem; background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+            <div>
+              <span style="font-size: 0.72rem; color: #C05621; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(192, 86, 33, 0.1); padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.4rem;">
+                <i class="fa-solid fa-utensils"></i> CATALOGUE GLOBAL KIKI TRAITEUR
+              </span>
+              <h3 style="margin: 0.35rem 0 0; font-family: 'Playfair Display', serif; font-size: 1.35rem; color: #721513; font-weight: 900;">
+                Activer / Désactiver les Plats Proposés sur ce Site
+              </h3>
+              <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #6E5A56;">
+                Le Responsable de Site choisit en direct les recettes du catalogue central qu'il met à la carte selon son stock et approvisionnement.
+              </p>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+            @for (plat of b2b.catalogueJour(); track plat.id) {
+              <div [style.background]="plat.disponible !== false ? '#FFFFFF' : '#FAF8F4'"
+                   [style.border-color]="plat.disponible !== false ? '#EDE7DC' : '#CBD5E1'"
+                   [style.opacity]="plat.disponible !== false ? '1' : '0.65'"
+                   style="border: 1.5px solid; border-radius: 14px; padding: 1rem; display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; transition: all 0.2s;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <img [src]="plat.image" [alt]="plat.nom" style="width: 48px; height: 48px; border-radius: 10px; object-fit: cover; border: 1px solid #EDE7DC;">
+                  <div>
+                    <div style="font-size: 0.82rem; font-weight: 800; color: #332724; line-height: 1.3;">{{ plat.nom }}</div>
+                    <div style="font-size: 0.72rem; color: #6E5A56; margin-top: 0.2rem;">
+                      <span style="font-weight: 700; color: #721513;">{{ plat.categorie }}</span> • {{ (plat.prixUnitaire | number) }} FCFA
+                    </div>
+                  </div>
+                </div>
+
+                <button 
+                  type="button"
+                  (click)="b2b.toggleDisponibilitePlat(plat.id)"
+                  [style.background]="plat.disponible !== false ? '#FAF5EA' : '#EDE7DC'"
+                  [style.color]="plat.disponible !== false ? '#606C38' : '#6E5A56'"
+                  [style.border-color]="plat.disponible !== false ? '#606C38' : '#CBD5E1'"
+                  style="border: 1.5px solid; padding: 0.4rem 0.85rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 800; cursor: pointer; white-space: nowrap; transition: all 0.2s;">
+                  <i class="fa-solid" [class.fa-check]="plat.disponible !== false" [class.fa-ban]="plat.disponible === false"></i>
+                  {{ plat.disponible !== false ? 'Proposé' : 'Désactivé' }}
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+
       </div>
     }
 
@@ -674,6 +773,61 @@
           </button>
         </div>
 
+      </div>
+    </div>
+  }
+
+  <!-- MODAL D'ÉDITION DU PLANNING PAR LE RESPONSABLE DE SITE -->
+  @if (showEditPlanningModal() && planningEnEdition()) {
+    <div class="cuisine-modal-overlay">
+      <div class="cuisine-modal-card" style="max-width: 520px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #EDE7DC; padding-bottom: 0.85rem; margin-bottom: 1.25rem;">
+          <h3 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.35rem; color: #721513; font-weight: 800;">
+            <i class="fa-regular fa-calendar-days"></i> Modifier le Menu : {{ planningEnEdition()!.jour }}
+          </h3>
+          <button (click)="showEditPlanningModal.set(false)" style="background: none; border: none; color: #6E5A56; font-size: 1.25rem; cursor: pointer;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Thème Culinaire du Jour</label>
+            <input 
+              type="text" 
+              [(ngModel)]="planningEnEdition()!.theme"
+              style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem 0.85rem; font-size: 0.85rem; font-weight: 700; color: #332724; background: #FFFFFF;">
+          </div>
+
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Plats Vedettes & Suggestions</label>
+            <textarea 
+              [(ngModel)]="planningEnEdition()!.platVedette"
+              rows="3"
+              style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem 0.85rem; font-size: 0.85rem; font-weight: 600; color: #332724; background: #FFFFFF; resize: vertical;"></textarea>
+          </div>
+
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Statut de Validation</label>
+            <select 
+              [(ngModel)]="planningEnEdition()!.statut"
+              style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem 0.85rem; font-size: 0.85rem; font-weight: 700; color: #721513; background: #FFFFFF;">
+              <option value="PROGRAMME">À préparer / Programmé</option>
+              <option value="VALIDE">Validé par le Responsable Site</option>
+              <option value="EN_COURS">Service en cours</option>
+              <option value="SERVI">Clôturé / Servi</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+          <button (click)="showEditPlanningModal.set(false)" style="flex: 1; padding: 0.75rem; background: #FAF8F4; color: #6E5A56; border: 1.5px solid #EDE7DC; border-radius: 9999px; font-weight: 700; cursor: pointer;">
+            Annuler
+          </button>
+          <button (click)="enregistrerModifPlanning()" style="flex: 1.5; padding: 0.75rem; background: #721513; color: #FFFFFF; border: none; border-radius: 9999px; font-weight: 800; cursor: pointer;">
+            <i class="fa-solid fa-check"></i> Enregistrer les Modifications
+          </button>
+        </div>
       </div>
     </div>
   }

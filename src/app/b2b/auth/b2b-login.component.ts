@@ -35,8 +35,20 @@ export class B2bLoginComponent {
   showPassword = signal(false);
   loading = signal(false);
 
-  // 4 PROFILS OFFICIELS EXIGÉS PAR LE MENTOR TONTON FUFU
+  // 5 PROFILS OFFICIELS DU CDCF (Y COMPRIS LE SUPER ADMIN KIKI TRAITEUR)
   profilsDemo: ProfilDemo[] = [
+    {
+      id: 'super-admin-kiki',
+      nom: 'Direction Kiki Traiteur',
+      roleTitre: 'Super Admin Kiki (Global)',
+      badge: 'Direction Générale',
+      badgeColor: '#721513',
+      identifiant: 'admin.general@kikitraiteur.sn',
+      description: 'Gestion globale de toutes les entreprises, création des sites, contractualisation des tarifs, gestion du catalogue (archivage/création) et supervision.',
+      icone: 'fa-solid fa-crown',
+      role: 'SUPER_ADMIN',
+      destinationUrl: '/b2b/super-admin'
+    },
     {
       id: 'responsable-entreprise',
       nom: 'Mme Fatou Fall',

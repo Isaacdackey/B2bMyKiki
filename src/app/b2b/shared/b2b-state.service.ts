@@ -17,8 +17,85 @@ export class B2bStateService {
     badgeColor: '#721513'
   });
 
-  // Section active dans l'Espace Responsable Entreprise (RH)
-  rhActiveSection = signal<'COMMANDES_SITE' | 'EMPLOYES' | 'STATISTIQUES' | 'FACTURATION' | 'SITES'>('COMMANDES_SITE');
+  // Section active dans l'Espace Super Admin Kiki Traiteur
+  superAdminActiveSection = signal<'ENTREPRISES' | 'SITES' | 'CATALOGUE' | 'PLANNING' | 'FACTURATION'>('ENTREPRISES');
+
+  // Section active dans l'Espace Responsable Entreprise (RH) : Dashboard Vue Globale par défaut
+  rhActiveSection = signal<'STATISTIQUES' | 'COMMANDES_SITE' | 'EMPLOYES' | 'FACTURATION' | 'SITES'>('STATISTIQUES');
+
+  // Méthode pour ajouter une entreprise cliente
+  ajouterEntreprise(nouvelle: Omit<EntrepriseB2B, 'id' | 'sites'>) {
+    const id = 'ent-' + Date.now();
+    const ent: EntrepriseB2B = {
+      ...nouvelle,
+      id,
+      sites: []
+    };
+    this.listeEntreprises.update(list => [ent, ...list]);
+    return ent;
+  }
+
+  // Méthode pour modifier une entreprise cliente
+  modifierEntreprise(id: string, updates: Partial<EntrepriseB2B>) {
+    this.listeEntreprises.update(list => list.map(e => e.id === id ? { ...e, ...updates } : e));
+    if (this.currentEntreprise().id === id) {
+      this.currentEntreprise.update(e => ({ ...e, ...updates }));
+    }
+  }
+
+  // Méthode pour archiver / désarchiver une entreprise
+  toggleArchiverEntreprise(id: string) {
+    this.listeEntreprises.update(list => list.map(e => e.id === id ? { ...e, isArchivee: !e.isArchivee } : e));
+  }
+
+  // Méthode pour ajouter un site à une entreprise
+  ajouterSiteAEntreprise(entrepriseId: string, site: Omit<SiteB2B, 'id'>) {
+    const siteId = 'site-' + Date.now();
+    const nouveauSite: SiteB2B = { ...site, id: siteId };
+    this.listeEntreprises.update(list => list.map(e => {
+      if (e.id === entrepriseId) {
+        return { ...e, sites: [...e.sites, nouveauSite] };
+      }
+      return e;
+    }));
+    if (this.currentEntreprise().id === entrepriseId) {
+      this.currentEntreprise.update(e => ({ ...e, sites: [...e.sites, nouveauSite] }));
+    }
+    return nouveauSite;
+  }
+
+  // Méthode pour modifier un site
+  modifierSite(entrepriseId: string, siteId: string, updates: Partial<SiteB2B>) {
+    this.listeEntreprises.update(list => list.map(e => {
+      if (e.id === entrepriseId) {
+        return {
+          ...e,
+          sites: e.sites.map(s => s.id === siteId ? { ...s, ...updates } : s)
+        };
+      }
+      return e;
+    }));
+    if (this.currentEntreprise().id === entrepriseId) {
+      this.currentEntreprise.update(e => ({
+        ...e,
+        sites: e.sites.map(s => s.id === siteId ? { ...s, ...updates } : s)
+      }));
+    }
+  }
+
+  // Méthodes Catalogue Global Super Admin (Ajouter, Modifier, Archiver)
+  ajouterPlatCatalogue(plat: Omit<PlatB2B, 'id'>) {
+    const nouveauPlat: PlatB2B = { ...plat, id: 'plat-' + Date.now(), disponible: true, isArchive: false };
+    this.catalogueJour.update(list => [nouveauPlat, ...list]);
+  }
+
+  modifierPlatCatalogue(id: string, updates: Partial<PlatB2B>) {
+    this.catalogueJour.update(list => list.map(p => p.id === id ? { ...p, ...updates } : p));
+  }
+
+  toggleArchiverPlat(id: string) {
+    this.catalogueJour.update(list => list.map(p => p.id === id ? { ...p, isArchive: !p.isArchive } : p));
+  }
 
   // Onglet actif dans l'Espace Responsable de Site Kiki (Cuisine & Dispatch)
   cuisineActiveTab = signal<'PRODUCTION' | 'SCAN_QR' | 'AUTONOME' | 'BORDEREAUX' | 'PLANNING_SEMAINE'>('PRODUCTION');
@@ -45,7 +122,7 @@ export class B2bStateService {
 
   private updateSidebarCssVar(collapsed: boolean) {
     if (typeof document !== 'undefined' && document.documentElement) {
-      document.documentElement.style.setProperty('--b2b-sidebar-w', collapsed ? '80px' : '280px');
+      document.documentElement.style.setProperty('--b2b-sidebar-w', collapsed ? '80px' : '300px');
     }
   }
 
@@ -85,60 +162,130 @@ export class B2bStateService {
   // Panier libre pour le salarié autonome / prestataire
   panierAutonome = signal<LignePanierAutonome[]>([]);
 
+  // Liste des entreprises clientes conventionnées (gérées par le Super Admin Kiki Traiteur)
+  listeEntreprises = signal<EntrepriseB2B[]>([
+    {
+      id: 'ent-001',
+      nom: 'TotalEnergies Sénégal',
+      codeEntreprise: 'TOT-SN',
+      ninea: '001294829 2V1',
+      emailContact: 'moyens.generaux@totalenergies.sn',
+      telephone: '+221 33 832 29 66',
+      tauxPriseEnCharge: 100,
+      plafondJournalier: 5000,
+      budgetMensuelAlloue: 18500000,
+      tarifNegocieHtva: 4500,
+      cadenceFacturation: 'MENSUELLE',
+      isArchivee: false,
+      sites: [
+        { 
+          id: 'site-1', 
+          nom: 'Siège Plateau - Dakar', 
+          adresse: 'Boulevard de la République, Dakar Plateau', 
+          heureCutOff: '10:30', 
+          contactReferent: 'M. Babacar Ndiaye (RH)', 
+          telephoneReferent: '+221 77 123 45 67',
+          creneauxDisponibles: [
+            '11h30 - 12h00 (Service Anticipé)',
+            '12h00 - 12h30 (Premier Service)',
+            '12h30 - 13h00 (Deuxième Service)',
+            '13h00 - 13h30 (Troisième Service)',
+            '13h30 - 14h00 (Service Tardif)',
+            '14h00 - 14h30 (Dernier Service)'
+          ]
+        },
+        { 
+          id: 'site-2', 
+          nom: 'Dépôt Bel-Air / Port', 
+          adresse: 'Zone Industrielle Bel-Air, Port Autonome de Dakar', 
+          heureCutOff: '09:45', 
+          contactReferent: 'Mme Aminata Sow (Logistique)', 
+          telephoneReferent: '+221 78 234 56 78',
+          creneauxDisponibles: [
+            '11h30 - 12h00 (Quart Matin)',
+            '12h00 - 12h45 (Service Midi)',
+            '13h00 - 13h45 (Service Relève)',
+            '19h00 - 20h00 (Dîner Équipe de Nuit)'
+          ]
+        },
+        { 
+          id: 'site-3', 
+          nom: 'Plateforme Diamniadio', 
+          adresse: 'Pôle Urbain de Diamniadio, Dakar', 
+          heureCutOff: '10:00', 
+          contactReferent: 'M. Cheikh Diop', 
+          telephoneReferent: '+221 76 345 67 89',
+          creneauxDisponibles: [
+            '12h00 - 12h30 (Premier Service)',
+            '12h30 - 13h15 (Service Principal)',
+            '13h15 - 14h00 (Service Décalé)'
+          ]
+        }
+      ]
+    },
+    {
+      id: 'ent-002',
+      nom: 'Sonatel Orange Sénégal',
+      codeEntreprise: 'SONA-SN',
+      ninea: '003849182 2K4',
+      emailContact: 'comite.entreprise@orange-sonatel.sn',
+      telephone: '+221 33 839 12 00',
+      tauxPriseEnCharge: 70,
+      plafondJournalier: 4000,
+      budgetMensuelAlloue: 25000000,
+      tarifNegocieHtva: 4200,
+      cadenceFacturation: 'HEBDOMADAIRE',
+      isArchivee: false,
+      sites: [
+        {
+          id: 'site-sona-1',
+          nom: 'Siège Technopole Pikine',
+          adresse: 'Parc Technologique de la Sonatel, Pikine',
+          heureCutOff: '10:15',
+          contactReferent: 'Mme Awa Cissé (RH)',
+          telephoneReferent: '+221 77 450 99 88',
+          creneauxDisponibles: ['12h00 - 13h00', '13h00 - 14h00']
+        },
+        {
+          id: 'site-sona-2',
+          nom: 'Agence Commerciale Cheikh Anta Diop',
+          adresse: 'Avenue Cheikh Anta Diop, Fann',
+          heureCutOff: '10:30',
+          contactReferent: 'M. Mansour Sy',
+          telephoneReferent: '+221 78 112 33 44',
+          creneauxDisponibles: ['12h30 - 13h30']
+        }
+      ]
+    },
+    {
+      id: 'ent-003',
+      nom: 'Bolloré Transport & Logistics',
+      codeEntreprise: 'BOLL-SN',
+      ninea: '009847120 3M1',
+      emailContact: 'direction.rh@bollore-logistics.sn',
+      telephone: '+221 33 849 50 00',
+      tauxPriseEnCharge: 100,
+      plafondJournalier: 5000,
+      budgetMensuelAlloue: 14000000,
+      tarifNegocieHtva: 4600,
+      cadenceFacturation: 'MENSUELLE',
+      isArchivee: false,
+      sites: [
+        {
+          id: 'site-boll-1',
+          nom: 'Terminal Maritime Dakar',
+          adresse: 'Zone Portuaire Mole 2, Dakar',
+          heureCutOff: '09:30',
+          contactReferent: 'M. Alioune Gueye',
+          telephoneReferent: '+221 76 990 12 34',
+          creneauxDisponibles: ['11h30 - 12h30', '12h30 - 13h30']
+        }
+      ]
+    }
+  ]);
+
   // Entreprise active
-  currentEntreprise = signal<EntrepriseB2B>({
-    id: 'ent-001',
-    nom: 'TotalEnergies Sénégal',
-    codeEntreprise: 'TOT-SN',
-    tauxPriseEnCharge: 100, // 100% prise en charge par l'entreprise
-    plafondJournalier: 5000,
-    budgetMensuelAlloue: 18500000,
-    sites: [
-      { 
-        id: 'site-1', 
-        nom: 'Siège Plateau - Dakar', 
-        adresse: 'Boulevard de la République, Dakar Plateau', 
-        heureCutOff: '10:30', 
-        contactReferent: 'M. Babacar Ndiaye (RH)', 
-        telephoneReferent: '+221 77 123 45 67',
-        creneauxDisponibles: [
-          '11h30 - 12h00 (Service Anticipé)',
-          '12h00 - 12h30 (Premier Service)',
-          '12h30 - 13h00 (Deuxième Service)',
-          '13h00 - 13h30 (Troisième Service)',
-          '13h30 - 14h00 (Service Tardif)',
-          '14h00 - 14h30 (Dernier Service)'
-        ]
-      },
-      { 
-        id: 'site-2', 
-        nom: 'Dépôt Bel-Air / Port', 
-        adresse: 'Zone Industrielle Bel-Air, Port Autonome de Dakar', 
-        heureCutOff: '09:45', 
-        contactReferent: 'Mme Aminata Sow (Logistique)', 
-        telephoneReferent: '+221 78 234 56 78',
-        creneauxDisponibles: [
-          '11h30 - 12h00 (Quart Matin)',
-          '12h00 - 12h45 (Service Midi)',
-          '13h00 - 13h45 (Service Relève)',
-          '19h00 - 20h00 (Dîner Équipe de Nuit)'
-        ]
-      },
-      { 
-        id: 'site-3', 
-        nom: 'Plateforme Diamniadio', 
-        adresse: 'Pôle Urbain de Diamniadio, Dakar', 
-        heureCutOff: '10:00', 
-        contactReferent: 'M. Cheikh Diop', 
-        telephoneReferent: '+221 76 345 67 89',
-        creneauxDisponibles: [
-          '12h00 - 12h30 (Premier Service)',
-          '12h30 - 13h15 (Service Principal)',
-          '13h15 - 14h00 (Service Décalé)'
-        ]
-      }
-    ]
-  });
+  currentEntreprise = signal<EntrepriseB2B>(this.listeEntreprises()[0]);
 
   selectedSiteId = signal<string>('site-1');
 
@@ -204,22 +351,32 @@ export class B2bStateService {
   // Date de commande
   dateCommande = signal<Date>(new Date());
 
-  // Catalogue du jour
+  // Catalogue du jour (avec drapeau disponible modifiable par le Responsable Site Kiki)
   catalogueJour = signal<PlatB2B[]>([
-    { id: 'e1', nom: 'Salade Niçoise au Thon Frais', description: 'Haricots verts, œufs durs, tomates, vinaigrette maison', categorie: 'ENTREE', prixUnitaire: 1200, image: '/assets/images/plats/e1.jpg', calories: 240 },
-    { id: 'e2', nom: 'Pastels Dorés au Thon (x3)', description: 'Beignets croustillants servis avec sauce tomate piment doux', categorie: 'ENTREE', prixUnitaire: 1200, image: '/assets/images/plats/e2.jpg', calories: 310 },
-    { id: 'e3', nom: 'Velouté de Légumes & Croûtons d\'Ail', description: 'Courgettes, carottes, pointe de crème fraîche', categorie: 'ENTREE', prixUnitaire: 1200, image: '/assets/images/plats/e3.jpg', calories: 180 },
-    { id: 'p1', nom: 'Poulet Yassa Braisé Kiki & Riz Parfumé', description: 'Cuisse de poulet fermier marinée aux oignons caramélisés, citron vert et moutarde, riz parfumé', categorie: 'PLAT', prixUnitaire: 2800, image: '/assets/images/plats/p1.jpg', calories: 650 },
-    { id: 'p2', nom: 'Capitaine Braisé & Riz Parfumé au Jasmin', description: 'Filet de poisson frais braisé au feu de bois, sauce moutarde oignon & piment', categorie: 'PLAT', prixUnitaire: 3200, image: '/assets/images/plats/p2.jpg', calories: 580 },
-    { id: 'p3', nom: 'Plat Équilibré : Pavé de Bœuf aux Herbes & Légumes Vapeur', description: 'Bœuf tendre du boucher, purée de patates douces et haricots persillés', categorie: 'PLAT', prixUnitaire: 3000, image: '/assets/images/plats/p3.jpg', calories: 520 },
-    { id: 'p4', nom: 'Thiéboudienne Penda Mbaye Royal (Riz Rouge)', description: 'Riz rouge traditionnel sénégalais mijoté aux légumes du terroir et poisson noble', categorie: 'PLAT', prixUnitaire: 2600, image: '/assets/images/plats/p4.jpg', calories: 610 },
-    { id: 'd1', nom: 'Coupe de Fruits Exotiques Frais', description: 'Mangue kent, ananas pain de sucre, papaye arrosée de citron vert', categorie: 'DESSERT', prixUnitaire: 800, image: '/assets/images/plats/d1.jpg', calories: 120 },
-    { id: 'd2', nom: 'Fondant au Chocolat Noir Intense & Cœur Coulant', description: 'Cacao noir pur d\'Afrique, crème anglaise vanillée', categorie: 'DESSERT', prixUnitaire: 1000, image: '/assets/images/plats/d2.jpg', calories: 340 },
-    { id: 'd3', nom: 'Yaourt Onctueux Fait Maison au Miel', description: 'Lait entier local et miel de fleurs de savane', categorie: 'DESSERT', prixUnitaire: 800, image: '/assets/images/plats/d3.jpg', calories: 160 },
-    { id: 'b1', nom: 'Jus Naturel de Bissap Frais Menthe', description: 'Infusion de fleurs d\'hibiscus, menthe sauvage, sans conservateur', categorie: 'BOISSON', prixUnitaire: 600, image: '/assets/images/plats/b1.jpg', calories: 90 },
-    { id: 'b2', nom: 'Jus de Bouye Artisanal (Pain de Singe)', description: 'Pulpe naturelle de fruit de baobab onctueuse et vanillée', categorie: 'BOISSON', prixUnitaire: 600, image: '/assets/images/plats/b2.jpg', calories: 110 },
-    { id: 'b3', nom: 'Eau Minérale Naturelle Kirène (50cl)', description: 'Bouteille individuelle capsule scellée', categorie: 'BOISSON', prixUnitaire: 400, image: '/assets/images/plats/b3.jpg', calories: 0 }
+    { id: 'e1', nom: 'Salade Niçoise au Thon Frais', description: 'Haricots verts, œufs durs, tomates, vinaigrette maison', categorie: 'ENTREE', prixUnitaire: 1200, image: '/assets/images/plats/e1.jpg', calories: 240, disponible: true },
+    { id: 'e2', nom: 'Pastels Dorés au Thon (x3)', description: 'Beignets croustillants servis avec sauce tomate piment doux', categorie: 'ENTREE', prixUnitaire: 1200, image: '/assets/images/plats/e2.jpg', calories: 310, disponible: true },
+    { id: 'e3', nom: 'Velouté de Légumes & Croûtons d\'Ail', description: 'Courgettes, carottes, pointe de crème fraîche', categorie: 'ENTREE', prixUnitaire: 1200, image: '/assets/images/plats/e3.jpg', calories: 180, disponible: true },
+    { id: 'p1', nom: 'Poulet Yassa Braisé Kiki & Riz Parfumé', description: 'Cuisse de poulet fermier marinée aux oignons caramélisés, citron vert et moutarde, riz parfumé', categorie: 'PLAT', prixUnitaire: 2800, image: '/assets/images/plats/p1.jpg', calories: 650, disponible: true },
+    { id: 'p2', nom: 'Capitaine Braisé & Riz Parfumé au Jasmin', description: 'Filet de poisson frais braisé au feu de bois, sauce moutarde oignon & piment', categorie: 'PLAT', prixUnitaire: 3200, image: '/assets/images/plats/p2.jpg', calories: 580, disponible: true },
+    { id: 'p3', nom: 'Plat Équilibré : Pavé de Bœuf aux Herbes & Légumes Vapeur', description: 'Bœuf tendre du boucher, purée de patates douces et haricots persillés', categorie: 'PLAT', prixUnitaire: 3000, image: '/assets/images/plats/p3.jpg', calories: 520, disponible: true },
+    { id: 'p4', nom: 'Thiéboudienne Penda Mbaye Royal (Riz Rouge)', description: 'Riz rouge traditionnel sénégalais mijoté aux légumes du terroir et poisson noble', categorie: 'PLAT', prixUnitaire: 2600, image: '/assets/images/plats/p4.jpg', calories: 610, disponible: true },
+    { id: 'd1', nom: 'Coupe de Fruits Exotiques Frais', description: 'Mangue kent, ananas pain de sucre, papaye arrosée de citron vert', categorie: 'DESSERT', prixUnitaire: 800, image: '/assets/images/plats/d1.jpg', calories: 120, disponible: true },
+    { id: 'd2', nom: 'Fondant au Chocolat Noir Intense & Cœur Coulant', description: 'Cacao noir pur d\'Afrique, crème anglaise vanillée', categorie: 'DESSERT', prixUnitaire: 1000, image: '/assets/images/plats/d2.jpg', calories: 340, disponible: true },
+    { id: 'd3', nom: 'Yaourt Onctueux Fait Maison au Miel', description: 'Lait entier local et miel de fleurs de savane', categorie: 'DESSERT', prixUnitaire: 800, image: '/assets/images/plats/d3.jpg', calories: 160, disponible: true },
+    { id: 'b1', nom: 'Jus Naturel de Bissap Frais Menthe', description: 'Infusion de fleurs d\'hibiscus, menthe sauvage, sans conservateur', categorie: 'BOISSON', prixUnitaire: 600, image: '/assets/images/plats/b1.jpg', calories: 90, disponible: true },
+    { id: 'b2', nom: 'Jus de Bouye Artisanal (Pain de Singe)', description: 'Pulpe naturelle de fruit de baobab onctueuse et vanillée', categorie: 'BOISSON', prixUnitaire: 600, image: '/assets/images/plats/b2.jpg', calories: 110, disponible: true },
+    { id: 'b3', nom: 'Eau Minérale Naturelle Kirène (50cl)', description: 'Bouteille individuelle capsule scellée', categorie: 'BOISSON', prixUnitaire: 400, image: '/assets/images/plats/b3.jpg', calories: 0, disponible: true }
   ]);
+
+  // Méthode pour activer / désactiver la proposition d'un plat sur le site
+  toggleDisponibilitePlat(platId: string) {
+    this.catalogueJour.update(list => list.map(p => {
+      if (p.id === platId) {
+        return { ...p, disponible: p.disponible !== false ? false : true };
+      }
+      return p;
+    }));
+  }
 
   // Panier
   selection = signal<SelectionRepas>({
