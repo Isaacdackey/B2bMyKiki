@@ -16,8 +16,10 @@ import { EmployeB2B, CommandeHistoriqueB2B } from '../shared/b2b.models';
 export class B2bRhDashboardComponent {
   b2b = inject(B2bStateService);
 
-  // Onglet actif : 'COMMANDES_SITE' | 'EMPLOYES' | 'FACTURATION' | 'STATISTIQUES' | 'SITES'
-  activeSection = signal<'COMMANDES_SITE' | 'EMPLOYES' | 'FACTURATION' | 'STATISTIQUES' | 'SITES'>('COMMANDES_SITE');
+  // Utilisation de la section persistée dans le service partagé pour synchronisation avec la navbar latérale
+  get activeSection() {
+    return this.b2b.rhActiveSection;
+  }
 
   // FILTRES CLÉS EXIGÉS PAR LE MENTOR : PAR SITE + DATE DÉBUT + DATE FIN
   selectedSiteId = signal<string>('site-1');

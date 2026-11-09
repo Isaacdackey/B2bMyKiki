@@ -23,54 +23,6 @@
       </div>
     </div>
 
-    <!-- BARRE D'ONGLETS CUISINE & DISPATCH -->
-    <div style="display: flex; gap: 0.5rem; border-bottom: 2px solid #EDE7DC; padding-bottom: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
-      <button 
-        (click)="activeTab.set('PRODUCTION')"
-        [style.background]="activeTab() === 'PRODUCTION' ? '#721513' : '#FFFFFF'"
-        [style.color]="activeTab() === 'PRODUCTION' ? '#FFFFFF' : '#6E5A56'"
-        [style.border-color]="activeTab() === 'PRODUCTION' ? '#721513' : '#EDE7DC'"
-        style="padding: 0.65rem 1.25rem; border: 1.5px solid; border-radius: 9999px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
-        <i class="fa-solid fa-fire-burner"></i> Portions & Plats du Jour (Brigade)
-      </button>
-
-      <button 
-        (click)="activeTab.set('SCAN_QR')"
-        [style.background]="activeTab() === 'SCAN_QR' ? '#721513' : '#FFFFFF'"
-        [style.color]="activeTab() === 'SCAN_QR' ? '#FFFFFF' : '#6E5A56'"
-        [style.border-color]="activeTab() === 'SCAN_QR' ? '#721513' : '#EDE7DC'"
-        style="padding: 0.65rem 1.25rem; border: 1.5px solid; border-radius: 9999px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
-        <i class="fa-solid fa-qrcode"></i> Scanner QR Retrait (Food Truck / Réfectoire)
-      </button>
-
-      <button 
-        (click)="activeTab.set('AUTONOME')"
-        [style.background]="activeTab() === 'AUTONOME' ? '#721513' : '#FFFFFF'"
-        [style.color]="activeTab() === 'AUTONOME' ? '#FFFFFF' : '#6E5A56'"
-        [style.border-color]="activeTab() === 'AUTONOME' ? '#721513' : '#EDE7DC'"
-        style="padding: 0.65rem 1.25rem; border: 1.5px solid; border-radius: 9999px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
-        <i class="fa-solid fa-utensils"></i> Commandes Personnelles ({{ commandesAutonomes().length }})
-      </button>
-
-      <button 
-        (click)="activeTab.set('BORDEREAUX')"
-        [style.background]="activeTab() === 'BORDEREAUX' ? '#721513' : '#FFFFFF'"
-        [style.color]="activeTab() === 'BORDEREAUX' ? '#FFFFFF' : '#6E5A56'"
-        [style.border-color]="activeTab() === 'BORDEREAUX' ? '#721513' : '#EDE7DC'"
-        style="padding: 0.65rem 1.25rem; border: 1.5px solid; border-radius: 9999px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
-        <i class="fa-solid fa-truck-ramp-box"></i> Bordereaux de Livraison (BL)
-      </button>
-
-      <button 
-        (click)="activeTab.set('PLANNING_SEMAINE')"
-        [style.background]="activeTab() === 'PLANNING_SEMAINE' ? '#721513' : '#FFFFFF'"
-        [style.color]="activeTab() === 'PLANNING_SEMAINE' ? '#FFFFFF' : '#6E5A56'"
-        [style.border-color]="activeTab() === 'PLANNING_SEMAINE' ? '#721513' : '#EDE7DC'"
-        style="padding: 0.65rem 1.25rem; border: 1.5px solid; border-radius: 9999px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
-        <i class="fa-regular fa-calendar-days"></i> Planning Hebdomadaire
-      </button>
-    </div>
-
     <!-- ============================================================== -->
     <!-- SECTION 1 : FEUILLE DE PRODUCTION DU JOUR                      -->
     <!-- ============================================================== -->

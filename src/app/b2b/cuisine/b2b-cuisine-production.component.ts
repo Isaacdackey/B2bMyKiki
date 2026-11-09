@@ -16,8 +16,10 @@ import { LigneProductionCuisine, BonLivraisonSite, CommandePersonnelleAutonome }
 export class B2bCuisineProductionComponent {
   b2b = inject(B2bStateService);
 
-  // Onglet actif : 'PRODUCTION' | 'SCAN_QR' | 'AUTONOME' | 'BORDEREAUX' | 'PLANNING_SEMAINE'
-  activeTab = signal<'PRODUCTION' | 'SCAN_QR' | 'AUTONOME' | 'BORDEREAUX' | 'PLANNING_SEMAINE'>('PRODUCTION');
+  // Synchronisation avec les sous-menus de la navbar
+  get activeTab() {
+    return this.b2b.cuisineActiveTab;
+  }
 
   // SCANNER QR CODE RETRAIT (Exigé par le mentor)
   codeScanneInput = signal<string>('');

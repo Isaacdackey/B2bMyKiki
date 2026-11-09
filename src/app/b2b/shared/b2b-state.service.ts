@@ -17,6 +17,12 @@ export class B2bStateService {
     badgeColor: '#721513'
   });
 
+  // Section active dans l'Espace Responsable Entreprise (RH)
+  rhActiveSection = signal<'COMMANDES_SITE' | 'EMPLOYES' | 'STATISTIQUES' | 'FACTURATION' | 'SITES'>('COMMANDES_SITE');
+
+  // Onglet actif dans l'Espace Responsable de Site Kiki (Cuisine & Dispatch)
+  cuisineActiveTab = signal<'PRODUCTION' | 'SCAN_QR' | 'AUTONOME' | 'BORDEREAUX' | 'PLANNING_SEMAINE'>('PRODUCTION');
+
   // Mode profil employé simulé : SUBVENTIONNE (prise en charge RH 100%) ou AUTONOME (frais personnels, panier libre, Wave)
   modeProfil = signal<'SUBVENTIONNE' | 'AUTONOME'>('SUBVENTIONNE');
 

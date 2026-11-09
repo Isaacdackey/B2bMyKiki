@@ -6,36 +6,6 @@
   <!-- CONTENU PRINCIPAL DU DASHBOARD -->
   <main style="max-width: 1350px; margin: 2rem auto; padding: 0 1.5rem;">
 
-    <!-- BARRE D'ONGLETS RH UNIFIÉE -->
-    <div style="display: flex; gap: 0.5rem; border-bottom: 2px solid #EDE7DC; padding-bottom: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
-      <button 
-        (click)="activeSection.set('COMMANDES_SITE')"
-        [style.background]="activeSection() === 'COMMANDES_SITE' ? '#721513' : '#FFFFFF'"
-        [style.color]="activeSection() === 'COMMANDES_SITE' ? '#FFFFFF' : '#6E5A56'"
-        [style.border-color]="activeSection() === 'COMMANDES_SITE' ? '#721513' : '#EDE7DC'"
-        style="padding: 0.65rem 1.25rem; border: 1.5px solid; border-radius: 9999px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
-        <i class="fa-solid fa-list-check"></i> Commandes & Rapprochement par Site
-      </button>
-
-      <button 
-        (click)="activeSection.set('EMPLOYES')"
-        [style.background]="activeSection() === 'EMPLOYES' ? '#721513' : '#FFFFFF'"
-        [style.color]="activeSection() === 'EMPLOYES' ? '#FFFFFF' : '#6E5A56'"
-        [style.border-color]="activeSection() === 'EMPLOYES' ? '#721513' : '#EDE7DC'"
-        style="padding: 0.65rem 1.25rem; border: 1.5px solid; border-radius: 9999px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
-        <i class="fa-solid fa-users"></i> Annuaire & Quotas Salariés
-      </button>
-
-      <button 
-        (click)="activeSection.set('STATISTIQUES')"
-        [style.background]="activeSection() === 'STATISTIQUES' ? '#721513' : '#FFFFFF'"
-        [style.color]="activeSection() === 'STATISTIQUES' ? '#FFFFFF' : '#6E5A56'"
-        [style.border-color]="activeSection() === 'STATISTIQUES' ? '#721513' : '#EDE7DC'"
-        style="padding: 0.65rem 1.25rem; border: 1.5px solid; border-radius: 9999px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s;">
-        <i class="fa-solid fa-chart-pie"></i> Vue Globale Entreprise
-      </button>
-    </div>
-
     <!-- ============================================================== -->
     <!-- SECTION 1 (EXIGÉE PAR LE MENTOR) : COMMANDES & FACTURE PAR SITE-->
     <!-- ============================================================== -->

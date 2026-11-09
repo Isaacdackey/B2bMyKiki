@@ -111,34 +111,120 @@
       <div class="b2b-nav-section-title">ESPACE DÉDIÉ</div>
     }
 
-    <!-- 1. CAS DU RESPONSABLE ENTREPRISE (RH / DAF) -->
+    <!-- 1. CAS DU RESPONSABLE ENTREPRISE (RH / DAF) : AVEC SOUS-MENUS -->
     @if (b2b.currentSession().role === 'RESPONSABLE_ENTREPRISE') {
-      <a routerLink="/b2b/rh" routerLinkActive="active" class="b2b-sidebar-link" title="Espace Responsable Entreprise" (click)="b2b.closeMobileDrawer()">
-        <div class="b2b-link-icon-wrap" style="color: #721513;">
-          <i class="fa-solid fa-briefcase" aria-hidden="true"></i>
-        </div>
+      <div class="b2b-nav-group">
+        <a routerLink="/b2b/rh" class="b2b-sidebar-link group-header" title="Responsable Entreprise" (click)="b2b.closeMobileDrawer()">
+          <div class="b2b-link-icon-wrap" style="color: #721513;">
+            <i class="fa-solid fa-briefcase" aria-hidden="true"></i>
+          </div>
+          @if (!b2b.isSidebarCollapsed()) {
+            <div class="b2b-link-text">
+              <span class="b2b-link-title">Responsable Entreprise</span>
+              <span class="b2b-link-subtitle">Portail RH & Moyens Généraux</span>
+            </div>
+          }
+        </a>
+
+        <!-- SOUS-MENUS RH DÉDIÉS DANS LA NAVBAR -->
         @if (!b2b.isSidebarCollapsed()) {
-          <div class="b2b-link-text">
-            <span class="b2b-link-title">Responsable Entreprise</span>
-            <span class="b2b-link-subtitle">Quotas, Sites & Facturation</span>
+          <div class="b2b-submenu-list">
+            <button 
+              type="button" 
+              class="b2b-submenu-item"
+              [class.active]="b2b.rhActiveSection() === 'COMMANDES_SITE'"
+              (click)="b2b.rhActiveSection.set('COMMANDES_SITE'); b2b.closeMobileDrawer()">
+              <i class="fa-solid fa-list-check submenu-icon"></i>
+              <span>Commandes & Rapprochement</span>
+            </button>
+
+            <button 
+              type="button" 
+              class="b2b-submenu-item"
+              [class.active]="b2b.rhActiveSection() === 'EMPLOYES'"
+              (click)="b2b.rhActiveSection.set('EMPLOYES'); b2b.closeMobileDrawer()">
+              <i class="fa-solid fa-users submenu-icon"></i>
+              <span>Annuaire & Quotas Salariés</span>
+            </button>
+
+            <button 
+              type="button" 
+              class="b2b-submenu-item"
+              [class.active]="b2b.rhActiveSection() === 'STATISTIQUES'"
+              (click)="b2b.rhActiveSection.set('STATISTIQUES'); b2b.closeMobileDrawer()">
+              <i class="fa-solid fa-chart-pie submenu-icon"></i>
+              <span>Vue Globale Entreprise</span>
+            </button>
           </div>
         }
-      </a>
+      </div>
     }
 
-    <!-- 2. CAS DU RESPONSABLE DE SITE KIKI (Gérant Cantine & Dispatch) -->
+    <!-- 2. CAS DU RESPONSABLE DE SITE KIKI (Gérant Cantine & Dispatch) : AVEC SOUS-MENUS -->
     @if (b2b.currentSession().role === 'RESPONSABLE_SITE_KIKI') {
-      <a routerLink="/b2b/cuisine" routerLinkActive="active" class="b2b-sidebar-link" title="Responsable de Site Kiki" (click)="b2b.closeMobileDrawer()">
-        <div class="b2b-link-icon-wrap" style="color: #C05621;">
-          <i class="fa-solid fa-clipboard-check" aria-hidden="true"></i>
-        </div>
+      <div class="b2b-nav-group">
+        <a routerLink="/b2b/cuisine" class="b2b-sidebar-link group-header" title="Responsable de Site Kiki" (click)="b2b.closeMobileDrawer()">
+          <div class="b2b-link-icon-wrap" style="color: #C05621;">
+            <i class="fa-solid fa-clipboard-check" aria-hidden="true"></i>
+          </div>
+          @if (!b2b.isSidebarCollapsed()) {
+            <div class="b2b-link-text">
+              <span class="b2b-link-title">Responsable Site Kiki</span>
+              <span class="b2b-link-subtitle">Exploitation, Portions & Scanner</span>
+            </div>
+          }
+        </a>
+
+        <!-- SOUS-MENUS CUISINE / CANTINE DANS LA NAVBAR -->
         @if (!b2b.isSidebarCollapsed()) {
-          <div class="b2b-link-text">
-            <span class="b2b-link-title">Responsable Site Kiki</span>
-            <span class="b2b-link-subtitle">Exploitation, Portions & Scanner</span>
+          <div class="b2b-submenu-list">
+            <button 
+              type="button" 
+              class="b2b-submenu-item"
+              [class.active]="b2b.cuisineActiveTab() === 'PRODUCTION'"
+              (click)="b2b.cuisineActiveTab.set('PRODUCTION'); b2b.closeMobileDrawer()">
+              <i class="fa-solid fa-fire-burner submenu-icon"></i>
+              <span>Portions & Plats du Jour</span>
+            </button>
+
+            <button 
+              type="button" 
+              class="b2b-submenu-item"
+              [class.active]="b2b.cuisineActiveTab() === 'SCAN_QR'"
+              (click)="b2b.cuisineActiveTab.set('SCAN_QR'); b2b.closeMobileDrawer()">
+              <i class="fa-solid fa-qrcode submenu-icon"></i>
+              <span>Scanner QR Retrait</span>
+            </button>
+
+            <button 
+              type="button" 
+              class="b2b-submenu-item"
+              [class.active]="b2b.cuisineActiveTab() === 'AUTONOME'"
+              (click)="b2b.cuisineActiveTab.set('AUTONOME'); b2b.closeMobileDrawer()">
+              <i class="fa-solid fa-utensils submenu-icon"></i>
+              <span>Commandes Personnelles</span>
+            </button>
+
+            <button 
+              type="button" 
+              class="b2b-submenu-item"
+              [class.active]="b2b.cuisineActiveTab() === 'BORDEREAUX'"
+              (click)="b2b.cuisineActiveTab.set('BORDEREAUX'); b2b.closeMobileDrawer()">
+              <i class="fa-solid fa-truck-ramp-box submenu-icon"></i>
+              <span>Bordereaux de Livraison (BL)</span>
+            </button>
+
+            <button 
+              type="button" 
+              class="b2b-submenu-item"
+              [class.active]="b2b.cuisineActiveTab() === 'PLANNING_SEMAINE'"
+              (click)="b2b.cuisineActiveTab.set('PLANNING_SEMAINE'); b2b.closeMobileDrawer()">
+              <i class="fa-regular fa-calendar-days submenu-icon"></i>
+              <span>Planning Hebdomadaire</span>
+            </button>
           </div>
         }
-      </a>
+      </div>
     }
 
     <!-- 3. CAS DU SALARIÉ (CONVENTIONNÉ OU AUTONOME) -->
