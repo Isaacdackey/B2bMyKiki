@@ -148,6 +148,7 @@ export class B2bStateService {
     siteNom: 'Siège Plateau - Dakar',
     departement: 'Finance & Comptabilité',
     type: 'SUBVENTIONNE',
+    tauxSubvention: 100, // Prise en charge 100%
     actif: true,
     repasConsommesMois: 18,
     montantPrisEnChargeMois: 90000
@@ -155,13 +156,13 @@ export class B2bStateService {
 
   // Annuaire des employés RH de l'entreprise
   listeEmployes = signal<EmployeB2B[]>([
-    { id: 'emp-101', matricule: 'TOT-9842', nom: 'Ndiaye', prenom: 'Babacar', email: 'b.ndiaye@totalenergies.sn', telephone: '+221 77 123 45 67', siteId: 'site-1', siteNom: 'Siège Plateau', departement: 'Finance & Comptabilité', type: 'SUBVENTIONNE', actif: true, repasConsommesMois: 19, montantPrisEnChargeMois: 95000 },
-    { id: 'emp-102', matricule: 'TOT-9843', nom: 'Fall', prenom: 'Fatou', email: 'f.fall@totalenergies.sn', telephone: '+221 78 456 78 90', siteId: 'site-1', siteNom: 'Siège Plateau', departement: 'Ressources Humaines', type: 'SUBVENTIONNE', actif: true, repasConsommesMois: 21, montantPrisEnChargeMois: 105000 },
-    { id: 'emp-103', matricule: 'TOT-9844', nom: 'Diallo', prenom: 'Mamadou', email: 'm.diallo@totalenergies.sn', telephone: '+221 76 567 89 01', siteId: 'site-2', siteNom: 'Dépôt Bel-Air', departement: 'Opérations Maritimes', type: 'SUBVENTIONNE', actif: true, repasConsommesMois: 22, montantPrisEnChargeMois: 110000 },
-    { id: 'emp-104', matricule: 'TOT-9845', nom: 'Sow', prenom: 'Aminata', email: 'a.sow@totalenergies.sn', telephone: '+221 77 678 90 12', siteId: 'site-2', siteNom: 'Dépôt Bel-Air', departement: 'Maintenance & Sécurité', type: 'SUBVENTIONNE', actif: true, repasConsommesMois: 17, montantPrisEnChargeMois: 85000 },
-    { id: 'emp-105', matricule: 'TOT-9846', nom: 'Diop', prenom: 'Cheikh', email: 'c.diop@totalenergies.sn', telephone: '+221 78 789 01 23', siteId: 'site-3', siteNom: 'Plateforme Diamniadio', departement: 'Logistique & Transit', type: 'SUBVENTIONNE', actif: true, repasConsommesMois: 20, montantPrisEnChargeMois: 100000 },
-    { id: 'emp-106', matricule: 'TOT-EXT-01', nom: 'Ba', prenom: 'Ousmane (Consultant)', email: 'o.ba@consultant.sn', telephone: '+221 76 890 12 34', siteId: 'site-1', siteNom: 'Siège Plateau', departement: 'Direction Projet IT', type: 'AUTONOME', actif: true, repasConsommesMois: 14, montantPrisEnChargeMois: 0 },
-    { id: 'emp-107', matricule: 'TOT-9847', nom: 'Sarr', prenom: 'Khady', email: 'k.sarr@totalenergies.sn', telephone: '+221 77 901 23 45', siteId: 'site-1', siteNom: 'Siège Plateau', departement: 'Juridique & Conformité', type: 'SUBVENTIONNE', actif: true, repasConsommesMois: 18, montantPrisEnChargeMois: 90000 }
+    { id: 'emp-101', matricule: 'TOT-9842', nom: 'Ndiaye', prenom: 'Babacar', email: 'b.ndiaye@totalenergies.sn', telephone: '+221 77 123 45 67', siteId: 'site-1', siteNom: 'Siège Plateau', departement: 'Finance & Comptabilité', type: 'SUBVENTIONNE', tauxSubvention: 100, actif: true, repasConsommesMois: 19, montantPrisEnChargeMois: 95000 },
+    { id: 'emp-102', matricule: 'TOT-9843', nom: 'Fall', prenom: 'Fatou', email: 'f.fall@totalenergies.sn', telephone: '+221 78 456 78 90', siteId: 'site-1', siteNom: 'Siège Plateau', departement: 'Ressources Humaines', type: 'SUBVENTIONNE', tauxSubvention: 100, actif: true, repasConsommesMois: 21, montantPrisEnChargeMois: 105000 },
+    { id: 'emp-103', matricule: 'TOT-9844', nom: 'Diallo', prenom: 'Mamadou', email: 'm.diallo@totalenergies.sn', telephone: '+221 76 567 89 01', siteId: 'site-2', siteNom: 'Dépôt Bel-Air', departement: 'Opérations Maritimes', type: 'SUBVENTIONNE', tauxSubvention: 70, actif: true, repasConsommesMois: 22, montantPrisEnChargeMois: 77000 },
+    { id: 'emp-104', matricule: 'TOT-9845', nom: 'Sow', prenom: 'Aminata', email: 'a.sow@totalenergies.sn', telephone: '+221 77 678 90 12', siteId: 'site-2', siteNom: 'Dépôt Bel-Air', departement: 'Maintenance & Sécurité', type: 'SUBVENTIONNE', tauxSubvention: 50, actif: true, repasConsommesMois: 17, montantPrisEnChargeMois: 42500 },
+    { id: 'emp-105', matricule: 'TOT-9846', nom: 'Diop', prenom: 'Cheikh', email: 'c.diop@totalenergies.sn', telephone: '+221 78 789 01 23', siteId: 'site-3', siteNom: 'Plateforme Diamniadio', departement: 'Logistique & Transit', type: 'SUBVENTIONNE', tauxSubvention: 100, actif: true, repasConsommesMois: 20, montantPrisEnChargeMois: 100000 },
+    { id: 'emp-106', matricule: 'TOT-EXT-01', nom: 'Ba', prenom: 'Ousmane (Consultant)', email: 'o.ba@consultant.sn', telephone: '+221 76 890 12 34', siteId: 'site-1', siteNom: 'Siège Plateau', departement: 'Direction Projet IT', type: 'AUTONOME', tauxSubvention: 0, actif: true, repasConsommesMois: 14, montantPrisEnChargeMois: 0 },
+    { id: 'emp-107', matricule: 'TOT-9847', nom: 'Sarr', prenom: 'Khady', email: 'k.sarr@totalenergies.sn', telephone: '+221 77 901 23 45', siteId: 'site-1', siteNom: 'Siège Plateau', departement: 'Juridique & Conformité', type: 'SUBVENTIONNE', tauxSubvention: 100, actif: true, repasConsommesMois: 18, montantPrisEnChargeMois: 90000 }
   ]);
 
   // Historique unifié des commandes individuelles pour rapprochement RH par site et par date
@@ -263,8 +264,9 @@ export class B2bStateService {
   partPriseEnChargeEntreprise = computed(() => {
     const emp = this.currentEmploye();
     if (emp.type === 'AUTONOME') return 0;
-    const taux = this.currentEntreprise().tauxPriseEnCharge;
-    return (this.formuleActuelle().prixForfait * taux) / 100;
+    // Taux spécifique au salarié s'il est défini, sinon taux par défaut entreprise
+    const taux = emp.tauxSubvention !== undefined ? emp.tauxSubvention : this.currentEntreprise().tauxPriseEnCharge;
+    return Math.round((this.formuleActuelle().prixForfait * taux) / 100);
   });
 
   resteAPayerEmploye = computed(() => {
@@ -318,6 +320,7 @@ export class B2bStateService {
       siteNom: site ? site.nom : 'Siège Plateau',
       departement: nouvelEmp.departement || 'Général',
       type: nouvelEmp.type || 'SUBVENTIONNE',
+      tauxSubvention: nouvelEmp.tauxSubvention !== undefined ? nouvelEmp.tauxSubvention : 100,
       actif: true,
       repasConsommesMois: 0,
       montantPrisEnChargeMois: 0
@@ -405,6 +408,7 @@ export class B2bStateService {
         siteNom: 'Siège Plateau',
         departement: 'Direction Projet IT',
         type: 'AUTONOME' as const,
+        tauxSubvention: 0,
         actif: true,
         repasConsommesMois: 14,
         montantPrisEnChargeMois: 0
@@ -422,11 +426,31 @@ export class B2bStateService {
         siteNom: 'Siège Plateau - Dakar',
         departement: 'Finance & Comptabilité',
         type: 'SUBVENTIONNE' as const,
+        tauxSubvention: 100,
         actif: true,
         repasConsommesMois: 19,
         montantPrisEnChargeMois: 95000
       };
       this.currentEmploye.set(subventionne);
+    }
+  }
+
+  // Mettre à jour le taux de subvention d'un collaborateur
+  setTauxSubventionEmploye(empId: string, nouveauTaux: number) {
+    this.listeEmployes.update(list => list.map(emp => {
+      if (emp.id === empId) {
+        const type = nouveauTaux === 0 ? 'AUTONOME' : 'SUBVENTIONNE';
+        return { ...emp, tauxSubvention: nouveauTaux, type };
+      }
+      return emp;
+    }));
+    // Si c'est l'employé actif, on met à jour le signal courant
+    if (this.currentEmploye().id === empId) {
+      this.currentEmploye.update(emp => ({
+        ...emp,
+        tauxSubvention: nouveauTaux,
+        type: nouveauTaux === 0 ? 'AUTONOME' : 'SUBVENTIONNE'
+      }));
     }
   }
 

@@ -137,21 +137,9 @@
             @if (b2b.selection().boisson) { <i class="fa-solid fa-check" style="color: #606C38; margin-left: 0.25rem;"></i> }
           </button>
 
-          <button 
-            (click)="activeTab.set('SUPPLEMENT')"
-            [class.active]="activeTab() === 'SUPPLEMENT'"
-            class="b2b-cat-btn">
-            <i class="fa-solid fa-plus"></i> Suppléments Extras
-            @if (b2b.selection().supplements.length > 0) {
-              <span style="background: #E51D24; color: #fff; padding: 0.1rem 0.45rem; border-radius: 9999px; font-size: 0.68rem; font-weight: 800;">
-                {{ b2b.selection().supplements.length }}
-              </span>
-            }
-          </button>
-        </div>
+          </div>
 
-        @if (activeTab() !== 'SUPPLEMENT') {
-          <div class="b2b-grid-plats">
+        <div class="b2b-grid-plats">
             @for (plat of activePlats(); track plat.id) {
               <div 
                 (click)="b2b.choisirPlat(plat)"
@@ -186,42 +174,6 @@
               </div>
             }
           </div>
-        } @else {
-          <!-- SUPPLEMETS PAYANTS HORS FORFAIT -->
-          <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.5rem; margin-top: 1.5rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
-            <h3 style="margin: 0 0 0.5rem; font-family: 'Playfair Display', serif; font-size: 1.15rem; color: #721513; font-weight: 800;">
-              Suppléments & Boissons Complémentaires
-            </h3>
-            <p style="margin: 0 0 1.25rem; font-size: 0.82rem; color: #6E5A56;">
-              Ces articles sont ajoutés en plus de votre forfait d'entreprise et réglés individuellement via Wave Mobile Money.
-            </p>
-
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;">
-              @for (plat of b2b.catalogueJour(); track plat.id) {
-                <div 
-                  (click)="b2b.toggleSupplement(plat)"
-                  [style.border-color]="b2b.isSupplementSelected(plat.id) ? '#E51D24' : '#EDE7DC'"
-                  [style.background]="b2b.isSupplementSelected(plat.id) ? '#FAF5EA' : '#FAF8F4'"
-                  style="border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 0.75rem; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.2s;">
-                  <div style="display: flex; align-items: center; gap: 0.75rem;">
-                    <img [src]="plat.image" style="width: 50px; height: 50px; border-radius: 10px; object-fit: cover;">
-                    <div>
-                      <div style="font-size: 0.85rem; font-weight: 700; color: #332724;">{{ plat.nom }}</div>
-                      <div style="font-size: 0.78rem; color: #E51D24; font-weight: 800;">+{{ plat.prixUnitaire }} FCFA</div>
-                    </div>
-                  </div>
-
-                  <button 
-                    [style.background]="b2b.isSupplementSelected(plat.id) ? '#E51D24' : '#EDE7DC'"
-                    [style.color]="b2b.isSupplementSelected(plat.id) ? '#FFFFFF' : '#721513'"
-                    style="width: 32px; min-width: 32px; max-width: 32px; height: 32px; min-height: 32px !important; max-height: 32px; border-radius: 50% !important; border: none; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; aspect-ratio: 1 / 1;">
-                    <i [class]="b2b.isSupplementSelected(plat.id) ? 'fa-solid fa-check' : 'fa-solid fa-plus'" style="margin: 0 !important;"></i>
-                  </button>
-                </div>
-              }
-            </div>
-          </div>
-        }
       </div>
 
       <!-- COLONNE DROITE : PLATEAU RÉCAPITULATIF SUBVENTIONNÉ -->
@@ -798,6 +750,74 @@
             </button>
           </div>
         }
+
+      </div>
+    </div>
+  }
+
+
+  <!-- MODAL INDÉPENDANT POUR REVOIR LE QR CODE À TOUT MOMENT -->
+  @if (showQrCodeModal() && derniereCommande()) {
+    <div class="b2b-modal-overlay">
+      <div class="b2b-modal-card" style="max-width: 440px; text-align: center; border-top: 5px solid #721513;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1.5px solid #EDE7DC; padding-bottom: 0.75rem;">
+          <h3 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.3rem; color: #721513; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-solid fa-qrcode"></i> Mon QR Code Déjeuner
+          </h3>
+          <button 
+            type="button" 
+            (click)="fermerQrCodeModal()" 
+            style="background: none; border: none; font-size: 1.2rem; color: #6E5A56; cursor: pointer; padding: 0.25rem;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 0.85rem; margin-bottom: 1rem; text-align: left; font-size: 0.8rem;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
+            <span style="color: #6E5A56;">Salarié :</span>
+            <strong style="color: #332724;">{{ b2b.currentEmploye().prenom }} {{ b2b.currentEmploye().nom }}</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
+            <span style="color: #6E5A56;">Site de retrait :</span>
+            <strong style="color: #721513;">{{ derniereCommande()?.siteNom }}</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: #6E5A56;">Heure de retrait :</span>
+            <strong style="color: #606C38;"><i class="fa-regular fa-clock"></i> {{ derniereCommande()?.heureRetrait }}</strong>
+          </div>
+        </div>
+
+        <!-- Rendu SVG Haute Résolution du QR Code -->
+        <div style="background: #FFFFFF; border: 2px solid #EDE7DC; border-radius: 18px; padding: 1.25rem; margin: 0 auto 1.25rem; max-width: 260px; box-shadow: 0 8px 25px rgba(114, 21, 19, 0.08);">
+          <div style="display: flex; justify-content: center; align-items: center; margin: 0 auto; background: #FAF8F4; padding: 0.65rem; border-radius: 12px; border: 1px solid #EDE7DC;">
+            <svg viewBox="0 0 25 25" width="160" height="160" shape-rendering="crispEdges">
+              <rect width="25" height="25" fill="#FAF8F4"/>
+              @for (row of qrMatrix(); track $index; let r = $index) {
+                @for (cell of row; track $index; let c = $index) {
+                  @if (cell) {
+                    <rect [attr.x]="c" [attr.y]="r" width="1" height="1" fill="#721513"/>
+                  }
+                }
+              }
+            </svg>
+          </div>
+
+          <div style="margin-top: 0.75rem;">
+            <span style="font-family: monospace; font-size: 0.85rem; font-weight: 800; color: #721513; background: #FAF5EA; padding: 0.25rem 0.65rem; border-radius: 6px; border: 1px solid #E2D5BE;">
+              {{ derniereCommande()?.qrCode }}
+            </span>
+          </div>
+          <div style="font-size: 0.72rem; color: #606C38; font-weight: 700; margin-top: 0.45rem;">
+            <i class="fa-solid fa-camera"></i> À présenter au comptoir Kiki Traiteur
+          </div>
+        </div>
+
+        <button 
+          (click)="fermerQrCodeModal()"
+          style="width: 100%; padding: 0.75rem; border-radius: 9999px; background: #721513; color: #FFFFFF; border: none; font-weight: 800; font-size: 0.85rem; cursor: pointer;">
+          Fermer
+        </button>
 
       </div>
     </div>

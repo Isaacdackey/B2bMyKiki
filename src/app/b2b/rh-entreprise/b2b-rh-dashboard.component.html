@@ -413,7 +413,7 @@
                 <th>Collaborateur</th>
                 <th>Département</th>
                 <th>Site de Livraison</th>
-                <th>Statut Prise en Charge</th>
+                <th>Taux Subvention</th>
                 <th>Repas ce mois</th>
                 <th>Total Subventionné</th>
                 <th>Actions</th>
@@ -430,11 +430,23 @@
                   <td>{{ emp.departement }}</td>
                   <td>{{ emp.siteNom }}</td>
                   <td>
-                    @if (emp.type === 'SUBVENTIONNE') {
-                      <span class="rh-badge-subv"><i class="fa-solid fa-check"></i> Prise en charge 100%</span>
-                    } @else {
-                      <span class="rh-badge-autonome"><i class="fa-solid fa-mobile-screen"></i> Autonome (Wave)</span>
-                    }
+                    <div style="display: flex; align-items: center; gap: 0.4rem;">
+                      <select 
+                        [ngModel]="emp.tauxSubvention"
+                        (ngModelChange)="b2b.setTauxSubventionEmploye(emp.id, +$event)"
+                        style="background: #FFFFFF; font-weight: 800; font-size: 0.75rem; border-radius: 8px; border: 1.5px solid #EDE7DC; padding: 0.25rem 0.4rem; color: #721513;">
+                        <option [value]="100">100% (Pris en charge)</option>
+                        <option [value]="70">70% (Co-financé)</option>
+                        <option [value]="50">50% (Partagé)</option>
+                        <option [value]="30">30% (Partiel)</option>
+                        <option [value]="0">0% (Autonome Wave)</option>
+                      </select>
+                      <span [style.background]="emp.tauxSubvention > 0 ? 'rgba(96, 108, 56, 0.15)' : 'rgba(29, 78, 216, 0.12)'"
+                            [style.color]="emp.tauxSubvention > 0 ? '#606C38' : '#1D4ED8'"
+                            style="padding: 0.2rem 0.5rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 800;">
+                        {{ emp.tauxSubvention }}%
+                      </span>
+                    </div>
                   </td>
                   <td style="font-weight: 800; color: #332724;">{{ emp.repasConsommesMois }} repas</td>
                   <td style="font-weight: 800; color: #606C38;">{{ (emp.montantPrisEnChargeMois | number) }} FCFA</td>
@@ -767,10 +779,13 @@
               </select>
             </div>
             <div>
-              <label style="font-size: 0.75rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.25rem;">Statut Cantine :</label>
-              <select [(ngModel)]="newEmp().type" style="width: 100%;">
-                <option value="SUBVENTIONNE">Subventionné 100%</option>
-                <option value="AUTONOME">Autonome (Paiement Wave)</option>
+              <label style="font-size: 0.75rem; color: #721513; font-weight: 800; display: block; margin-bottom: 0.25rem;">Taux de Subvention Salarié :</label>
+              <select [(ngModel)]="newEmp().tauxSubvention" style="width: 100%; font-weight: 700; color: #721513;">
+                <option [ngValue]="100">100% (Prise en charge intégrale)</option>
+                <option [ngValue]="70">70% (Co-financement)</option>
+                <option [ngValue]="50">50% (Partagé 50/50)</option>
+                <option [ngValue]="30">30% (Aide partielle)</option>
+                <option [ngValue]="0">0% (Salarié Autonome • Wave direct)</option>
               </select>
             </div>
           </div>

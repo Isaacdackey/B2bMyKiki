@@ -41,7 +41,8 @@ export class B2bRhDashboardComponent {
     telephone: '',
     siteId: 'site-1',
     departement: 'Opérations',
-    type: 'SUBVENTIONNE'
+    type: 'SUBVENTIONNE',
+    tauxSubvention: 100
   });
 
   // Modal Facture PDF Générée
@@ -147,7 +148,8 @@ export class B2bRhDashboardComponent {
       telephone: '+221 ',
       siteId: 'site-1',
       departement: 'Ressources Humaines',
-      type: 'SUBVENTIONNE'
+      type: 'SUBVENTIONNE',
+      tauxSubvention: 100
     });
     this.showAddEmployeeModal.set(true);
   }
@@ -158,7 +160,13 @@ export class B2bRhDashboardComponent {
       alert('Veuillez renseigner le nom, prénom et email du collaborateur.');
       return;
     }
-    this.b2b.ajouterEmploye(val);
+    const taux = val.tauxSubvention ?? 100;
+    const type = taux === 0 ? 'AUTONOME' : 'SUBVENTIONNE';
+    this.b2b.ajouterEmploye({
+      ...val,
+      tauxSubvention: taux,
+      type
+    });
     this.showAddEmployeeModal.set(false);
   }
 

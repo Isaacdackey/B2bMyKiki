@@ -75,6 +75,7 @@ export interface EmployeB2B {
   siteNom?: string;
   departement: string;
   type: 'SUBVENTIONNE' | 'AUTONOME';
+  tauxSubvention: number; // Taux de prise en charge paramétrable de 0% à 100%
   actif: boolean;
   repasConsommesMois: number;
   montantPrisEnChargeMois: number;

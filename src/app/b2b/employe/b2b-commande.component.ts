@@ -16,8 +16,8 @@ import { PlatB2B } from '../shared/b2b.models';
 export class B2bCommandeComponent {
   b2b = inject(B2bStateService);
 
-  // Onglet de filtrage pour le mode SUBVENTIONNE
-  activeTab = signal<'ENTREE' | 'PLAT' | 'DESSERT' | 'BOISSON' | 'SUPPLEMENT'>('ENTREE');
+  // Onglet de filtrage pour le mode SUBVENTIONNE (Strictement les 4 composantes de la formule)
+  activeTab = signal<'ENTREE' | 'PLAT' | 'DESSERT' | 'BOISSON'>('ENTREE');
 
   // Filtre catalogue pour le mode AUTONOME
   filterAutonome = signal<'TOUT' | 'PLAT' | 'ENTREE' | 'DESSERT' | 'BOISSON'>('TOUT');
@@ -40,6 +40,52 @@ export class B2bCommandeComponent {
   isWaveProcessing = signal(false);
   qrDataString = signal<string>('');
 
+  // DERNIÈRE COMMANDE ENREGISTRÉE & REVOIR LE QR CODE À TOUT MOMENT
+  derniereCommande = signal<{
+    id: string;
+    date: string;
+    heureRetrait: string;
+    siteNom: string;
+    formuleNom: string;
+    entreeNom?: string;
+    platNom?: string;
+    dessertNom?: string;
+    boissonNom?: string;
+    qrCode: string;
+    prixTotal: number;
+    partEntreprise: number;
+    partEmploye: number;
+  } | null>({
+    id: 'CMD-TOT-20261109-001',
+    date: 'Aujourd’hui',
+    heureRetrait: '12h00 - 12h30',
+    siteNom: 'Siège Plateau - Dakar',
+    formuleNom: 'Formule Déjeuner 4 comp.',
+    entreeNom: 'Pastels Dorés au Thon (x3)',
+    platNom: 'Poulet Yassa Braisé Kiki & Riz Parfumé',
+    dessertNom: 'Fondant au Chocolat Noir',
+    boissonNom: 'Jus Naturel de Bissap Frais Menthe',
+    qrCode: 'KT-TOT-9842-SITE1-20261109',
+    prixTotal: 5000,
+    partEntreprise: 5000,
+    partEmploye: 0
+  });
+
+  // Modal spécifique pour réafficher le QR Code de retrait
+  showQrCodeModal = signal(false);
+
+  ouvrirQrCodeModal() {
+    const cmd = this.derniereCommande();
+    if (cmd) {
+      this.qrDataString.set(cmd.qrCode);
+      this.showQrCodeModal.set(true);
+    }
+  }
+
+  fermerQrCodeModal() {
+    this.showQrCodeModal.set(false);
+  }
+
   // Génération du QR Code SVG en direct (haute précision, sans dépendance externe)
   qrMatrix = computed(() => {
     const data = this.qrDataString() || 'KIKI-B2B-PASS';
@@ -49,7 +95,6 @@ export class B2bCommandeComponent {
   // Liste des plats filtrés pour l'onglet actif (Mode Subventionné)
   activePlats = computed(() => {
     const tab = this.activeTab();
-    if (tab === 'SUPPLEMENT') return [];
     return this.b2b.catalogueJour().filter(p => p.categorie === tab);
   });
 
@@ -93,10 +138,27 @@ export class B2bCommandeComponent {
 
   confirmerPaiementEtEnvoi() {
     const matricule = this.b2b.currentEmploye().matricule;
-    const siteId = this.b2b.siteActuel().id;
+    const site = this.b2b.siteActuel();
     const dateStr = new Date().toISOString().slice(0, 10);
-    const code = `KT-${matricule}-${siteId}-${dateStr}`;
+    const code = `KT-${matricule}-${site.id}-${dateStr}`;
     this.qrDataString.set(code);
+
+    const s = this.b2b.selection();
+    this.derniereCommande.set({
+      id: `CMD-B2B-${Date.now().toString().slice(-6)}`,
+      date: 'Aujourd’hui',
+      heureRetrait: this.b2b.creneauLivraison(),
+      siteNom: site.nom,
+      formuleNom: this.b2b.formuleActuelle().nom,
+      entreeNom: s.entree?.nom,
+      platNom: s.plat?.nom,
+      dessertNom: s.dessert?.nom,
+      boissonNom: s.boisson?.nom,
+      qrCode: code,
+      prixTotal: this.b2b.modeProfil() === 'AUTONOME' ? this.b2b.totalPanierAutonome() : this.b2b.formuleActuelle().prixForfait,
+      partEntreprise: this.b2b.partPriseEnChargeEntreprise(),
+      partEmploye: this.b2b.resteAPayerEmploye()
+    });
 
     if (this.b2b.modeProfil() === 'AUTONOME' || this.b2b.resteAPayerEmploye() > 0) {
       this.isWaveProcessing.set(true);
