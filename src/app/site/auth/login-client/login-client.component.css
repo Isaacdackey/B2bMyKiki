@@ -28,10 +28,7 @@
       border-radius: 16px;
       padding: 2.8rem 2.2rem;
       box-shadow: 0 15px 35px rgba(114, 21, 19, 0.08), 0 5px 15px rgba(0, 0, 0, 0.04);
-      border-top: 5px solid #7A1C1C;
-      border-left: 1px solid rgba(114, 21, 19, 0.08);
-      border-right: 1px solid rgba(114, 21, 19, 0.08);
-      border-bottom: 1px solid rgba(114, 21, 19, 0.08);
+      border: 1px solid rgba(114, 21, 19, 0.08);
       position: relative;
     }
 

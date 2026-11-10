@@ -1972,7 +1972,7 @@
 
 /* PANIER AUTONOME */
 .b2b-plateau-autonome {
-  border-top-color: #1D4ED8 !important;
+  border-color: rgba(29, 78, 216, 0.25);
 }
 
 .b2b-panier-autonome-list {

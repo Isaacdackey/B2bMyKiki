@@ -22,10 +22,7 @@
       border-radius: var(--border-radius-lg);
       padding: 3.5rem 2.5rem;
       box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
-      border-top: 5px solid #7A1C1C;
-      border-left: 1px solid var(--border-color);
-      border-right: 1px solid var(--border-color);
-      border-bottom: 1px solid var(--border-color);
+      border: 1px solid var(--border-color);
       position: relative;
     }
 
