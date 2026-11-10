@@ -108,7 +108,7 @@
 .ent-icon {
   width: 44px;
   height: 44px;
-  border-radius: 12px;
+  border-radius: 50% !important;
   background: rgba(229, 29, 36, 0.1);
   color: #E51D24;
   display: flex;
@@ -205,7 +205,7 @@
 .demo-card-icon {
   width: 44px;
   height: 44px;
-  border-radius: 12px;
+  border-radius: 50% !important;
   display: flex;
   align-items: center;
   justify-content: center;

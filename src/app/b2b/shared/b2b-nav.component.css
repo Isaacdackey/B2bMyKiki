@@ -111,7 +111,7 @@
 .b2b-sidebar-toggle-btn {
   width: 34px;
   height: 34px;
-  border-radius: 8px;
+  border-radius: 50% !important;
   background-color: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: #FFFFFF;
@@ -164,7 +164,7 @@
   margin: 0 auto !important;
   width: 38px !important;
   height: 38px !important;
-  border-radius: 10px !important;
+  border-radius: 50% !important;
 }
 
 /* Fiche Entreprise Conventionnée */
@@ -185,7 +185,7 @@
   margin: 1rem auto;
   width: 44px;
   height: 44px;
-  border-radius: 12px;
+  border-radius: 50% !important;
   background-color: rgba(255, 255, 255, 0.15);
   border: none !important;
   color: #FFFFFF !important;
@@ -200,7 +200,7 @@
 .b2b-enterprise-icon {
   width: 40px;
   height: 40px;
-  border-radius: 12px;
+  border-radius: 50% !important;
   background: rgba(255, 255, 255, 0.16) !important;
   color: #FFFFFF !important;
   border: none !important;
@@ -361,7 +361,7 @@
   height: 48px;
   margin: 0.45rem auto;
   padding: 0;
-  border-radius: 14px;
+  border-radius: 50% !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -371,7 +371,7 @@
 .b2b-link-icon-wrap {
   width: 38px;
   height: 38px;
-  border-radius: 11px;
+  border-radius: 50% !important;
   background: rgba(255, 255, 255, 0.16) !important;
   color: #FFFFFF !important;
   border: none !important;
@@ -522,7 +522,7 @@
   border: 1.5px solid #EDE7DC;
   background: #FAF8F4;
   color: #721513;
-  border-radius: 10px;
+  border-radius: 50% !important;
   display: flex;
   align-items: center;
   justify-content: center;

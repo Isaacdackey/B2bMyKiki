@@ -310,17 +310,50 @@ div.badge i[class*="fa-"]:not(:only-child),
   margin-right: 0.45rem;
 }
 
-/* Centrage parfait pour les icônes seules dans un bouton, lien ou conteneur d'icône */
+/* Centrage parfait et forme 100% arrondie (cercle) pour toutes les boîtes et boutons d'icônes du projet */
 button > i[class*="fa-"]:only-child,
 a > i[class*="fa-"]:only-child,
+div > i[class*="fa-"]:only-child,
+span > i[class*="fa-"]:only-child,
 .panier-bouton-top > i[class*="fa-"],
 .dish-fav-btn > i[class*="fa-"],
 .btn-dish-action > i[class*="fa-"],
 .cat-icon-box > i[class*="fa-"],
 .b2b-link-icon-wrap > i[class*="fa-"],
-.b2b-enterprise-icon > i[class*="fa-"] {
+.b2b-enterprise-icon > i[class*="fa-"],
+.b2b-sidebar-enterprise-mini > i[class*="fa-"],
+.b2b-sidebar-toggle-btn > i[class*="fa-"],
+.ent-icon > i[class*="fa-"],
+.demo-card-icon > i[class*="fa-"] {
   margin: 0 !important;
   padding: 0 !important;
+}
+
+.b2b-link-icon-wrap,
+.b2b-enterprise-icon,
+.b2b-sidebar-enterprise-mini,
+.b2b-sidebar-toggle-btn,
+.b2b-mobile-menu-btn,
+.panier-bouton-top,
+.dish-fav-btn,
+.btn-dish-action,
+.cat-icon-box,
+.slot-icon,
+.b2b-icon-box-red,
+.b2b-icon-box-blue,
+.ent-icon,
+.demo-card-icon,
+.btn-remove-slot,
+.btn-icon,
+.btn-icon-action {
+  border-radius: 50% !important;
+  aspect-ratio: 1 / 1 !important;
+  min-height: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  flex-shrink: 0 !important;
 }
 
 /* =============================================

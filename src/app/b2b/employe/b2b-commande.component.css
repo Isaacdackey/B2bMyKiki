@@ -649,11 +649,22 @@
 }
 
 .cat-icon-box {
-  font-size: 1.25rem;
+  width: 38px;
+  height: 38px;
+  border-radius: 50% !important;
+  background: #FAF8F4;
+  border: 1.5px solid #EDE7DC;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.05rem;
   color: #721513;
+  transition: all 0.2s ease;
 }
 
 .category-card.active .cat-icon-box {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(230, 218, 186, 0.35);
   color: #E6DABA;
 }
 
@@ -772,8 +783,12 @@
   position: absolute;
   top: 10px;
   right: 10px;
-  width: 32px;
-  height: 32px;
+  width: 34px !important;
+  min-width: 34px !important;
+  max-width: 34px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
   border-radius: 50% !important;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(8px);
@@ -796,8 +811,8 @@
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 100% !important;
-  height: 100% !important;
+  width: auto !important;
+  height: auto !important;
   line-height: 1 !important;
   margin: 0 !important;
   padding: 0 !important;
@@ -872,9 +887,13 @@
 }
 
 .btn-dish-action {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
+  width: 34px !important;
+  min-width: 34px !important;
+  max-width: 34px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
+  border-radius: 50% !important;
   background: linear-gradient(135deg, #721513, #E51D24);
   border: none;
   color: #fff;
@@ -1047,7 +1066,7 @@
 .slot-icon {
   width: 32px;
   height: 32px;
-  border-radius: 8px;
+  border-radius: 50% !important;
   background: rgba(114, 21, 19, 0.08);
   color: #721513;
   display: flex;
@@ -1431,7 +1450,7 @@
 .b2b-icon-box-red {
   width: 48px;
   height: 48px;
-  border-radius: 14px;
+  border-radius: 50% !important;
   background-color: rgba(229, 29, 36, 0.1);
   color: #E51D24;
   display: flex;
@@ -2443,11 +2462,21 @@
 }
 
 .cat-icon-box {
-  font-size: 1.35rem;
+  width: 38px;
+  height: 38px;
+  border-radius: 50% !important;
+  background: #FAF8F4;
+  border: 1.5px solid #EDE7DC;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.05rem;
   color: #721513;
 }
 
 .category-card.active .cat-icon-box {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(230, 218, 186, 0.35);
   color: #E6DABA;
 }
 
