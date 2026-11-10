@@ -286,10 +286,13 @@
 }
 
 .b2b-sidebar-link {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  padding: 0.7rem 0.85rem;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+  background: transparent;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
   border-radius: 14px;
   color: rgba(255, 255, 255, 0.88);
   text-decoration: none;
@@ -299,11 +302,12 @@
   border: 1px solid transparent;
   width: 100%;
   box-sizing: border-box;
+  cursor: pointer;
 }
 
 .b2b-sidebar.collapsed .b2b-sidebar-link {
-  justify-content: center;
-  align-items: center;
+  justify-content: center !important;
+  align-items: center !important;
   padding: 0 !important;
   margin: 0.35rem auto;
   width: 48px;
@@ -406,20 +410,30 @@
 .b2b-link-text {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
   white-space: nowrap;
 }
 
 .b2b-link-title {
-  font-size: 0.86rem;
+  font-size: 0.84rem;
   font-weight: 700;
   color: #FFFFFF;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .b2b-link-subtitle {
-  font-size: 0.68rem;
+  font-size: 0.67rem;
   color: rgba(255, 255, 255, 0.7);
   font-weight: 500;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .b2b-sidebar-link.active .b2b-link-subtitle {

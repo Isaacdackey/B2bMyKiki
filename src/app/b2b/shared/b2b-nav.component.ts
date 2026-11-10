@@ -1,6 +1,6 @@
 import { Component, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { B2bStateService } from './b2b-state.service';
 
 @Component({
@@ -12,6 +12,25 @@ import { B2bStateService } from './b2b-state.service';
 })
 export class B2bNavComponent {
   b2b = inject(B2bStateService);
+  private router = inject(Router);
+
+  navigerSuperAdmin(section: 'ENTREPRISES' | 'CATALOGUE' | 'PLANNING') {
+    this.b2b.superAdminActiveSection.set(section);
+    this.router.navigate(['/b2b/super-admin']);
+    this.b2b.closeMobileDrawer();
+  }
+
+  navigerRh(section: 'STATISTIQUES' | 'COMMANDES_SITE' | 'EMPLOYES') {
+    this.b2b.rhActiveSection.set(section);
+    this.router.navigate(['/b2b/rh']);
+    this.b2b.closeMobileDrawer();
+  }
+
+  navigerCuisine(tab: 'PRODUCTION' | 'PLANNING_SEMAINE' | 'SCAN_QR' | 'AUTONOME' | 'BORDEREAUX') {
+    this.b2b.cuisineActiveTab.set(tab);
+    this.router.navigate(['/b2b/cuisine']);
+    this.b2b.closeMobileDrawer();
+  }
 
   @HostListener('window:keydown.escape')
   onEscape() {
