@@ -42,10 +42,10 @@
   <!-- En-tête Sidebar : Brand Logo + Bouton de Réduction / Fermeture Mobile -->
   <div class="b2b-sidebar-header">
     <a routerLink="/b2b" class="b2b-sidebar-brand" [title]="'Kiki Traiteur B2B Pro'" (click)="b2b.closeMobileDrawer()">
-      <img src="assets/images/logo.png" 
+      <img src="assets/images/KIKI TRAITEUR Logo Blanc.png" 
            alt="Kiki Traiteur" 
            class="b2b-sidebar-logo"
-           onerror="this.src='assets/images/KIKI TRAITEUR Logo Picto Rouge bordeau.png'">
+           onerror="this.src='assets/images/KIKI TRAITEUR Logo Picto blanc.png'">
       @if (!b2b.isSidebarCollapsed()) {
         <div class="b2b-sidebar-brand-info">
           <div class="b2b-sidebar-brand-name">
@@ -79,9 +79,10 @@
 
   <!-- Fiche Session / Rôle Actif Dynamique -->
   @if (!b2b.isSidebarCollapsed()) {
-    <div class="b2b-sidebar-enterprise" [style.border-left-color]="b2b.currentSession().badgeColor">
-      <div class="b2b-enterprise-icon" [style.color]="b2b.currentSession().badgeColor" [style.background]="b2b.currentSession().badgeColor + '15'">
+    <div class="b2b-sidebar-enterprise">
+      <div class="b2b-enterprise-icon">
         <i class="fa-solid" 
+           [class.fa-crown]="b2b.currentSession().role === 'SUPER_ADMIN'"
            [class.fa-briefcase]="b2b.currentSession().role === 'RESPONSABLE_ENTREPRISE'"
            [class.fa-clipboard-check]="b2b.currentSession().role === 'RESPONSABLE_SITE_KIKI'"
            [class.fa-user-shield]="b2b.currentSession().role === 'SALARIE_CONVENTIONNE'"
@@ -89,13 +90,13 @@
         </i>
       </div>
       <div class="b2b-enterprise-meta">
-        <span class="b2b-enterprise-tag" [style.color]="b2b.currentSession().badgeColor">{{ b2b.currentSession().badge }}</span>
+        <span class="b2b-enterprise-tag">{{ b2b.currentSession().badge }}</span>
         <strong class="b2b-enterprise-name">{{ b2b.currentSession().nomComplet }}</strong>
-        <span style="font-size: 0.7rem; color: #8A7268; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ b2b.currentSession().entite }}</span>
+        <span class="b2b-enterprise-sub">{{ b2b.currentSession().entite }}</span>
       </div>
     </div>
   } @else {
-    <div class="b2b-sidebar-enterprise-mini" [title]="b2b.currentSession().nomComplet + ' • ' + b2b.currentSession().badge" [style.color]="b2b.currentSession().badgeColor">
+    <div class="b2b-sidebar-enterprise-mini" [title]="b2b.currentSession().nomComplet + ' • ' + b2b.currentSession().badge">
       <i class="fa-solid" 
          [class.fa-crown]="b2b.currentSession().role === 'SUPER_ADMIN'"
          [class.fa-briefcase]="b2b.currentSession().role === 'RESPONSABLE_ENTREPRISE'"
@@ -116,7 +117,7 @@
     @if (b2b.currentSession().role === 'SUPER_ADMIN') {
       <div class="b2b-nav-group">
         <a routerLink="/b2b/super-admin" class="b2b-sidebar-link group-header" title="Super Admin Kiki" (click)="b2b.closeMobileDrawer()">
-          <div class="b2b-link-icon-wrap" style="color: #721513;">
+          <div class="b2b-link-icon-wrap">
             <i class="fa-solid fa-crown" aria-hidden="true"></i>
           </div>
           @if (!b2b.isSidebarCollapsed()) {
@@ -164,7 +165,7 @@
     @if (b2b.currentSession().role === 'RESPONSABLE_ENTREPRISE') {
       <div class="b2b-nav-group">
         <a routerLink="/b2b/rh" class="b2b-sidebar-link group-header" title="Responsable Entreprise" (click)="b2b.closeMobileDrawer()">
-          <div class="b2b-link-icon-wrap" style="color: #721513;">
+          <div class="b2b-link-icon-wrap">
             <i class="fa-solid fa-briefcase" aria-hidden="true"></i>
           </div>
           @if (!b2b.isSidebarCollapsed()) {
@@ -213,7 +214,7 @@
     @if (b2b.currentSession().role === 'RESPONSABLE_SITE_KIKI') {
       <div class="b2b-nav-group">
         <a routerLink="/b2b/cuisine" class="b2b-sidebar-link group-header" title="Responsable de Site Kiki" (click)="b2b.closeMobileDrawer()">
-          <div class="b2b-link-icon-wrap" style="color: #C05621;">
+          <div class="b2b-link-icon-wrap">
             <i class="fa-solid fa-clipboard-check" aria-hidden="true"></i>
           </div>
           @if (!b2b.isSidebarCollapsed()) {
@@ -278,14 +279,27 @@
 
     <!-- 3. CAS DU SALARIÉ (CONVENTIONNÉ OU AUTONOME) -->
     @if (b2b.currentSession().role === 'SALARIE_CONVENTIONNE' || b2b.currentSession().role === 'SALARIE_AUTONOME') {
-      <a routerLink="/b2b/commande" routerLinkActive="active" class="b2b-sidebar-link" title="Ma Commande Déjeuner" (click)="b2b.closeMobileDrawer()">
-        <div class="b2b-link-icon-wrap" [style.color]="b2b.currentSession().role === 'SALARIE_CONVENTIONNE' ? '#2E7D32' : '#1D4ED8'">
+      <a routerLink="/b2b/commande" routerLinkActive="active" class="b2b-sidebar-link" title="Mets du Jour & Catalogue" (click)="b2b.closeMobileDrawer()">
+        <div class="b2b-link-icon-wrap">
           <i class="fa-solid fa-utensils" aria-hidden="true"></i>
         </div>
         @if (!b2b.isSidebarCollapsed()) {
           <div class="b2b-link-text">
-            <span class="b2b-link-title">Ma Commande Déjeuner</span>
+            <span class="b2b-link-title">Mets &amp; Formule</span>
             <span class="b2b-link-subtitle">{{ b2b.currentSession().role === 'SALARIE_CONVENTIONNE' ? 'Formule 100% Subventionnée' : 'À la carte • Paiement Wave' }}</span>
+          </div>
+        }
+      </a>
+
+      <!-- Page dédiée au Panier / Plateau Déjeuner -->
+      <a routerLink="/b2b/panier" routerLinkActive="active" class="b2b-sidebar-link" title="Mon Panier / Plateau Déjeuner" (click)="b2b.closeMobileDrawer()">
+        <div class="b2b-link-icon-wrap">
+          <i class="fa-solid fa-basket-shopping" aria-hidden="true"></i>
+        </div>
+        @if (!b2b.isSidebarCollapsed()) {
+          <div class="b2b-link-text">
+            <span class="b2b-link-title">Mon Plateau / Panier</span>
+            <span class="b2b-link-subtitle">Validation &amp; QR Code Retrait</span>
           </div>
         }
       </a>

@@ -293,21 +293,34 @@ div.password-field.input-with-icon input:not([type="checkbox"]):not([type="radio
   margin-right: 0 !important;
 }
 
-/* Espacement global automatique pour éviter que les icônes ne touchent le texte dans tout le projet */
-button i[class*="fa-"]:not(.input-icon),
-a i[class*="fa-"]:not(.input-icon),
-span i[class*="fa-"]:not(.input-icon),
-h1 i[class*="fa-"],
-h2 i[class*="fa-"],
-h3 i[class*="fa-"],
-h4 i[class*="fa-"],
-h5 i[class*="fa-"],
-h6 i[class*="fa-"],
-label i[class*="fa-"],
-p i[class*="fa-"],
-div.badge i[class*="fa-"],
-.btn i[class*="fa-"] {
-  margin-right: 0.45rem !important;
+/* Espacement global automatique uniquement quand l'icône est suivie d'un élément de texte (et JAMAIS pour une icône seule) */
+button i[class*="fa-"]:not(.input-icon):not(:only-child),
+a i[class*="fa-"]:not(.input-icon):not(:only-child),
+span i[class*="fa-"]:not(.input-icon):not(:only-child),
+h1 i[class*="fa-"]:not(:only-child),
+h2 i[class*="fa-"]:not(:only-child),
+h3 i[class*="fa-"]:not(:only-child),
+h4 i[class*="fa-"]:not(:only-child),
+h5 i[class*="fa-"]:not(:only-child),
+h6 i[class*="fa-"]:not(:only-child),
+label i[class*="fa-"]:not(:only-child),
+p i[class*="fa-"]:not(:only-child),
+div.badge i[class*="fa-"]:not(:only-child),
+.btn i[class*="fa-"]:not(:only-child) {
+  margin-right: 0.45rem;
+}
+
+/* Centrage parfait pour les icônes seules dans un bouton, lien ou conteneur d'icône */
+button > i[class*="fa-"]:only-child,
+a > i[class*="fa-"]:only-child,
+.panier-bouton-top > i[class*="fa-"],
+.dish-fav-btn > i[class*="fa-"],
+.btn-dish-action > i[class*="fa-"],
+.cat-icon-box > i[class*="fa-"],
+.b2b-link-icon-wrap > i[class*="fa-"],
+.b2b-enterprise-icon > i[class*="fa-"] {
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 /* =============================================

@@ -34,11 +34,70 @@ export class B2bCommandeComponent {
     this.isAfterCutOff.update(v => !v);
   }
 
-  // Modal de confirmation / checkout
+  // Slides du carrousel Hero Banner MyKiki
+  slides = [
+    {
+      id: 'slide-1',
+      badge: 'COMMANDER IMMÉDIATEMENT',
+      isPromo: false,
+      titre: 'Pastels au Mérou & Crevettes (Lot de 12)',
+      description: 'Beignets croustillants farcis au poisson noble et crevettes, servis avec une sauce tomate pimentée signature.',
+      prix: 6000,
+      imageUrl: 'assets/images/plats/pastels.jpg',
+      boutonTexte: 'Choisir ce plat'
+    },
+    {
+      id: 'slide-2',
+      badge: 'OFFRE DU MOMENT',
+      isPromo: true,
+      titre: 'Dégustation Offerte au Lab',
+      description: 'Dès 40 convives, profitez d\'une séance dégustation sur-mesure avec notre Chef exécutif.',
+      imageUrl: 'assets/images/table-with-delicious-sweets-covered-with-pink-silk.jpg',
+      boutonTexte: 'Nouvelle demande'
+    },
+    {
+      id: 'slide-3',
+      badge: 'SPÉCIALITÉ DU CHEF',
+      isPromo: false,
+      titre: 'Thiéboudienne Penda Mbaye Royale',
+      description: 'Riz rouge mijoté au mérou frais, crevettes géantes et légumes du terroir.',
+      prix: 5500,
+      imageUrl: 'assets/images/plats/thieboudienne.jpg',
+      boutonTexte: 'Choisir ce plat'
+    }
+  ];
+  slideActuel = signal(0);
+  valeursFumee: string[] = ['Professionnalisme', 'Convivialité', 'Loyauté', 'Fiabilité', 'Excellence', 'Savoir-faire'];
+
+  allerAuSlide(index: number) {
+    this.slideActuel.set(index);
+  }
+
   showConfirmationModal = signal(false);
   orderPlaced = signal(false);
   isWaveProcessing = signal(false);
   qrDataString = signal<string>('');
+
+  // Catégories inspirées de MyKiki
+  categorieSelectionnee = signal<string>('all');
+
+  categories = [
+    { id: 'all', name: 'Tous', icon: 'fa-globe' },
+    { id: 'ENTREE', name: '1. Entrée', icon: 'fa-cookie-bite' },
+    { id: 'PLAT', name: '2. Plat Chaud', icon: 'fa-utensils' },
+    { id: 'DESSERT', name: '3. Dessert', icon: 'fa-cake-candles' },
+    { id: 'BOISSON', name: '4. Boisson', icon: 'fa-wine-glass-alt' }
+  ];
+
+  selectCategory(catId: string) {
+    this.categorieSelectionnee.set(catId);
+    if (catId === 'all') {
+      this.filterAutonome.set('TOUT');
+    } else {
+      this.filterAutonome.set(catId as any);
+      this.activeTab.set(catId as any);
+    }
+  }
 
   // DERNIÈRE COMMANDE ENREGISTRÉE & REVOIR LE QR CODE À TOUT MOMENT
   derniereCommande = signal<{
@@ -92,11 +151,65 @@ export class B2bCommandeComponent {
     return this.generateQrMatrix(data);
   });
 
-  // Liste des plats filtrés pour l'onglet actif (Mode Subventionné)
-  activePlats = computed(() => {
-    const tab = this.activeTab();
-    return this.b2b.catalogueJour().filter(p => p.categorie === tab);
+  // Plats filtrés unifiés avec recherche et catégorie
+  platsFiltres = computed(() => {
+    const cat = this.categorieSelectionnee();
+    const query = this.termeRecherche().trim().toLowerCase();
+    let plats = this.b2b.catalogueJour();
+
+    if (cat !== 'all') {
+      plats = plats.filter(p => p.categorie === cat);
+    }
+
+    if (query) {
+      plats = plats.filter(p => 
+        p.nom.toLowerCase().includes(query) || 
+        p.description.toLowerCase().includes(query)
+      );
+    }
+
+    return plats;
   });
+
+  // Ouvrir / fermer le tiroir latéral du panier ou scroll vers le panier
+  afficherPanierMobile = signal(false);
+
+  togglePanier() {
+    this.afficherPanierMobile.update(v => !v);
+    if (typeof document !== 'undefined') {
+      const el = document.getElementById('b2b-cart-section');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  }
+
+  // Nombre d'articles actifs (soit composantes plateau, soit articles panier Wave)
+  nombreArticlesPanier = computed(() => {
+    if (this.b2b.modeProfil() === 'SUBVENTIONNE') {
+      const s = this.b2b.selection();
+      return (s.entree ? 1 : 0) + (s.plat ? 1 : 0) + (s.dessert ? 1 : 0) + (s.boisson ? 1 : 0);
+    } else {
+      return this.b2b.nbArticlesPanierAutonome();
+    }
+  });
+
+  // Action intelligente : selon le mode (conventionné ou autonome)
+  choisirOuAjouterPlat(plat: PlatB2B) {
+    if (this.b2b.modeProfil() === 'SUBVENTIONNE') {
+      this.b2b.choisirPlat(plat);
+    } else {
+      this.b2b.ajouterAuPanierAutonome(plat);
+    }
+  }
+
+  isPlatActiveDansMode(plat: PlatB2B): boolean {
+    if (this.b2b.modeProfil() === 'SUBVENTIONNE') {
+      return this.isPlatSelected(plat);
+    } else {
+      return this.b2b.quantitePlatAutonome(plat.id) > 0;
+    }
+  }
 
   // Liste des plats filtrés (Mode Autonome)
   platsAutonome = computed(() => {

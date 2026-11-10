@@ -1,631 +1,195 @@
 <div class="b2b-wrapper">
   <app-b2b-nav></app-b2b-nav>
 
-  <!-- BANDEAU PROFIL SALARIÉ CONNECTÉ AVEC BOUTON DÉCONNEXION/CHANGER DE PROFIL -->
-  <section class="b2b-profile-bar">
-    <div class="b2b-profile-bar-inner">
-      <div class="b2b-profile-info">
-        <span class="b2b-profile-label">
-          <i class="fa-solid fa-circle-user" style="color: #721513;"></i> Connecté en tant que :
-        </span>
-        <span class="b2b-profile-user">
-          <strong>{{ b2b.currentEmploye().prenom }} {{ b2b.currentEmploye().nom }}</strong>
-          <span class="b2b-profile-meta">({{ b2b.currentEmploye().matricule }} • {{ b2b.currentEmploye().departement }})</span>
-        </span>
-        <span class="b2b-badge-statut-pill" 
-              [style.background]="b2b.modeProfil() === 'SUBVENTIONNE' ? 'rgba(96, 108, 56, 0.12)' : 'rgba(29, 78, 216, 0.1)'"
-              [style.color]="b2b.modeProfil() === 'SUBVENTIONNE' ? '#606C38' : '#1D4ED8'"
-              [style.border]="b2b.modeProfil() === 'SUBVENTIONNE' ? '1px solid #606C38' : '1px solid #1D4ED8'"
-              style="padding: 0.2rem 0.65rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem;">
-          <i class="fa-solid" [class.fa-building-shield]="b2b.modeProfil() === 'SUBVENTIONNE'" [class.fa-wallet]="b2b.modeProfil() === 'AUTONOME'"></i>
-          {{ b2b.modeProfil() === 'SUBVENTIONNE' ? 'Conventionné 100% RH (0 F)' : 'Autonome (Frais personnels Wave)' }}
-        </span>
-      </div>
+  <!-- ============================================================== -->
+  <!-- 0. MESSAGE D'ACCUEIL PERSONNALISÉ & BOUTON PANIER EN HAUT       -->
+  <!-- ============================================================== -->
+  <div class="user-greeting-banner">
+    <div class="greeting-left">
+      <span class="greeting-hello">
+        Bonjour, <strong class="user-highlight font-serif-luxury">{{ b2b.currentEmploye().prenom }}</strong>
+      </span>
+      <span class="greeting-sub">
+        Ravi de vous retrouver chez Kiki Traiteur • {{ b2b.siteActuel().nom }}
+      </span>
+    </div>
 
-      <!-- Actions Profil & Déconnexion Démo -->
-      <div style="display: flex; align-items: center; gap: 0.65rem;">
-        @if (derniereCommande()) {
-          <button 
-            type="button" 
-            (click)="ouvrirQrCodeModal()" 
-            class="b2b-btn-voir-qr-header"
-            title="Afficher le QR code de retrait pour la cantine"
-            style="background: #721513; border: 1.5px solid #721513; color: #FFFFFF; padding: 0.4rem 0.95rem; border-radius: 9999px; font-size: 0.78rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.45rem; box-shadow: 0 4px 12px rgba(114, 21, 19, 0.25); transition: all 0.2s;">
-            <i class="fa-solid fa-qrcode"></i> Revoir mon QR Code
-          </button>
+    <!-- Actions En-tête : Bouton Panier/Plateau MyKiki (Sans Emojis) -->
+    <div class="top-header-actions-row">
+      <!-- Bouton Panier / Plateau vers la PAGE PANIER dédiée (style MyKiki) -->
+      <a 
+        routerLink="/b2b/panier"
+        class="panier-bouton-top" 
+        [title]="b2b.modeProfil() === 'SUBVENTIONNE' ? 'Voir mon plateau déjeuner' : 'Voir mon panier déjeuner'"
+        aria-label="Mon Panier Déjeuner">
+        <i class="fa-solid fa-basket-shopping"></i>
+        @if (nombreArticlesPanier() > 0) {
+          <span class="panier-pastille-top">{{ nombreArticlesPanier() }}</span>
         }
-        <a 
-          routerLink="/b2b/login" 
-          class="b2b-change-account-btn"
-          title="Changer de profil ou tester un autre rôle"
-          style="background: #FAF8F4; border: 1.5px solid #EDE7DC; color: #721513; padding: 0.4rem 0.85rem; border-radius: 9999px; font-size: 0.76rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.45rem; transition: all 0.2s;">
-          <i class="fa-solid fa-right-left"></i> Changer de Profil / Déconnexion
-        </a>
-      </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- BANDEAU INFO CONVENTION & CUT-OFF TIME -->
+  <div class="b2b-status-bar-mykiki">
+    <div class="b2b-status-left">
+      <span class="b2b-badge-statut-pill" [class.is-subventionne]="b2b.modeProfil() === 'SUBVENTIONNE'" [class.is-autonome]="b2b.modeProfil() === 'AUTONOME'">
+        <i class="fa-solid" [class.fa-circle-check]="b2b.modeProfil() === 'SUBVENTIONNE'" [class.fa-wallet]="b2b.modeProfil() === 'AUTONOME'"></i>
+        {{ b2b.modeProfil() === 'SUBVENTIONNE' ? 'Conventionné 100% RH • Prise en charge totale' : 'Salarié Autonome • Paiement Wave' }}
+      </span>
+
+      <span class="b2b-cutoff-chip">
+        <i class="fa-regular fa-clock text-red"></i> Cut-Off Commande : <strong>{{ b2b.siteActuel().heureCutOff }}</strong>
+      </span>
+    </div>
+
+    <div class="b2b-status-right">
+      @if (derniereCommande()) {
+        <button 
+          type="button" 
+          (click)="ouvrirQrCodeModal()" 
+          class="btn-voir-qr-pill"
+          title="Afficher le QR code de retrait pour le réfectoire">
+          <i class="fa-solid fa-qrcode"></i> Revoir mon QR Code
+        </button>
+      }
+      <a 
+        routerLink="/b2b/login" 
+        class="btn-switch-account-pill"
+        title="Changer de profil ou tester un autre rôle">
+        <i class="fa-solid fa-right-left"></i> Changer de profil
+      </a>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- 2. BARRE DE RECHERCHE DANS LE CATALOGUE                        -->
+  <!-- ============================================================== -->
+  <div class="search-bar-wrapper">
+    <div class="search-bar-inner">
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <input 
+        type="text" 
+        [ngModel]="termeRecherche()" 
+        (ngModelChange)="termeRecherche.set($event)"
+        placeholder="Rechercher un plat, cocktail, formule ou ingrédient..." 
+        class="search-input"
+      />
+      @if (termeRecherche()) {
+        <button type="button" class="btn-clear-search" (click)="termeRecherche.set('')">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- 3. CATÉGORIES DU CATALOGUE                                     -->
+  <!-- ============================================================== -->
+  <section class="categories-section">
+    <div class="section-head-row">
+      <h3 class="section-title font-serif-luxury">Catégories &amp; Spécialités</h3>
+      <span class="category-meta">{{ platsFiltres().length }} mets disponibles aujourd'hui</span>
+    </div>
+
+    <div class="categories-scroll-row">
+      @for (cat of categories; track cat.id) {
+        <div 
+          class="category-card" 
+          [class.active]="categorieSelectionnee() === cat.id" 
+          (click)="selectCategory(cat.id)">
+          <div class="cat-icon-box">
+            <i class="fa-solid" [ngClass]="cat.icon"></i>
+          </div>
+          <span class="cat-name">{{ cat.name }}</span>
+        </div>
+      }
     </div>
   </section>
 
-  <!-- ========================================================================= -->
-  <!-- VUE 1 : SALARIÉ CONVENTIONNÉ (FORMULE COMPLÈTE & PRISE EN CHARGE 100% RH) -->
-  <!-- ========================================================================= -->
-  @if (b2b.modeProfil() === 'SUBVENTIONNE') {
-    
-    <!-- BANNIÈRE D'ALERTE CUT-OFF & FORMULE OBLIGATOIRE -->
-    <section class="b2b-banner">
-      <div class="b2b-banner-card">
-        <div class="b2b-banner-left">
-          <div class="b2b-icon-box-red">
-            <i class="fa-regular fa-clock"></i>
-          </div>
-          <div>
-            <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
-              <h2 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 800; color: #721513;">
-                Commande du Déjeuner • {{ b2b.siteActuel().nom }}
-              </h2>
-              <span class="b2b-cutoff-pill"><i class="fa-solid fa-hourglass-half"></i> Cut-Off : {{ b2b.siteActuel().heureCutOff }}</span>
-              
-              <!-- Badge dynamique de Cut-Off -->
-              @if (!isAfterCutOff()) {
-                <span style="background: rgba(96, 108, 56, 0.15); color: #606C38; border: 1px solid #606C38; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem;">
-                  <i class="fa-solid fa-circle" style="font-size: 0.5rem;"></i> Commandes Ouvertes pour ce midi
-                </span>
-              } @else {
-                <span style="background: rgba(229, 29, 36, 0.15); color: #E51D24; border: 1px solid #E51D24; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem;">
-                  <i class="fa-solid fa-triangle-exclamation"></i> Cut-off 10h30 dépassé : Enregistré pour Demain Midi
-                </span>
-              }
-            </div>
-
-            <p style="margin: 0.35rem 0 0; font-size: 0.82rem; color: #6E5A56;">
-              Formule obligatoire conventionnée : <strong style="color: #721513;">1 Entrée + 1 Plat Chaud + 1 Dessert + 1 Boisson</strong>. 
-              Prise en charge à 100% par TotalEnergies Sénégal.
-            </p>
-          </div>
-
-          <!-- Bouton de test démo du Cut-off -->
-          <div style="margin-left: auto;">
-            <button 
-              type="button" 
-              (click)="toggleSimulerApresCutOff()"
-              style="background: #FAF8F4; border: 1px solid #EDE7DC; color: #6E5A56; padding: 0.35rem 0.65rem; border-radius: 8px; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: all 0.2s;">
-              <i class="fa-solid fa-clock-rotate-left"></i> Simuler {{ isAfterCutOff() ? 'Avant 10h30' : 'Après 10h30' }}
-            </button>
-          </div>
-        </div>
-
-        <!-- Jauge de sélection formule -->
-        <div class="b2b-gauge-box">
-          <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 600;">
-            <span style="color: #6E5A56;">Plateau repas :</span>
-            <strong [style.color]="b2b.isFormuleComplete() ? '#606C38' : '#E51D24'">
-              {{ (b2b.selection().entree ? 1 : 0) + (b2b.selection().plat ? 1 : 0) + (b2b.selection().dessert ? 1 : 0) + (b2b.selection().boisson ? 1 : 0) }} / 4 composantes
-            </strong>
-          </div>
-          <div class="b2b-progress-bar-bg">
-            <div class="b2b-progress-bar-fill"
-                 [style.width.%]="((b2b.selection().entree ? 1 : 0) + (b2b.selection().plat ? 1 : 0) + (b2b.selection().dessert ? 1 : 0) + (b2b.selection().boisson ? 1 : 0)) * 25">
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- GRILLE COMMANDE FORMULE -->
-    <main class="b2b-main">
-      <!-- COLONNE GAUCHE : SÉLECTION PAR CATÉGORIE -->
-      <div style="min-width: 0; max-width: 100%; width: 100%; box-sizing: border-box;">
-        <div class="b2b-category-tabs">
-          <button 
-            (click)="activeTab.set('ENTREE')"
-            [class.active]="activeTab() === 'ENTREE'"
-            class="b2b-cat-btn">
-            <i class="fa-solid fa-carrot"></i> 1. Entrée
-            @if (b2b.selection().entree) { <i class="fa-solid fa-check" style="color: #606C38; margin-left: 0.25rem;"></i> }
-          </button>
-
-          <button 
-            (click)="activeTab.set('PLAT')"
-            [class.active]="activeTab() === 'PLAT'"
-            class="b2b-cat-btn">
-            <i class="fa-solid fa-bowl-rice"></i> 2. Plat Chaud
-            @if (b2b.selection().plat) { <i class="fa-solid fa-check" style="color: #606C38; margin-left: 0.25rem;"></i> }
-          </button>
-
-          <button 
-            (click)="activeTab.set('DESSERT')"
-            [class.active]="activeTab() === 'DESSERT'"
-            class="b2b-cat-btn">
-            <i class="fa-solid fa-cake-candles"></i> 3. Dessert
-            @if (b2b.selection().dessert) { <i class="fa-solid fa-check" style="color: #606C38; margin-left: 0.25rem;"></i> }
-          </button>
-
-          <button 
-            (click)="activeTab.set('BOISSON')"
-            [class.active]="activeTab() === 'BOISSON'"
-            class="b2b-cat-btn">
-            <i class="fa-solid fa-glass-water"></i> 4. Boisson
-            @if (b2b.selection().boisson) { <i class="fa-solid fa-check" style="color: #606C38; margin-left: 0.25rem;"></i> }
-          </button>
-
-          </div>
-
-        <div class="b2b-grid-plats">
-            @for (plat of activePlats(); track plat.id) {
-              <div 
-                (click)="b2b.choisirPlat(plat)"
-                [class.selected]="isPlatSelected(plat)"
-                class="b2b-card">
-                
-                <div class="b2b-card-img-wrap">
-                  <img [src]="plat.image" [alt]="plat.nom" class="b2b-card-img" loading="lazy" decoding="async">
-                  @if (isPlatSelected(plat)) {
-                    <span class="b2b-badge-selected">
-                      <i class="fa-solid fa-check"></i> CHOISI POUR LE MIDI
-                    </span>
-                  }
-                </div>
-
-                <div class="b2b-card-body">
-                  <div>
-                    <h3 class="b2b-card-title">{{ plat.nom }}</h3>
-                    <p style="margin: 0.4rem 0 0; font-size: 0.8rem; color: #6E5A56; line-height: 1.5;">{{ plat.description }}</p>
-                  </div>
-
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; border-top: 1px solid #EDE7DC; padding-top: 0.85rem;">
-                    <span style="font-size: 0.75rem; color: #721513; font-weight: 700;">
-                      <i class="fa-solid fa-circle-check" style="color: #606C38;"></i> Inclus dans la formule
-                    </span>
-                    <button class="b2b-card-btn">
-                      {{ isPlatSelected(plat) ? 'Sélectionné' : 'Choisir ce plat' }}
-                    </button>
-                  </div>
-                </div>
-
-              </div>
-            }
-          </div>
-      </div>
-
-      <!-- COLONNE DROITE : PLATEAU RÉCAPITULATIF SUBVENTIONNÉ -->
-      <div>
-        <div class="b2b-plateau">
-          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #EDE7DC; padding-bottom: 0.85rem; margin-bottom: 1.25rem;">
-            <h3 class="b2b-plateau-title">Mon Plateau Déjeuner</h3>
-            <button (click)="b2b.reinitialiserSelection()" style="background: none; border: none; color: #6E5A56; font-size: 0.75rem; font-weight: 600; cursor: pointer;">
-              <i class="fa-solid fa-trash-can"></i> Réinitialiser
-            </button>
-          </div>
-
-          <!-- CARTE D'ACCÈS PERMANENT AU QR CODE DU MIDI -->
-          @if (derniereCommande()) {
-            <div style="background: #FAF5EA; border: 1.5px dashed #721513; border-radius: 12px; padding: 0.75rem; margin-bottom: 1.15rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
-              <div style="display: flex; align-items: center; gap: 0.55rem;">
-                <div style="width: 34px; height: 34px; border-radius: 50%; background: #721513; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0;">
-                  <i class="fa-solid fa-qrcode"></i>
-                </div>
-                <div>
-                  <div style="font-size: 0.76rem; font-weight: 800; color: #721513;">Repas Midi Validé</div>
-                  <div style="font-size: 0.68rem; color: #6E5A56;">Code : <strong style="font-family: monospace; color: #721513;">{{ derniereCommande()?.qrCode }}</strong></div>
-                </div>
-              </div>
-              <button 
-                type="button" 
-                (click)="ouvrirQrCodeModal()" 
-                style="background: #721513; color: #FFFFFF; border: none; padding: 0.35rem 0.75rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; cursor: pointer; white-space: nowrap;">
-                Voir QR
-              </button>
-            </div>
-          }
-
-          <!-- 4 Slots Formule -->
-          <div class="b2b-plateau-slot" [class.filled]="!!b2b.selection().entree">
-            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #6E5A56; font-weight: 700;">
-              <span><i class="fa-solid fa-carrot"></i> 1. ENTRÉE</span>
-              <span [style.color]="b2b.selection().entree ? '#606C38' : '#E51D24'">
-                @if (b2b.selection().entree) { <i class="fa-solid fa-check"></i> Choisi } @else { Requis }
-              </span>
-            </div>
-            <div style="font-size: 0.85rem; font-weight: 700; color: #332724; margin-top: 0.35rem;">
-              {{ b2b.selection().entree?.nom || 'Aucune entrée sélectionnée' }}
-            </div>
-          </div>
-
-          <div class="b2b-plateau-slot" [class.filled]="!!b2b.selection().plat">
-            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #6E5A56; font-weight: 700;">
-              <span><i class="fa-solid fa-bowl-rice"></i> 2. PLAT CHAUD</span>
-              <span [style.color]="b2b.selection().plat ? '#606C38' : '#E51D24'">
-                @if (b2b.selection().plat) { <i class="fa-solid fa-check"></i> Choisi } @else { Requis }
-              </span>
-            </div>
-            <div style="font-size: 0.85rem; font-weight: 700; color: #332724; margin-top: 0.35rem;">
-              {{ b2b.selection().plat?.nom || 'Aucun plat chaud sélectionné' }}
-            </div>
-          </div>
-
-          <div class="b2b-plateau-slot" [class.filled]="!!b2b.selection().dessert">
-            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #6E5A56; font-weight: 700;">
-              <span><i class="fa-solid fa-cake-candles"></i> 3. DESSERT</span>
-              <span [style.color]="b2b.selection().dessert ? '#606C38' : '#E51D24'">
-                @if (b2b.selection().dessert) { <i class="fa-solid fa-check"></i> Choisi } @else { Requis }
-              </span>
-            </div>
-            <div style="font-size: 0.85rem; font-weight: 700; color: #332724; margin-top: 0.35rem;">
-              {{ b2b.selection().dessert?.nom || 'Aucun dessert sélectionné' }}
-            </div>
-          </div>
-
-          <div class="b2b-plateau-slot" [class.filled]="!!b2b.selection().boisson">
-            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #6E5A56; font-weight: 700;">
-              <span><i class="fa-solid fa-glass-water"></i> 4. BOISSON</span>
-              <span [style.color]="b2b.selection().boisson ? '#606C38' : '#E51D24'">
-                @if (b2b.selection().boisson) { <i class="fa-solid fa-check"></i> Choisi } @else { Requis }
-              </span>
-            </div>
-            <div style="font-size: 0.85rem; font-weight: 700; color: #332724; margin-top: 0.35rem;">
-              {{ b2b.selection().boisson?.nom || 'Aucune boisson sélectionnée' }}
-            </div>
-          </div>
-
-          <!-- Suppléments éventuels -->
-          @if (b2b.selection().supplements.length > 0) {
-            <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid #EDE7DC;">
-              <div style="font-size: 0.75rem; color: #E51D24; font-weight: 800; margin-bottom: 0.5rem;">Suppléments hors formule :</div>
-              @for (sup of b2b.selection().supplements; track sup.id) {
-                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #332724; margin-bottom: 0.25rem;">
-                  <span>{{ sup.nom }}</span>
-                  <strong style="color: #E51D24;">+{{ sup.prixUnitaire }} F</strong>
-                </div>
-              }
-            </div>
-          }
-
-          <!-- Créneau de retrait -->
-          <div style="margin-top: 1.25rem;">
-            <label style="font-size: 0.75rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.35rem;">
-              <i class="fa-solid fa-clock"></i> Créneau de distribution sur site :
-            </label>
-            <select 
-              [ngModel]="b2b.creneauLivraison()" 
-              (ngModelChange)="b2b.creneauLivraison.set($event)"
-              class="b2b-site-select" style="width: 100%;">
-              @for (c of b2b.creneauxSiteActuel(); track c) {
-                <option [value]="c">{{ c }}</option>
-              }
-            </select>
-          </div>
-
-          <!-- Calcul Financier Subventionné -->
-          <div style="background-color: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 1.15rem; margin-top: 1.25rem; font-size: 0.85rem;">
-            <div style="display: flex; justify-content: space-between; color: #6E5A56; margin-bottom: 0.35rem;">
-              <span>Forfait Formule Déjeuner :</span>
-              <span style="color: #332724; font-weight: 700;">{{ b2b.formuleActuelle().prixForfait }} FCFA</span>
-            </div>
-
-            @if (b2b.totalSupplements() > 0) {
-              <div style="display: flex; justify-content: space-between; color: #E51D24; margin-bottom: 0.35rem;">
-                <span>Extras hors formule :</span>
-                <span style="font-weight: 800;">+{{ b2b.totalSupplements() }} FCFA</span>
-              </div>
-            }
-
-            <div style="display: flex; justify-content: space-between; color: #606C38; margin-bottom: 0.35rem; padding-top: 0.35rem; border-top: 1px solid #EDE7DC;">
-              <span>Prise en charge {{ b2b.currentEntreprise().nom }} :</span>
-              <span style="font-weight: 800;">-{{ b2b.partPriseEnChargeEntreprise() }} FCFA</span>
-            </div>
-
-            <div style="display: flex; justify-content: space-between; font-size: 1.15rem; font-weight: 900; color: #721513; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1.5px solid #EDE7DC;">
-              <span>Reste à payer :</span>
-              <span [style.color]="b2b.resteAPayerEmploye() === 0 ? '#606C38' : '#E51D24'">
-                {{ b2b.resteAPayerEmploye() }} FCFA
-              </span>
-            </div>
-          </div>
-
-          @if (!b2b.isFormuleComplete()) {
-            <div style="background: rgba(114, 21, 19, 0.08); border: 1px solid rgba(114, 21, 19, 0.2); color: #721513; font-size: 0.75rem; font-weight: 600; padding: 0.65rem; border-radius: 10px; margin-top: 1rem; text-align: center;">
-              <i class="fa-solid fa-triangle-exclamation"></i> Sélectionnez les 4 éléments pour valider votre repas.
-            </div>
-          }
-
-          <button 
-            [disabled]="!b2b.isFormuleComplete()"
-            (click)="validerCommande()"
-            class="b2b-btn-valider"
-            [class.ready]="b2b.isFormuleComplete()"
-            [class.disabled]="!b2b.isFormuleComplete()">
-            <i class="fa-solid fa-circle-check"></i> Valider mon Déjeuner (0 FCFA)
-          </button>
-        </div>
-      </div>
-    </main>
-
-  } @else {
-
-    <!-- ========================================================================= -->
-    <!-- VUE 2 : SALARIÉ NON PRIS EN CHARGE (INSPIRÉE FIDÈLEMENT DE L'ESPACE CLIENT MYKIKI) -->
-    <!-- ========================================================================= -->
-    
-    <div class="mykiki-b2b-experience">
+  <!-- ============================================================== -->
+  <!-- 4. CONTENU PRINCIPAL : NOS PLATS INCONTOURNABLES + RÉCAPITULATIF -->
+  <!-- ============================================================== -->
+  <section class="mykiki-main-section">
+    <div class="mykiki-dual-layout">
       
-      <!-- 1. USER GREETING BANNER (IDENTIQUE À L'ESPACE CLIENT) -->
-      <div class="user-greeting-banner">
-        <div class="greeting-left">
-          <span class="greeting-hello">Bonjour, <strong class="user-highlight font-serif-luxury">{{ b2b.currentEmploye().prenom }}</strong> <i class="fa-solid fa-hand fa-shake" style="color: #E51D24; font-size: 1.15rem; margin-left: 0.35rem;"></i></span>
-          <span class="greeting-sub">Ravi de vous retrouver sur le comptoir digital Kiki Traiteur • {{ b2b.siteActuel().nom }}</span>
-        </div>
-
-        <div class="hero-fidelite-badge">
-          <div class="fidelite-badge-icon-wrap">
-            <i class="fa-solid fa-coins"></i>
-          </div>
-          <div class="fidelite-badge-info">
-            <span class="fidelite-badge-pts font-serif-luxury">10</span>
-            <span class="fidelite-badge-txt">pts fidélité</span>
-          </div>
-          <div class="fidelite-badge-sparkle">
-            <i class="fa-solid fa-crown"></i>
-          </div>
-        </div>
-      </div>
-
-      <!-- 2. HERO BANNER BORDEAUX KIKI TRAITEUR -->
-      <section class="mykiki-hero-card">
-        <div class="mykiki-hero-left">
-          <div class="mykiki-hero-badge">
-            <i class="fa-solid fa-utensils me-1"></i> MENU DU JOUR DU MIDI • COMPTOIR ENTREPRISE
-          </div>
-          <h2 class="mykiki-hero-title font-serif-luxury">
-            Menu du Jour • {{ b2b.siteActuel().nom }}
-          </h2>
-          <p class="mykiki-hero-desc">
-            Retrouvez tous les plats du jour cuisinés ce matin par nos chefs pour votre site. Composez librement votre repas à vos frais (sans obligation de formule 4 composantes) et réglez instantanément par Wave.
-          </p>
-
-          <div class="mykiki-hero-cutoff-box">
-            <i class="fa-regular fa-clock text-gold"></i>
-            <span>Cut-Off commande : <strong>{{ b2b.siteActuel().heureCutOff }}</strong> • Livraison groupée au réfectoire ce midi</span>
-          </div>
-        </div>
-
-        <div class="mykiki-hero-right">
-          <div class="mykiki-value-pill"><i class="fa-solid fa-star text-gold"></i> FIABILITÉ</div>
-          <div class="mykiki-value-pill"><i class="fa-solid fa-star text-gold"></i> EXCELLENCE</div>
-          <div class="mykiki-value-pill"><i class="fa-solid fa-star text-gold"></i> SAVOIR-FAIRE</div>
-        </div>
-      </section>
-
-      <!-- 3. BARRE DE RECHERCHE CENTRÉE -->
-      <div class="search-bar-wrapper">
-        <div class="search-bar-inner">
-          <i class="fa-solid fa-magnifying-glass search-icon"></i>
-          <input 
-            type="text" 
-            [ngModel]="termeRecherche()" 
-            (ngModelChange)="termeRecherche.set($event)"
-            placeholder="Rechercher un plat, cocktail, formule ou ingrédient..." 
-            class="search-input">
-          @if (termeRecherche()) {
-            <button type="button" class="btn-clear-search" (click)="termeRecherche.set('')">
-              <i class="fa-solid fa-xmark"></i>
-            </button>
-          }
-        </div>
-      </div>
-
-      <!-- 4. CATÉGORIES & SPÉCIALITÉS (CARTES HORIZONTALES AVEC ICÔNES) -->
-      <div class="categories-section">
+      <!-- COLONNE GAUCHE : GRILLE DE PLATS IDENTIQUE À MYKIKI -->
+      <div class="mykiki-dishes-col">
         <div class="section-head-row">
-          <h3 class="section-title font-serif-luxury">Menu du Jour par Spécialité</h3>
-          <span class="category-meta">{{ platsAutonome().length }} mets disponibles aujourd'hui</span>
+          <h3 class="section-title font-serif-luxury">Nos plats incontournables</h3>
+          <span class="category-meta">Cuisine Centrale Kiki Traiteur</span>
         </div>
 
-        <div class="categories-scroll-row">
-          <div class="category-card" [class.active]="filterAutonome() === 'TOUT'" (click)="filterAutonome.set('TOUT')">
-            <div class="cat-icon-box"><i class="fa-solid fa-globe"></i></div>
-            <span class="cat-name">Tout le Menu du Jour</span>
+        @if (platsFiltres().length === 0) {
+          <div class="empty-phare-state">
+            <i class="fa-solid fa-utensils mb-2"></i>
+            <p>Aucun plat ne correspond à vos critères actuels.</p>
+            <button class="btn-reset-filters" (click)="selectCategory('all'); termeRecherche.set('')">
+              Voir tous les plats
+            </button>
           </div>
-
-          <div class="category-card" [class.active]="filterAutonome() === 'PLAT'" (click)="filterAutonome.set('PLAT')">
-            <div class="cat-icon-box"><i class="fa-solid fa-utensils"></i></div>
-            <span class="cat-name">Plats Chauds du Jour</span>
-          </div>
-
-          <div class="category-card" [class.active]="filterAutonome() === 'ENTREE'" (click)="filterAutonome.set('ENTREE')">
-            <div class="cat-icon-box"><i class="fa-solid fa-carrot"></i></div>
-            <span class="cat-name">Entrées du Jour</span>
-          </div>
-
-          <div class="category-card" [class.active]="filterAutonome() === 'DESSERT'" (click)="filterAutonome.set('DESSERT')">
-            <div class="cat-icon-box"><i class="fa-solid fa-cake-candles"></i></div>
-            <span class="cat-name">Desserts & Douceurs</span>
-          </div>
-
-          <div class="category-card" [class.active]="filterAutonome() === 'BOISSON'" (click)="filterAutonome.set('BOISSON')">
-            <div class="cat-icon-box"><i class="fa-solid fa-glass-water"></i></div>
-            <span class="cat-name">Boissons & Nectars Frais</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 5. GRILLE PRINCIPALE : PLATS INCONTOURNABLES + PANIER FIXE DROITE -->
-      <div class="mykiki-dual-layout">
-        
-        <!-- SECTION GAUCHE : GRILLE DES DISH-CARDS -->
-        <div class="mykiki-dishes-col">
-          <div class="section-head-row">
-            <h3 class="section-title font-serif-luxury">Nos Plats du Jour à la Carte</h3>
-            <span class="category-meta">Sélection fraîche du jour • Cuisine centrale Kiki</span>
-          </div>
-
-          @if (platsAutonome().length === 0) {
-            <div class="mykiki-empty-state">
-              <i class="fa-solid fa-magnifying-glass"></i>
-              <p>Aucun plat ne correspond à votre recherche « {{ termeRecherche() }} ».</p>
-              <button (click)="termeRecherche.set(''); filterAutonome.set('TOUT')" class="btn-reset-filters">
-                Réinitialiser les filtres
-              </button>
-            </div>
-          } @else {
-            <div class="mykiki-dishes-grid">
-              @for (plat of platsAutonome(); track plat.id) {
-                <div class="mykiki-dish-card" [class.in-cart]="b2b.quantitePlatAutonome(plat.id) > 0">
+        } @else {
+          <div class="dishes-grid">
+            @for (plat of platsFiltres(); track plat.id) {
+              <div class="dish-card" [class.is-chosen]="isPlatActiveDansMode(plat)">
+                
+                <div class="dish-image-wrap">
+                  <img [src]="plat.image" [alt]="plat.nom" class="dish-img" loading="lazy" decoding="async">
                   
-                  <div class="dish-image-wrap">
-                    <img [src]="plat.image" [alt]="plat.nom" class="dish-img" loading="lazy" decoding="async">
-                    
-                    <!-- Badge Catégorie Overlay en haut à gauche -->
-                    <div class="dish-badge-overlay">
-                      <span class="dish-tag">
-                        @if (plat.categorie === 'PLAT') { Plats Chauds & Spécialités }
-                        @else if (plat.categorie === 'ENTREE') { Entrées & Cocktails }
-                        @else if (plat.categorie === 'DESSERT') { Desserts & Douceurs }
-                        @else { Boissons & Nectars }
-                      </span>
-                    </div>
-
-                    <!-- Bouton caddie en haut à droite -->
-                    <button 
-                      (click)="b2b.ajouterAuPanierAutonome(plat)" 
-                      class="dish-cart-btn" 
-                      title="Ajouter au panier">
-                      <i class="fa-solid fa-cart-shopping"></i>
-                    </button>
+                  <div class="dish-badge-overlay">
+                    <span class="dish-tag">
+                      @if (plat.categorie === 'ENTREE') { 1. Entrée }
+                      @else if (plat.categorie === 'PLAT') { 2. Plat Chaud }
+                      @else if (plat.categorie === 'DESSERT') { 3. Dessert }
+                      @else { 4. Boisson }
+                    </span>
                   </div>
 
-                  <div class="dish-card-content">
-                    <h4 class="dish-title">{{ plat.nom }}</h4>
-                    <p class="dish-desc">{{ plat.description }}</p>
+                  <button 
+                    type="button"
+                    (click)="choisirOuAjouterPlat(plat)"
+                    class="dish-fav-btn" 
+                    [class.in-cart]="isPlatActiveDansMode(plat)"
+                    title="Sélectionner pour mon repas">
+                    <i class="fa-solid" [class.fa-check]="isPlatActiveDansMode(plat)" [class.fa-cart-plus]="!isPlatActiveDansMode(plat)"></i>
+                  </button>
+                </div>
 
-                    <div class="dish-footer-row">
-                      <div class="dish-price font-serif-luxury">
-                        {{ plat.prixUnitaire }} <span class="dish-currency">FCFA</span>
-                      </div>
+                <div class="dish-body">
+                  <div class="dish-header-row">
+                    <h4 class="dish-title font-serif-luxury">{{ plat.nom }}</h4>
+                  </div>
 
-                      <!-- Contrôle d'Ajout ou Quantité -->
-                      @if (b2b.quantitePlatAutonome(plat.id) === 0) {
-                        <button (click)="b2b.ajouterAuPanierAutonome(plat)" class="btn-dish-add">
-                          <i class="fa-solid fa-plus"></i> Choisir
-                        </button>
+                  <p class="dish-desc">{{ plat.description }}</p>
+
+                  <div class="dish-footer-row">
+                    <div class="dish-price-box">
+                      @if (b2b.modeProfil() === 'SUBVENTIONNE') {
+                        <span class="price-amount" style="color: #606C38; font-size: 0.92rem;">
+                          <i class="fa-solid fa-circle-check"></i> Inclus Formule (0 F)
+                        </span>
                       } @else {
-                        <div class="dish-qty-stepper">
-                          <button (click)="b2b.retirerDuPanierAutonome(plat.id)" class="stepper-btn">-</button>
-                          <span class="stepper-num">{{ b2b.quantitePlatAutonome(plat.id) }}</span>
-                          <button (click)="b2b.ajouterAuPanierAutonome(plat)" class="stepper-btn">+</button>
-                        </div>
+                        <span class="price-amount">{{ plat.prixUnitaire }} FCFA</span>
                       }
                     </div>
-                  </div>
 
+                    <button 
+                      type="button"
+                      class="btn-dish-action" 
+                      [class.has-items]="isPlatActiveDansMode(plat)" 
+                      (click)="choisirOuAjouterPlat(plat)">
+                      <i class="fa-solid" [ngClass]="isPlatActiveDansMode(plat) ? 'fa-check' : 'fa-plus'"></i>
+                    </button>
+                  </div>
                 </div>
-              }
-            </div>
-          }
-        </div>
 
-        <!-- SECTION DROITE : PANIER DIGITAL & PAIEMENT WAVE -->
-        <div class="mykiki-cart-col">
-          <div class="mykiki-cart-card">
-            
-            <div class="cart-head">
-              <div>
-                <h3 class="cart-title font-serif-luxury">Mon Panier Déjeuner</h3>
-                <span class="cart-subtitle">Frais personnels • {{ b2b.siteActuel().nom }}</span>
-              </div>
-              @if (b2b.panierAutonome().length > 0) {
-                <button (click)="b2b.viderPanierAutonome()" class="btn-clear-cart" title="Vider le panier">
-                  <i class="fa-solid fa-trash-can"></i>
-                </button>
-              }
-            </div>
-
-            <!-- Liste des articles -->
-            @if (b2b.panierAutonome().length === 0) {
-              <div class="cart-empty-box">
-                <div class="cart-empty-icon"><i class="fa-solid fa-bag-shopping"></i></div>
-                <div class="cart-empty-title">Votre panier est vide</div>
-                <p class="cart-empty-desc">
-                  Cliquez sur <strong>« Choisir »</strong> pour ajouter vos plats et boissons au panier.
-                </p>
-              </div>
-            } @else {
-              <div class="cart-items-scroll">
-                @for (item of b2b.panierAutonome(); track item.plat.id) {
-                  <div class="cart-item-row">
-                    <img [src]="item.plat.image" class="cart-item-thumb">
-                    <div class="cart-item-details">
-                      <div class="cart-item-name">{{ item.plat.nom }}</div>
-                      <div class="cart-item-price-unit">{{ item.plat.prixUnitaire }} FCFA</div>
-                    </div>
-
-                    <div class="cart-item-actions">
-                      <div class="cart-stepper-mini">
-                        <button (click)="b2b.retirerDuPanierAutonome(item.plat.id)">-</button>
-                        <span>{{ item.quantite }}</span>
-                        <button (click)="b2b.ajouterAuPanierAutonome(item.plat)">+</button>
-                      </div>
-                      <div class="cart-item-subtotal">
-                        {{ item.plat.prixUnitaire * item.quantite }} F
-                      </div>
-                    </div>
-                  </div>
-                }
               </div>
             }
-
-            <!-- Créneau de livraison sur site -->
-            <div class="cart-site-slot">
-              <label class="slot-label">
-                <i class="fa-solid fa-location-dot text-red"></i> Récupération au réfectoire :
-              </label>
-              <select 
-                [ngModel]="b2b.creneauLivraison()" 
-                (ngModelChange)="b2b.creneauLivraison.set($event)"
-                class="slot-select">
-                @for (c of b2b.creneauxSiteActuel(); track c) {
-                  <option [value]="c">{{ c }}</option>
-                }
-              </select>
-            </div>
-
-            <!-- Total et ventilation financière -->
-            <div class="cart-summary-box">
-              <div class="summary-line">
-                <span>Sous-total articles :</span>
-                <span class="font-bold">{{ b2b.totalPanierAutonome() }} FCFA</span>
-              </div>
-              <div class="summary-line">
-                <span>Subvention Entreprise :</span>
-                <span class="text-muted">0 FCFA (Frais personnels)</span>
-              </div>
-              <div class="summary-total-line">
-                <span class="total-label font-serif-luxury">Net à payer Wave :</span>
-                <span class="total-val">{{ b2b.totalPanierAutonome() }} FCFA</span>
-              </div>
-            </div>
-
-            <!-- Bouton Wave Mobile Money Sénégal -->
-            <button 
-              [disabled]="b2b.panierAutonome().length === 0"
-              (click)="validerCommande()"
-              class="btn-wave-checkout"
-              [class.active]="b2b.panierAutonome().length > 0"
-              [class.disabled]="b2b.panierAutonome().length === 0">
-              <i class="fa-solid fa-mobile-screen-button"></i> Payer avec Wave ({{ b2b.totalPanierAutonome() }} FCFA)
-            </button>
-
-            <div class="wave-security-notice">
-              <i class="fa-solid fa-shield-halved text-blue"></i>
-              <span>Paiement instantané sécurisé Wave Mobile Money Sénégal (+221)</span>
-            </div>
-
           </div>
-        </div>
-
+        }
       </div>
-
     </div>
-
-  }
+  </section>
 
   <!-- ========================================================================= -->
   <!-- MODAL DE CHECKOUT (ADAPTÉE SUBVENTIONNÉ 0 F OU AUTONOME WAVE)            -->

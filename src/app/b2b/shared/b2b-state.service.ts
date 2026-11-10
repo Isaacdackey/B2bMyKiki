@@ -516,6 +516,17 @@ export class B2bStateService {
     this.selection.set(sel);
   }
 
+  retirerPlat(plat: PlatB2B) {
+    const sel = { ...this.selection() };
+    switch (plat.categorie) {
+      case 'ENTREE': if (sel.entree?.id === plat.id) sel.entree = undefined; break;
+      case 'PLAT': if (sel.plat?.id === plat.id) sel.plat = undefined; break;
+      case 'DESSERT': if (sel.dessert?.id === plat.id) sel.dessert = undefined; break;
+      case 'BOISSON': if (sel.boisson?.id === plat.id) sel.boisson = undefined; break;
+    }
+    this.selection.set(sel);
+  }
+
   toggleSupplement(plat: PlatB2B) {
     const sel = { ...this.selection() };
     const index = sel.supplements.findIndex(p => p.id === plat.id);

@@ -1,0 +1,370 @@
+<div class="b2b-wrapper">
+  <app-b2b-nav></app-b2b-nav>
+
+  <!-- ENTÊTE DE NAVIGATION PANIER -->
+  <div class="panier-top-bar">
+    <div class="panier-top-left">
+      <a routerLink="/b2b/commande" class="btn-retour-catalogue">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Retour aux mets</span>
+      </a>
+      <h1 class="panier-page-title font-serif-luxury">
+        {{ b2b.modeProfil() === 'SUBVENTIONNE' ? 'Mon Plateau Déjeuner (Prise en charge RH)' : 'Mon Panier Déjeuner (Frais Personnels)' }}
+      </h1>
+    </div>
+
+    <div class="panier-top-right">
+      <span class="site-chip">
+        <i class="fa-solid fa-location-dot text-red"></i> {{ b2b.siteActuel().nom }}
+      </span>
+    </div>
+  </div>
+
+  <!-- CONTENU PRINCIPAL DE LA PAGE PANIER -->
+  <div class="panier-main-container">
+    @if (b2b.modeProfil() === 'SUBVENTIONNE') {
+      <!-- MODE CONVENTIONNÉ : LE GRAND PLATEAU REPAS -->
+      <div class="panier-card-fullscreen">
+        <div class="panier-card-header">
+          <div>
+            <h2 class="cart-title font-serif-luxury">Composition de votre Plateau Déjeuner</h2>
+            <span class="cart-subtitle">Formule 4 composantes prise en charge à 100% par TotalEnergies Sénégal</span>
+          </div>
+          <button (click)="b2b.reinitialiserSelection()" class="btn-clear-cart" title="Vider le plateau">
+            <i class="fa-solid fa-trash-can"></i> Réinitialiser
+          </button>
+        </div>
+
+        <!-- Jauge d'avancement 4 composantes -->
+        <div class="gauge-container-panier">
+          <div class="gauge-label-row">
+            <span>Avancement du plateau :</span>
+            <strong [style.color]="b2b.isFormuleComplete() ? '#606C38' : '#E51D24'">
+              {{ (b2b.selection().entree ? 1 : 0) + (b2b.selection().plat ? 1 : 0) + (b2b.selection().dessert ? 1 : 0) + (b2b.selection().boisson ? 1 : 0) }} / 4 composantes sélectionnées
+            </strong>
+          </div>
+          <div class="gauge-bar-bg">
+            <div class="gauge-bar-fill" [style.width.%]="((b2b.selection().entree ? 1 : 0) + (b2b.selection().plat ? 1 : 0) + (b2b.selection().dessert ? 1 : 0) + (b2b.selection().boisson ? 1 : 0)) * 25"></div>
+          </div>
+        </div>
+
+        <!-- Les 4 cartes de composantes -->
+        <div class="plateau-grid-slots">
+          
+          <!-- 1. ENTRÉE -->
+          <div class="plateau-slot-card" [class.filled]="!!b2b.selection().entree">
+            <div class="slot-badge">
+              <i class="fa-solid fa-cookie-bite"></i> 1. Entrée
+            </div>
+            @if (b2b.selection().entree) {
+              <div class="slot-content">
+                <img [src]="b2b.selection().entree?.image" class="slot-thumb">
+                <div class="slot-info">
+                  <h4 class="slot-title">{{ b2b.selection().entree?.nom }}</h4>
+                  <p class="slot-desc">{{ b2b.selection().entree?.description }}</p>
+                  <span class="slot-status-ok"><i class="fa-solid fa-circle-check"></i> Prêt pour plateau</span>
+                </div>
+                <button (click)="b2b.retirerPlat(b2b.selection().entree!)" class="btn-remove-slot" title="Retirer">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            } @else {
+              <div class="slot-empty">
+                <p>Aucune entrée choisie</p>
+                <a routerLink="/b2b/commande" class="btn-pick-slot"><i class="fa-solid fa-plus"></i> Choisir une entrée</a>
+              </div>
+            }
+          </div>
+
+          <!-- 2. PLAT CHAUD -->
+          <div class="plateau-slot-card" [class.filled]="!!b2b.selection().plat">
+            <div class="slot-badge">
+              <i class="fa-solid fa-utensils"></i> 2. Plat Chaud
+            </div>
+            @if (b2b.selection().plat) {
+              <div class="slot-content">
+                <img [src]="b2b.selection().plat?.image" class="slot-thumb">
+                <div class="slot-info">
+                  <h4 class="slot-title">{{ b2b.selection().plat?.nom }}</h4>
+                  <p class="slot-desc">{{ b2b.selection().plat?.description }}</p>
+                  <span class="slot-status-ok"><i class="fa-solid fa-circle-check"></i> Prêt pour plateau</span>
+                </div>
+                <button (click)="b2b.retirerPlat(b2b.selection().plat!)" class="btn-remove-slot" title="Retirer">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            } @else {
+              <div class="slot-empty">
+                <p>Aucun plat chaud choisi</p>
+                <a routerLink="/b2b/commande" class="btn-pick-slot"><i class="fa-solid fa-plus"></i> Choisir un plat chaud</a>
+              </div>
+            }
+          </div>
+
+          <!-- 3. DESSERT -->
+          <div class="plateau-slot-card" [class.filled]="!!b2b.selection().dessert">
+            <div class="slot-badge">
+              <i class="fa-solid fa-cake-candles"></i> 3. Dessert
+            </div>
+            @if (b2b.selection().dessert) {
+              <div class="slot-content">
+                <img [src]="b2b.selection().dessert?.image" class="slot-thumb">
+                <div class="slot-info">
+                  <h4 class="slot-title">{{ b2b.selection().dessert?.nom }}</h4>
+                  <p class="slot-desc">{{ b2b.selection().dessert?.description }}</p>
+                  <span class="slot-status-ok"><i class="fa-solid fa-circle-check"></i> Prêt pour plateau</span>
+                </div>
+                <button (click)="b2b.retirerPlat(b2b.selection().dessert!)" class="btn-remove-slot" title="Retirer">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            } @else {
+              <div class="slot-empty">
+                <p>Aucun dessert choisi</p>
+                <a routerLink="/b2b/commande" class="btn-pick-slot"><i class="fa-solid fa-plus"></i> Choisir un dessert</a>
+              </div>
+            }
+          </div>
+
+          <!-- 4. BOISSON -->
+          <div class="plateau-slot-card" [class.filled]="!!b2b.selection().boisson">
+            <div class="slot-badge">
+              <i class="fa-solid fa-wine-glass-alt"></i> 4. Boisson
+            </div>
+            @if (b2b.selection().boisson) {
+              <div class="slot-content">
+                <img [src]="b2b.selection().boisson?.image" class="slot-thumb">
+                <div class="slot-info">
+                  <h4 class="slot-title">{{ b2b.selection().boisson?.nom }}</h4>
+                  <p class="slot-desc">{{ b2b.selection().boisson?.description }}</p>
+                  <span class="slot-status-ok"><i class="fa-solid fa-circle-check"></i> Prêt pour plateau</span>
+                </div>
+                <button (click)="b2b.retirerPlat(b2b.selection().boisson!)" class="btn-remove-slot" title="Retirer">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            } @else {
+              <div class="slot-empty">
+                <p>Aucune boisson choisie</p>
+                <a routerLink="/b2b/commande" class="btn-pick-slot"><i class="fa-solid fa-plus"></i> Choisir une boisson</a>
+              </div>
+            }
+          </div>
+
+        </div>
+
+        <!-- Paramètres & Validation -->
+        <div class="panier-footer-grid">
+          <div class="creneau-box">
+            <label class="slot-label">
+              <i class="fa-solid fa-clock text-red"></i> Créneau de retrait au réfectoire :
+            </label>
+            <select 
+              [ngModel]="b2b.creneauLivraison()" 
+              (ngModelChange)="b2b.creneauLivraison.set($event)"
+              class="slot-select">
+              @for (c of b2b.creneauxSiteActuel(); track c) {
+                <option [value]="c">{{ c }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="panier-summary-card">
+            <div class="summary-line">
+              <span>Forfait Formule Déjeuner :</span>
+              <span class="font-bold">{{ b2b.formuleActuelle().prixForfait }} FCFA</span>
+            </div>
+            <div class="summary-line text-green">
+              <span>Prise en charge Entreprise :</span>
+              <span class="font-bold">-{{ b2b.partPriseEnChargeEntreprise() }} FCFA</span>
+            </div>
+            <div class="summary-total-line">
+              <span class="total-label font-serif-luxury">Net à payer :</span>
+              <span class="total-val text-green">0 FCFA</span>
+            </div>
+
+            <button 
+              [disabled]="!b2b.isFormuleComplete()"
+              (click)="validerCommande()"
+              class="btn-valider-panier"
+              [class.active]="b2b.isFormuleComplete()"
+              [class.disabled]="!b2b.isFormuleComplete()">
+              <i class="fa-solid fa-circle-check"></i> Valider et Générer mon QR Code (0 F)
+            </button>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <!-- MODE AUTONOME : PANIER LIBRE / WAVE -->
+      <div class="panier-card-fullscreen">
+        <div class="panier-card-header">
+          <div>
+            <h2 class="cart-title font-serif-luxury">Mon Panier Déjeuner À La Carte</h2>
+            <span class="cart-subtitle">Paiement personnel sécurisé via Wave Mobile Money</span>
+          </div>
+          @if (b2b.panierAutonome().length > 0) {
+            <button (click)="b2b.viderPanierAutonome()" class="btn-clear-cart">
+              <i class="fa-solid fa-trash-can"></i> Vider le panier
+            </button>
+          }
+        </div>
+
+        @if (b2b.panierAutonome().length === 0) {
+          <div class="panier-empty-state">
+            <div class="empty-icon"><i class="fa-solid fa-basket-shopping"></i></div>
+            <h3>Votre panier est vide</h3>
+            <p>Vous n'avez pas encore ajouté de plat pour votre pause déjeuner.</p>
+            <a routerLink="/b2b/commande" class="btn-go-catalogue">
+              <i class="fa-solid fa-utensils"></i> Découvrir les mets du jour
+            </a>
+          </div>
+        } @else {
+          <div class="panier-table-wrap">
+            <table class="panier-table">
+              <thead>
+                <tr>
+                  <th>Mets</th>
+                  <th>Prix Unitaire</th>
+                  <th>Quantité</th>
+                  <th>Sous-Total</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of b2b.panierAutonome(); track item.plat.id) {
+                  <tr>
+                    <td>
+                      <div class="table-item-cell">
+                        <img [src]="item.plat.image" class="item-table-img">
+                        <div>
+                          <strong class="item-table-nom">{{ item.plat.nom }}</strong>
+                          <span class="item-table-cat">{{ item.plat.categorie }}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>{{ item.plat.prixUnitaire }} FCFA</td>
+                    <td>
+                      <div class="cart-stepper-table">
+                        <button (click)="b2b.retirerDuPanierAutonome(item.plat.id)">-</button>
+                        <span>{{ item.quantite }}</span>
+                        <button (click)="b2b.ajouterAuPanierAutonome(item.plat)">+</button>
+                      </div>
+                    </td>
+                    <td><strong class="text-bordeaux">{{ item.plat.prixUnitaire * item.quantite }} FCFA</strong></td>
+                    <td>
+                      <button (click)="b2b.retirerDuPanierAutonome(item.plat.id)" class="btn-del-row" title="Supprimer">
+                        <i class="fa-solid fa-trash-can"></i>
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="panier-footer-grid">
+            <div class="creneau-box">
+              <label class="slot-label">
+                <i class="fa-solid fa-clock text-red"></i> Heure de retrait au réfectoire :
+              </label>
+              <select 
+                [ngModel]="b2b.creneauLivraison()" 
+                (ngModelChange)="b2b.creneauLivraison.set($event)"
+                class="slot-select">
+                @for (c of b2b.creneauxSiteActuel(); track c) {
+                  <option [value]="c">{{ c }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="panier-summary-card">
+              <div class="summary-line">
+                <span>Articles ({{ b2b.nbArticlesPanierAutonome() }}) :</span>
+                <span class="font-bold">{{ b2b.totalPanierAutonome() }} FCFA</span>
+              </div>
+              <div class="summary-total-line">
+                <span class="total-label font-serif-luxury">Total Wave :</span>
+                <span class="total-val text-bordeaux">{{ b2b.totalPanierAutonome() }} FCFA</span>
+              </div>
+
+              <button 
+                (click)="validerCommande()"
+                class="btn-valider-panier-wave">
+                <i class="fa-solid fa-mobile-screen-button"></i> Payer via Wave ({{ b2b.totalPanierAutonome() }} FCFA)
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- MODAL DE CONFIRMATION / QR CODE -->
+  @if (showConfirmationModal()) {
+    <div class="b2b-modal-overlay">
+      <div class="b2b-modal-card">
+        @if (!orderPlaced()) {
+          <div class="modal-step-confirm">
+            <h3 class="modal-title font-serif-luxury">Confirmation de votre Commande</h3>
+            <p class="modal-sub">Vérifiez les détails avant transmission à la cuisine centrale :</p>
+
+            <div class="modal-summary-box">
+              <div><span>Site de retrait :</span> <strong>{{ b2b.siteActuel().nom }}</strong></div>
+              <div><span>Créneau :</span> <strong>{{ b2b.creneauLivraison() }}</strong></div>
+              @if (b2b.modeProfil() === 'SUBVENTIONNE') {
+                <div><span>Prise en charge RH :</span> <strong class="text-green">100% (0 FCFA)</strong></div>
+              } @else {
+                <div><span>Total à payer Wave :</span> <strong class="text-bordeaux">{{ b2b.totalPanierAutonome() }} FCFA</strong></div>
+              }
+            </div>
+
+            @if (b2b.modeProfil() === 'AUTONOME') {
+              <div class="wave-prompt-box">
+                <label>Numéro de téléphone Wave :</label>
+                <input type="text" [(ngModel)]="wavePhone" class="wave-input" placeholder="+221 7X XXX XX XX">
+              </div>
+            }
+
+            <div class="modal-actions-row">
+              <button (click)="showConfirmationModal.set(false)" class="btn-cancel-modal">Annuler</button>
+              <button (click)="confirmerPaiementEtEnvoi()" class="btn-confirm-modal">
+                @if (isWaveProcessing()) {
+                  <i class="fa-solid fa-spinner fa-spin"></i> Traitement Wave...
+                } @else {
+                  <i class="fa-solid fa-check"></i> Confirmer la commande
+                }
+              </button>
+            </div>
+          </div>
+        } @else {
+          <div class="modal-step-success">
+            <div class="success-icon-wrap"><i class="fa-solid fa-circle-check"></i></div>
+            <h3 class="modal-title font-serif-luxury">Commande Confirmée avec Succès !</h3>
+            <p class="modal-sub">Votre commande a été transmise au Responsable d'Exploitation Kiki Traiteur.</p>
+
+            <!-- QR Code -->
+            <div class="qr-box">
+              <svg viewBox="0 0 25 25" width="160" height="160" shape-rendering="crispEdges">
+                <rect width="25" height="25" fill="#FAF8F4"/>
+                @for (row of qrMatrix(); track $index; let r = $index) {
+                  @for (cell of row; track $index; let c = $index) {
+                    @if (cell) {
+                      <rect [attr.x]="c" [attr.y]="r" width="1" height="1" fill="#721513"/>
+                    }
+                  }
+                }
+              </svg>
+              <div class="qr-code-txt">{{ qrDataString() }}</div>
+            </div>
+
+            <button (click)="fermerModalSucces()" class="btn-confirm-modal full-w">
+              <i class="fa-solid fa-check"></i> Terminer et retourner au menu
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+</div>
+

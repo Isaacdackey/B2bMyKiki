@@ -15,6 +15,10 @@ export const B2B_ROUTES: Routes = [
     loadComponent: () => import('./employe/b2b-commande.component').then(m => m.B2bCommandeComponent)
   },
   {
+    path: 'panier',
+    loadComponent: () => import('./employe/b2b-panier.component').then(m => m.B2bPanierComponent)
+  },
+  {
     path: 'rh',
     loadComponent: () => import('./rh-entreprise/b2b-rh-dashboard.component').then(m => m.B2bRhDashboardComponent)
   },
