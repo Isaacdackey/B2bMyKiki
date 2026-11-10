@@ -93,7 +93,7 @@
     </div>
 
     <div class="categories-scroll-row">
-      @for (cat of categories; track cat.id) {
+      @for (cat of categories(); track cat.id) {
         <div 
           class="category-card" 
           [class.active]="categorieSelectionnee() === cat.id" 
@@ -138,10 +138,10 @@
                   
                   <div class="dish-badge-overlay">
                     <span class="dish-tag">
-                      @if (plat.categorie === 'ENTREE') { 1. Entrée }
-                      @else if (plat.categorie === 'PLAT') { 2. Plat Chaud }
-                      @else if (plat.categorie === 'DESSERT') { 3. Dessert }
-                      @else { 4. Boisson }
+                      @if (plat.categorie === 'ENTREE') { {{ b2b.modeProfil() === 'SUBVENTIONNE' ? '1. Entrée' : 'Entrée' }} }
+                      @else if (plat.categorie === 'PLAT') { {{ b2b.modeProfil() === 'SUBVENTIONNE' ? '2. Plat Chaud' : 'Plat Chaud' }} }
+                      @else if (plat.categorie === 'DESSERT') { {{ b2b.modeProfil() === 'SUBVENTIONNE' ? '3. Dessert' : 'Dessert' }} }
+                      @else { {{ b2b.modeProfil() === 'SUBVENTIONNE' ? '4. Boisson' : 'Boisson' }} }
                     </span>
                   </div>
 

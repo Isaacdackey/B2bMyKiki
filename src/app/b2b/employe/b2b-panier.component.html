@@ -225,9 +225,9 @@
                 <tr>
                   <th>Mets</th>
                   <th>Prix Unitaire</th>
-                  <th>Quantité</th>
+                  <th class="col-center">Quantité</th>
                   <th>Sous-Total</th>
-                  <th>Action</th>
+                  <th class="col-center">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -243,15 +243,15 @@
                       </div>
                     </td>
                     <td>{{ item.plat.prixUnitaire }} FCFA</td>
-                    <td>
+                    <td class="col-center">
                       <div class="cart-stepper-table">
-                        <button (click)="b2b.retirerDuPanierAutonome(item.plat.id)">-</button>
-                        <span>{{ item.quantite }}</span>
-                        <button (click)="b2b.ajouterAuPanierAutonome(item.plat)">+</button>
+                        <button type="button" class="stepper-btn-pill" (click)="b2b.retirerDuPanierAutonome(item.plat.id)" aria-label="Diminuer">-</button>
+                        <span class="stepper-val-pill">{{ item.quantite }}</span>
+                        <button type="button" class="stepper-btn-pill" (click)="b2b.ajouterAuPanierAutonome(item.plat)" aria-label="Augmenter">+</button>
                       </div>
                     </td>
                     <td><strong class="text-bordeaux">{{ item.plat.prixUnitaire * item.quantite }} FCFA</strong></td>
-                    <td>
+                    <td class="col-center">
                       <button (click)="b2b.retirerDuPanierAutonome(item.plat.id)" class="btn-del-row" title="Supprimer">
                         <i class="fa-solid fa-trash-can"></i>
                       </button>
@@ -320,8 +320,13 @@
 
             @if (b2b.modeProfil() === 'AUTONOME') {
               <div class="wave-prompt-box">
-                <label>Numéro de téléphone Wave :</label>
+                <label>
+                  <i class="fa-solid fa-mobile-screen text-blue"></i> Numéro de téléphone Wave :
+                </label>
                 <input type="text" [(ngModel)]="wavePhone" class="wave-input" placeholder="+221 7X XXX XX XX">
+                <p class="wave-helper-text">
+                  <i class="fa-solid fa-shield-halved"></i> Une demande de débit sera envoyée directement sur votre compte Wave.
+                </p>
               </div>
             }
 

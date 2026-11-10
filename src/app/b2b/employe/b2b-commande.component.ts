@@ -78,16 +78,19 @@ export class B2bCommandeComponent {
   isWaveProcessing = signal(false);
   qrDataString = signal<string>('');
 
-  // Catégories inspirées de MyKiki
+  // Catégories inspirées de MyKiki avec libellés adaptés au mode profil
   categorieSelectionnee = signal<string>('all');
 
-  categories = [
-    { id: 'all', name: 'Tous', icon: 'fa-globe' },
-    { id: 'ENTREE', name: '1. Entrée', icon: 'fa-cookie-bite' },
-    { id: 'PLAT', name: '2. Plat Chaud', icon: 'fa-utensils' },
-    { id: 'DESSERT', name: '3. Dessert', icon: 'fa-cake-candles' },
-    { id: 'BOISSON', name: '4. Boisson', icon: 'fa-wine-glass-alt' }
-  ];
+  categories = computed(() => {
+    const isSub = this.b2b.modeProfil() === 'SUBVENTIONNE';
+    return [
+      { id: 'all', name: 'Tous', icon: 'fa-globe' },
+      { id: 'ENTREE', name: isSub ? '1. Entrée' : 'Entrées', icon: 'fa-cookie-bite' },
+      { id: 'PLAT', name: isSub ? '2. Plat Chaud' : 'Plats Chauds', icon: 'fa-utensils' },
+      { id: 'DESSERT', name: isSub ? '3. Dessert' : 'Desserts', icon: 'fa-cake-candles' },
+      { id: 'BOISSON', name: isSub ? '4. Boisson' : 'Boissons', icon: 'fa-wine-glass-alt' }
+    ];
+  });
 
   selectCategory(catId: string) {
     this.categorieSelectionnee.set(catId);
