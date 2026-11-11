@@ -456,7 +456,7 @@
                           [style.border]="emp.tauxSubvention > 0 ? '1px solid rgba(96, 108, 56, 0.3)' : '1px solid rgba(29, 78, 216, 0.3)'"
                           style="padding: 0.3rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem;">
                       <i class="fa-solid" [class.fa-percent]="emp.tauxSubvention > 0" [class.fa-wallet]="emp.tauxSubvention === 0"></i>
-                      {{ emp.tauxSubvention }}% {{ emp.tauxSubvention === 100 ? '(Pris en charge)' : emp.tauxSubvention === 0 ? '(Autonome Wave)' : '(Co-financé)' }}
+                      {{ emp.tauxSubvention }}%
                     </span>
                   </td>
                   <td data-label="Repas ce mois" style="font-weight: 800; color: #332724;">{{ emp.repasConsommesMois }} repas</td>
