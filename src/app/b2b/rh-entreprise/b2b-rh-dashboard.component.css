@@ -12,38 +12,41 @@
   background-color: transparent !important;
   color: #332724 !important;
   min-height: 100dvh;
-  padding: 2.5rem 1.5rem 5rem;
+  padding: 1.75rem clamp(1rem, 2vw, 2rem) 5rem;
   max-width: 100%;
   width: auto;
   min-width: 0;
   box-sizing: border-box;
-  margin-left: var(--b2b-sidebar-w, 280px);
+  margin-left: var(--b2b-sidebar-w, 300px);
   transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 @media (max-width: 1023px) {
   .rh-wrapper {
+    --b2b-page-px: 1rem;
+    --b2b-page-pt: 1rem;
     margin-left: 0 !important;
     width: 100% !important;
+    padding: 1rem 1rem 5rem;
   }
 }
 
 /* CARDS STATS KPI */
 .rh-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.25rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1.15rem;
+  margin-bottom: 1.75rem;
 }
 
 .rh-kpi-card {
   background: #FFFFFF !important;
   border: 1.5px solid #EDE7DC !important;
   border-radius: 18px !important;
-  padding: 1.5rem !important;
+  padding: 1.25rem 1.35rem !important;
   box-shadow: 0 8px 25px rgba(114, 21, 19, 0.05) !important;
 }
 
@@ -52,12 +55,15 @@
   background: #FFFFFF !important;
   border: 1.5px solid #EDE7DC !important;
   border-radius: 18px !important;
-  overflow: hidden !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  -webkit-overflow-scrolling: touch;
   box-shadow: 0 10px 30px rgba(114, 21, 19, 0.04) !important;
 }
 
 .rh-table {
   width: 100%;
+  min-width: 720px;
   border-collapse: collapse;
   text-align: left;
   font-size: 0.85rem;
@@ -82,6 +88,80 @@
 
 .rh-table tr:hover td {
   background-color: #FAF5EA !important;
+}
+
+/* TRANSFORMATION RESPONSIVE MOBILE : TABLEAU RH -> CARTES EMPILÉES (< 768px) */
+@media (max-width: 767px) {
+  .rh-table {
+    min-width: 100% !important;
+    display: block;
+  }
+
+  .rh-table thead {
+    display: none;
+  }
+
+  .rh-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    padding: 0.85rem;
+    background: #FAF8F4;
+  }
+
+  .rh-table tbody tr {
+    display: flex;
+    flex-direction: column;
+    background: #FFFFFF !important;
+    border: 1.5px solid #EDE7DC;
+    border-radius: 14px;
+    padding: 0.85rem 1rem;
+    box-shadow: 0 2px 10px rgba(114, 21, 19, 0.04);
+    gap: 0.45rem;
+  }
+
+  .rh-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.35rem 0 !important;
+    border-bottom: 1px dashed #EDE7DC !important;
+    text-align: right;
+    gap: 0.75rem;
+    font-size: 0.82rem;
+    word-break: break-word;
+  }
+
+  .rh-table tbody td:last-child {
+    border-bottom: none !important;
+    padding-top: 0.5rem !important;
+  }
+
+  .rh-table tbody td::before {
+    content: attr(data-label);
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #721513;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    text-align: left;
+    flex-shrink: 0;
+  }
+
+  .rh-table tfoot,
+  .rh-table tfoot tr {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    box-sizing: border-box;
+    gap: 0.35rem;
+  }
+
+  .rh-table tfoot td {
+    padding: 0.2rem 0 !important;
+    border: none !important;
+  }
 }
 
 /* BADGES */
@@ -182,7 +262,28 @@
   border-radius: 22px !important;
   max-width: 580px;
   width: 100%;
-  padding: 2.25rem;
+  max-height: 90dvh;
+  overflow-y: auto;
+  padding: clamp(1.25rem, 3vw, 2.25rem) !important;
   box-shadow: 0 25px 60px rgba(114, 21, 19, 0.15) !important;
   color: #332724 !important;
+  box-sizing: border-box;
+}
+
+.rh-sites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 1.5rem;
+}
+
+.rh-form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .rh-form-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
 }

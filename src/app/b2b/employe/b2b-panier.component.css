@@ -6,12 +6,12 @@
   background-color: #FAF8F4;
   color: #1E293B;
   min-height: 100dvh;
-  padding: 1.25rem 2rem 6rem;
+  padding: 1.25rem clamp(1rem, 2vw, 2rem) 6rem;
   width: auto;
   min-width: 0;
   max-width: 100%;
   box-sizing: border-box;
-  margin-left: var(--b2b-sidebar-w, 280px);
+  margin-left: var(--b2b-sidebar-w, 300px);
   transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
@@ -20,6 +20,8 @@
 
 @media (max-width: 1023px) {
   .b2b-wrapper {
+    --b2b-page-px: 1rem;
+    --b2b-page-pt: 1rem;
     margin-left: 0 !important;
     width: 100% !important;
     padding: 1rem 1rem 6rem;
@@ -91,7 +93,7 @@
   background: #FFFFFF;
   border: 1px solid rgba(114, 21, 19, 0.12);
   border-radius: 20px;
-  padding: 1.75rem;
+  padding: clamp(1rem, 3vw, 1.75rem);
   box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);
   display: flex;
   flex-direction: column;
@@ -102,6 +104,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  flex-wrap: wrap;
   gap: 1rem;
   border-bottom: 1.5px solid #EDE7DC;
   padding-bottom: 1rem;
@@ -172,8 +175,8 @@
 /* GRILLE DES 4 SLOTS DU PLATEAU */
 .plateau-grid-slots {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 1.15rem;
 }
 
 .plateau-slot-card {
@@ -416,10 +419,12 @@
 /* TABLEAU AUTONOME */
 .panier-table-wrap {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .panier-table {
   width: 100%;
+  min-width: 580px;
   border-collapse: collapse;
   text-align: left;
   font-size: 0.84rem;
@@ -442,6 +447,56 @@
   padding: 0.85rem 1rem;
   border-bottom: 1px solid #EDE7DC;
   vertical-align: middle;
+}
+
+@media (max-width: 640px) {
+  .panier-table {
+    min-width: 100% !important;
+    display: block;
+  }
+
+  .panier-table thead {
+    display: none;
+  }
+
+  .panier-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .panier-table tbody tr {
+    display: flex;
+    flex-direction: column;
+    background: #FAF8F4;
+    border: 1.5px solid #EDE7DC;
+    border-radius: 14px;
+    padding: 0.85rem 1rem;
+    gap: 0.45rem;
+  }
+
+  .panier-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.35rem 0 !important;
+    border-bottom: 1px dashed #EDE7DC !important;
+    text-align: right !important;
+    gap: 0.75rem;
+  }
+
+  .panier-table tbody td:last-child {
+    border-bottom: none !important;
+  }
+
+  .panier-table tbody td::before {
+    content: attr(data-label);
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #721513;
+    text-transform: uppercase;
+    text-align: left;
+  }
 }
 
 .table-item-cell {
@@ -578,10 +633,13 @@
 .b2b-modal-card {
   background: #FFFFFF;
   border-radius: 20px;
-  padding: 2rem;
+  padding: clamp(1.25rem, 3.5vw, 2rem);
   max-width: 480px;
   width: 100%;
+  max-height: 90dvh;
+  overflow-y: auto;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
 }
 
 .modal-title {

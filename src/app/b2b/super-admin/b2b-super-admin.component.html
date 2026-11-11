@@ -141,7 +141,7 @@
                 </div>
 
                 <!-- Actions sur l'entreprise -->
-                <div style="display: flex; gap: 0.5rem;">
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                   <button (click)="ouvrirModalModifierEntreprise(ent)" class="sa-btn-action" title="Modifier les conditions de l'entreprise">
                     <i class="fa-regular fa-pen-to-square"></i> Modifier
                   </button>
@@ -161,7 +161,7 @@
                   <i class="fa-solid fa-truck-ramp-box"></i> Sites de Restauration Déclarés ({{ ent.sites ? ent.sites.length : 0 }})
                 </div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem;">
+                <div class="sa-sites-grid">
                   @for (site of ent.sites; track site.id) {
                     <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 1.15rem; display: flex; flex-direction: column; justify-content: space-between;">
                       <div>
@@ -244,7 +244,7 @@
         </div>
 
         <!-- Grille du Catalogue Central -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 1.25rem;">
+        <div class="sa-catalogue-grid">
           @for (plat of platsFiltres(); track plat.id) {
             <div [style.opacity]="plat.isArchive ? '0.6' : '1'"
                  style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(114, 21, 19, 0.04); display: flex; flex-direction: column; justify-content: space-between;">
@@ -308,7 +308,7 @@
           </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+        <div class="sa-planning-grid">
           @for (item of planningSemaineGlobal(); track item.id) {
             <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.25rem; box-shadow: 0 4px 18px rgba(114, 21, 19, 0.04); display: flex; flex-direction: column; justify-content: space-between;">
               <div>
@@ -362,8 +362,8 @@
           </button>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-          <div style="grid-column: span 2;">
+        <div class="sa-form-grid-2">
+          <div class="sa-form-span-2">
             <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Raison Sociale de l'Entreprise</label>
             <input type="text" [(ngModel)]="entrepriseEnEdition().nom" placeholder="Ex: TotalEnergies Sénégal" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700;">
           </div>
@@ -441,7 +441,7 @@
             <input type="text" [(ngModel)]="siteEnEdition().adresse" placeholder="Ex: Boulevard de la République, Dakar" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem;">
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="sa-form-grid-2">
             <div>
               <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Heure Cut-Off (Clôture)</label>
               <input type="text" [(ngModel)]="siteEnEdition().heureCutOff" placeholder="10:30" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 800; color: #E51D24;">
@@ -492,7 +492,7 @@
             <textarea [(ngModel)]="platEnEdition().description" rows="2" placeholder="Oignons caramélisés, citron vert, riz parfumé..." style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem;"></textarea>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="sa-form-grid-2">
             <div>
               <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Catégorie Alimentaire</label>
               <select [(ngModel)]="platEnEdition().categorie" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700; color: #721513;">
@@ -548,7 +548,7 @@
             <input type="text" [(ngModel)]="planningEnEdition().platVedette" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700;">
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="sa-form-grid-2">
             <div>
               <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Statut de Production</label>
               <select [(ngModel)]="planningEnEdition().statut" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700; color: #721513;">

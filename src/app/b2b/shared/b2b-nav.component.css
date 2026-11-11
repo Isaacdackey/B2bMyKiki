@@ -618,6 +618,10 @@
 
   .b2b-mobile-topbar {
     display: flex;
+    margin-left: calc(-1 * var(--b2b-page-px, 1rem));
+    margin-right: calc(-1 * var(--b2b-page-px, 1rem));
+    margin-top: calc(-1 * var(--b2b-page-pt, 1rem));
+    width: calc(100% + 2 * var(--b2b-page-px, 1rem));
   }
 
   .b2b-drawer-overlay {

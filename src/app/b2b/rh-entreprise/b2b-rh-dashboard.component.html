@@ -181,25 +181,25 @@
               <tbody>
                 @for (c of paginatedCommandes(); track c.id) {
                   <tr>
-                    <td>
+                    <td data-label="Date & Heure">
                       <div style="font-weight: 800; color: #332724;">{{ c.date }}</div>
                       <div style="font-size: 0.72rem; color: #6E5A56;"><i class="fa-regular fa-clock"></i> {{ c.heure }}</div>
                     </td>
-                    <td>
+                    <td data-label="Collaborateur">
                       <div style="font-weight: 700; color: #721513;">{{ c.employeNom }}</div>
                       <code style="font-size: 0.72rem; color: #6E5A56; background: #FAF5EA; padding: 0.1rem 0.4rem; border-radius: 4px;">{{ c.matricule }}</code>
                     </td>
-                    <td style="font-size: 0.82rem; color: #332724;">{{ c.siteNom }}</td>
-                    <td style="font-weight: 600; color: #332724;">{{ c.platNom }}</td>
-                    <td>
+                    <td data-label="Site de Retrait" style="font-size: 0.82rem; color: #332724;">{{ c.siteNom }}</td>
+                    <td data-label="Plat Chaud" style="font-weight: 600; color: #332724;">{{ c.platNom }}</td>
+                    <td data-label="Formule">
                       <span style="font-size: 0.75rem; color: #6E5A56; background: #FAF8F4; border: 1px solid #EDE7DC; padding: 0.2rem 0.55rem; border-radius: 9999px;">
                         1E + 1P + 1D + 1B
                       </span>
                     </td>
-                    <td style="font-weight: 900; color: #E51D24;">
+                    <td data-label="Prise en Charge RH" style="font-weight: 900; color: #E51D24;">
                       {{ (c.partEntreprise | number) }} FCFA
                     </td>
-                    <td style="white-space: nowrap;">
+                    <td data-label="Statut Retrait" style="white-space: nowrap;">
                       <span style="background: rgba(96, 108, 56, 0.12); color: #606C38; padding: 0.35rem 0.75rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
                         <i class="fa-solid fa-qrcode"></i> Livré & Scanné
                       </span>
@@ -412,12 +412,12 @@
             [ngModel]="searchQuery()"
             (ngModelChange)="searchQuery.set($event)"
             placeholder="Rechercher par nom, matricule ou département..." 
-            style="flex: 1; min-width: 280px; background: #FFFFFF !important; color: #332724 !important; border: 1.5px solid #EDE7DC !important; border-radius: 12px !important; padding: 0.65rem 1rem !important;">
+            style="flex: 1 1 220px; min-width: 0; background: #FFFFFF !important; color: #332724 !important; border: 1.5px solid #EDE7DC !important; border-radius: 12px !important; padding: 0.65rem 1rem !important;">
 
           <select 
             [ngModel]="selectedSiteFilter()"
             (ngModelChange)="selectedSiteFilter.set($event)"
-            style="background: #FFFFFF !important; color: #721513 !important; font-weight: 700; border: 1.5px solid #EDE7DC !important; border-radius: 12px !important; padding: 0.65rem 1rem !important;">
+            style="flex: 0 1 auto; background: #FFFFFF !important; color: #721513 !important; font-weight: 700; border: 1.5px solid #EDE7DC !important; border-radius: 12px !important; padding: 0.65rem 1rem !important;">
             <option value="TOUS">Tous les sites</option>
             @for (site of b2b.currentEntreprise().sites; track site.id) {
               <option [value]="site.id">{{ site.nom }}</option>
@@ -443,14 +443,14 @@
             <tbody>
               @for (emp of paginatedEmployes(); track emp.id) {
                 <tr>
-                  <td><code style="color: #721513; font-weight: 800; background: #FAF5EA; padding: 0.2rem 0.5rem; border-radius: 6px;">{{ emp.matricule }}</code></td>
-                  <td>
+                  <td data-label="Matricule"><code style="color: #721513; font-weight: 800; background: #FAF5EA; padding: 0.2rem 0.5rem; border-radius: 6px;">{{ emp.matricule }}</code></td>
+                  <td data-label="Collaborateur">
                     <div style="font-weight: 700; color: #332724;">{{ emp.prenom }} {{ emp.nom }}</div>
                     <div style="font-size: 0.75rem; color: #6E5A56;">{{ emp.email }}</div>
                   </td>
-                  <td>{{ emp.departement }}</td>
-                  <td>{{ emp.siteNom }}</td>
-                  <td>
+                  <td data-label="Département">{{ emp.departement }}</td>
+                  <td data-label="Site de Livraison">{{ emp.siteNom }}</td>
+                  <td data-label="Taux Subvention">
                     <span [style.background]="emp.tauxSubvention > 0 ? 'rgba(96, 108, 56, 0.15)' : 'rgba(29, 78, 216, 0.12)'"
                           [style.color]="emp.tauxSubvention > 0 ? '#606C38' : '#1D4ED8'"
                           [style.border]="emp.tauxSubvention > 0 ? '1px solid rgba(96, 108, 56, 0.3)' : '1px solid rgba(29, 78, 216, 0.3)'"
@@ -459,9 +459,9 @@
                       {{ emp.tauxSubvention }}% {{ emp.tauxSubvention === 100 ? '(Pris en charge)' : emp.tauxSubvention === 0 ? '(Autonome Wave)' : '(Co-financé)' }}
                     </span>
                   </td>
-                  <td style="font-weight: 800; color: #332724;">{{ emp.repasConsommesMois }} repas</td>
-                  <td style="font-weight: 800; color: #606C38;">{{ (emp.montantPrisEnChargeMois | number) }} FCFA</td>
-                  <td>
+                  <td data-label="Repas ce mois" style="font-weight: 800; color: #332724;">{{ emp.repasConsommesMois }} repas</td>
+                  <td data-label="Total Subventionné" style="font-weight: 800; color: #606C38;">{{ (emp.montantPrisEnChargeMois | number) }} FCFA</td>
+                  <td data-label="Actions">
                     <button 
                       (click)="b2b.toggleStatutEmploye(emp.id)"
                       [style.background]="emp.actif ? '#FAF8F4' : '#EDE7DC'"
@@ -569,15 +569,15 @@
             <tbody>
               @for (ligne of b2b.historiqueFacturationMois(); track ligne.id) {
                 <tr>
-                  <td style="font-weight: 700; color: #332724;">{{ ligne.date }}</td>
-                  <td>{{ ligne.siteNom }}</td>
-                  <td style="font-weight: 800; color: #721513;">{{ ligne.nbRepasSubventionnes }} repas</td>
-                  <td>{{ (ligne.prixUnitaire | number) }} FCFA</td>
-                  <td><span class="rh-badge-subv">{{ ligne.tauxSubvention }}% Entreprise</span></td>
-                  <td style="font-weight: 900; color: #E51D24; font-size: 0.95rem;">
+                  <td data-label="Période / Semaine" style="font-weight: 700; color: #332724;">{{ ligne.date }}</td>
+                  <td data-label="Site de Livraison">{{ ligne.siteNom }}</td>
+                  <td data-label="Nombre de Repas" style="font-weight: 800; color: #721513;">{{ ligne.nbRepasSubventionnes }} repas</td>
+                  <td data-label="Prix Unitaire">{{ (ligne.prixUnitaire | number) }} FCFA</td>
+                  <td data-label="Prise en Charge"><span class="rh-badge-subv">{{ ligne.tauxSubvention }}% Entreprise</span></td>
+                  <td data-label="Montant Facturé" style="font-weight: 900; color: #E51D24; font-size: 0.95rem;">
                     {{ (ligne.partEntreprise | number) }} FCFA
                   </td>
-                  <td>
+                  <td data-label="Statut">
                     <span style="background: rgba(96, 108, 56, 0.12); color: #606C38; padding: 0.25rem 0.6rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 700;">
                       <i class="fa-solid fa-check-double"></i> Livré & Validé
                     </span>
@@ -618,7 +618,7 @@
           Sites Physiques de Livraison Conventionnés
         </h2>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem;">
+        <div class="rh-sites-grid">
           @for (site of b2b.currentEntreprise().sites; track site.id) {
             <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
               <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
@@ -662,7 +662,7 @@
       <div class="rh-modal-card" style="max-width: 680px; width: 100%; padding: 2rem;">
         
         <!-- En-tête Facture Proforma -->
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #721513; padding-bottom: 1.25rem; margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #721513; padding-bottom: 1.25rem; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
           <div style="display: flex; align-items: center; gap: 0.85rem;">
             <img src="assets/images/logo.png" alt="Kiki Traiteur" style="height: 52px; object-fit: contain;">
             <div>
@@ -679,7 +679,7 @@
         </div>
 
         <!-- Coordonnées Facturation -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; background: #FAF8F4; padding: 1.25rem; border-radius: 14px; border: 1.5px solid #EDE7DC; margin-bottom: 1.5rem; font-size: 0.82rem; line-height: 1.5;">
+        <div class="rh-form-grid-2" style="background: #FAF8F4; padding: 1.25rem; border-radius: 14px; border: 1.5px solid #EDE7DC; margin-bottom: 1.5rem; font-size: 0.82rem; line-height: 1.5;">
           <div>
             <strong style="color: #721513; text-transform: uppercase; font-size: 0.72rem; display: block; margin-bottom: 0.25rem;">ENTREPRISE CLIENTE</strong>
             <div style="font-weight: 800; font-size: 0.95rem; color: #332724;">{{ b2b.currentEntreprise().nom }}</div>
@@ -694,8 +694,8 @@
         </div>
 
         <!-- Détail du Décompte Financier -->
-        <div style="border: 1px solid #EDE7DC; border-radius: 12px; overflow: hidden; margin-bottom: 1.5rem;">
-          <table style="width: 100%; border-collapse: collapse; font-size: 0.84rem; text-align: left;">
+        <div style="border: 1px solid #EDE7DC; border-radius: 12px; overflow-x: auto; margin-bottom: 1.5rem;">
+          <table style="width: 100%; min-width: 460px; border-collapse: collapse; font-size: 0.84rem; text-align: left;">
             <thead style="background: #FAF8F4; color: #721513; border-bottom: 1.5px solid #EDE7DC;">
               <tr>
                 <th style="padding: 0.75rem 1rem;">Désignation</th>
@@ -764,7 +764,7 @@
             <input type="text" [(ngModel)]="newEmp().matricule" style="width: 100%;">
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="rh-form-grid-2">
             <div>
               <label style="font-size: 0.75rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.25rem;">Nom :</label>
               <input type="text" [(ngModel)]="newEmp().nom" placeholder="Ex: Kouamé" style="width: 100%;">
@@ -780,7 +780,7 @@
             <input type="email" [(ngModel)]="newEmp().email" placeholder="m.kouame@totalenergies.ci" style="width: 100%;">
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="rh-form-grid-2">
             <div>
               <label style="font-size: 0.75rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.25rem;">Site de Rattachement :</label>
               <select [(ngModel)]="newEmp().siteId" style="width: 100%;">

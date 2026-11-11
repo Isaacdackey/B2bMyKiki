@@ -233,7 +233,7 @@
               <tbody>
                 @for (item of b2b.panierAutonome(); track item.plat.id) {
                   <tr>
-                    <td>
+                    <td data-label="Mets">
                       <div class="table-item-cell">
                         <img [src]="item.plat.image" class="item-table-img">
                         <div>
@@ -242,16 +242,16 @@
                         </div>
                       </div>
                     </td>
-                    <td>{{ item.plat.prixUnitaire }} FCFA</td>
-                    <td class="col-center">
+                    <td data-label="Prix Unitaire">{{ item.plat.prixUnitaire }} FCFA</td>
+                    <td data-label="Quantité" class="col-center">
                       <div class="cart-stepper-table">
                         <button type="button" class="stepper-btn-pill" (click)="b2b.retirerDuPanierAutonome(item.plat.id)" aria-label="Diminuer">-</button>
                         <span class="stepper-val-pill">{{ item.quantite }}</span>
                         <button type="button" class="stepper-btn-pill" (click)="b2b.ajouterAuPanierAutonome(item.plat)" aria-label="Augmenter">+</button>
                       </div>
                     </td>
-                    <td><strong class="text-bordeaux">{{ item.plat.prixUnitaire * item.quantite }} FCFA</strong></td>
-                    <td class="col-center">
+                    <td data-label="Sous-Total"><strong class="text-bordeaux">{{ item.plat.prixUnitaire * item.quantite }} FCFA</strong></td>
+                    <td data-label="Action" class="col-center">
                       <button (click)="b2b.retirerDuPanierAutonome(item.plat.id)" class="btn-del-row" title="Supprimer">
                         <i class="fa-solid fa-trash-can"></i>
                       </button>

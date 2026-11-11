@@ -120,8 +120,8 @@
         </div>
 
         <!-- Tableau de Production Consolidé Clair -->
-        <div class="cuisine-table-wrap" style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
-          <div style="padding: 1.15rem 1.5rem; background: #FAF8F4; border-bottom: 1.5px solid #EDE7DC; display: flex; justify-content: space-between; align-items: center;">
+        <div class="cuisine-table-card">
+          <div class="cuisine-table-header">
             <h3 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.2rem; color: #721513; font-weight: 800;">
               Consolidation par Plat du Jour & Statut de Cuisson (Midi)
             </h3>
@@ -130,51 +130,53 @@
             </span>
           </div>
 
-          <table class="cuisine-table">
-            <thead>
-              <tr>
-                <th>Poste / Catégorie</th>
-                <th>Intitulé du Plat / Portion</th>
-                <th>Quantité Consolidée</th>
-                <th>Unité de Conditionnement</th>
-                <th>Statut de Production (Cuisine)</th>
-                <th>Action Rapide</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (l of lignesPaginees(); track l.platId) {
+          <div class="cuisine-table-wrap">
+            <table class="cuisine-table">
+              <thead>
                 <tr>
-                  <td>
-                    @if (l.categorie === 'PLAT') { <span style="color: #E51D24; font-weight: 700;"><i class="fa-solid fa-bowl-rice"></i> Plat Chaud</span> }
-                    @if (l.categorie === 'ENTREE') { <span style="color: #606C38; font-weight: 700;"><i class="fa-solid fa-carrot"></i> Entrée</span> }
-                    @if (l.categorie === 'DESSERT') { <span style="color: #721513; font-weight: 700;"><i class="fa-solid fa-cake-candles"></i> Dessert</span> }
-                    @if (l.categorie === 'BOISSON') { <span style="color: #6E5A56; font-weight: 700;"><i class="fa-solid fa-glass-water"></i> Boisson</span> }
-                  </td>
-                  <td style="font-weight: 700; color: #332724; font-size: 0.95rem;">{{ l.nomPlat }}</td>
-                  <td style="font-size: 1.25rem; font-weight: 900; color: #721513; font-family: 'Playfair Display', serif;">{{ l.quantiteTotale }}</td>
-                  <td style="color: #6E5A56; font-weight: 500;">{{ l.unite }}</td>
-                  <td>
-                    @if (l.statut === 'PREPARATION_TERMINEE') {
-                      <span (click)="changerStatutCuisson(l.platId)" class="status-badge-terminee"><i class="fa-solid fa-check"></i> Prêt & Conditionné</span>
-                    }
-                    @if (l.statut === 'EN_CUISSON') {
-                      <span (click)="changerStatutCuisson(l.platId)" class="status-badge-cuisson"><i class="fa-solid fa-fire"></i> En Cuisson</span>
-                    }
-                    @if (l.statut === 'EN_ATTENTE') {
-                      <span (click)="changerStatutCuisson(l.platId)" class="status-badge-attente"><i class="fa-regular fa-clock"></i> En Attente</span>
-                    }
-                  </td>
-                  <td>
-                    <button 
-                      (click)="changerStatutCuisson(l.platId)"
-                      style="background: #FAF8F4; border: 1.5px solid #EDE7DC; color: #721513; padding: 0.4rem 0.85rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.2s;">
-                      Avancer statut
-                    </button>
-                  </td>
+                  <th>Poste / Catégorie</th>
+                  <th>Intitulé du Plat / Portion</th>
+                  <th>Quantité Consolidée</th>
+                  <th>Unité de Conditionnement</th>
+                  <th>Statut de Production (Cuisine)</th>
+                  <th>Action Rapide</th>
                 </tr>
-              }
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                @for (l of lignesPaginees(); track l.platId) {
+                  <tr>
+                    <td data-label="Poste / Catégorie">
+                      @if (l.categorie === 'PLAT') { <span style="color: #E51D24; font-weight: 700;"><i class="fa-solid fa-bowl-rice"></i> Plat Chaud</span> }
+                      @if (l.categorie === 'ENTREE') { <span style="color: #606C38; font-weight: 700;"><i class="fa-solid fa-carrot"></i> Entrée</span> }
+                      @if (l.categorie === 'DESSERT') { <span style="color: #721513; font-weight: 700;"><i class="fa-solid fa-cake-candles"></i> Dessert</span> }
+                      @if (l.categorie === 'BOISSON') { <span style="color: #6E5A56; font-weight: 700;"><i class="fa-solid fa-glass-water"></i> Boisson</span> }
+                    </td>
+                    <td data-label="Intitulé du Plat" style="font-weight: 700; color: #332724; font-size: 0.95rem;">{{ l.nomPlat }}</td>
+                    <td data-label="Quantité Consolidée" style="font-size: 1.25rem; font-weight: 900; color: #721513; font-family: 'Playfair Display', serif;">{{ l.quantiteTotale }}</td>
+                    <td data-label="Conditionnement" style="color: #6E5A56; font-weight: 500;">{{ l.unite }}</td>
+                    <td data-label="Statut Cuisine">
+                      @if (l.statut === 'PREPARATION_TERMINEE') {
+                        <span (click)="changerStatutCuisson(l.platId)" class="status-badge-terminee"><i class="fa-solid fa-check"></i> Prêt & Conditionné</span>
+                      }
+                      @if (l.statut === 'EN_CUISSON') {
+                        <span (click)="changerStatutCuisson(l.platId)" class="status-badge-cuisson"><i class="fa-solid fa-fire"></i> En Cuisson</span>
+                      }
+                      @if (l.statut === 'EN_ATTENTE') {
+                        <span (click)="changerStatutCuisson(l.platId)" class="status-badge-attente"><i class="fa-regular fa-clock"></i> En Attente</span>
+                      }
+                    </td>
+                    <td data-label="Action Rapide">
+                      <button 
+                        (click)="changerStatutCuisson(l.platId)"
+                        style="background: #FAF8F4; border: 1.5px solid #EDE7DC; color: #721513; padding: 0.4rem 0.85rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+                        Avancer statut
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
 
           <!-- BARRE DE PAGINATION LUXE KIKI TRAITEUR -->
           <div style="padding: 1rem 1.5rem; background: #FAF8F4; border-top: 1.5px solid #EDE7DC; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
@@ -242,7 +244,7 @@
     @if (activeTab() === 'SCAN_QR') {
       <div>
         
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        <div class="cuisine-scan-grid">
           
           <!-- Bloc Scanner Caméra / Clavier / Douchette -->
           <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 20px; padding: 2rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
@@ -276,18 +278,18 @@
               <label style="font-size: 0.78rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.4rem;">
                 Code QR ou Matricule Collaborateur :
               </label>
-              <div style="display: flex; gap: 0.5rem;">
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                 <input 
                   type="text" 
                   [ngModel]="codeScanneInput()"
                   (ngModelChange)="codeScanneInput.set($event)"
                   placeholder="Ex : KT-TOT-9842-SITE1-20261106"
                   (keyup.enter)="traiterScanQr()"
-                  style="flex: 1; padding: 0.75rem 1rem; border: 1.5px solid #EDE7DC; border-radius: 12px; font-size: 0.85rem; font-weight: 700; color: #332724; background: #FAF8F4;">
+                  style="flex: 1 1 200px; min-width: 0; padding: 0.75rem 1rem; border: 1.5px solid #EDE7DC; border-radius: 12px; font-size: 0.85rem; font-weight: 700; color: #332724; background: #FAF8F4;">
                 <button 
                   type="button"
                   (click)="traiterScanQr()"
-                  style="padding: 0.75rem 1.25rem; background: linear-gradient(135deg, #721513, #E51D24); color: #FFFFFF; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 0.4rem;">
+                  style="flex: 0 0 auto; padding: 0.75rem 1.25rem; background: linear-gradient(135deg, #721513, #E51D24); color: #FFFFFF; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
                   <i class="fa-solid fa-check"></i> Valider
                 </button>
               </div>
@@ -403,7 +405,7 @@
           </div>
 
           <!-- Filtres sur période (Aujourd'hui, Semaine, Mois, Tout) -->
-          <div style="display: flex; align-items: center; gap: 0.5rem; background: #FFFFFF; border: 1.5px solid #EDE7DC; padding: 0.35rem 0.5rem; border-radius: 9999px;">
+          <div style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; background: #FFFFFF; border: 1.5px solid #EDE7DC; padding: 0.35rem 0.5rem; border-radius: 16px;">
             <span style="font-size: 0.75rem; font-weight: 800; color: #721513; padding-left: 0.5rem;"><i class="fa-regular fa-calendar"></i> Période :</span>
             <button 
               type="button"
@@ -440,75 +442,77 @@
           </div>
         </div>
 
-        <div class="cuisine-table-wrap" style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
-          <table class="cuisine-table">
-            <thead>
-              <tr>
-                <th>Réf. Commande</th>
-                <th>Client & Contact</th>
-                <th>Site de Livraison</th>
-                <th>Plats & Boissons</th>
-                <th>Montant Réglé</th>
-                <th>Créneau</th>
-                <th>Statut de Préparation</th>
-                <th>Changer Statut</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (cmd of commandesAutonomes(); track cmd.id) {
+        <div class="cuisine-table-card">
+          <div class="cuisine-table-wrap">
+            <table class="cuisine-table">
+              <thead>
                 <tr>
-                  <td style="font-weight: 800; color: #721513; font-family: monospace;">{{ cmd.codeCommande }}</td>
-                  <td>
-                    <strong style="color: #332724;">{{ cmd.clientNom }}</strong>
-                    <div style="font-size: 0.75rem; color: #6E5A56;">{{ cmd.telephone }}</div>
-                  </td>
-                  <td style="font-size: 0.85rem; color: #332724;">{{ cmd.siteNom }}</td>
-                  <td style="font-weight: 600; color: #332724; font-size: 0.85rem;">{{ cmd.articles }}</td>
-                  <td style="font-weight: 900; color: #E51D24;">{{ (cmd.montantTotal | number) }} FCFA</td>
-                  <td style="font-weight: 700; color: #6E5A56; font-size: 0.8rem;">{{ cmd.heurePrevue }}</td>
-                  <td style="white-space: nowrap;">
-                    @if (cmd.statut === 'EN_PREPARATION') {
-                      <span style="background: rgba(229, 29, 36, 0.12); color: #E51D24; padding: 0.35rem 0.75rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
-                        <i class="fa-solid fa-fire-burner"></i> En Préparation
-                      </span>
-                    }
-                    @if (cmd.statut === 'PRET_AU_RETRAIT') {
-                      <span style="background: rgba(203, 153, 126, 0.25); color: #721513; padding: 0.35rem 0.75rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
-                        <i class="fa-solid fa-box"></i> Prêt au Retrait
-                      </span>
-                    }
-                    @if (cmd.statut === 'LIVRE') {
-                      <span style="background: rgba(96, 108, 56, 0.15); color: #606C38; padding: 0.35rem 0.75rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
-                        <i class="fa-solid fa-circle-check"></i> Récupéré / Livré
-                      </span>
-                    }
-                  </td>
-                  <td>
-                    <div style="display: flex; gap: 0.35rem;">
-                      <button 
-                        (click)="changerStatutAutonome(cmd.id, 'EN_PREPARATION')"
-                        title="Mettre en préparation"
-                        style="padding: 0.3rem 0.5rem; background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 6px; cursor: pointer; color: #E51D24;">
-                        <i class="fa-solid fa-fire"></i>
-                      </button>
-                      <button 
-                        (click)="changerStatutAutonome(cmd.id, 'PRET_AU_RETRAIT')"
-                        title="Marquer comme Prêt"
-                        style="padding: 0.3rem 0.5rem; background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 6px; cursor: pointer; color: #721513;">
-                        <i class="fa-solid fa-box"></i>
-                      </button>
-                      <button 
-                        (click)="changerStatutAutonome(cmd.id, 'LIVRE')"
-                        title="Marquer comme Récupéré"
-                        style="padding: 0.3rem 0.5rem; background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 6px; cursor: pointer; color: #606C38;">
-                        <i class="fa-solid fa-check"></i>
-                      </button>
-                    </div>
-                  </td>
+                  <th>Réf. Commande</th>
+                  <th>Client & Contact</th>
+                  <th>Site de Livraison</th>
+                  <th>Plats & Boissons</th>
+                  <th>Montant Réglé</th>
+                  <th>Créneau</th>
+                  <th>Statut de Préparation</th>
+                  <th>Changer Statut</th>
                 </tr>
-              }
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                @for (cmd of commandesAutonomes(); track cmd.id) {
+                  <tr>
+                    <td data-label="Réf. Commande" style="font-weight: 800; color: #721513; font-family: monospace;">{{ cmd.codeCommande }}</td>
+                    <td data-label="Client & Contact">
+                      <strong style="color: #332724;">{{ cmd.clientNom }}</strong>
+                      <div style="font-size: 0.75rem; color: #6E5A56;">{{ cmd.telephone }}</div>
+                    </td>
+                    <td data-label="Site de Livraison" style="font-size: 0.85rem; color: #332724;">{{ cmd.siteNom }}</td>
+                    <td data-label="Plats & Boissons" style="font-weight: 600; color: #332724; font-size: 0.85rem;">{{ cmd.articles }}</td>
+                    <td data-label="Montant Réglé" style="font-weight: 900; color: #E51D24;">{{ (cmd.montantTotal | number) }} FCFA</td>
+                    <td data-label="Créneau" style="font-weight: 700; color: #6E5A56; font-size: 0.8rem;">{{ cmd.heurePrevue }}</td>
+                    <td data-label="Statut" style="white-space: nowrap;">
+                      @if (cmd.statut === 'EN_PREPARATION') {
+                        <span style="background: rgba(229, 29, 36, 0.12); color: #E51D24; padding: 0.35rem 0.75rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
+                          <i class="fa-solid fa-fire-burner"></i> En Préparation
+                        </span>
+                      }
+                      @if (cmd.statut === 'PRET_AU_RETRAIT') {
+                        <span style="background: rgba(203, 153, 126, 0.25); color: #721513; padding: 0.35rem 0.75rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
+                          <i class="fa-solid fa-box"></i> Prêt au Retrait
+                        </span>
+                      }
+                      @if (cmd.statut === 'LIVRE') {
+                        <span style="background: rgba(96, 108, 56, 0.15); color: #606C38; padding: 0.35rem 0.75rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
+                          <i class="fa-solid fa-circle-check"></i> Récupéré / Livré
+                        </span>
+                      }
+                    </td>
+                    <td data-label="Action">
+                      <div style="display: flex; gap: 0.35rem;">
+                        <button 
+                          (click)="changerStatutAutonome(cmd.id, 'EN_PREPARATION')"
+                          title="Mettre en préparation"
+                          style="padding: 0.3rem 0.5rem; background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 6px; cursor: pointer; color: #E51D24;">
+                          <i class="fa-solid fa-fire"></i>
+                        </button>
+                        <button 
+                          (click)="changerStatutAutonome(cmd.id, 'PRET_AU_RETRAIT')"
+                          title="Marquer comme Prêt"
+                          style="padding: 0.3rem 0.5rem; background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 6px; cursor: pointer; color: #721513;">
+                          <i class="fa-solid fa-box"></i>
+                        </button>
+                        <button 
+                          (click)="changerStatutAutonome(cmd.id, 'LIVRE')"
+                          title="Marquer comme Récupéré"
+                          style="padding: 0.3rem 0.5rem; background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 6px; cursor: pointer; color: #606C38;">
+                          <i class="fa-solid fa-check"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         </div>
 
       </div>
@@ -531,7 +535,7 @@
           </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 1.5rem;">
+        <div class="cuisine-bl-grid">
           @for (bl of bonsLivraison(); track bl.id) {
             <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
               
@@ -608,7 +612,7 @@
           </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+        <div class="cuisine-planning-grid">
           @for (p of planningSemaine(); track p.jour) {
             <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.25rem; box-shadow: 0 4px 15px rgba(114, 21, 19, 0.03); display: flex; flex-direction: column; justify-content: space-between;">
               <div>
@@ -663,7 +667,7 @@
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+          <div class="cuisine-catalogue-grid">
             @for (plat of b2b.catalogueJour(); track plat.id) {
               <div [style.background]="plat.disponible !== false ? '#FFFFFF' : '#FAF8F4'"
                    [style.border-color]="plat.disponible !== false ? '#EDE7DC' : '#CBD5E1'"
@@ -730,7 +734,7 @@
         </div>
 
         <!-- Tableau d'émargement nominatif -->
-        <div style="max-height: 280px; overflow-y: auto; background: #FFFFFF; border-radius: 14px; border: 1.5px solid #EDE7DC; margin-bottom: 1.5rem;">
+        <div style="max-height: 280px; overflow-y: auto; overflow-x: auto; background: #FFFFFF; border-radius: 14px; border: 1.5px solid #EDE7DC; margin-bottom: 1.5rem;">
           <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: left;">
             <thead>
               <tr style="border-bottom: 1.5px solid #EDE7DC; color: #721513; background: #FAF8F4;">
@@ -762,13 +766,13 @@
           </table>
         </div>
 
-        <div style="display: flex; gap: 1rem;">
-          <button (click)="showBLModal.set(false)" style="flex: 1; padding: 0.85rem; background: #FAF8F4; color: #6E5A56; border: 1.5px solid #EDE7DC; border-radius: 9999px; font-weight: 700; cursor: pointer;">
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+          <button (click)="showBLModal.set(false)" style="flex: 1 1 140px; padding: 0.85rem; background: #FAF8F4; color: #6E5A56; border: 1.5px solid #EDE7DC; border-radius: 9999px; font-weight: 700; cursor: pointer;">
             Fermer
           </button>
           <button 
             (click)="validerEmargement()"
-            style="flex: 1.5; padding: 0.85rem; background: linear-gradient(135deg, #606C38, #283618); color: #FFFFFF; border: none; border-radius: 9999px; font-weight: 800; cursor: pointer;">
+            style="flex: 1.5 1 200px; padding: 0.85rem; background: linear-gradient(135deg, #606C38, #283618); color: #FFFFFF; border: none; border-radius: 9999px; font-weight: 800; cursor: pointer;">
             <i class="fa-solid fa-signature"></i> Valider la Réception & Signature
           </button>
         </div>

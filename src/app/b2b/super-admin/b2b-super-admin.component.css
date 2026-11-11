@@ -12,30 +12,33 @@
   background-color: transparent !important;
   color: #332724 !important;
   min-height: 100dvh;
-  padding: 2.5rem 1.5rem 5rem;
+  padding: 1.75rem clamp(1rem, 2vw, 2rem) 5rem;
   max-width: 100%;
   width: auto;
   min-width: 0;
   box-sizing: border-box;
-  margin-left: var(--b2b-sidebar-w, 280px);
+  margin-left: var(--b2b-sidebar-w, 300px);
   transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 @media (max-width: 1023px) {
   .super-admin-wrapper {
+    --b2b-page-px: 1rem;
+    --b2b-page-pt: 1rem;
     margin-left: 0 !important;
     width: 100% !important;
+    padding: 1rem 1rem 5rem;
   }
 }
 
 .sa-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.25rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1.15rem;
+  margin-bottom: 1.75rem;
 }
 
 .sa-kpi-card {
@@ -56,12 +59,15 @@
   background: #FFFFFF;
   border: 1.5px solid #EDE7DC;
   border-radius: 18px;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
   box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);
 }
 
 .sa-table {
   width: 100%;
+  min-width: 700px;
   border-collapse: collapse;
   text-align: left;
 }
@@ -145,10 +151,48 @@
   border-radius: 20px;
   max-width: 620px;
   width: 100%;
-  padding: 2rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
   box-shadow: 0 20px 45px rgba(0, 0, 0, 0.2);
-  max-height: 90vh;
+  max-height: 90dvh;
   overflow-y: auto;
   border: 1.5px solid #EDE7DC;
+  box-sizing: border-box;
+}
+
+.sa-sites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 1rem;
+}
+
+.sa-catalogue-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr));
+  gap: 1.25rem;
+}
+
+.sa-planning-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  gap: 1rem;
+}
+
+.sa-form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.sa-form-span-2 {
+  grid-column: span 2;
+}
+
+@media (max-width: 640px) {
+  .sa-form-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+  .sa-form-span-2 {
+    grid-column: span 1 !important;
+  }
 }
 
