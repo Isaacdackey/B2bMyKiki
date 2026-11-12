@@ -317,24 +317,24 @@
     <!-- ONGLET 3 : PROJECTION DU QR CODE CANTINE DU JOUR                -->
     <!-- ============================================================== -->
     @if (activeTab() === 'PROJECTION_QR') {
-      <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 20px; padding: 1.5rem 1.5rem 1.25rem; text-align: center; max-width: 580px; margin: 0 auto; box-shadow: 0 8px 30px rgba(114, 21, 19, 0.08);">
+      <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 20px; padding: 1.75rem 2rem 1.5rem; text-align: center; max-width: 640px; margin: 0 auto; box-shadow: 0 8px 30px rgba(114, 21, 19, 0.08);">
         
-        <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: #FAF5EA; color: #721513; padding: 0.25rem 0.75rem; border-radius: 9999px; font-weight: 800; font-size: 0.72rem; margin-bottom: 0.5rem; border: 1px solid #E2D5BE;">
+        <div style="display: inline-flex; align-items: center; gap: 0.45rem; background: #FAF5EA; color: #721513; padding: 0.3rem 0.85rem; border-radius: 9999px; font-weight: 800; font-size: 0.75rem; margin-bottom: 0.65rem; border: 1px solid #E2D5BE;">
           <i class="fa-solid fa-tv"></i> ÉCRAN DE PROJECTION CANTINE KIKI TRAITEUR
         </div>
 
-        <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.45rem; color: #721513; font-weight: 900;">
+        <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.6rem; color: #721513; font-weight: 900;">
           Scannez pour récupérer votre repas
         </h2>
-        <p style="margin: 0.25rem 0 1rem; font-size: 0.82rem; color: #6E5A56;">
+        <p style="margin: 0.35rem 0 1.25rem; font-size: 0.88rem; color: #6E5A56;">
           Approchez l'appareil photo de votre smartphone pour débloquer votre plateau.
         </p>
 
-        <!-- CARTE DU QR CODE GRAND FORMAT COMPACTE SANS SCROLL -->
-        <div style="background: #FAF8F4; border: 2px solid #721513; border-radius: 20px; padding: 1.15rem; max-width: 270px; margin: 0 auto 1rem; box-shadow: 0 6px 20px rgba(114, 21, 19, 0.1);">
+        <!-- CARTE DU QR CODE BIEN CALIBRÉE ET LISIBLE -->
+        <div style="background: #FAF8F4; border: 2.5px solid #721513; border-radius: 22px; padding: 1.5rem; max-width: 320px; margin: 0 auto 1.25rem; box-shadow: 0 8px 25px rgba(114, 21, 19, 0.1);">
           
-          <div style="display: flex; justify-content: center; align-items: center; margin: 0 auto; background: #FFFFFF; padding: 0.75rem; border-radius: 14px; border: 1px solid #EDE7DC;">
-            <svg viewBox="0 0 25 25" width="170" height="170" shape-rendering="crispEdges">
+          <div style="display: flex; justify-content: center; align-items: center; margin: 0 auto; background: #FFFFFF; padding: 0.85rem; border-radius: 16px; border: 1px solid #EDE7DC;">
+            <svg viewBox="0 0 25 25" width="215" height="215" shape-rendering="crispEdges">
               <rect width="25" height="25" fill="#FFFFFF"/>
               @for (row of qrCantineMatrix(); track $index; let r = $index) {
                 @for (cell of row; track $index; let c = $index) {
@@ -346,13 +346,13 @@
             </svg>
           </div>
 
-          <div style="margin-top: 0.75rem;">
-            <span style="font-family: monospace; font-size: 0.8rem; font-weight: 900; color: #721513; background: #FFFFFF; padding: 0.25rem 0.65rem; border-radius: 6px; border: 1.5px solid #E2D5BE; display: inline-block;">
+          <div style="margin-top: 1rem;">
+            <span style="font-family: monospace; font-size: 0.88rem; font-weight: 900; color: #721513; background: #FFFFFF; padding: 0.3rem 0.75rem; border-radius: 8px; border: 1.5px solid #E2D5BE; display: inline-block;">
               {{ qrCantineString() }}
             </span>
           </div>
 
-          <div style="font-size: 0.72rem; color: #606C38; font-weight: 800; margin-top: 0.45rem;">
+          <div style="font-size: 0.75rem; color: #606C38; font-weight: 800; margin-top: 0.5rem;">
             <i class="fa-solid fa-circle-check"></i> Synchronisé en direct avec la brigade
           </div>
         </div>
@@ -361,7 +361,7 @@
           <button 
             type="button" 
             (click)="setTab('COMMANDES')"
-            style="background: #721513; color: #FFFFFF; border: none; border-radius: 10px; padding: 0.55rem 1.35rem; font-weight: 800; font-size: 0.82rem; cursor: pointer;">
+            style="background: #721513; color: #FFFFFF; border: none; border-radius: 10px; padding: 0.65rem 1.5rem; font-weight: 800; font-size: 0.85rem; cursor: pointer;">
             <i class="fa-solid fa-receipt"></i> Voir les commandes scannées
           </button>
         </div>
