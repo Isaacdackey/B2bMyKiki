@@ -1588,43 +1588,72 @@
           </div>
         }
 
-        <!-- Grille du Catalogue Central -->
+        <!-- Grille du Catalogue Central avec Photos bien cadrées de haut -->
         <div class="sa-catalogue-grid">
           @for (plat of platsPagines(); track plat.id) {
             <div [style.opacity]="plat.isArchive ? '0.6' : '1'"
-                 style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(114, 21, 19, 0.04); display: flex; flex-direction: column; justify-content: space-between;">
+                 style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 18px rgba(114, 21, 19, 0.04); display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s, box-shadow 0.2s;">
               <div>
-                <div style="position: relative; height: 160px; overflow: hidden; background: #FAF8F4;">
-                  <img [src]="plat.image" [alt]="plat.nom" style="width: 100%; height: 100%; object-fit: cover;">
-                  <span style="position: absolute; top: 10px; left: 10px; background: rgba(51, 39, 36, 0.85); color: #FAF8F4; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 800;">
-                    {{ plat.categorie }}
+                <!-- Conteneur Photo bien cadrée de haut (Top-Down Food Framing) -->
+                <div style="position: relative; height: 180px; overflow: hidden; background: #FAF8F4; display: flex; align-items: center; justify-content: center;">
+                  <img [src]="plat.image" [alt]="plat.nom" style="width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                  
+                  <!-- Badge Catégorie -->
+                  <span [style.background]="plat.categorie === 'PLAT' ? '#721513' : plat.categorie === 'ENTREE' ? '#606C38' : plat.categorie === 'DESSERT' ? '#C05621' : '#332724'"
+                        style="position: absolute; top: 12px; left: 12px; color: #FAF8F4; padding: 0.3rem 0.75rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,0.25); display: flex; align-items: center; gap: 0.35rem;">
+                    <i class="fa-solid" [class.fa-bowl-food]="plat.categorie === 'PLAT'" [class.fa-leaf]="plat.categorie === 'ENTREE'" [class.fa-cake-candles]="plat.categorie === 'DESSERT'" [class.fa-wine-glass]="plat.categorie === 'BOISSON'"></i>
+                    {{ plat.categorie === 'PLAT' ? 'Plat Chaud' : plat.categorie === 'ENTREE' ? 'Entrée' : plat.categorie === 'DESSERT' ? 'Dessert' : 'Boisson' }}
                   </span>
+
+                  <!-- Badge Vue Top-Down Traiteur -->
+                  <span style="position: absolute; bottom: 10px; right: 12px; background: rgba(51, 39, 36, 0.85); backdrop-filter: blur(4px); color: #FAF8F4; padding: 0.2rem 0.55rem; border-radius: 6px; font-size: 0.65rem; font-weight: 700;">
+                    <i class="fa-solid fa-camera"></i> Cadrage Haut
+                  </span>
+
                   @if (plat.isArchive) {
-                    <span style="position: absolute; top: 10px; right: 10px; background: #E51D24; color: #FFFFFF; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 800;">
-                      Archivé
+                    <span style="position: absolute; top: 12px; right: 12px; background: #E51D24; color: #FFFFFF; padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 800; box-shadow: 0 2px 8px rgba(229,29,36,0.3);">
+                      <i class="fa-solid fa-box-archive"></i> Archivé
                     </span>
                   }
                 </div>
 
-                <div style="padding: 1.15rem;">
-                  <h3 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.15rem; color: #721513; font-weight: 800; line-height: 1.35;">
-                    {{ plat.nom }}
-                  </h3>
-                  <p style="margin: 0.35rem 0 0.85rem; font-size: 0.78rem; color: #6E5A56; line-height: 1.5;">
+                <div style="padding: 1.25rem;">
+                  <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.4rem;">
+                    <h3 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.15rem; color: #721513; font-weight: 800; line-height: 1.35;">
+                      {{ plat.nom }}
+                    </h3>
+                  </div>
+
+                  <p style="margin: 0 0 0.85rem; font-size: 0.8rem; color: #6E5A56; line-height: 1.5; min-height: 2.4rem;">
                     {{ plat.description }}
                   </p>
-                  <div style="font-size: 1.1rem; font-weight: 900; color: #721513;">
-                    {{ (plat.prixUnitaire | number) }} <span style="font-size: 0.75rem;">FCFA</span>
+
+                  <!-- Fiche nutritionnelle / allergènes si renseignés -->
+                  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.85rem;">
+                    @if (plat.calories) {
+                      <span style="background: rgba(96, 108, 56, 0.1); color: #606C38; font-size: 0.7rem; font-weight: 800; padding: 0.2rem 0.55rem; border-radius: 6px;">
+                        <i class="fa-solid fa-fire-flame-curved"></i> {{ plat.calories }} kcal
+                      </span>
+                    }
+                    @if (plat.allergene) {
+                      <span style="background: rgba(192, 86, 33, 0.1); color: #C05621; font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 6px;">
+                        <i class="fa-solid fa-triangle-exclamation"></i> {{ plat.allergene }}
+                      </span>
+                    }
+                  </div>
+
+                  <div style="font-size: 1.25rem; font-weight: 900; color: #721513; display: flex; align-items: baseline; gap: 0.25rem;">
+                    {{ (plat.prixUnitaire | number) }} <span style="font-size: 0.8rem; color: #6E5A56; font-weight: 700;">FCFA</span>
                   </div>
                 </div>
               </div>
 
               <!-- Actions Plat -->
-              <div style="border-top: 1px solid #EDE7DC; padding: 0.85rem 1.15rem; background: #FAF8F4; display: flex; justify-content: space-between; align-items: center;">
-                <button (click)="ouvrirModalModifierPlat(plat)" class="sa-btn-action">
+              <div style="border-top: 1px solid #EDE7DC; padding: 0.85rem 1.25rem; background: #FAF8F4; display: flex; justify-content: space-between; align-items: center;">
+                <button (click)="ouvrirModalModifierPlat(plat)" class="sa-btn-action" style="font-weight: 700;">
                   <i class="fa-regular fa-pen-to-square"></i> Modifier
                 </button>
-                <button (click)="b2b.toggleArchiverPlat(plat.id)" class="sa-btn-action" [style.color]="plat.isArchive ? '#606C38' : '#E51D24'">
+                <button (click)="b2b.toggleArchiverPlat(plat.id)" class="sa-btn-action" [style.color]="plat.isArchive ? '#606C38' : '#E51D24'" style="font-weight: 700;">
                   <i class="fa-solid" [class.fa-box-archive]="!plat.isArchive" [class.fa-rotate-left]="plat.isArchive"></i>
                   {{ plat.isArchive ? 'Restaurer' : 'Archiver' }}
                 </button>
@@ -1674,42 +1703,206 @@
     }
 
     <!-- ============================================================== -->
-    <!-- ============================================================== -->
-    <!-- SECTION 3 : PLANNING GLOBAL DE PRODUCTION (SUPERVISION PAR SITE)-->
+    <!-- SECTION 3 : PROGRAMMATION GLOBALE & PLANNING SUPER ADMIN         -->
     <!-- ============================================================== -->
     @if (activeSection() === 'PLANNING') {
       <div>
         
+        <!-- En-tête Programmation Globale -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
           <div>
-            <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
-              Planning Centralisé des Menus & Supervision par Site
+            <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.5rem; color: #721513; font-weight: 900; display: flex; align-items: center; gap: 0.65rem;">
+              <i class="fa-solid fa-calendar-check"></i> Programmation Globale Kiki Traiteur
             </h2>
             <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #6E5A56;">
-              Planification des thèmes, menus dédiés par site client, portions prévisionnelles et dispatch logistique.
+              Préparez le calendrier modèle de la semaine (Lundi au Dimanche) puis déployez vers toutes les entreprises clientes. Les gestionnaires de site n'ont plus qu'à renseigner leurs quantités.
             </p>
           </div>
 
+          <!-- Actions Globales : Déploiement & Ajout -->
           <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-            <!-- SÉLECTEUR DE SITE POUR LE PLANNING -->
-            <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 12px; padding: 0.35rem 0.75rem;">
-              <span style="font-size: 0.75rem; font-weight: 800; color: #721513; display: inline-flex; align-items: center; gap: 0.35rem;">
-                <i class="fa-solid fa-location-dot"></i> Site :
+            <button 
+              type="button"
+              (click)="deployerVersTousLesSites()" 
+              class="sa-btn-primary" 
+              style="background: #606C38; border-color: #606C38; box-shadow: 0 4px 14px rgba(96, 108, 56, 0.35); font-weight: 800; font-size: 0.85rem; padding: 0.65rem 1.25rem;">
+              <i class="fa-solid fa-cloud-arrow-up"></i> Déployer vers toutes les Entreprises
+            </button>
+
+            <button (click)="ouvrirModalNouveauMenuSite()" class="sa-btn-action" style="font-weight: 800; border: 1.5px solid #EDE7DC; background: #FFFFFF; color: #721513; padding: 0.65rem 1rem;">
+              <i class="fa-solid fa-plus"></i> Menu Sur-Mesure Site
+            </button>
+          </div>
+        </div>
+
+        <!-- BANDEAU D'EXPLICATION DU DÉPLOIEMENT AUTOMATIQUE FILTRÉ -->
+        <div style="background: rgba(96, 108, 56, 0.08); border: 1.5px solid #606C38; border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 1.75rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div style="display: flex; align-items: center; gap: 0.85rem;">
+            <div style="width: 42px; height: 42px; border-radius: 10px; background: #606C38; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <div>
+              <div style="font-size: 0.92rem; font-weight: 800; color: #332724;">
+                Filtrage Automatique selon les Conventions d'Entreprises
+              </div>
+              <div style="font-size: 0.78rem; color: #6E5A56; margin-top: 0.15rem;">
+                Lors du clic sur <strong>« Déployer »</strong>, chaque entreprise reçoit uniquement les catégories prévues à son contrat (Ex: <em>Total Bel-Air</em> reçoit Plat + Boisson, <em>Total Plateau</em> reçoit Entrée + Plat + Dessert + Boisson). Les quantités débutent à 0 pour saisie locale par le Responsable de Site.
+              </div>
+            </div>
+          </div>
+          <div style="font-size: 0.8rem; font-weight: 800; color: #606C38; background: #FFFFFF; border: 1px solid #606C38; padding: 0.35rem 0.75rem; border-radius: 9999px;">
+            <i class="fa-solid fa-building"></i> {{ b2b.listeEntreprises().length }} Entreprises Connectées
+          </div>
+        </div>
+
+        <!-- NAVIGATION CALENDRIER DU LUNDI AU DIMANCHE -->
+        <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+              <span style="font-size: 0.75rem; font-weight: 800; color: #6E5A56; text-transform: uppercase; letter-spacing: 0.05em;">
+                Calendrier Modèle Hebdomadaire
               </span>
-              <select 
-                [ngModel]="filtreSitePlanning()"
-                (ngModelChange)="filtreSitePlanning.set($event)"
-                style="background: transparent; border: none; font-size: 0.82rem; font-weight: 700; color: #332724; cursor: pointer; outline: none;">
-                <option value="TOUS">Tous les sites (Vue consolidée)</option>
-                @for (s of tousLesSites(); track s.id) {
-                  <option [value]="s.id">{{ s.entrepriseNom }} • {{ s.nom }}</option>
-                }
-              </select>
+              <h3 style="margin: 0.2rem 0 0; font-size: 1.25rem; color: #721513; font-weight: 900;">
+                Programmation du {{ jourPlanningGlobalActif() }} : {{ menuModeleGlobalJourActif()?.theme || 'Menu du Jour' }}
+              </h3>
             </div>
 
-            <button (click)="ouvrirModalNouveauMenuSite()" class="sa-btn-primary">
-              <i class="fa-solid fa-plus"></i> Planifier un Menu de Site
-            </button>
+            <!-- Boutons d'ajout rapide au jour actif -->
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              <button 
+                type="button"
+                (click)="categoriePlatAAjouter.set('ENTREE'); modalAjouterPlatAuJourGlobal.set(true)" 
+                class="sa-btn-action" 
+                style="font-size: 0.75rem; font-weight: 800; color: #606C38; border-color: #606C38;">
+                <i class="fa-solid fa-plus"></i> Entrée
+              </button>
+              <button 
+                type="button"
+                (click)="categoriePlatAAjouter.set('PLAT'); modalAjouterPlatAuJourGlobal.set(true)" 
+                class="sa-btn-action" 
+                style="font-size: 0.75rem; font-weight: 800; color: #721513; border-color: #721513;">
+                <i class="fa-solid fa-plus"></i> Plat Chaud
+              </button>
+              <button 
+                type="button"
+                (click)="categoriePlatAAjouter.set('DESSERT'); modalAjouterPlatAuJourGlobal.set(true)" 
+                class="sa-btn-action" 
+                style="font-size: 0.75rem; font-weight: 800; color: #C05621; border-color: #C05621;">
+                <i class="fa-solid fa-plus"></i> Dessert
+              </button>
+              <button 
+                type="button"
+                (click)="categoriePlatAAjouter.set('BOISSON'); modalAjouterPlatAuJourGlobal.set(true)" 
+                class="sa-btn-action" 
+                style="font-size: 0.75rem; font-weight: 800; color: #332724; border-color: #332724;">
+                <i class="fa-solid fa-plus"></i> Boisson
+              </button>
+            </div>
+          </div>
+
+          <!-- Onglets Jours Lundi -> Dimanche -->
+          <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; margin-bottom: 1.5rem;">
+            @for (jour of ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']; track jour) {
+              <button 
+                type="button"
+                (click)="jourPlanningGlobalActif.set($any(jour))"
+                style="padding: 0.85rem 0.5rem; border-radius: 12px; border: 1.5px solid; text-align: center; cursor: pointer; transition: all 0.2s;"
+                [style.background]="jourPlanningGlobalActif() === jour ? '#721513' : '#FAF8F4'"
+                [style.color]="jourPlanningGlobalActif() === jour ? '#FFFFFF' : '#332724'"
+                [style.border-color]="jourPlanningGlobalActif() === jour ? '#721513' : '#EDE7DC'">
+                <div style="font-size: 0.95rem; font-weight: 800; line-height: 1;">{{ jour }}</div>
+                <div style="font-size: 0.7rem; margin-top: 0.35rem; font-weight: 600;" [style.color]="jourPlanningGlobalActif() === jour ? 'rgba(255,255,255,0.85)' : '#6E5A56'">
+                  {{ (b2b.menusPlanifiesEntreprises().find(m => (m.entrepriseId === 'ent-001' || m.entrepriseId === 'GLOBAL') && m.jourNom === jour)?.lignes?.length || 0) }} mets
+                </div>
+              </button>
+            }
+          </div>
+
+          <!-- Grille des mets prévus pour ce jour dans le calendrier modèle -->
+          @if (!menuModeleGlobalJourActif() || menuModeleGlobalJourActif()!.lignes.length === 0) {
+            <div style="background: #FAF8F4; border: 1.5px dashed #E2D5BE; border-radius: 14px; padding: 2.5rem 1.5rem; text-align: center;">
+              <div style="font-size: 2rem; color: #C5A880; margin-bottom: 0.5rem;">
+                <i class="fa-solid fa-utensils"></i>
+              </div>
+              <h4 style="margin: 0 0 0.3rem; font-size: 1.1rem; color: #721513; font-weight: 800;">
+                Aucun plat au programme pour ce {{ jourPlanningGlobalActif() }}
+              </h4>
+              <p style="margin: 0 auto 1rem; font-size: 0.82rem; color: #6E5A56; max-width: 400px;">
+                Ajoutez des plats du catalogue central pour constituer le menu modèle qui sera envoyé à toutes les cantines.
+              </p>
+              <button 
+                type="button" 
+                (click)="categoriePlatAAjouter.set('PLAT'); modalAjouterPlatAuJourGlobal.set(true)" 
+                class="sa-btn-primary" 
+                style="display: inline-flex;">
+                <i class="fa-solid fa-plus"></i> Choisir un Plat Chaud dans le Catalogue
+              </button>
+            </div>
+          } @else {
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem;">
+              @for (ligne of menuModeleGlobalJourActif()!.lignes; track ligne.id) {
+                <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 0.85rem; display: flex; gap: 0.85rem; align-items: center; position: relative; box-shadow: 0 2px 8px rgba(114, 21, 19, 0.03);">
+                  
+                  <!-- Photo Cadrée de Haut -->
+                  <div style="width: 64px; height: 64px; border-radius: 12px; overflow: hidden; border: 1.5px solid #EDE7DC; flex-shrink: 0; background: #FFFFFF;">
+                    <img [src]="ligne.image || '/assets/images/plats/p1.jpg'" [alt]="ligne.nomPlat" style="width: 100%; height: 100%; object-fit: cover;">
+                  </div>
+
+                  <!-- Infos -->
+                  <div style="flex: 1; min-width: 0;">
+                    <div style="display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.2rem;">
+                      <span [style.background]="ligne.categorie === 'PLAT' ? '#721513' : ligne.categorie === 'ENTREE' ? '#606C38' : ligne.categorie === 'DESSERT' ? '#C05621' : '#332724'"
+                            style="color: #FFFFFF; font-size: 0.65rem; font-weight: 800; padding: 0.15rem 0.45rem; border-radius: 4px; text-transform: uppercase;">
+                        {{ ligne.categorie }}
+                      </span>
+                    </div>
+                    <div style="font-size: 0.88rem; font-weight: 800; color: #332724; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                      {{ ligne.nomPlat }}
+                    </div>
+                    <div style="font-size: 0.72rem; color: #6E5A56; margin-top: 0.15rem;">
+                      Quantité par site : <em>À saisir</em>
+                    </div>
+                  </div>
+
+                  <!-- Retirer du modèle -->
+                  <button 
+                    type="button"
+                    (click)="retirerPlatDuProgrammeGlobal(ligne.id)" 
+                    style="border: none; background: rgba(229, 29, 36, 0.08); color: #E51D24; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"
+                    title="Retirer ce met du menu global">
+                    <i class="fa-solid fa-trash-can" style="font-size: 0.85rem;"></i>
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- SECTION SUPERVISION PAR SITE (POUR CONTRÔLE DÉTAILLÉ) -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+          <div>
+            <h3 style="margin: 0; font-size: 1.2rem; color: #721513; font-weight: 800;">
+              Vue par Site Déployé & Contrôle Opérationnel
+            </h3>
+            <p style="margin: 0.2rem 0 0; font-size: 0.8rem; color: #6E5A56;">
+              Consultez les menus programmés site par site pour vérifier le dispatching et les portions.
+            </p>
+          </div>
+
+          <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 12px; padding: 0.35rem 0.75rem;">
+            <span style="font-size: 0.75rem; font-weight: 800; color: #721513; display: inline-flex; align-items: center; gap: 0.35rem;">
+              <i class="fa-solid fa-location-dot"></i> Filtrer par Site :
+            </span>
+            <select 
+              [ngModel]="filtreSitePlanning()"
+              (ngModelChange)="filtreSitePlanning.set($event)"
+              style="background: transparent; border: none; font-size: 0.82rem; font-weight: 700; color: #332724; cursor: pointer; outline: none;">
+              <option value="TOUS">Tous les sites (Vue consolidée)</option>
+              @for (s of tousLesSites(); track s.id) {
+                <option [value]="s.id">{{ s.entrepriseNom }} • {{ s.nom }}</option>
+              }
+            </select>
           </div>
         </div>
 
@@ -2177,8 +2370,30 @@
           </div>
 
           <div>
-            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Description des Ingrédients</label>
+            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Description des Ingrédients & Préparation</label>
             <textarea [(ngModel)]="platEnEdition().description" rows="2" placeholder="Oignons caramélisés, citron vert, riz parfumé..." style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem;"></textarea>
+          </div>
+
+          <!-- Choix Photo Cadrée de Haut (Top-down view) -->
+          <div>
+            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">
+              <i class="fa-solid fa-camera"></i> Photo Cadrée de Haut (Vue Aérienne / Top-Down)
+            </label>
+            <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
+              <input type="text" [(ngModel)]="platEnEdition().image" placeholder="/assets/images/plats/p1.jpg" style="flex: 1; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700;">
+              @if (platEnEdition().image) {
+                <img [src]="platEnEdition().image" alt="Aperçu" style="width: 44px; height: 44px; border-radius: 10px; object-fit: cover; border: 1.5px solid #EDE7DC;">
+              }
+            </div>
+            <!-- Présélections photos de qualité traiteur -->
+            <div style="font-size: 0.72rem; color: #6E5A56; margin-bottom: 0.35rem; font-weight: 700;">Photos traiteur disponibles :</div>
+            <div style="display: flex; gap: 0.4rem; overflow-x: auto; padding-bottom: 0.25rem;">
+              @for (img of ['/assets/images/plats/p1.jpg', '/assets/images/plats/p2.jpg', '/assets/images/plats/p3.jpg', '/assets/images/plats/p4.jpg', '/assets/images/plats/e1.jpg', '/assets/images/plats/e2.jpg', '/assets/images/plats/d1.jpg', '/assets/images/plats/d2.jpg', '/assets/images/plats/b1.jpg', '/assets/images/plats/b2.jpg']; track img) {
+                <button type="button" (click)="platEnEdition().image = img" style="border: 2px solid; padding: 0; border-radius: 8px; overflow: hidden; width: 40px; height: 40px; cursor: pointer; flex-shrink: 0;" [style.border-color]="platEnEdition().image === img ? '#721513' : '#EDE7DC'">
+                  <img [src]="img" style="width: 100%; height: 100%; object-fit: cover;">
+                </button>
+              }
+            </div>
           </div>
 
           <div class="sa-form-grid-2">
@@ -2186,15 +2401,31 @@
               <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Catégorie Alimentaire</label>
               <select [(ngModel)]="platEnEdition().categorie" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700; color: #721513;">
                 <option value="PLAT">Plat Chaud Principal</option>
-                <option value="ENTREE">Entrée & Cocktail</option>
+                <option value="ENTREE">Entrée & Salade</option>
                 <option value="DESSERT">Dessert & Douceur</option>
-                <option value="BOISSON">Boisson & Nectar</option>
+                <option value="BOISSON">Boisson & Jus Frais</option>
               </select>
             </div>
 
             <div>
               <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Tarif Unitaire (FCFA)</label>
               <input type="number" [(ngModel)]="platEnEdition().prixUnitaire" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 800; color: #721513;">
+            </div>
+          </div>
+
+          <div class="sa-form-grid-2">
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">
+                <i class="fa-solid fa-triangle-exclamation"></i> Allergènes
+              </label>
+              <input type="text" [(ngModel)]="platEnEdition().allergene" placeholder="Ex: Gluten, Arachides, Aucun" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem;">
+            </div>
+
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">
+                <i class="fa-solid fa-fire-flame-curved"></i> Calories (kcal)
+              </label>
+              <input type="number" [(ngModel)]="platEnEdition().calories" placeholder="550" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem;">
             </div>
           </div>
         </div>
@@ -2518,6 +2749,75 @@
           <button (click)="lancerDuplicationMenu()" class="sa-btn-primary">
             <i class="fa-solid fa-clone"></i> Confirmer la Duplication
           </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ============================================================== -->
+  <!-- MODAL : SÉLECTIONNER UN PLAT DU CATALOGUE POUR LE PLANNING GLOBAL -->
+  <!-- ============================================================== -->
+  @if (modalAjouterPlatAuJourGlobal()) {
+    <div class="sa-modal-backdrop" (click)="modalAjouterPlatAuJourGlobal.set(false)">
+      <div class="sa-modal-card" (click)="$event.stopPropagation()" style="max-width: 680px; padding: 1.75rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <div>
+            <span style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">Programmation Globale • {{ jourPlanningGlobalActif() }}</span>
+            <h3 style="margin: 0.2rem 0 0; font-size: 1.25rem; color: #721513; font-weight: 800;">
+              Ajouter un met : {{ categoriePlatAAjouter() === 'PLAT' ? 'Plat Chaud' : categoriePlatAAjouter() === 'ENTREE' ? 'Entrée' : categoriePlatAAjouter() === 'DESSERT' ? 'Dessert' : 'Boisson' }}
+            </h3>
+          </div>
+          <button (click)="modalAjouterPlatAuJourGlobal.set(false)" style="background: none; border: none; font-size: 1.25rem; color: #6E5A56; cursor: pointer;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Filtre de catégorie dans la modale -->
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem;">
+          @for (cat of ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON']; track cat) {
+            <button 
+              type="button"
+              (click)="categoriePlatAAjouter.set($any(cat))"
+              style="padding: 0.45rem 0.85rem; border-radius: 9999px; border: 1.5px solid; font-size: 0.75rem; font-weight: 800; cursor: pointer;"
+              [style.background]="categoriePlatAAjouter() === cat ? '#721513' : '#FAF8F4'"
+              [style.color]="categoriePlatAAjouter() === cat ? '#FFFFFF' : '#332724'"
+              [style.border-color]="categoriePlatAAjouter() === cat ? '#721513' : '#EDE7DC'">
+              {{ cat === 'PLAT' ? 'Plats Chauds' : cat === 'ENTREE' ? 'Entrées' : cat === 'DESSERT' ? 'Desserts' : 'Boissons' }}
+            </button>
+          }
+        </div>
+
+        <!-- Liste des plats disponibles -->
+        <div style="max-height: 380px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; padding-right: 0.25rem;">
+          @for (plat of platsDisponiblesPourAjout(); track plat.id) {
+            <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 12px; padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+              <div style="display: flex; align-items: center; gap: 0.85rem; min-width: 0;">
+                <div style="width: 52px; height: 52px; border-radius: 10px; overflow: hidden; border: 1px solid #EDE7DC; flex-shrink: 0; background: #FFFFFF;">
+                  <img [src]="plat.image" [alt]="plat.nom" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div style="min-width: 0;">
+                  <div style="font-size: 0.9rem; font-weight: 800; color: #332724; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    {{ plat.nom }}
+                  </div>
+                  <div style="font-size: 0.75rem; color: #6E5A56; margin-top: 0.15rem;">
+                    {{ plat.prixUnitaire | number }} FCFA • {{ plat.calories || 500 }} kcal
+                  </div>
+                </div>
+              </div>
+
+              <button 
+                type="button"
+                (click)="ajouterPlatAuProgrammeGlobal(plat)"
+                class="sa-btn-primary" 
+                style="padding: 0.45rem 0.95rem; font-size: 0.78rem; font-weight: 800; white-space: nowrap;">
+                <i class="fa-solid fa-plus"></i> Sélectionner
+              </button>
+            </div>
+          }
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 1.25rem;">
+          <button (click)="modalAjouterPlatAuJourGlobal.set(false)" class="sa-btn-action">Fermer</button>
         </div>
       </div>
     </div>

@@ -864,10 +864,73 @@ export class B2bSuperAdminComponent {
         categorie: p.categorie || 'PLAT',
         prixUnitaire: p.prixUnitaire || 2500,
         image: p.image || '/assets/images/plats/p1.jpg',
+        allergene: p.allergene || 'Aucun allergène majeur',
         calories: p.calories || 500
       });
     }
     this.showModalPlat.set(false);
+  }
+
+  // PROGRAMMATION GLOBALE & DÉPLOIEMENT VERS TOUTES LES ENTREPRISES
+  jourPlanningGlobalActif = signal<'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche'>('Lundi');
+  modalAjouterPlatAuJourGlobal = signal<boolean>(false);
+  categoriePlatAAjouter = signal<'ENTREE' | 'PLAT' | 'DESSERT' | 'BOISSON'>('PLAT');
+
+  // Plats du jour dans le planning modèle global (Lundi à Dimanche)
+  menuModeleGlobalJourActif = computed(() => {
+    const jour = this.jourPlanningGlobalActif();
+    return this.b2b.menusPlanifiesEntreprises().find(m => (m.entrepriseId === 'ent-001' || m.entrepriseId === 'GLOBAL') && m.jourNom === jour);
+  });
+
+  // Plats disponibles dans le catalogue pour ajout au planning
+  platsDisponiblesPourAjout = computed(() => {
+    const cat = this.categoriePlatAAjouter();
+    return this.b2b.catalogueJour().filter(p => !p.isArchive && p.categorie === cat);
+  });
+
+  ajouterPlatAuProgrammeGlobal(plat: PlatB2B) {
+    const jour = this.jourPlanningGlobalActif();
+    this.b2b.menusPlanifiesEntreprises.update(list => list.map(m => {
+      if ((m.entrepriseId === 'ent-001' || m.entrepriseId === 'GLOBAL') && m.jourNom === jour) {
+        // Vérifier si le plat n'est pas déjà présent
+        if (m.lignes.some(l => l.platId === plat.id)) {
+          return m;
+        }
+        const nouvelleLigne = {
+          id: 'l-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
+          categorie: plat.categorie,
+          platId: plat.id,
+          nomPlat: plat.nom,
+          image: plat.image,
+          quantitePrevue: 35,
+          disponible: true
+        };
+        return {
+          ...m,
+          lignes: [...m.lignes, nouvelleLigne]
+        };
+      }
+      return m;
+    }));
+    this.modalAjouterPlatAuJourGlobal.set(false);
+  }
+
+  retirerPlatDuProgrammeGlobal(ligneId: string) {
+    const jour = this.jourPlanningGlobalActif();
+    this.b2b.menusPlanifiesEntreprises.update(list => list.map(m => {
+      if ((m.entrepriseId === 'ent-001' || m.entrepriseId === 'GLOBAL') && m.jourNom === jour) {
+        return {
+          ...m,
+          lignes: m.lignes.filter(l => l.id !== ligneId)
+        };
+      }
+      return m;
+    }));
+  }
+
+  deployerVersTousLesSites() {
+    this.b2b.deployerProgrammationGlobaleVersEntreprises();
+    alert('Succès ! La programmation globale a été synchronisée vers toutes les entreprises partenaires (filtrée selon les catégories autorisées par leurs conventions respectives).');
   }
 
   // ACTIONS PLANNING SUPERVISION

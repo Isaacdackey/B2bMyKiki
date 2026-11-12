@@ -914,6 +914,57 @@ export class B2bStateService {
     }));
   }
 
+  // PROGRAMMATION GLOBALE & DÉPLOIEMENT VERS TOUTES LES ENTREPRISES
+  // Déploie le programme global préparé par le Super Admin vers les sites/entreprises
+  // en adaptant automatiquement selon les catégories autorisées de chaque entreprise.
+  deployerProgrammationGlobaleVersEntreprises() {
+    const programmeGlobal = this.menusPlanifiesEntreprises().filter(m => m.entrepriseId === 'ent-001' || m.entrepriseId === 'GLOBAL');
+    const entreprises = this.listeEntreprises();
+
+    this.menusPlanifiesEntreprises.update(listeActuelle => {
+      let nouvelleListe = [...listeActuelle];
+
+      entreprises.forEach(ent => {
+        const categoriesAutorisees = ent.categoriesAutorisees || ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'];
+
+        ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'].forEach(jour => {
+          const modeleJour = programmeGlobal.find(p => p.jourNom === jour);
+          if (!modeleJour) return;
+
+          // Filtrer les lignes selon les catégories autorisées du contrat de l'entreprise
+          const lignesFiltrees = modeleJour.lignes
+            .filter(l => categoriesAutorisees.includes(l.categorie))
+            .map(l => ({
+              ...l,
+              id: 'l-' + ent.id + '-' + jour + '-' + l.platId,
+              quantitePrevue: 0 // Au gestionnaire de site de renseigner ses quantités !
+            }));
+
+          const existantIdx = nouvelleListe.findIndex(m => m.entrepriseId === ent.id && m.jourNom === jour);
+          const menuDeploye: MenuPlanifieJourEntreprise = {
+            id: `plan-${ent.id}-${jour.toLowerCase().slice(0, 3)}`,
+            entrepriseId: ent.id,
+            jourNom: jour as any,
+            dateStr: modeleJour.dateStr,
+            theme: modeleJour.theme,
+            lignes: lignesFiltrees,
+            quantitesSaisies: false,
+            statutConformite: 'NON_SAISI'
+          };
+
+          if (existantIdx >= 0) {
+            // Conserver si déjà des quantités ou écraser avec le nouveau programme
+            nouvelleListe[existantIdx] = menuDeploye;
+          } else {
+            nouvelleListe.push(menuDeploye);
+          }
+        });
+      });
+
+      return nouvelleListe;
+    });
+  }
+
   // Annuaire des employés RH de l'entreprise
   listeEmployes = signal<EmployeB2B[]>([
     { id: 'emp-101', matricule: 'TOT-9842', nom: 'Ndiaye', prenom: 'Babacar', email: 'b.ndiaye@totalenergies.sn', telephone: '+221 77 123 45 67', siteId: 'site-1', siteNom: 'Siège Plateau', departement: 'Finance & Comptabilité', type: 'SUBVENTIONNE', tauxSubvention: 100, actif: true, repasConsommesMois: 19, montantPrisEnChargeMois: 95000 },
