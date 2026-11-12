@@ -1538,8 +1538,19 @@
             </p>
           </div>
 
-          <!-- Filtres Catégorie & Archivage -->
+          <!-- Filtres Recherche, Catégorie & Archivage -->
           <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+            <!-- Recherche instantanée -->
+            <div style="position: relative; display: flex; align-items: center;">
+              <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 0.75rem; color: #6E5A56; font-size: 0.8rem; pointer-events: none;"></i>
+              <input 
+                type="text" 
+                [ngModel]="recherchePlatCatalogue()" 
+                (ngModelChange)="recherchePlatCatalogue.set($event)" 
+                placeholder="Rechercher un plat..." 
+                style="padding: 0.55rem 0.85rem 0.55rem 2.1rem; border: 1.5px solid #EDE7DC; border-radius: 10px; font-size: 0.82rem; width: 190px; outline: none; background: #FFFFFF; color: #332724; font-weight: 600;">
+            </div>
+
             <select 
               [ngModel]="filtreCategorieCatalogue()"
               (ngModelChange)="filtreCategorieCatalogue.set($event)"
@@ -1719,18 +1730,30 @@
             </p>
           </div>
 
-          <!-- Actions Globales : Déploiement & Ajout -->
+          <!-- Actions Globales : Déploiement & Reconduction -->
           <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+            <button 
+              type="button"
+              (click)="modalDupliquerJourGlobal.set(true)" 
+              class="sa-btn-action" 
+              style="font-weight: 800; border: 1.5px solid #EDE7DC; background: #FFFFFF; color: #721513; padding: 0.65rem 1rem;">
+              <i class="fa-regular fa-copy"></i> Dupliquer ce Jour...
+            </button>
+
+            <button 
+              type="button"
+              (click)="reconduireSemaineSuivante()" 
+              class="sa-btn-action" 
+              style="font-weight: 800; border: 1.5px solid #C5A880; background: #FAF8F4; color: #721513; padding: 0.65rem 1rem;">
+              <i class="fa-solid fa-arrows-rotate"></i> Reconduire Semaine Suivante
+            </button>
+
             <button 
               type="button"
               (click)="deployerVersTousLesSites()" 
               class="sa-btn-primary" 
               style="background: #606C38; border-color: #606C38; box-shadow: 0 4px 14px rgba(96, 108, 56, 0.35); font-weight: 800; font-size: 0.85rem; padding: 0.65rem 1.25rem;">
-              <i class="fa-solid fa-cloud-arrow-up"></i> Déployer vers toutes les Entreprises
-            </button>
-
-            <button (click)="ouvrirModalNouveauMenuSite()" class="sa-btn-action" style="font-weight: 800; border: 1.5px solid #EDE7DC; background: #FFFFFF; color: #721513; padding: 0.65rem 1rem;">
-              <i class="fa-solid fa-plus"></i> Menu Sur-Mesure Site
+              <i class="fa-solid fa-cloud-arrow-up"></i> Publier & Synchroniser vers les Entreprises
             </button>
           </div>
         </div>
@@ -2818,6 +2841,48 @@
 
         <div style="display: flex; justify-content: flex-end; margin-top: 1.25rem;">
           <button (click)="modalAjouterPlatAuJourGlobal.set(false)" class="sa-btn-action">Fermer</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ============================================================== -->
+  <!-- MODAL : DUPLIQUER UN JOUR DU PLANNING GLOBAL                   -->
+  <!-- ============================================================== -->
+  @if (modalDupliquerJourGlobal()) {
+    <div class="sa-modal-backdrop" (click)="modalDupliquerJourGlobal.set(false)">
+      <div class="sa-modal-card" (click)="$event.stopPropagation()" style="max-width: 480px; padding: 1.75rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <h3 style="margin: 0; font-size: 1.25rem; color: #721513; font-weight: 800;">
+            <i class="fa-regular fa-copy"></i> Dupliquer la Programmation
+          </h3>
+          <button (click)="modalDupliquerJourGlobal.set(false)" style="background: none; border: none; font-size: 1.25rem; color: #6E5A56; cursor: pointer;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <p style="font-size: 0.85rem; color: #6E5A56; margin: 0 0 1rem; line-height: 1.5;">
+          Copier l'ensemble des mets du programme de <strong>{{ jourPlanningGlobalActif() }}</strong> vers un autre jour de la semaine.
+        </p>
+
+        <div>
+          <label style="font-size: 0.75rem; font-weight: 800; color: #332724; display: block; margin-bottom: 0.35rem;">
+            Jour de destination :
+          </label>
+          <select [ngModel]="jourCibleDuplicationGlobal()" (ngModelChange)="jourCibleDuplicationGlobal.set($event)" style="width: 100%; height: 40px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.9rem; font-weight: 800; color: #721513; background: #FFFFFF;">
+            @for (j of ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']; track j) {
+              @if (j !== jourPlanningGlobalActif()) {
+                <option [value]="j">{{ j }}</option>
+              }
+            }
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem; justify-content: flex-end;">
+          <button (click)="modalDupliquerJourGlobal.set(false)" class="sa-btn-action">Annuler</button>
+          <button (click)="dupliquerJourGlobal()" class="sa-btn-primary">
+            <i class="fa-solid fa-clone"></i> Dupliquer vers ce jour
+          </button>
         </div>
       </div>
     </div>

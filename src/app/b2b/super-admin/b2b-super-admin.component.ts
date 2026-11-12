@@ -460,19 +460,22 @@ export class B2bSuperAdminComponent {
   platIdEnEdition = signal<string>('');
 
   // Filtre Catalogue & Pagination
+  recherchePlatCatalogue = signal<string>('');
   filtreCategorieCatalogue = signal<'TOUS' | 'ENTREE' | 'PLAT' | 'DESSERT' | 'BOISSON'>('TOUS');
   filtreArchivePlat = signal<'TOUS' | 'ACTIFS' | 'ARCHIVES'>('ACTIFS');
   pageCatalogue = signal<number>(1);
   pageSizeCatalogue = signal<number>(6);
 
   platsFiltres = computed(() => {
+    const q = this.recherchePlatCatalogue().trim().toLowerCase();
     const cat = this.filtreCategorieCatalogue();
     const arch = this.filtreArchivePlat();
 
     return this.b2b.catalogueJour().filter(p => {
+      const matchQuery = !q || p.nom.toLowerCase().includes(q) || (p.description && p.description.toLowerCase().includes(q));
       const matchCat = cat === 'TOUS' || p.categorie === cat;
       const matchArch = arch === 'TOUS' ? true : arch === 'ACTIFS' ? !p.isArchive : p.isArchive;
-      return matchCat && matchArch;
+      return matchQuery && matchCat && matchArch;
     });
   });
 
@@ -931,6 +934,47 @@ export class B2bSuperAdminComponent {
   deployerVersTousLesSites() {
     this.b2b.deployerProgrammationGlobaleVersEntreprises();
     alert('Succès ! La programmation globale a été synchronisée vers toutes les entreprises partenaires (filtrée selon les catégories autorisées par leurs conventions respectives).');
+  }
+
+  // DUPLICATION & RECONDUCTION DU PLANNING GLOBAL
+  modalDupliquerJourGlobal = signal<boolean>(false);
+  jourCibleDuplicationGlobal = signal<'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche'>('Mardi');
+
+  dupliquerJourGlobal() {
+    const sourceJour = this.jourPlanningGlobalActif();
+    const cibleJour = this.jourCibleDuplicationGlobal();
+    if (sourceJour === cibleJour) {
+      alert('Veuillez sélectionner un jour de destination différent du jour source.');
+      return;
+    }
+
+    const sourceMenu = this.b2b.menusPlanifiesEntreprises().find(m => (m.entrepriseId === 'ent-001' || m.entrepriseId === 'GLOBAL') && m.jourNom === sourceJour);
+    if (!sourceMenu) return;
+
+    this.b2b.menusPlanifiesEntreprises.update(list => list.map(m => {
+      if ((m.entrepriseId === 'ent-001' || m.entrepriseId === 'GLOBAL') && m.jourNom === cibleJour) {
+        return {
+          ...m,
+          theme: sourceMenu.theme ? `${sourceMenu.theme} (Copié de ${sourceJour})` : m.theme,
+          lignes: sourceMenu.lignes.map(l => ({
+            ...l,
+            id: 'l-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4)
+          }))
+        };
+      }
+      return m;
+    }));
+
+    this.modalDupliquerJourGlobal.set(false);
+    this.jourPlanningGlobalActif.set(cibleJour);
+    alert(`Le menu du ${sourceJour} a été dupliqué avec succès vers le ${cibleJour} !`);
+  }
+
+  reconduireSemaineSuivante() {
+    if (confirm('Voulez-vous reconduire l\'intégralité du programme hebdomadaire actuel sur la semaine suivante et synchroniser automatiquement vers les cantines partenaires ?')) {
+      this.b2b.deployerProgrammationGlobaleVersEntreprises();
+      alert('Reconduction effectuée avec succès pour la semaine suivante ! Toutes les cantines ont été mises à jour.');
+    }
   }
 
   // ACTIONS PLANNING SUPERVISION
