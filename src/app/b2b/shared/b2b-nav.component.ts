@@ -23,7 +23,7 @@ export class B2bNavComponent {
     }
   }
 
-  navigerRh(section: 'STATISTIQUES' | 'COMMANDES_SITE' | 'EMPLOYES') {
+  navigerRh(section: 'STATISTIQUES' | 'COMMANDES_SITE' | 'EMPLOYES' | 'FACTURATION') {
     this.b2b.rhActiveSection.set(section);
     this.router.navigate(['/b2b/rh']);
     this.b2b.closeMobileDrawer();

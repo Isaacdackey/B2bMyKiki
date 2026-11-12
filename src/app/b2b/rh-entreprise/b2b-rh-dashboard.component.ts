@@ -21,17 +21,23 @@ export class B2bRhDashboardComponent {
     return this.b2b.rhActiveSection;
   }
 
-  // FILTRES CLÉS EXIGÉS PAR LE MENTOR : PAR SITE + DATE DÉBUT + DATE FIN
-  selectedSiteId = signal<string>('site-1');
-  dateDebut = signal<string>('2026-11-01');
-  dateFin = signal<string>('2026-11-30');
+  // FILTRES CLÉS EXIGÉS PAR LE MENTOR : DATE DÉBUT + DATE FIN (par défaut sur la journée courante)
+  selectedSiteId = signal<string>('TOUS');
+  dateDebut = signal<string>('2026-11-12');
+  dateFin = signal<string>('2026-11-12');
 
-  // Période active sélectionnée selon la convention RH : Aujourd’hui, Semaine, Mois, Personnalisé
-  periodeActive = signal<'AUJOURDHUI' | 'SEMAINE' | 'MOIS' | 'PERSONNALISE'>('MOIS');
+  // Période active sélectionnée selon la convention RH : Aujourd’hui (par défaut), Semaine, Mois, Personnalisé
+  periodeActive = signal<'AUJOURDHUI' | 'SEMAINE' | 'MOIS' | 'PERSONNALISE'>('AUJOURDHUI');
 
-  // Filtre recherche employé
+  // Filtre recherche employé & filtre période récapitulatif employés
   searchQuery = signal<string>('');
   selectedSiteFilter = signal<string>('TOUS');
+  employeDateDebut = signal<string>('2026-11-01');
+  employeDateFin = signal<string>('2026-11-12');
+
+  // Filtres Facturation
+  factureDateDebut = signal<string>('2026-11-01');
+  factureDateFin = signal<string>('2026-11-12');
 
   // Modal nouvel employé
   showAddEmployeeModal = signal<boolean>(false);
@@ -55,6 +61,56 @@ export class B2bRhDashboardComponent {
   // Site sélectionné
   siteActif = computed(() => {
     return this.b2b.currentEntreprise().sites.find(s => s.id === this.selectedSiteId()) || this.b2b.currentEntreprise().sites[0];
+  });
+
+  // Commandes filtrées pour l'entreprise selon les 3 statuts stricts : EN_COURS -> SCANNE -> LIVRE
+  commandesSiteFiltrees = computed(() => {
+    const debut = this.dateDebut();
+    const fin = this.dateFin();
+
+    return this.b2b.listeCommandesSite().filter(cmd => {
+      const matchDate = (!debut || cmd.date >= debut) && (!fin || cmd.date <= fin);
+      return matchDate;
+    });
+  });
+
+  // Facturation consolidée filtrée
+  lignesFacturationFiltrees = computed(() => {
+    const debut = this.factureDateDebut();
+    const fin = this.factureDateFin();
+
+    return this.b2b.lignesFacturationEntreprise().filter(ligne => {
+      const matchDate = (!debut || ligne.date >= debut) && (!fin || ligne.date <= fin);
+      return matchDate;
+    });
+  });
+
+  totalPlatsLivresMoisEnCours = computed(() => {
+    return this.b2b.lignesFacturationEntreprise().reduce((acc, l) => acc + l.nbPlatsLivres, 0);
+  });
+
+  totalMontantFactureMoisEnCours = computed(() => {
+    return this.b2b.lignesFacturationEntreprise().reduce((acc, l) => acc + l.montantTotal, 0);
+  });
+
+  totalMontantEntrepriseMoisEnCours = computed(() => {
+    return this.b2b.lignesFacturationEntreprise().reduce((acc, l) => acc + l.montantPartEntreprise, 0);
+  });
+
+  // Employés pris en charge (taux subvention > 0)
+  employesPrisEnChargeCount = computed(() => {
+    return this.b2b.listeEmployes().filter(e => e.tauxSubvention > 0).length;
+  });
+
+  // Consommation journalière calculée pour la journée
+  consommationJournaliereRepas = computed(() => {
+    const today = this.dateDebut();
+    return this.b2b.listeCommandesSite().filter(c => c.date === today).length;
+  });
+
+  consommationJournaliereMontant = computed(() => {
+    const today = this.dateDebut();
+    return this.b2b.listeCommandesSite().filter(c => c.date === today).reduce((acc, c) => acc + c.partEntreprise, 0);
   });
 
   // Commandes filtrées pour le site et la période choisie (Cœur de la demande du Mentor)
@@ -104,15 +160,19 @@ export class B2bRhDashboardComponent {
   definirPeriode(type: 'AUJOURDHUI' | 'SEMAINE' | 'MOIS' | 'PERSONNALISE') {
     this.periodeActive.set(type);
     if (type === 'AUJOURDHUI') {
-      this.dateDebut.set('2026-11-06');
-      this.dateFin.set('2026-11-06');
+      this.dateDebut.set('2026-11-12');
+      this.dateFin.set('2026-11-12');
     } else if (type === 'SEMAINE') {
-      this.dateDebut.set('2026-11-03');
-      this.dateFin.set('2026-11-07');
+      this.dateDebut.set('2026-11-09');
+      this.dateFin.set('2026-11-15');
     } else if (type === 'MOIS') {
       this.dateDebut.set('2026-11-01');
       this.dateFin.set('2026-11-30');
     }
+  }
+
+  exporterExcelFacturation() {
+    alert('Export Excel généré avec succès ! Le fichier "Facturation_Kiki_Traiteur.xlsx" a été téléchargé.');
   }
 
   surChangementDateManuel() {

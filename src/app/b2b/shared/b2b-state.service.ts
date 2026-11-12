@@ -23,6 +23,12 @@ export class B2bStateService {
   // Section active dans l'Espace Responsable Entreprise (RH) : Dashboard Vue Globale par défaut
   rhActiveSection = signal<'STATISTIQUES' | 'COMMANDES_SITE' | 'EMPLOYES' | 'FACTURATION' | 'SITES'>('STATISTIQUES');
 
+  // Helpers de réduction pour les calculs de totaux de facturation
+  sommePlatsLivres(acc: number, l: FacturationLigneJournaliere) { return acc + (l.nbPlatsLivres || 0); }
+  sommeMontantTotal(acc: number, l: FacturationLigneJournaliere) { return acc + (l.montantTotal || 0); }
+  sommeMontantEntreprise(acc: number, l: FacturationLigneJournaliere) { return acc + (l.montantPartEntreprise || 0); }
+  sommePartEntreprise(acc: number, c: CommandeEntrepriseSite) { return acc + (c.partEntreprise || 0); }
+
   // Types de prestation configurables
   typesPrestationConfigurables = signal<{ code: string; libelle: string; desc: string; categoriesDefaut: string[] }[]>([
     { 

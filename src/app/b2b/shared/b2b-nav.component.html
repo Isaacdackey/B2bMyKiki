@@ -231,8 +231,25 @@
         </div>
         @if (!b2b.isSidebarCollapsed()) {
           <div class="b2b-link-text">
-            <span class="b2b-link-title">Annuaire &amp; Quotas</span>
+            <span class="b2b-link-title">Employés</span>
             <span class="b2b-link-subtitle">Salariés &amp; taux de prise en charge</span>
+          </div>
+        }
+      </button>
+
+      <button 
+        type="button" 
+        class="b2b-sidebar-link"
+        [class.active]="b2b.rhActiveSection() === 'FACTURATION'"
+        (click)="navigerRh('FACTURATION')"
+        title="Facturation Entreprise">
+        <div class="b2b-link-icon-wrap">
+          <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i>
+        </div>
+        @if (!b2b.isSidebarCollapsed()) {
+          <div class="b2b-link-text">
+            <span class="b2b-link-title">Facturation</span>
+            <span class="b2b-link-subtitle">Relevé journalier &amp; exports</span>
           </div>
         }
       </button>
