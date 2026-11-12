@@ -440,7 +440,7 @@
                   <div style="font-size: 0.74rem; color: #64748B; font-weight: 600;">Entreprises partenaires</div>
                   <div style="font-size: 1.25rem; font-weight: 800; color: #0F172A; margin-top: 0.15rem;">{{ nbEntreprisesActives() }} actives</div>
                 </div>
-                <button type="button" (click)="b2b.superAdminActiveSection.set('ENTREPRISES')" class="sa-btn-action" style="font-size: 0.74rem;">
+                <button type="button" (click)="allerASection('ENTREPRISES')" class="sa-btn-action" style="font-size: 0.74rem;">
                   Voir le répertoire <i class="fa-solid fa-arrow-right"></i>
                 </button>
               </div>
@@ -450,7 +450,7 @@
                   <div style="font-size: 0.74rem; color: #64748B; font-weight: 600;">Catalogue des Chefs</div>
                   <div style="font-size: 1.25rem; font-weight: 800; color: #0F172A; margin-top: 0.15rem;">{{ totalPlatsCatalogue() }} plats</div>
                 </div>
-                <button type="button" (click)="b2b.superAdminActiveSection.set('CATALOGUE')" class="sa-btn-action" style="font-size: 0.74rem;">
+                <button type="button" (click)="allerASection('CATALOGUE')" class="sa-btn-action" style="font-size: 0.74rem;">
                   Gérer <i class="fa-solid fa-arrow-right"></i>
                 </button>
               </div>
@@ -460,7 +460,7 @@
                   <div style="font-size: 0.74rem; color: #64748B; font-weight: 600;">Menus de la semaine</div>
                   <div style="font-size: 1.25rem; font-weight: 800; color: #0F172A; margin-top: 0.15rem;">{{ planningSemaineGlobal().length }} programmés</div>
                 </div>
-                <button type="button" (click)="b2b.superAdminActiveSection.set('PLANNING')" class="sa-btn-action" style="font-size: 0.74rem;">
+                <button type="button" (click)="allerASection('PLANNING')" class="sa-btn-action" style="font-size: 0.74rem;">
                   Planning <i class="fa-solid fa-arrow-right"></i>
                 </button>
               </div>

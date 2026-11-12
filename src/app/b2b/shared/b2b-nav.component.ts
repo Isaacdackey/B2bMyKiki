@@ -18,18 +18,27 @@ export class B2bNavComponent {
     this.b2b.superAdminActiveSection.set(section);
     this.router.navigate(['/b2b/super-admin']);
     this.b2b.closeMobileDrawer();
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   navigerRh(section: 'STATISTIQUES' | 'COMMANDES_SITE' | 'EMPLOYES') {
     this.b2b.rhActiveSection.set(section);
     this.router.navigate(['/b2b/rh']);
     this.b2b.closeMobileDrawer();
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   navigerCuisine(tab: 'PRODUCTION' | 'PLANNING_SEMAINE' | 'SCAN_QR' | 'AUTONOME' | 'BORDEREAUX') {
     this.b2b.cuisineActiveTab.set(tab);
     this.router.navigate(['/b2b/cuisine']);
     this.b2b.closeMobileDrawer();
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   @HostListener('window:keydown.escape')

@@ -20,6 +20,13 @@ export class B2bSuperAdminComponent {
     return this.b2b.superAdminActiveSection;
   }
 
+  allerASection(section: 'DASHBOARD' | 'ENTREPRISES' | 'CATALOGUE' | 'PLANNING' | 'SITES' | 'FACTURATION') {
+    this.b2b.superAdminActiveSection.set(section as any);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
   // Filtres Entreprises & Pagination
   searchEntreprise = signal<string>('');
   filtreArchiveEntreprise = signal<'TOUTES' | 'ACTIVES' | 'ARCHIVEES'>('ACTIVES');
