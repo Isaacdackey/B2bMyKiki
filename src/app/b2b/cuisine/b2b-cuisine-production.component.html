@@ -246,7 +246,7 @@
                 <th style="padding: 0.85rem 1.25rem;">Salarié</th>
                 <th style="padding: 0.85rem 1.25rem;">Plat Commandé</th>
                 <th style="padding: 0.85rem 1.25rem; text-align: center;">Statut</th>
-                <th style="padding: 0.85rem 1.25rem; text-align: right;">Action Responsable</th>
+                <th style="padding: 0.85rem 1.25rem; text-align: center;">Action Responsable</th>
               </tr>
             </thead>
             <tbody>
@@ -281,13 +281,13 @@
                       </span>
                     }
                   </td>
-                  <td style="padding: 0.85rem 1.25rem; text-align: right;">
+                  <td style="padding: 0.85rem 1.25rem; text-align: center;">
                     @if (cmd.statut === 'EN_COURS') {
                       <!-- Simulation du scan employé si l'employé n'a pas son smartphone ou pour test -->
                       <button 
                         type="button" 
                         (click)="simulerScanEmploye(cmd.id)"
-                        style="background: #EFF6FF; color: #1D4ED8; border: 1.5px solid #93C5FD; border-radius: 8px; padding: 0.45rem 0.85rem; font-size: 0.78rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;">
+                        style="background: #EFF6FF; color: #1D4ED8; border: 1.5px solid #93C5FD; border-radius: 8px; padding: 0.45rem 0.85rem; font-size: 0.78rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; margin: 0 auto;">
                         <i class="fa-solid fa-qrcode"></i> Valider Scan
                       </button>
                     } @else if (cmd.statut === 'SCANNE') {
@@ -295,12 +295,12 @@
                       <button 
                         type="button" 
                         (click)="marquerLivre(cmd.id)"
-                        style="background: #606C38; color: #FFFFFF; border: none; border-radius: 8px; padding: 0.45rem 0.95rem; font-size: 0.78rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 2px 8px rgba(96, 108, 56, 0.3);">
+                        style="background: #606C38; color: #FFFFFF; border: none; border-radius: 8px; padding: 0.45rem 0.95rem; font-size: 0.78rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 2px 8px rgba(96, 108, 56, 0.3); margin: 0 auto;">
                         <i class="fa-solid fa-check"></i> Marquer Livré
                       </button>
                     } @else {
-                      <span style="font-size: 0.75rem; color: #9CA3AF; font-weight: 700;">
-                        <i class="fa-solid fa-circle-check" style="color: #606C38;"></i> Remis
+                      <span style="font-size: 0.78rem; color: #606C38; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem; margin: 0 auto;">
+                        <i class="fa-solid fa-circle-check"></i> Remis
                       </span>
                     }
                   </td>
