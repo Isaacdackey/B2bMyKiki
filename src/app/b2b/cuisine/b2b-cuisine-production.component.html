@@ -52,9 +52,9 @@
     </div>
 
     <!-- ============================================================== -->
-    <!-- BARRE DES ONGLETS DE GESTION DU SITE                           -->
+    <!-- BARRE DES ONGLETS DE GESTION DU SITE (ZERO SCROLLBAR)          -->
     <!-- ============================================================== -->
-    <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 0.65rem 0.85rem; margin-bottom: 1.5rem; display: flex; gap: 0.5rem; overflow-x: auto; box-shadow: 0 4px 15px rgba(114, 21, 19, 0.04);">
+    <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 0.5rem 0.65rem; margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; box-shadow: 0 4px 15px rgba(114, 21, 19, 0.04);">
       
       <button 
         type="button" 
@@ -62,8 +62,8 @@
         [style.background]="activeTab() === 'MENU' ? '#721513' : 'transparent'"
         [style.color]="activeTab() === 'MENU' ? '#FFFFFF' : '#332724'"
         [style.border]="activeTab() === 'MENU' ? '1.5px solid #721513' : '1.5px solid transparent'"
-        style="font-weight: 800; font-size: 0.85rem; padding: 0.6rem 1.1rem; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap;">
-        <i class="fa-solid fa-calendar-days"></i> Menu Planifié & Quantités
+        style="font-weight: 800; font-size: 0.8rem; padding: 0.5rem 0.85rem; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; white-space: nowrap;">
+        <i class="fa-solid fa-calendar-days"></i> Menu & Quantités
       </button>
 
       <button 
@@ -72,9 +72,9 @@
         [style.background]="activeTab() === 'COMMANDES' ? '#721513' : 'transparent'"
         [style.color]="activeTab() === 'COMMANDES' ? '#FFFFFF' : '#332724'"
         [style.border]="activeTab() === 'COMMANDES' ? '1.5px solid #721513' : '1.5px solid transparent'"
-        style="font-weight: 800; font-size: 0.85rem; padding: 0.6rem 1.1rem; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap;">
-        <i class="fa-solid fa-receipt"></i> Commandes du Jour & Retrait
-        <span [style.background]="activeTab() === 'COMMANDES' ? 'rgba(255,255,255,0.25)' : '#FAF5EA'" [style.color]="activeTab() === 'COMMANDES' ? '#FFFFFF' : '#721513'" style="padding: 0.15rem 0.45rem; border-radius: 6px; font-size: 0.72rem; font-weight: 900;">
+        style="font-weight: 800; font-size: 0.8rem; padding: 0.5rem 0.85rem; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; white-space: nowrap;">
+        <i class="fa-solid fa-receipt"></i> Commandes du Jour
+        <span [style.background]="activeTab() === 'COMMANDES' ? 'rgba(255,255,255,0.25)' : '#FAF5EA'" [style.color]="activeTab() === 'COMMANDES' ? '#FFFFFF' : '#721513'" style="padding: 0.1rem 0.4rem; border-radius: 6px; font-size: 0.7rem; font-weight: 900;">
           {{ commandesSite().length }}
         </span>
       </button>
@@ -85,8 +85,8 @@
         [style.background]="activeTab() === 'PROJECTION_QR' ? '#E51D24' : 'transparent'"
         [style.color]="activeTab() === 'PROJECTION_QR' ? '#FFFFFF' : '#E51D24'"
         [style.border]="activeTab() === 'PROJECTION_QR' ? '1.5px solid #E51D24' : '1.5px solid #FCD34D'"
-        style="font-weight: 800; font-size: 0.85rem; padding: 0.6rem 1.1rem; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap;">
-        <i class="fa-solid fa-qrcode"></i> QR Code Cantine à Projeter
+        style="font-weight: 800; font-size: 0.8rem; padding: 0.5rem 0.85rem; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; white-space: nowrap;">
+        <i class="fa-solid fa-qrcode"></i> QR Code Cantine
       </button>
 
       <button 
@@ -95,10 +95,10 @@
         [style.background]="activeTab() === 'RECLAMATIONS' ? '#721513' : 'transparent'"
         [style.color]="activeTab() === 'RECLAMATIONS' ? '#FFFFFF' : '#332724'"
         [style.border]="activeTab() === 'RECLAMATIONS' ? '1.5px solid #721513' : '1.5px solid transparent'"
-        style="font-weight: 800; font-size: 0.85rem; padding: 0.6rem 1.1rem; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap;">
-        <i class="fa-solid fa-triangle-exclamation"></i> Réclamations Retardataires
+        style="font-weight: 800; font-size: 0.8rem; padding: 0.5rem 0.85rem; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; white-space: nowrap;">
+        <i class="fa-solid fa-triangle-exclamation"></i> Réclamations
         @if (reclamationsEnAttenteCount() > 0) {
-          <span style="background: #E51D24; color: #FFFFFF; padding: 0.15rem 0.45rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 900;">
+          <span style="background: #E51D24; color: #FFFFFF; padding: 0.1rem 0.4rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 900;">
             {{ reclamationsEnAttenteCount() }}
           </span>
         }
@@ -110,7 +110,7 @@
         [style.background]="activeTab() === 'UTILISATEURS' ? '#721513' : 'transparent'"
         [style.color]="activeTab() === 'UTILISATEURS' ? '#FFFFFF' : '#332724'"
         [style.border]="activeTab() === 'UTILISATEURS' ? '1.5px solid #721513' : '1.5px solid transparent'"
-        style="font-weight: 800; font-size: 0.85rem; padding: 0.6rem 1.1rem; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap;">
+        style="font-weight: 800; font-size: 0.8rem; padding: 0.5rem 0.85rem; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; white-space: nowrap;">
         <i class="fa-solid fa-users-gear"></i> Utilisateurs ({{ employesSite().length }})
       </button>
 
@@ -120,8 +120,8 @@
         [style.background]="activeTab() === 'FACTURATION' ? '#721513' : 'transparent'"
         [style.color]="activeTab() === 'FACTURATION' ? '#FFFFFF' : '#332724'"
         [style.border]="activeTab() === 'FACTURATION' ? '1.5px solid #721513' : '1.5px solid transparent'"
-        style="font-weight: 800; font-size: 0.85rem; padding: 0.6rem 1.1rem; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap;">
-        <i class="fa-solid fa-file-invoice-dollar"></i> Facturation Journalière
+        style="font-weight: 800; font-size: 0.8rem; padding: 0.5rem 0.85rem; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; white-space: nowrap;">
+        <i class="fa-solid fa-file-invoice-dollar"></i> Facturation
       </button>
 
       <button 
@@ -130,8 +130,8 @@
         [style.background]="activeTab() === 'INFOS' ? '#721513' : 'transparent'"
         [style.color]="activeTab() === 'INFOS' ? '#FFFFFF' : '#332724'"
         [style.border]="activeTab() === 'INFOS' ? '1.5px solid #721513' : '1.5px solid transparent'"
-        style="font-weight: 800; font-size: 0.85rem; padding: 0.6rem 1.1rem; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap;">
-        <i class="fa-solid fa-circle-info"></i> Informations
+        style="font-weight: 800; font-size: 0.8rem; padding: 0.5rem 0.85rem; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; white-space: nowrap;">
+        <i class="fa-solid fa-circle-info"></i> Infos
       </button>
 
     </div>
