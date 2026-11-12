@@ -16,6 +16,24 @@ import { PlatB2B } from '../shared/b2b.models';
 export class B2bCommandeComponent {
   b2b = inject(B2bStateService);
 
+  // SÉLECTION DU JOUR POUR COMMANDER TOUTE LA SEMAINE (Lundi à Dimanche)
+  joursSemaine = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'] as const;
+  jourSelectionne = signal<'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche'>('Jeudi');
+
+  datesSemaineMap: Record<string, string> = {
+    'Lundi': '09 Nov',
+    'Mardi': '10 Nov',
+    'Mercredi': '11 Nov',
+    'Jeudi': '12 Nov (Aujourd\'hui)',
+    'Vendredi': '13 Nov',
+    'Samedi': '14 Nov',
+    'Dimanche': '15 Nov'
+  };
+
+  changerJourCommande(jour: 'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche') {
+    this.jourSelectionne.set(jour);
+  }
+
   // Onglet de filtrage pour le mode SUBVENTIONNE (Strictement les 4 composantes de la formule)
   activeTab = signal<'ENTREE' | 'PLAT' | 'DESSERT' | 'BOISSON'>('ENTREE');
 
@@ -23,16 +41,103 @@ export class B2bCommandeComponent {
   filterAutonome = signal<'TOUT' | 'PLAT' | 'ENTREE' | 'DESSERT' | 'BOISSON'>('TOUT');
   termeRecherche = signal<string>('');
 
-  // Numéro Wave pour le salarié autonome
+  // Numéro Wave pour le salarié autonome (0% de subvention)
   wavePhone = signal<string>('+221 77 654 32 10');
 
-  // GESTION DU CUT-OFF 10H30 (Exigence Mentor)
-  // Permet de simuler ou vérifier si la commande est pour aujourd'hui ou demain
+  // GESTION DU CUT-OFF & RÉCLAMATIONS (Exigence Mentor)
   isAfterCutOff = signal<boolean>(false);
-  
+
   toggleSimulerApresCutOff() {
     this.isAfterCutOff.update(v => !v);
   }
+
+  // Vérifier si la commande est bloquée par le cut-off
+  isBloqueParCutOff = computed(() => {
+    // Si c'est pour un jour futur (Vendredi, Samedi, Dimanche), pas de blocage cut-off !
+    const jour = this.jourSelectionne();
+    if (jour === 'Vendredi' || jour === 'Samedi' || jour === 'Dimanche') {
+      return false;
+    }
+    // Si l'employé a été débloqué par le responsable de site, il n'est plus bloqué !
+    if (this.b2b.isEmployeDebloqueAujourdhui(this.b2b.currentEmploye().id)) {
+      return false;
+    }
+    // Sinon, dépend de la simulation ou de l'état cut-off
+    return this.isAfterCutOff();
+  });
+
+  // MODAL DE RÉCLAMATION (Cut-Off Dépassé)
+  showReclamationModal = signal<boolean>(false);
+  motifReclamationInput = signal<string>('Réunion imprévue en clientèle ce matin, demande de déblocage pour déjeuner à la cantine.');
+  reclamationEnvoyee = signal<boolean>(false);
+
+  ouvrirModalReclamation() {
+    this.reclamationEnvoyee.set(false);
+    this.showReclamationModal.set(true);
+  }
+
+  fermerModalReclamation() {
+    this.showReclamationModal.set(false);
+  }
+
+  envoyerReclamation() {
+    this.b2b.soumettreReclamation(this.b2b.currentEmploye(), this.motifReclamationInput());
+    this.reclamationEnvoyee.set(true);
+    setTimeout(() => {
+      this.showReclamationModal.set(false);
+      this.reclamationEnvoyee.set(false);
+    }, 2500);
+  }
+
+  // Plats du menu planifié pour le jour sélectionné
+  menuDuJourSelectionne = computed(() => {
+    const entId = this.b2b.currentEntreprise().id;
+    const jour = this.jourSelectionne();
+    return this.b2b.menusPlanifiesEntreprises().find(m => m.entrepriseId === entId && m.jourNom === jour) || null;
+  });
+
+  // Plats filtrés enrichis avec les quotas & stocks en temps réel
+  platsFiltres = computed(() => {
+    const cat = this.categorieSelectionnee();
+    const query = this.termeRecherche().trim().toLowerCase();
+    const menu = this.menuDuJourSelectionne();
+    const jour = this.jourSelectionne();
+
+    let listeBase: PlatB2B[] = [];
+
+    if (menu && menu.lignes && menu.lignes.length > 0) {
+      // Afficher les plats programmés par le Responsable pour ce jour précis
+      listeBase = menu.lignes.map(l => {
+        const platOrigine = this.b2b.catalogueJour().find(p => p.id === l.platId);
+        return {
+          id: l.platId,
+          nom: l.nomPlat,
+          description: platOrigine?.description || 'Plat cuisiné frais du jour par la brigade Kiki.',
+          categorie: l.categorie as any,
+          prixUnitaire: platOrigine?.prixUnitaire || 3000,
+          image: platOrigine?.image || '/assets/images/plats/p1.jpg',
+          calories: platOrigine?.calories || 500,
+          disponible: l.disponible !== false
+        };
+      });
+    } else {
+      // Fallback catalogue complet
+      listeBase = this.b2b.catalogueJour().filter(p => !p.isArchive);
+    }
+
+    if (cat !== 'all') {
+      listeBase = listeBase.filter(p => p.categorie === cat);
+    }
+
+    if (query) {
+      listeBase = listeBase.filter(p => 
+        p.nom.toLowerCase().includes(query) || 
+        p.description.toLowerCase().includes(query)
+      );
+    }
+
+    return listeBase;
+  });
 
   // Slides du carrousel Hero Banner MyKiki
   slides = [
@@ -154,25 +259,10 @@ export class B2bCommandeComponent {
     return this.generateQrMatrix(data);
   });
 
-  // Plats filtrés unifiés avec recherche et catégorie
-  platsFiltres = computed(() => {
-    const cat = this.categorieSelectionnee();
-    const query = this.termeRecherche().trim().toLowerCase();
-    let plats = this.b2b.catalogueJour();
-
-    if (cat !== 'all') {
-      plats = plats.filter(p => p.categorie === cat);
-    }
-
-    if (query) {
-      plats = plats.filter(p => 
-        p.nom.toLowerCase().includes(query) || 
-        p.description.toLowerCase().includes(query)
-      );
-    }
-
-    return plats;
-  });
+  // Helper stock pour le template
+  getStock(platId: string) {
+    return this.b2b.getStockInfoPlat(platId, this.jourSelectionne());
+  }
 
   // Ouvrir / fermer le tiroir latéral du panier ou scroll vers le panier
   afficherPanierMobile = signal(false);
@@ -187,7 +277,6 @@ export class B2bCommandeComponent {
     }
   }
 
-  // Nombre d'articles actifs (soit composantes plateau, soit articles panier Wave)
   nombreArticlesPanier = computed(() => {
     if (this.b2b.modeProfil() === 'SUBVENTIONNE') {
       const s = this.b2b.selection();
@@ -197,8 +286,11 @@ export class B2bCommandeComponent {
     }
   });
 
-  // Action intelligente : selon le mode (conventionné ou autonome)
   choisirOuAjouterPlat(plat: PlatB2B) {
+    if (this.isBloqueParCutOff()) {
+      this.ouvrirModalReclamation();
+      return;
+    }
     if (this.b2b.modeProfil() === 'SUBVENTIONNE') {
       this.b2b.choisirPlat(plat);
     } else {
@@ -214,26 +306,6 @@ export class B2bCommandeComponent {
     }
   }
 
-  // Liste des plats filtrés (Mode Autonome)
-  platsAutonome = computed(() => {
-    const filter = this.filterAutonome();
-    const query = this.termeRecherche().trim().toLowerCase();
-    let plats = this.b2b.catalogueJour();
-
-    if (filter !== 'TOUT') {
-      plats = plats.filter(p => p.categorie === filter);
-    }
-
-    if (query) {
-      plats = plats.filter(p => 
-        p.nom.toLowerCase().includes(query) || 
-        p.description.toLowerCase().includes(query)
-      );
-    }
-
-    return plats;
-  });
-
   isPlatSelected(plat: PlatB2B): boolean {
     const s = this.b2b.selection();
     if (plat.categorie === 'ENTREE') return s.entree?.id === plat.id;
@@ -244,6 +316,10 @@ export class B2bCommandeComponent {
   }
 
   validerCommande() {
+    if (this.isBloqueParCutOff()) {
+      this.ouvrirModalReclamation();
+      return;
+    }
     if (this.b2b.modeProfil() === 'SUBVENTIONNE') {
       if (!this.b2b.isFormuleComplete()) return;
     } else {
@@ -262,7 +338,7 @@ export class B2bCommandeComponent {
     const s = this.b2b.selection();
     this.derniereCommande.set({
       id: `CMD-B2B-${Date.now().toString().slice(-6)}`,
-      date: 'Aujourd’hui',
+      date: this.jourSelectionne() + ' ' + (this.datesSemaineMap[this.jourSelectionne()] || ''),
       heureRetrait: this.b2b.creneauLivraison(),
       siteNom: site.nom,
       formuleNom: this.b2b.formuleActuelle().nom,
@@ -276,7 +352,10 @@ export class B2bCommandeComponent {
       partEmploye: this.b2b.resteAPayerEmploye()
     });
 
-    if (this.b2b.modeProfil() === 'AUTONOME' || this.b2b.resteAPayerEmploye() > 0) {
+    // Pour l'employé non subventionné (0% ou AUTONOME) : règlement obligatoire par Wave
+    const estNonSubventionne = this.b2b.modeProfil() === 'AUTONOME' || this.b2b.currentEmploye().tauxSubvention === 0;
+
+    if (estNonSubventionne || this.b2b.resteAPayerEmploye() > 0) {
       this.isWaveProcessing.set(true);
       setTimeout(() => {
         this.isWaveProcessing.set(false);
@@ -302,7 +381,6 @@ export class B2bCommandeComponent {
     const size = 25;
     const matrix: boolean[][] = Array.from({ length: size }, () => Array(size).fill(false));
     
-    // Fonction helper pour les 3 yeux de repérage (Finder patterns)
     const addFinder = (row: number, col: number) => {
       for (let r = 0; r < 7; r++) {
         for (let c = 0; c < 7; c++) {
@@ -317,13 +395,11 @@ export class B2bCommandeComponent {
     addFinder(0, size - 7);
     addFinder(size - 7, 0);
 
-    // Lignes de timing horizontales et verticales
     for (let i = 8; i < size - 8; i++) {
       matrix[6][i] = (i % 2 === 0);
       matrix[i][6] = (i % 2 === 0);
     }
 
-    // Petit motif d'alignement pour Version 2 (centré en 18, 18)
     const alignR = 18, alignC = 18;
     for (let r = -2; r <= 2; r++) {
       for (let c = -2; c <= 2; c++) {
@@ -333,7 +409,6 @@ export class B2bCommandeComponent {
       }
     }
 
-    // Pseudo-hachage déterministe pour injecter les données dans les cellules libres
     let hash = 0;
     for (let i = 0; i < text.length; i++) {
       hash = ((hash << 5) - hash + text.charCodeAt(i)) | 0;
@@ -341,7 +416,6 @@ export class B2bCommandeComponent {
 
     for (let r = 0; r < size; r++) {
       for (let c = 0; c < size; c++) {
-        // Ignorer les finder patterns
         const inFinder1 = r < 8 && c < 8;
         const inFinder2 = r < 8 && c >= size - 8;
         const inFinder3 = r >= size - 8 && c < 8;

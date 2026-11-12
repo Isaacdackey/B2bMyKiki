@@ -1,5 +1,5 @@
 import { Injectable, signal, computed, effect } from '@angular/core';
-import { EntrepriseB2B, SiteB2B, PlatB2B, FormuleRegle, EmployeB2B, SelectionRepas, CommandeHistoriqueB2B, LignePanierAutonome, UserRoleB2B, UserSessionB2B, CommandeEntrepriseSite, FacturationLigneJournaliere, MenuPlanifieJourEntreprise, InvitationAdminB2B, StatutCommandeSite } from './b2b.models';
+import { EntrepriseB2B, SiteB2B, PlatB2B, FormuleRegle, EmployeB2B, SelectionRepas, CommandeHistoriqueB2B, LignePanierAutonome, UserRoleB2B, UserSessionB2B, CommandeEntrepriseSite, FacturationLigneJournaliere, MenuPlanifieJourEntreprise, InvitationAdminB2B, StatutCommandeSite, ReclamationCutOffB2B } from './b2b.models';
 
 @Injectable({
   providedIn: 'root'
@@ -143,8 +143,8 @@ export class B2bStateService {
     this.catalogueJour.update(list => list.map(p => p.id === id ? { ...p, isArchive: !p.isArchive } : p));
   }
 
-  // Onglet actif dans l'Espace Responsable de Site Kiki (Cuisine & Dispatch)
-  cuisineActiveTab = signal<'PRODUCTION' | 'SCAN_QR' | 'AUTONOME' | 'BORDEREAUX' | 'PLANNING_SEMAINE'>('PRODUCTION');
+  // Onglet actif dans l'Espace Responsable de Site Kiki (Gestion de son Entreprise/Site : 5 onglets + Réclamations + Projection QR)
+  cuisineActiveTab = signal<'INFOS' | 'UTILISATEURS' | 'MENU' | 'COMMANDES' | 'FACTURATION' | 'RECLAMATIONS' | 'PROJECTION_QR'>('MENU');
 
   // Mode profil employé simulé : SUBVENTIONNE (prise en charge RH 100%) ou AUTONOME (frais personnels, panier libre, Wave)
   modeProfil = signal<'SUBVENTIONNE' | 'AUTONOME'>('SUBVENTIONNE');
@@ -899,6 +899,124 @@ export class B2bStateService {
       }
       return m;
     }));
+  }
+
+  // GESTION DES RÉCLAMATIONS RETARDATAIRES (Cut-off dépassé)
+  listeReclamations = signal<ReclamationCutOffB2B[]>([
+    {
+      id: 'rec-1',
+      entrepriseId: 'ent-001',
+      siteId: 'site-1',
+      employeId: 'emp-103',
+      employeNom: 'Mamadou Diallo',
+      matricule: 'TOT-9844',
+      departement: 'Opérations Maritimes',
+      date: '2026-11-12',
+      heureDemande: '10:42',
+      motif: 'Réunion d\'urgence avec le client offshore, retard de 12 min sur le cut-off.',
+      statut: 'EN_ATTENTE'
+    },
+    {
+      id: 'rec-2',
+      entrepriseId: 'ent-001',
+      siteId: 'site-1',
+      employeId: 'emp-105',
+      employeNom: 'Cheikh Diop',
+      matricule: 'TOT-9846',
+      departement: 'Logistique & Transit',
+      date: '2026-11-12',
+      heureDemande: '10:55',
+      motif: 'Coupure réseau sur la plateforme de transit à Diamniadio.',
+      statut: 'EN_ATTENTE'
+    },
+    {
+      id: 'rec-3',
+      entrepriseId: 'ent-001',
+      siteId: 'site-1',
+      employeId: 'emp-104',
+      employeNom: 'Aminata Sow',
+      matricule: 'TOT-9845',
+      departement: 'Maintenance & Sécurité',
+      date: '2026-11-11',
+      heureDemande: '10:38',
+      motif: 'Intervention sécurité incendie prioritaire.',
+      statut: 'DEBLOQUE',
+      debloquePar: 'Responsable de Site Kiki',
+      debloqueAt: '10:45'
+    }
+  ]);
+
+  // Ajouter une réclamation d'employé
+  soumettreReclamation(employe: EmployeB2B, motif: string): ReclamationCutOffB2B {
+    const now = new Date();
+    const heure = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const dateStr = now.toISOString().slice(0, 10);
+    const nouvelle: ReclamationCutOffB2B = {
+      id: 'rec-' + Date.now(),
+      entrepriseId: this.currentEntreprise().id,
+      siteId: employe.siteId,
+      employeId: employe.id,
+      employeNom: `${employe.prenom} ${employe.nom}`,
+      matricule: employe.matricule,
+      departement: employe.departement,
+      date: dateStr,
+      heureDemande: heure,
+      motif: motif || 'Retard imprévu après l\'heure limite de cut-off',
+      statut: 'EN_ATTENTE'
+    };
+    this.listeReclamations.update(list => [nouvelle, ...list]);
+    return nouvelle;
+  }
+
+  // Débloquer un employé retardataire (Responsable de site)
+  debloquerReclamation(reclamationId: string) {
+    const now = new Date();
+    const heure = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    this.listeReclamations.update(list => list.map(r => {
+      if (r.id === reclamationId) {
+        return {
+          ...r,
+          statut: 'DEBLOQUE',
+          debloquePar: this.currentSession().nomComplet || 'Responsable de Site Kiki',
+          debloqueAt: heure
+        };
+      }
+      return r;
+    }));
+  }
+
+  // Vérifier si un employé est débloqué pour aujourd'hui
+  isEmployeDebloqueAujourdhui(employeId: string): boolean {
+    const today = new Date().toISOString().slice(0, 10);
+    return this.listeReclamations().some(r => 
+      r.employeId === employeId && 
+      (r.date === today || r.date === '2026-11-12') && 
+      r.statut === 'DEBLOQUE'
+    );
+  }
+
+  // Calculer les stocks en temps réel pour un plat un jour donné
+  getStockInfoPlat(platId: string, jourNom: string = 'Jeudi') {
+    const entId = this.currentEntreprise().id;
+    const menuJour = this.menusPlanifiesEntreprises().find(m => m.entrepriseId === entId && m.jourNom === jourNom);
+    const ligne = menuJour?.lignes.find(l => l.platId === platId);
+    const quotaPrevu = ligne?.quantitePrevue || 30; // Quota prévu
+    
+    // Commandes passées pour ce plat
+    const commandesCount = this.listeCommandesSite().filter(c => 
+      c.entrepriseId === entId && 
+      (c.platNom.includes(ligne?.nomPlat || '') || c.categorie === ligne?.categorie)
+    ).length;
+
+    // Déjà commandé ajusté
+    const dejaCommande = Math.min(quotaPrevu, Math.max(1, (commandesCount * 7) % quotaPrevu));
+    const resteDisponible = Math.max(0, quotaPrevu - dejaCommande);
+
+    return {
+      quotaPrevu,
+      dejaCommande,
+      resteDisponible
+    };
   }
 
   // Dupliquer un jour de menu vers un autre jour

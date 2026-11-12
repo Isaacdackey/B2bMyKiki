@@ -16,7 +16,6 @@
 
     <!-- Actions En-tête : Bouton Panier/Plateau MyKiki (Sans Emojis) -->
     <div class="top-header-actions-row">
-      <!-- Bouton Panier / Plateau vers la PAGE PANIER dédiée (style MyKiki) -->
       <a 
         routerLink="/b2b/panier"
         class="panier-bouton-top" 
@@ -30,17 +29,39 @@
     </div>
   </div>
 
-  <!-- BANDEAU INFO CONVENTION & CUT-OFF TIME -->
+  <!-- BANDEAU INFO CONVENTION & CUT-OFF TIME AVEC BOUTON RÉCLAMATION -->
   <div class="b2b-status-bar-mykiki">
-    <div class="b2b-status-left">
+    <div class="b2b-status-left" style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
       <span class="b2b-badge-statut-pill" [class.is-subventionne]="b2b.modeProfil() === 'SUBVENTIONNE'" [class.is-autonome]="b2b.modeProfil() === 'AUTONOME'">
         <i class="fa-solid" [class.fa-circle-check]="b2b.modeProfil() === 'SUBVENTIONNE'" [class.fa-wallet]="b2b.modeProfil() === 'AUTONOME'"></i>
-        {{ b2b.modeProfil() === 'SUBVENTIONNE' ? 'Conventionné 100% RH • Prise en charge totale' : 'Salarié Autonome • Paiement Wave' }}
+        {{ b2b.modeProfil() === 'SUBVENTIONNE' ? 'Conventionné (' + b2b.currentEmploye().tauxSubvention + '%) • ' + b2b.currentEntreprise().nom : 'Salarié Autonome (0%) • Paiement Wave' }}
       </span>
 
-      <span class="b2b-cutoff-chip">
-        <i class="fa-regular fa-clock text-red"></i> Cut-Off Commande : <strong>{{ b2b.siteActuel().heureCutOff }}</strong>
+      <span class="b2b-cutoff-chip" [style.border-color]="isBloqueParCutOff() ? '#EF4444' : '#E2D5BE'" [style.background]="isBloqueParCutOff() ? '#FEF2F2' : '#FAF5EA'">
+        <i class="fa-regular fa-clock" [style.color]="isBloqueParCutOff() ? '#DC2626' : '#E51D24'"></i> 
+        Cut-Off Commande : <strong>{{ b2b.currentEntreprise().cutOffHeure }}</strong>
+        @if (isBloqueParCutOff()) {
+          <strong style="color: #DC2626; margin-left: 0.35rem;">[CUT-OFF DÉPASSÉ]</strong>
+        }
       </span>
+
+      <!-- BOUTON RÉCLAMATION VISIBLE / ACCESSIBLE EN CAS DE CUT-OFF -->
+      @if (isBloqueParCutOff()) {
+        <button 
+          type="button" 
+          (click)="ouvrirModalReclamation()"
+          style="background: #E51D24; color: #FFFFFF; border: none; padding: 0.35rem 0.85rem; border-radius: 9999px; font-weight: 800; font-size: 0.75rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 2px 8px rgba(229, 29, 36, 0.3);">
+          <i class="fa-solid fa-triangle-exclamation"></i> Réclamation Cut-off
+        </button>
+      }
+
+      <!-- INTERRUPTEUR DE TEST / SIMULATION DU CUT-OFF -->
+      <button 
+        type="button" 
+        (click)="toggleSimulerApresCutOff()"
+        style="background: #FAF8F4; color: #6E5A56; border: 1px dashed #CBD5E1; padding: 0.25rem 0.6rem; border-radius: 6px; font-size: 0.7rem; font-weight: 700; cursor: pointer;">
+        <i class="fa-solid fa-flask"></i> {{ isAfterCutOff() ? 'Désactiver test Cut-off' : 'Simuler Cut-off dépassé' }}
+      </button>
     </div>
 
     <div class="b2b-status-right">
@@ -63,7 +84,45 @@
   </div>
 
   <!-- ============================================================== -->
-  <!-- 2. BARRE DE RECHERCHE DANS LE CATALOGUE                        -->
+  <!-- 1. CALENDRIER PAR DATE : COMMANDER POUR TOUTE LA SEMAINE       -->
+  <!-- ============================================================== -->
+  <section style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.15rem 1.25rem; box-shadow: 0 4px 15px rgba(114, 21, 19, 0.04);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
+      <div>
+        <h3 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.05rem; color: #721513; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fa-regular fa-calendar-days" style="color: #E51D24;"></i> Choisissez le jour de votre repas (Lundi à Dimanche)
+        </h3>
+        <p style="margin: 0.2rem 0 0; font-size: 0.78rem; color: #6E5A56;">
+          Commandez à l'avance pour toute la semaine selon les menus et quotas programmés par le Chef.
+        </p>
+      </div>
+
+      <span style="font-size: 0.75rem; font-weight: 800; color: #606C38; background: rgba(96, 108, 56, 0.1); padding: 0.25rem 0.65rem; border-radius: 9999px;">
+        <i class="fa-solid fa-circle-check"></i> Menus synchronisés en temps réel
+      </span>
+    </div>
+
+    <!-- SÉLECTEUR DE JOUR (LUNDI À DIMANCHE) -->
+    <div style="display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.35rem;">
+      @for (jour of joursSemaine; track jour) {
+        <button 
+          type="button" 
+          (click)="changerJourCommande(jour)"
+          [style.background]="jourSelectionne() === jour ? '#721513' : '#FAF8F4'"
+          [style.color]="jourSelectionne() === jour ? '#FFFFFF' : '#332724'"
+          [style.border-color]="jourSelectionne() === jour ? '#721513' : '#EDE7DC'"
+          style="flex: 1; min-width: 130px; padding: 0.75rem 0.65rem; border-radius: 12px; border: 1.5px solid; cursor: pointer; text-align: center; transition: all 0.2s ease;">
+          <div style="font-size: 0.85rem; font-weight: 800;">{{ jour }}</div>
+          <div [style.color]="jourSelectionne() === jour ? '#FAF5EA' : '#6E5A56'" style="font-size: 0.72rem; margin-top: 0.15rem; font-weight: 600;">
+            {{ datesSemaineMap[jour] }}
+          </div>
+        </button>
+      }
+    </div>
+  </section>
+
+  <!-- ============================================================== -->
+  <!-- 2. BARRE DE RECHERCHE DANS LE CATALOGUE DU JOUR SÉLECTIONNÉ    -->
   <!-- ============================================================== -->
   <div class="search-bar-wrapper">
     <div class="search-bar-inner">
@@ -72,7 +131,7 @@
         type="text" 
         [ngModel]="termeRecherche()" 
         (ngModelChange)="termeRecherche.set($event)"
-        placeholder="Rechercher un plat, cocktail, formule ou ingrédient..." 
+        placeholder="Rechercher un plat, entrée, dessert ou boisson pour {{ jourSelectionne() }}..." 
         class="search-input"
       />
       @if (termeRecherche()) {
@@ -88,8 +147,8 @@
   <!-- ============================================================== -->
   <section class="categories-section">
     <div class="section-head-row">
-      <h3 class="section-title font-serif-luxury">Catégories &amp; Spécialités</h3>
-      <span class="category-meta">{{ platsFiltres().length }} mets disponibles aujourd'hui</span>
+      <h3 class="section-title font-serif-luxury">Composantes du Déjeuner • {{ jourSelectionne() }}</h3>
+      <span class="category-meta">{{ platsFiltres().length }} plat(s) au menu</span>
     </div>
 
     <div class="categories-scroll-row">
@@ -108,22 +167,22 @@
   </section>
 
   <!-- ============================================================== -->
-  <!-- 4. CONTENU PRINCIPAL : NOS PLATS INCONTOURNABLES + RÉCAPITULATIF -->
+  <!-- 4. CONTENU PRINCIPAL : NOS PLATS AVEC QUOTAS & STOCKS TEMPS RÉEL-->
   <!-- ============================================================== -->
   <section class="mykiki-main-section">
     <div class="mykiki-dual-layout">
       
-      <!-- COLONNE GAUCHE : GRILLE DE PLATS IDENTIQUE À MYKIKI -->
+      <!-- COLONNE GAUCHE : GRILLE DE PLATS DU JOUR -->
       <div class="mykiki-dishes-col">
         <div class="section-head-row">
-          <h3 class="section-title font-serif-luxury">Nos plats incontournables</h3>
-          <span class="category-meta">Cuisine Centrale Kiki Traiteur</span>
+          <h3 class="section-title font-serif-luxury">Mets disponibles pour {{ jourSelectionne() }}</h3>
+          <span class="category-meta">Brigade Cuisine Kiki Traiteur</span>
         </div>
 
         @if (platsFiltres().length === 0) {
           <div class="empty-phare-state">
             <i class="fa-solid fa-utensils mb-2"></i>
-            <p>Aucun plat ne correspond à vos critères actuels.</p>
+            <p>Aucun plat disponible pour {{ jourSelectionne() }} dans cette catégorie.</p>
             <button class="btn-reset-filters" (click)="selectCategory('all'); termeRecherche.set('')">
               Voir tous les plats
             </button>
@@ -131,6 +190,7 @@
         } @else {
           <div class="dishes-grid">
             @for (plat of platsFiltres(); track plat.id) {
+              @let stock = getStock(plat.id);
               <div class="dish-card" [class.is-chosen]="isPlatActiveDansMode(plat)">
                 
                 <div class="dish-image-wrap">
@@ -162,11 +222,25 @@
 
                   <p class="dish-desc">{{ plat.description }}</p>
 
+                  <!-- BADGE DES STOCKS / QUOTAS EN TEMPS RÉEL (Exigence Mentor) -->
+                  <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 10px; padding: 0.45rem 0.65rem; margin: 0.65rem 0; font-size: 0.72rem; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: #6E5A56;">
+                      Quota: <strong>{{ stock.quotaPrevu }}</strong> | Pris: <strong>{{ stock.dejaCommande }}</strong>
+                    </span>
+                    <span [style.color]="stock.resteDisponible > 5 ? '#606C38' : '#DC2626'" style="font-weight: 800;">
+                      <i class="fa-solid fa-box"></i> Reste : <strong>{{ stock.resteDisponible }}</strong>
+                    </span>
+                  </div>
+
                   <div class="dish-footer-row">
                     <div class="dish-price-box">
-                      @if (b2b.modeProfil() === 'SUBVENTIONNE') {
+                      @if (b2b.modeProfil() === 'SUBVENTIONNE' && b2b.currentEmploye().tauxSubvention === 100) {
                         <span class="price-amount" style="color: #606C38; font-size: 0.92rem;">
                           <i class="fa-solid fa-circle-check"></i> Inclus Formule (0 F)
+                        </span>
+                      } @else if (b2b.modeProfil() === 'SUBVENTIONNE') {
+                        <span class="price-amount" style="color: #721513; font-size: 0.92rem;">
+                          Part salariale : {{ plat.prixUnitaire * (1 - (b2b.currentEmploye().tauxSubvention / 100)) | number }} F
                         </span>
                       } @else {
                         <span class="price-amount">{{ plat.prixUnitaire }} FCFA</span>
@@ -192,7 +266,7 @@
   </section>
 
   <!-- ========================================================================= -->
-  <!-- MODAL DE CHECKOUT (ADAPTÉE SUBVENTIONNÉ 0 F OU AUTONOME WAVE)            -->
+  <!-- MODAL DE CONFIRMATION / CHECKOUT (WAVE POUR LES NON SUBVENTIONNÉS 0%)   -->
   <!-- ========================================================================= -->
   @if (showConfirmationModal()) {
     <div class="b2b-modal-overlay">
@@ -208,11 +282,11 @@
               Confirmation de Commande
             </h3>
             <p style="margin: 0.35rem 0 1.25rem; font-size: 0.85rem; color: #6E5A56;">
-              Livraison pour <strong>{{ b2b.siteActuel().nom }}</strong> • Créneau {{ b2b.creneauLivraison() }}
+              Repas pour <strong>{{ jourSelectionne() }}</strong> • {{ b2b.siteActuel().nom }} • Créneau {{ b2b.creneauLivraison() }}
             </p>
 
             <!-- Récapitulatif selon le mode -->
-            @if (b2b.modeProfil() === 'SUBVENTIONNE') {
+            @if (b2b.modeProfil() === 'SUBVENTIONNE' && b2b.currentEmploye().tauxSubvention > 0) {
               <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 14px; padding: 1.1rem; text-align: left; font-size: 0.85rem; line-height: 1.6; margin-bottom: 1.25rem;">
                 <div><strong style="color: #721513;">Entrée :</strong> {{ b2b.selection().entree?.nom }}</div>
                 <div><strong style="color: #721513;">Plat Chaud :</strong> {{ b2b.selection().plat?.nom }}</div>
@@ -222,14 +296,14 @@
 
               @if (b2b.resteAPayerEmploye() === 0) {
                 <div style="background: rgba(96, 108, 56, 0.12); border: 1.5px solid #606C38; color: #606C38; border-radius: 14px; padding: 0.95rem; text-align: left; font-size: 0.82rem; margin-bottom: 1.5rem;">
-                  <strong><i class="fa-solid fa-circle-check"></i> Prise en charge 100% TotalEnergies Sénégal</strong>
+                  <strong><i class="fa-solid fa-circle-check"></i> Prise en charge 100% {{ b2b.currentEntreprise().nom }}</strong>
                   <p style="margin: 0.25rem 0 0; color: #332724;">
-                    Ce repas sera imputé directement sur la facture consolidée mensuelle de votre entreprise. Aucun paiement requis.
+                    Ce repas sera imputé directement sur la facture mensuelle de votre entreprise. Aucun paiement requis.
                   </p>
                 </div>
               }
             } @else {
-              <!-- Récapitulatif Autonome -->
+              <!-- Récapitulatif Autonome / 0% Subvention -->
               <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 14px; padding: 1rem; text-align: left; font-size: 0.85rem; max-height: 140px; overflow-y: auto; margin-bottom: 1.25rem;">
                 @for (item of b2b.panierAutonome(); track item.plat.id) {
                   <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
@@ -239,11 +313,11 @@
                 }
               </div>
 
-              <!-- Bloc Paiement Wave Mobile Money -->
+              <!-- Bloc Paiement Wave OBLIGATOIRE (Salarié Non Subventionné 0%) -->
               <div style="background: #EFF6FF; border: 1.5px solid #93C5FD; border-radius: 14px; padding: 1rem; text-align: left; margin-bottom: 1.25rem;">
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
-                  <strong style="color: #1D4ED8;"><i class="fa-solid fa-mobile-screen-button"></i> Règlement Wave Sénégal</strong>
-                  <span style="font-weight: 900; color: #1E3A8A; font-size: 1.1rem;">{{ b2b.totalPanierAutonome() }} FCFA</span>
+                  <strong style="color: #1D4ED8;"><i class="fa-solid fa-mobile-screen-button"></i> Règlement Wave Sénégal (Obligatoire)</strong>
+                  <span style="font-weight: 900; color: #1E3A8A; font-size: 1.1rem;">{{ b2b.totalPanierAutonome() || 5000 }} FCFA</span>
                 </div>
                 <label style="font-size: 0.75rem; color: #475569; font-weight: 700; display: block; margin-bottom: 0.25rem;">
                   Numéro de téléphone Wave :
@@ -254,7 +328,7 @@
                   (ngModelChange)="wavePhone.set($event)"
                   style="width: 100%; padding: 0.55rem 0.85rem; border: 1.5px solid #CBD5E1; border-radius: 8px; font-weight: 700; color: #0F172A; font-size: 0.9rem;">
                 <p style="margin: 0.35rem 0 0; font-size: 0.72rem; color: #64748B;">
-                  Une notification de validation sera transmise sur votre application Wave.
+                  Le paiement décrémentera automatiquement le stock disponible en cuisine.
                 </p>
               </div>
             }
@@ -270,36 +344,36 @@
               <button 
                 [disabled]="isWaveProcessing()"
                 (click)="confirmerPaiementEtEnvoi()"
-                [style.background]="b2b.modeProfil() === 'SUBVENTIONNE' ? 'linear-gradient(135deg, #606C38, #4D572D)' : 'linear-gradient(135deg, #1D4ED8, #1E40AF)'"
+                [style.background]="(b2b.modeProfil() === 'SUBVENTIONNE' && b2b.resteAPayerEmploye() === 0) ? 'linear-gradient(135deg, #606C38, #4D572D)' : 'linear-gradient(135deg, #1D4ED8, #1E40AF)'"
                 style="flex: 1.5; padding: 0.95rem; border-radius: 9999px; color: #FFFFFF; border: none; font-weight: 800; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
                 @if (isWaveProcessing()) {
                   <span><i class="fa-solid fa-spinner fa-spin"></i> Traitement Wave...</span>
                 } @else {
                   <span>
-                    {{ b2b.modeProfil() === 'SUBVENTIONNE' ? 'Confirmer mon repas (0 F)' : 'Payer avec Wave (' + b2b.totalPanierAutonome() + ' F)' }}
+                    {{ (b2b.modeProfil() === 'SUBVENTIONNE' && b2b.resteAPayerEmploye() === 0) ? 'Confirmer mon repas (0 F)' : 'Payer avec Wave (' + (b2b.totalPanierAutonome() || 5000) + ' F)' }}
                   </span>
                 }
               </button>
             </div>
           </div>
         } @else {
-          <!-- ÉCRAN DE SUCCÈS & QR CODE OFFICIEL DU MENTOR -->
+          <!-- ÉCRAN DE SUCCÈS & QR CODE DU RETRAIT -->
           <div style="text-align: center; padding: 0.5rem 0;">
             <div style="width: 54px; height: 54px; border-radius: 50%; background: rgba(96, 108, 56, 0.15); color: #606C38; font-size: 1.8rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
               <i class="fa-solid fa-check"></i>
             </div>
             
             <h3 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.45rem; color: #721513; font-weight: 800;">
-              Commande Enregistrée !
+              Commande Enregistrée pour {{ jourSelectionne() }} !
             </h3>
             
-            @if (b2b.modeProfil() === 'SUBVENTIONNE') {
+            @if (b2b.modeProfil() === 'SUBVENTIONNE' && b2b.currentEmploye().tauxSubvention > 0) {
               <p style="margin: 0.35rem 0 0; font-size: 0.82rem; color: #6E5A56;">
-                Formule 100% prise en charge • Imputée au compte <strong>{{ b2b.currentEntreprise().nom }}</strong>
+                Prise en charge {{ b2b.currentEmploye().tauxSubvention }}% • Imputée au compte <strong>{{ b2b.currentEntreprise().nom }}</strong>
               </p>
             } @else {
               <p style="margin: 0.35rem 0 0; font-size: 0.82rem; color: #1D4ED8; font-weight: 700;">
-                <i class="fa-solid fa-circle-check"></i> Règlement Wave validé instantanément
+                <i class="fa-solid fa-circle-check"></i> Règlement Wave validé instantanément • Stock décrémenté
               </p>
             }
 
@@ -309,7 +383,6 @@
                 <i class="fa-solid fa-qrcode"></i> QR CODE DE RETRAIT RÉFECTOIRE
               </div>
 
-              <!-- Rendu SVG haute définition du QR Code -->
               <div style="display: flex; justify-content: center; align-items: center; margin: 0 auto; background: #FAF8F4; padding: 0.65rem; border-radius: 12px; border: 1px solid #EDE7DC;">
                 <svg viewBox="0 0 25 25" width="160" height="160" shape-rendering="crispEdges">
                   <rect width="25" height="25" fill="#FAF8F4"/>
@@ -323,24 +396,19 @@
                 </svg>
               </div>
 
-              <!-- Matricule et code de secours -->
               <div style="margin-top: 0.75rem;">
                 <span style="font-family: monospace; font-size: 0.82rem; font-weight: 800; color: #721513; background: #FAF5EA; padding: 0.2rem 0.6rem; border-radius: 6px; border: 1px solid #E2D5BE;">
                   {{ qrDataString() }}
                 </span>
               </div>
               <div style="font-size: 0.72rem; color: #606C38; font-weight: 700; margin-top: 0.4rem;">
-                <i class="fa-solid fa-camera"></i> À scanner par la brigade cuisine Kiki
+                <i class="fa-solid fa-camera"></i> À scanner à la cantine
               </div>
             </div>
 
-            <p style="margin: 0.5rem 0 1.25rem; font-size: 0.82rem; color: #6E5A56;">
-              Distribution au réfectoire <strong>{{ b2b.siteActuel().nom }}</strong> : créneau <strong>{{ b2b.creneauLivraison() }}</strong>
-            </p>
-
             <button 
               (click)="fermerModalSucces()"
-              style="padding: 0.75rem 2rem; border-radius: 9999px; background: #721513; color: #FFFFFF; border: none; font-weight: 800; font-size: 0.88rem; cursor: pointer; box-shadow: 0 4px 15px rgba(114, 21, 19, 0.25);">
+              style="padding: 0.75rem 2rem; border-radius: 9999px; background: #721513; color: #FFFFFF; border: none; font-weight: 800; font-size: 0.88rem; cursor: pointer;">
               <i class="fa-solid fa-check"></i> Terminer
             </button>
           </div>
@@ -350,6 +418,76 @@
     </div>
   }
 
+  <!-- ========================================================================= -->
+  <!-- MODAL DE RÉCLAMATION CUT-OFF (RETARDATAIRES)                              -->
+  <!-- ========================================================================= -->
+  @if (showReclamationModal()) {
+    <div class="b2b-modal-overlay">
+      <div class="b2b-modal-card" style="max-width: 480px; text-align: left;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1.5px solid #EDE7DC; padding-bottom: 0.75rem;">
+          <h3 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.25rem; color: #721513; font-weight: 900; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-solid fa-triangle-exclamation" style="color: #E51D24;"></i> Réclamation Cut-off Dépassé
+          </h3>
+          <button 
+            type="button" 
+            (click)="fermerModalReclamation()" 
+            style="background: none; border: none; font-size: 1.2rem; color: #6E5A56; cursor: pointer;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        @if (!reclamationEnvoyee()) {
+          <div style="background: #FEF2F2; border: 1.5px solid #FCA5A5; border-radius: 12px; padding: 0.85rem; margin-bottom: 1rem; font-size: 0.82rem; color: #991B1B;">
+            <strong>L'heure limite de cut-off ({{ b2b.currentEntreprise().cutOffHeure }}) est dépassée pour aujourd'hui.</strong>
+            <p style="margin: 0.25rem 0 0; color: #7F1D1D;">
+              Transmettez une alerte au Responsable de site Kiki afin qu'il débloque manuellement votre commande pour ce midi.
+            </p>
+          </div>
+
+          <div style="margin-bottom: 1.25rem;">
+            <label style="font-size: 0.78rem; font-weight: 800; color: #332724; display: block; margin-bottom: 0.35rem;">
+              Motif de votre retard :
+            </label>
+            <textarea 
+              rows="3"
+              [ngModel]="motifReclamationInput()"
+              (ngModelChange)="motifReclamationInput.set($event)"
+              style="width: 100%; padding: 0.65rem; border: 1.5px solid #CBD5E1; border-radius: 8px; font-size: 0.85rem; font-family: inherit; resize: vertical;">
+            </textarea>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+            <button 
+              type="button" 
+              (click)="fermerModalReclamation()"
+              style="padding: 0.65rem 1.25rem; border: 1.5px solid #EDE7DC; background: #FAF8F4; border-radius: 10px; font-weight: 800; color: #6E5A56; cursor: pointer;">
+              Annuler
+            </button>
+            <button 
+              type="button" 
+              (click)="envoyerReclamation()"
+              style="padding: 0.65rem 1.5rem; border: none; background: #E51D24; color: #FFFFFF; border-radius: 10px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem;">
+              <i class="fa-solid fa-paper-plane"></i> Transmettre au Responsable
+            </button>
+          </div>
+        } @else {
+          <div style="text-align: center; padding: 1rem 0;">
+            <div style="width: 50px; height: 50px; border-radius: 50%; background: rgba(96, 108, 56, 0.15); color: #606C38; font-size: 1.6rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+              <i class="fa-solid fa-check"></i>
+            </div>
+            <h4 style="margin: 0; color: #721513; font-size: 1.2rem; font-weight: 800;">
+              Réclamation transmise avec succès !
+            </h4>
+            <p style="margin: 0.35rem 0 0; font-size: 0.82rem; color: #6E5A56;">
+              Votre alerte a été envoyée au Responsable de site. Dès validation de sa part, vous pourrez finaliser votre choix.
+            </p>
+          </div>
+        }
+
+      </div>
+    </div>
+  }
 
   <!-- MODAL INDÉPENDANT POUR REVOIR LE QR CODE À TOUT MOMENT -->
   @if (showQrCodeModal() && derniereCommande()) {
@@ -378,12 +516,11 @@
             <strong style="color: #721513;">{{ derniereCommande()?.siteNom }}</strong>
           </div>
           <div style="display: flex; justify-content: space-between;">
-            <span style="color: #6E5A56;">Heure de retrait :</span>
-            <strong style="color: #606C38;"><i class="fa-regular fa-clock"></i> {{ derniereCommande()?.heureRetrait }}</strong>
+            <span style="color: #6E5A56;">Jour & Heure :</span>
+            <strong style="color: #606C38;"><i class="fa-regular fa-clock"></i> {{ derniereCommande()?.date }} • {{ derniereCommande()?.heureRetrait }}</strong>
           </div>
         </div>
 
-        <!-- Rendu SVG Haute Résolution du QR Code -->
         <div style="background: #FFFFFF; border: 2px solid #EDE7DC; border-radius: 18px; padding: 1.25rem; margin: 0 auto 1.25rem; max-width: 260px; box-shadow: 0 8px 25px rgba(114, 21, 19, 0.08);">
           <div style="display: flex; justify-content: center; align-items: center; margin: 0 auto; background: #FAF8F4; padding: 0.65rem; border-radius: 12px; border: 1px solid #EDE7DC;">
             <svg viewBox="0 0 25 25" width="160" height="160" shape-rendering="crispEdges">
@@ -402,9 +539,6 @@
             <span style="font-family: monospace; font-size: 0.85rem; font-weight: 800; color: #721513; background: #FAF5EA; padding: 0.25rem 0.65rem; border-radius: 6px; border: 1px solid #E2D5BE;">
               {{ derniereCommande()?.qrCode }}
             </span>
-          </div>
-          <div style="font-size: 0.72rem; color: #606C38; font-weight: 700; margin-top: 0.45rem;">
-            <i class="fa-solid fa-camera"></i> À présenter au comptoir Kiki Traiteur
           </div>
         </div>
 

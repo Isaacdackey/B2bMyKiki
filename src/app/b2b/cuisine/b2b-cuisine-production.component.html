@@ -4,172 +4,254 @@
   <app-b2b-nav></app-b2b-nav>
 
   <!-- CONTENU PRINCIPAL CENTRÉ -->
-  <main style="max-width: 1280px; width: 100%; margin: 0 auto; padding: 1.5rem 0;">
+  <main style="max-width: 1320px; width: 100%; margin: 0 auto; padding: 1.25rem 0 4rem;">
 
-    <!-- BANDEAU OFFICIEL RESPONSABLE DE SITE KIKI -->
-    <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.25rem 1.5rem; margin-bottom: 1.75rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; box-shadow: 0 4px 18px rgba(192, 86, 33, 0.05);">
+    <!-- ============================================================== -->
+    <!-- EN-TÊTE OFFICIEL RESPONSABLE DE SITE KIKI                      -->
+    <!-- ============================================================== -->
+    <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; box-shadow: 0 4px 18px rgba(114, 21, 19, 0.05);">
       <div>
-        <span style="font-size: 0.72rem; color: #C05621; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(192, 86, 33, 0.1); padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.4rem;">
-          <i class="fa-solid fa-clipboard-check"></i> PORTAIL RESPONSABLE DE SITE KIKI • EXPLOITATION & CANTINE
-        </span>
-        <h2 style="margin: 0.35rem 0 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.45rem; color: #721513; font-weight: 900;">
-          Gestion d'Exploitation Cantine, Suivi des Portions & Distribution
-        </h2>
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+          <span style="font-size: 0.72rem; color: #721513; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; background: #FAF5EA; padding: 0.25rem 0.65rem; border-radius: 9999px; border: 1px solid #E2D5BE; display: inline-flex; align-items: center; gap: 0.4rem;">
+            <i class="fa-solid fa-store"></i> RESPONSABLE DE SITE KIKI • EXPLOITATION & CANTINE
+          </span>
+          <span style="font-size: 0.72rem; color: #606C38; font-weight: 700; background: rgba(96, 108, 56, 0.1); padding: 0.25rem 0.65rem; border-radius: 9999px;">
+            <i class="fa-solid fa-shield-check"></i> Site : {{ entreprise().sites[0]?.nom || 'Siège Plateau' }}
+          </span>
+        </div>
+
+        <h1 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.55rem; color: #721513; font-weight: 900;">
+          Gestion d'Exploitation Cantine • {{ entreprise().nom }}
+        </h1>
+        <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #6E5A56;">
+          Convention {{ entreprise().montantPriseEnChargeRepas | number }} FCFA/repas • Prestation : {{ getLibellePrestation(entreprise().typePrestation) }} • Cut-Off : {{ getLibelleCutOff(entreprise()) }}
+        </p>
       </div>
-      <div style="display: flex; align-items: center; gap: 0.75rem;">
-        <span style="font-size: 0.8rem; font-weight: 700; color: #6E5A56;">
-          <i class="fa-solid fa-store" style="color: #C05621;"></i> Site actif : <strong>Total Siège Plateau</strong>
-        </span>
+
+      <!-- BOUTONS D'ACTIONS RAPIDES : PROJETER QR CODE & RECLAMATIONS -->
+      <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+        <button 
+          type="button"
+          (click)="setTab('PROJECTION_QR')"
+          style="background: #E51D24; color: #FFFFFF; border: none; border-radius: 12px; padding: 0.65rem 1.15rem; font-weight: 800; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; box-shadow: 0 4px 14px rgba(229, 29, 36, 0.28);">
+          <i class="fa-solid fa-qrcode" style="font-size: 1rem;"></i> Projeter QR Code Cantine
+        </button>
+
+        <button 
+          type="button"
+          (click)="setTab('RECLAMATIONS')"
+          style="background: #FAF8F4; color: #721513; border: 1.5px solid #EDE7DC; border-radius: 12px; padding: 0.65rem 1.15rem; font-weight: 800; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; position: relative;">
+          <i class="fa-solid fa-triangle-exclamation" style="color: #E51D24;"></i> Réclamations ({{ reclamationsEnAttenteCount() }})
+          @if (reclamationsEnAttenteCount() > 0) {
+            <span style="position: absolute; top: -5px; right: -5px; background: #E51D24; color: #FFF; font-size: 0.65rem; font-weight: 900; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+              {{ reclamationsEnAttenteCount() }}
+            </span>
+          }
+        </button>
       </div>
     </div>
 
     <!-- ============================================================== -->
-    <!-- SECTION 1 : FEUILLE DE PRODUCTION DU JOUR                      -->
+    <!-- BARRE DES ONGLETS DE GESTION DU SITE                           -->
     <!-- ============================================================== -->
-    @if (activeTab() === 'PRODUCTION') {
-      <div>
+    <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 0.65rem 0.85rem; margin-bottom: 1.5rem; display: flex; gap: 0.5rem; overflow-x: auto; box-shadow: 0 4px 15px rgba(114, 21, 19, 0.04);">
+      
+      <button 
+        type="button" 
+        (click)="setTab('MENU')"
+        [style.background]="activeTab() === 'MENU' ? '#721513' : 'transparent'"
+        [style.color]="activeTab() === 'MENU' ? '#FFFFFF' : '#332724'"
+        [style.border]="activeTab() === 'MENU' ? '1.5px solid #721513' : '1.5px solid transparent'"
+        style="font-weight: 800; font-size: 0.85rem; padding: 0.6rem 1.1rem; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap;">
+        <i class="fa-solid fa-calendar-days"></i> Menu Planifié & Quantités
+      </button>
+
+      <button 
+        type="button" 
+        (click)="setTab('COMMANDES')"
+        [style.background]="activeTab() === 'COMMANDES' ? '#721513' : 'transparent'"
+        [style.color]="activeTab() === 'COMMANDES' ? '#FFFFFF' : '#332724'"
+        [style.border]="activeTab() === 'COMMANDES' ? '1.5px solid #721513' : '1.5px solid transparent'"
+        style="font-weight: 800; font-size: 0.85rem; padding: 0.6rem 1.1rem; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap;">
+        <i class="fa-solid fa-receipt"></i> Commandes du Jour & Retrait
+        <span [style.background]="activeTab() === 'COMMANDES' ? 'rgba(255,255,255,0.25)' : '#FAF5EA'" [style.color]="activeTab() === 'COMMANDES' ? '#FFFFFF' : '#721513'" style="padding: 0.15rem 0.45rem; border-radius: 6px; font-size: 0.72rem; font-weight: 900;">
+          {{ commandesSite().length }}
+        </span>
+      </button>
+
+      <button 
+        type="button" 
+        (click)="setTab('PROJECTION_QR')"
+        [style.background]="activeTab() === 'PROJECTION_QR' ? '#E51D24' : 'transparent'"
+        [style.color]="activeTab() === 'PROJECTION_QR' ? '#FFFFFF' : '#E51D24'"
+        [style.border]="activeTab() === 'PROJECTION_QR' ? '1.5px solid #E51D24' : '1.5px solid #FCD34D'"
+        style="font-weight: 800; font-size: 0.85rem; padding: 0.6rem 1.1rem; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap;">
+        <i class="fa-solid fa-qrcode"></i> QR Code Cantine à Projeter
+      </button>
+
+      <button 
+        type="button" 
+        (click)="setTab('RECLAMATIONS')"
+        [style.background]="activeTab() === 'RECLAMATIONS' ? '#721513' : 'transparent'"
+        [style.color]="activeTab() === 'RECLAMATIONS' ? '#FFFFFF' : '#332724'"
+        [style.border]="activeTab() === 'RECLAMATIONS' ? '1.5px solid #721513' : '1.5px solid transparent'"
+        style="font-weight: 800; font-size: 0.85rem; padding: 0.6rem 1.1rem; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap;">
+        <i class="fa-solid fa-triangle-exclamation"></i> Réclamations Retardataires
+        @if (reclamationsEnAttenteCount() > 0) {
+          <span style="background: #E51D24; color: #FFFFFF; padding: 0.15rem 0.45rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 900;">
+            {{ reclamationsEnAttenteCount() }}
+          </span>
+        }
+      </button>
+
+      <button 
+        type="button" 
+        (click)="setTab('UTILISATEURS')"
+        [style.background]="activeTab() === 'UTILISATEURS' ? '#721513' : 'transparent'"
+        [style.color]="activeTab() === 'UTILISATEURS' ? '#FFFFFF' : '#332724'"
+        [style.border]="activeTab() === 'UTILISATEURS' ? '1.5px solid #721513' : '1.5px solid transparent'"
+        style="font-weight: 800; font-size: 0.85rem; padding: 0.6rem 1.1rem; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap;">
+        <i class="fa-solid fa-users-gear"></i> Utilisateurs ({{ employesSite().length }})
+      </button>
+
+      <button 
+        type="button" 
+        (click)="setTab('FACTURATION')"
+        [style.background]="activeTab() === 'FACTURATION' ? '#721513' : 'transparent'"
+        [style.color]="activeTab() === 'FACTURATION' ? '#FFFFFF' : '#332724'"
+        [style.border]="activeTab() === 'FACTURATION' ? '1.5px solid #721513' : '1.5px solid transparent'"
+        style="font-weight: 800; font-size: 0.85rem; padding: 0.6rem 1.1rem; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap;">
+        <i class="fa-solid fa-file-invoice-dollar"></i> Facturation Journalière
+      </button>
+
+      <button 
+        type="button" 
+        (click)="setTab('INFOS')"
+        [style.background]="activeTab() === 'INFOS' ? '#721513' : 'transparent'"
+        [style.color]="activeTab() === 'INFOS' ? '#FFFFFF' : '#332724'"
+        [style.border]="activeTab() === 'INFOS' ? '1.5px solid #721513' : '1.5px solid transparent'"
+        style="font-weight: 800; font-size: 0.85rem; padding: 0.6rem 1.1rem; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap;">
+        <i class="fa-solid fa-circle-info"></i> Informations
+      </button>
+
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- ONGLET 1 : MENU PLANIFIÉ & SAISIE DES QUANTITÉS                -->
+    <!-- ============================================================== -->
+    @if (activeTab() === 'MENU') {
+      <div style="display: flex; flex-direction: column; gap: 1.25rem;">
         
-        <!-- KPIs Cuisine Ultra-Lisibles Style Kiki Traiteur -->
-        <div class="cuisine-kpi-grid">
-          
-          <div class="cuisine-kpi-card">
-            <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
-              <i class="fa-solid fa-box" style="color: #721513;"></i> TOTAL PLATEAUX À LIVRER
-            </div>
-            <div style="font-size: 2.2rem; font-weight: 900; color: #721513; margin: 0.5rem 0 0.25rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-              {{ totalPlateauxSites() }} <span style="font-size: 1rem; color: #E51D24; font-weight: 600;">plateaux</span>
-            </div>
-            <div style="font-size: 0.75rem; color: #6E5A56;">Cut-Off 10h30 terminé • Dispatch en cours</div>
-          </div>
-
-          <div class="cuisine-kpi-card">
-            <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
-              <i class="fa-solid fa-fire" style="color: #E51D24;"></i> PLATS CHAUDS EN CUISSON
-            </div>
-            <div style="font-size: 2.2rem; font-weight: 900; color: #E51D24; margin: 0.5rem 0 0.25rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-              {{ totalPortionsPlats() }} <span style="font-size: 1rem; color: #332724;">portions</span>
-            </div>
-            <div style="font-size: 0.75rem; color: #606C38; font-weight: 600;">Poulet Yassa, Capitaine, Bœuf & Thiéboudienne</div>
-          </div>
-
-          <div class="cuisine-kpi-card">
-            <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
-              <i class="fa-solid fa-snowflake" style="color: #606C38;"></i> ENTRÉES CONDITIONNÉES
-            </div>
-            <div style="font-size: 2.2rem; font-weight: 900; color: #606C38; margin: 0.5rem 0 0.25rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-              {{ totalPortionsEntrees() }} <span style="font-size: 1rem; color: #332724;">barquettes</span>
-            </div>
-            <div style="font-size: 0.75rem; color: #6E5A56;">Mise en cellule frigorifique à 4°C</div>
-          </div>
-
-          <div class="cuisine-kpi-card">
-            <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
-              <i class="fa-solid fa-truck-moving" style="color: #721513;"></i> TOURNÉES & CAMIONNETTES
-            </div>
-            <div style="font-size: 2.2rem; font-weight: 900; color: #721513; margin: 0.5rem 0 0.25rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-              3 <span style="font-size: 1rem; color: #6E5A56;">départs prévus</span>
-            </div>
-            <div style="font-size: 0.75rem; color: #6E5A56;">Plateau (11h15), Bel-Air (11h00), Diamniadio (10h45)</div>
-          </div>
-
+        <!-- SÉLECTEUR DU JOUR DE LA SEMAINE (Lundi à Dimanche) -->
+        <div style="display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.25rem;">
+          @for (jour of joursSemaine; track jour) {
+            <button 
+              type="button" 
+              (click)="changerJour(jour)"
+              [style.background]="jourSelectionne() === jour ? '#721513' : '#FFFFFF'"
+              [style.color]="jourSelectionne() === jour ? '#FFFFFF' : '#332724'"
+              [style.border-color]="jourSelectionne() === jour ? '#721513' : '#EDE7DC'"
+              style="padding: 0.65rem 1.2rem; border-radius: 12px; font-weight: 800; font-size: 0.85rem; border: 1.5px solid; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+              <i class="fa-regular fa-calendar"></i> {{ jour }}
+              @if (jour === 'Jeudi') {
+                <span [style.background]="jourSelectionne() === jour ? '#FAF5EA' : '#FAF5EA'" [style.color]="'#721513'" style="font-size: 0.65rem; padding: 0.1rem 0.4rem; border-radius: 4px; font-weight: 800;">
+                  Aujourd'hui
+                </span>
+              }
+            </button>
+          }
         </div>
 
-        <!-- Barre de Filtres par Catégorie de Poste Cuisine -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
-          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        @if (menuJourActif(); as mActif) {
+          <!-- BANDEAU INFO CONFORMITÉ DU JOUR -->
+          <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <h3 style="margin: 0; font-size: 1.25rem; color: #721513; font-weight: 900;">
+                  {{ mActif.jourNom }} • {{ mActif.theme || 'Service Quotidien' }}
+                </h3>
+                @if (mActif.statutConformite === 'CONFORME') {
+                  <span style="background: rgba(96, 108, 56, 0.15); color: #606C38; font-size: 0.75rem; font-weight: 800; padding: 0.2rem 0.65rem; border-radius: 9999px; border: 1px solid #606C38;">
+                    <i class="fa-solid fa-check"></i> Conforme aux effectifs ({{ employesSubventionnesCount() }} repas)
+                  </span>
+                } @else if (mActif.statutConformite === 'NON_CONFORME') {
+                  <span style="background: #FEE2E2; color: #DC2626; font-size: 0.75rem; font-weight: 800; padding: 0.2rem 0.65rem; border-radius: 9999px; border: 1px solid #DC2626;">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Quantités insuffisantes (< {{ employesSubventionnesCount() }})
+                  </span>
+                } @else {
+                  <span style="background: #FEF3C7; color: #D97706; font-size: 0.75rem; font-weight: 800; padding: 0.2rem 0.65rem; border-radius: 9999px; border: 1px solid #FCD34D;">
+                    <i class="fa-regular fa-clock"></i> Non saisi (Non visible par les salariés)
+                  </span>
+                }
+              </div>
+              <p style="margin: 0.35rem 0 0; font-size: 0.8rem; color: #6E5A56;">
+                Renseignez les quantités prévues pour chaque composante. Le total de chaque catégorie doit être au moins égal à l'effectif subventionné (<strong>{{ employesSubventionnesCount() }} salariés</strong>).
+              </p>
+            </div>
+
             <button 
-              (click)="filtrerParCategorie('TOUS')"
-              [style.background]="filtreCategorie() === 'TOUS' ? '#721513' : '#FFFFFF'"
-              [style.color]="filtreCategorie() === 'TOUS' ? '#FFFFFF' : '#721513'"
-              style="border: 1.5px solid #EDE7DC; padding: 0.45rem 1rem; border-radius: 9999px; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.2s;">
-              <i class="fa-solid fa-list-ul"></i> Tous les Plats & Portions ({{ lignesProduction().length }})
-            </button>
-            <button 
-              (click)="filtrerParCategorie('PLAT')"
-              [style.background]="filtreCategorie() === 'PLAT' ? '#E51D24' : '#FFFFFF'"
-              [style.color]="filtreCategorie() === 'PLAT' ? '#FFFFFF' : '#E51D24'"
-              style="border: 1.5px solid #EDE7DC; padding: 0.45rem 1rem; border-radius: 9999px; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.2s;">
-              <i class="fa-solid fa-fire"></i> Plats Chauds
-            </button>
-            <button 
-              (click)="filtrerParCategorie('ENTREE')"
-              [style.background]="filtreCategorie() === 'ENTREE' ? '#606C38' : '#FFFFFF'"
-              [style.color]="filtreCategorie() === 'ENTREE' ? '#FFFFFF' : '#606C38'"
-              style="border: 1.5px solid #EDE7DC; padding: 0.45rem 1rem; border-radius: 9999px; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.2s;">
-              <i class="fa-solid fa-snowflake"></i> Entrées Fraîches
-            </button>
-            <button 
-              (click)="filtrerParCategorie('DESSERT')"
-              [style.background]="filtreCategorie() === 'DESSERT' ? '#721513' : '#FFFFFF'"
-              [style.color]="filtreCategorie() === 'DESSERT' ? '#FFFFFF' : '#721513'"
-              style="border: 1.5px solid #EDE7DC; padding: 0.45rem 1rem; border-radius: 9999px; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.2s;">
-              <i class="fa-solid fa-cake-candles"></i> Desserts
-            </button>
-            <button 
-              (click)="filtrerParCategorie('BOISSON')"
-              [style.background]="filtreCategorie() === 'BOISSON' ? '#6E5A56' : '#FFFFFF'"
-              [style.color]="filtreCategorie() === 'BOISSON' ? '#FFFFFF' : '#6E5A56'"
-              style="border: 1.5px solid #EDE7DC; padding: 0.45rem 1rem; border-radius: 9999px; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.2s;">
-              <i class="fa-solid fa-glass-water"></i> Boissons
+              type="button" 
+              (click)="ouvrirModalAjoutPlat()"
+              style="background: #721513; color: #FFFFFF; border: none; border-radius: 10px; padding: 0.65rem 1.15rem; font-weight: 800; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem;">
+              <i class="fa-solid fa-plus"></i> Ajouter un plat du catalogue
             </button>
           </div>
 
-          <div style="font-size: 0.8rem; color: #6E5A56; font-weight: 600;">
-            <i class="fa-solid fa-kitchen-set" style="color: #721513;"></i> Brigade Kiki Traiteur
-          </div>
-        </div>
+          <!-- TABLEAU DES PLATS PLANIFIÉS AVEC SAISIE DES QUANTITÉS -->
+          <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+            <div style="padding: 1rem 1.25rem; background: #FAF8F4; border-bottom: 1px solid #EDE7DC; font-weight: 800; font-size: 0.85rem; color: #721513; display: flex; justify-content: space-between; align-items: center;">
+              <span><i class="fa-solid fa-list-check"></i> Plats & Quantités au programme de {{ mActif.jourNom }}</span>
+              <span style="font-size: 0.78rem; color: #6E5A56; font-weight: 600;">{{ mActif.lignes.length }} plat(s) au menu</span>
+            </div>
 
-        <!-- Tableau de Production Consolidé Clair -->
-        <div class="cuisine-table-card">
-          <div class="cuisine-table-header">
-            <h3 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.2rem; color: #721513; font-weight: 800;">
-              Consolidation par Plat du Jour & Statut de Cuisson (Midi)
-            </h3>
-            <span style="font-size: 0.8rem; color: #E51D24; font-weight: 700;">
-              <i class="fa-regular fa-calendar-check"></i> Midi • Cut-off 10h30 Traité
-            </span>
-          </div>
-
-          <div class="cuisine-table-wrap">
-            <table class="cuisine-table">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
               <thead>
-                <tr>
-                  <th>Poste / Catégorie</th>
-                  <th>Intitulé du Plat / Portion</th>
-                  <th>Quantité Consolidée</th>
-                  <th>Unité de Conditionnement</th>
-                  <th>Statut de Production (Cuisine)</th>
-                  <th>Action Rapide</th>
+                <tr style="background: #FAF8F4; color: #6E5A56; font-size: 0.72rem; text-transform: uppercase; font-weight: 800; border-bottom: 1.5px solid #EDE7DC;">
+                  <th style="padding: 0.85rem 1.25rem;">Catégorie</th>
+                  <th style="padding: 0.85rem 1.25rem;">Plat</th>
+                  <th style="padding: 0.85rem 1.25rem; text-align: center;">Quantité Prévue (Portions)</th>
+                  <th style="padding: 0.85rem 1.25rem; text-align: center;">Déjà Commandé</th>
+                  <th style="padding: 0.85rem 1.25rem; text-align: center;">Reste Disponible</th>
+                  <th style="padding: 0.85rem 1.25rem; text-align: right;">Action</th>
                 </tr>
               </thead>
               <tbody>
-                @for (l of lignesPaginees(); track l.platId) {
-                  <tr>
-                    <td data-label="Poste / Catégorie">
-                      @if (l.categorie === 'PLAT') { <span style="color: #E51D24; font-weight: 700;"><i class="fa-solid fa-bowl-rice"></i> Plat Chaud</span> }
-                      @if (l.categorie === 'ENTREE') { <span style="color: #606C38; font-weight: 700;"><i class="fa-solid fa-carrot"></i> Entrée</span> }
-                      @if (l.categorie === 'DESSERT') { <span style="color: #721513; font-weight: 700;"><i class="fa-solid fa-cake-candles"></i> Dessert</span> }
-                      @if (l.categorie === 'BOISSON') { <span style="color: #6E5A56; font-weight: 700;"><i class="fa-solid fa-glass-water"></i> Boisson</span> }
+                @for (ligne of mActif.lignes; track ligne.id) {
+                  @let stock = b2b.getStockInfoPlat(ligne.platId, mActif.jourNom);
+                  <tr style="border-bottom: 1px solid #F0EAE1;">
+                    <td style="padding: 0.85rem 1.25rem;">
+                      <span [style.background]="ligne.categorie === 'PLAT' ? '#FEE2E2' : ligne.categorie === 'ENTREE' ? '#ECFDF5' : ligne.categorie === 'DESSERT' ? '#FEF3C7' : '#EFF6FF'"
+                            [style.color]="ligne.categorie === 'PLAT' ? '#991B1B' : ligne.categorie === 'ENTREE' ? '#065F46' : ligne.categorie === 'DESSERT' ? '#92400E' : '#1E40AF'"
+                            style="padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; display: inline-block;">
+                        {{ ligne.categorie }}
+                      </span>
                     </td>
-                    <td data-label="Intitulé du Plat" style="font-weight: 700; color: #332724; font-size: 0.95rem;">{{ l.nomPlat }}</td>
-                    <td data-label="Quantité Consolidée" style="font-size: 1.25rem; font-weight: 900; color: #721513; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">{{ l.quantiteTotale }}</td>
-                    <td data-label="Conditionnement" style="color: #6E5A56; font-weight: 500;">{{ l.unite }}</td>
-                    <td data-label="Statut Cuisine">
-                      @if (l.statut === 'PREPARATION_TERMINEE') {
-                        <span (click)="changerStatutCuisson(l.platId)" class="status-badge-terminee"><i class="fa-solid fa-check"></i> Prêt & Conditionné</span>
-                      }
-                      @if (l.statut === 'EN_CUISSON') {
-                        <span (click)="changerStatutCuisson(l.platId)" class="status-badge-cuisson"><i class="fa-solid fa-fire"></i> En Cuisson</span>
-                      }
-                      @if (l.statut === 'EN_ATTENTE') {
-                        <span (click)="changerStatutCuisson(l.platId)" class="status-badge-attente"><i class="fa-regular fa-clock"></i> En Attente</span>
-                      }
+                    <td style="padding: 0.85rem 1.25rem;">
+                      <strong style="color: #332724; font-size: 0.9rem;">{{ ligne.nomPlat }}</strong>
                     </td>
-                    <td data-label="Action Rapide">
+                    <td style="padding: 0.85rem 1.25rem; text-align: center;">
+                      <input 
+                        type="number" 
+                        min="0"
+                        [ngModel]="ligne.quantitePrevue"
+                        (ngModelChange)="onQuantiteChange(ligne.id, $event)"
+                        style="width: 80px; text-align: center; padding: 0.45rem; border: 1.5px solid #CBD5E1; border-radius: 8px; font-weight: 800; font-size: 0.95rem; color: #721513; background: #FAF5EA;">
+                    </td>
+                    <td style="padding: 0.85rem 1.25rem; text-align: center; font-weight: 700; color: #6E5A56;">
+                      {{ stock.dejaCommande }}
+                    </td>
+                    <td style="padding: 0.85rem 1.25rem; text-align: center;">
+                      <span [style.color]="stock.resteDisponible > 5 ? '#606C38' : '#DC2626'" style="font-weight: 900; font-size: 0.95rem;">
+                        {{ stock.resteDisponible }}
+                      </span>
+                    </td>
+                    <td style="padding: 0.85rem 1.25rem; text-align: right;">
                       <button 
-                        (click)="changerStatutCuisson(l.platId)"
-                        style="background: #FAF8F4; border: 1.5px solid #EDE7DC; color: #721513; padding: 0.4rem 0.85rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.2s;">
-                        Avancer statut
+                        type="button" 
+                        (click)="supprimerLigneMenu(ligne.id)"
+                        style="background: none; border: none; color: #9CA3AF; cursor: pointer; padding: 0.4rem; font-size: 0.95rem;"
+                        title="Retirer ce plat du programme">
+                        <i class="fa-regular fa-trash-can" style="color: #DC2626;"></i>
                       </button>
                     </td>
                   </tr>
@@ -177,587 +259,134 @@
               </tbody>
             </table>
           </div>
-
-          <!-- BARRE DE PAGINATION LUXE KIKI TRAITEUR -->
-          <div style="padding: 1rem 1.5rem; background: #FAF8F4; border-top: 1.5px solid #EDE7DC; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-            
-            <!-- Informations d'affichage -->
-            <div style="font-size: 0.82rem; color: #6E5A56;">
-              Affichage de <strong style="color: #721513;">{{ indexDebut() }}</strong> à <strong style="color: #721513;">{{ indexFin() }}</strong> sur <strong style="color: #721513;">{{ lignesFiltrees().length }}</strong> plats & portions
-            </div>
-
-            <!-- Contrôles de Pages -->
-            <div style="display: flex; align-items: center; gap: 0.4rem;">
-              <button 
-                (click)="pagePrecedente()" 
-                [disabled]="pageIndex() === 1"
-                [style.opacity]="pageIndex() === 1 ? '0.4' : '1'"
-                [style.cursor]="pageIndex() === 1 ? 'not-allowed' : 'pointer'"
-                style="width: 34px; min-width: 34px; max-width: 34px; height: 34px; min-height: 34px !important; max-height: 34px; border-radius: 50% !important; border: 1.5px solid #EDE7DC; background: #FFFFFF; color: #721513; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; padding: 0; flex-shrink: 0; aspect-ratio: 1 / 1;">
-                <i class="fa-solid fa-chevron-left" style="margin: 0 !important;"></i>
-              </button>
-
-              @for (p of pagesArray(); track p) {
-                <button 
-                  (click)="allerPage(p)"
-                  [style.background]="pageIndex() === p ? '#721513' : '#FFFFFF'"
-                  [style.color]="pageIndex() === p ? '#FFFFFF' : '#332724'"
-                  [style.border-color]="pageIndex() === p ? '#721513' : '#EDE7DC'"
-                  style="width: 34px; min-width: 34px; max-width: 34px; height: 34px; min-height: 34px !important; max-height: 34px; border-radius: 50% !important; border: 1.5px solid; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; aspect-ratio: 1 / 1;">
-                  {{ p }}
-                </button>
-              }
-
-              <button 
-                (click)="pageSuivante()" 
-                [disabled]="pageIndex() === totalPages()"
-                [style.opacity]="pageIndex() === totalPages() ? '0.4' : '1'"
-                [style.cursor]="pageIndex() === totalPages() ? 'not-allowed' : 'pointer'"
-                style="width: 34px; min-width: 34px; max-width: 34px; height: 34px; min-height: 34px !important; max-height: 34px; border-radius: 50% !important; border: 1.5px solid #EDE7DC; background: #FFFFFF; color: #721513; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; padding: 0; flex-shrink: 0; aspect-ratio: 1 / 1;">
-                <i class="fa-solid fa-chevron-right" style="margin: 0 !important;"></i>
-              </button>
-            </div>
-
-            <!-- Sélecteur de taille de page -->
-            <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #6E5A56;">
-              <span>Plats par page :</span>
-              <select 
-                [ngModel]="pageSize()" 
-                (ngModelChange)="changerPageSize($event)"
-                style="background: #FFFFFF; color: #721513; font-weight: 700; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.25rem 0.5rem; cursor: pointer;">
-                <option [ngValue]="5">5</option>
-                <option [ngValue]="10">10</option>
-                <option [ngValue]="20">20</option>
-              </select>
-            </div>
-
-          </div>
-
-        </div>
-
+        }
       </div>
     }
 
     <!-- ============================================================== -->
-    <!-- SECTION 2 (MENTOR) : SCANNER QR CODE RETRAIT AU FOOD TRUCK     -->
+    <!-- ONGLET 2 : COMMANDES DU JOUR AVEC SCANNER & MARQUER LIVRÉ       -->
     <!-- ============================================================== -->
-    @if (activeTab() === 'SCAN_QR') {
-      <div>
+    @if (activeTab() === 'COMMANDES') {
+      <div style="display: flex; flex-direction: column; gap: 1.25rem;">
         
-        <div class="cuisine-scan-grid">
-          
-          <!-- Bloc Scanner Caméra / Clavier / Douchette -->
-          <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 20px; padding: 2rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
-            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
-              <div style="width: 44px; height: 44px; border-radius: 50% !important; background: #FAF5EA; color: #721513; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
-                <i class="fa-solid fa-qrcode" style="margin: 0 !important;"></i>
-              </div>
-              <div>
-                <h3 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.35rem; color: #721513; font-weight: 900;">
-                  Scanner de Retrait Salarié
-                </h3>
-                <p style="margin: 0.2rem 0 0; font-size: 0.8rem; color: #6E5A56;">
-                  Food Truck & Point de distribution sur site
-                </p>
-              </div>
+        <!-- KPIs DES COMMANDES DU JOUR -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+          <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.15rem; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+            <span style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
+              <i class="fa-solid fa-receipt" style="color: #721513;"></i> Total Commandes Jour
+            </span>
+            <div style="font-size: 1.85rem; font-weight: 900; color: #721513; margin-top: 0.35rem;">
+              {{ commandesSite().length }}
             </div>
+            <span style="font-size: 0.75rem; color: #6E5A56;">Repas enregistrés aujourd'hui</span>
+          </div>
 
-            <!-- Viseur Scanner Stylisé Kiki Traiteur -->
-            <div style="position: relative; background: #221817; border-radius: 16px; height: 210px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #FAF8F4; overflow: hidden; margin-bottom: 1.5rem;">
-              <div style="width: 140px; height: 140px; border: 2px dashed #E51D24; border-radius: 12px; display: flex; align-items: center; justify-content: center; position: relative;">
-                <i class="fa-solid fa-camera" style="font-size: 2.2rem; color: rgba(255,255,255,0.7);"></i>
-                <div style="position: absolute; width: 100%; height: 2px; background: #E51D24; box-shadow: 0 0 10px #E51D24; top: 50%; transform: translateY(-50%);"></div>
-              </div>
-              <span style="font-size: 0.75rem; margin-top: 0.75rem; color: #EDE7DC; font-weight: 600;">
-                <i class="fa-solid fa-bolt" style="color: #E51D24;"></i> Viseur Optique Actif
-              </span>
+          <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.15rem; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+            <span style="font-size: 0.72rem; color: #1D4ED8; font-weight: 700; text-transform: uppercase;">
+              <i class="fa-solid fa-qrcode" style="color: #1D4ED8;"></i> Scannés au Comptoir
+            </span>
+            <div style="font-size: 1.85rem; font-weight: 900; color: #1D4ED8; margin-top: 0.35rem;">
+              {{ commandesScanneesCount() }}
             </div>
+            <span style="font-size: 0.75rem; color: #6E5A56;">Prêts pour remise au salarié</span>
+          </div>
 
-            <!-- Saisie Manuelle ou Douchette Laser -->
-            <div style="margin-bottom: 1rem;">
-              <label style="font-size: 0.78rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.4rem;">
-                Code QR ou Matricule Collaborateur :
-              </label>
-              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                <input 
-                  type="text" 
-                  [ngModel]="codeScanneInput()"
-                  (ngModelChange)="codeScanneInput.set($event)"
-                  placeholder="Ex : KT-TOT-9842-SITE1-20261106"
-                  (keyup.enter)="traiterScanQr()"
-                  style="flex: 1 1 200px; min-width: 0; padding: 0.75rem 1rem; border: 1.5px solid #EDE7DC; border-radius: 12px; font-size: 0.85rem; font-weight: 700; color: #332724; background: #FAF8F4;">
-                <button 
-                  type="button"
-                  (click)="traiterScanQr()"
-                  style="flex: 0 0 auto; padding: 0.75rem 1.25rem; background: linear-gradient(135deg, #721513, #E51D24); color: #FFFFFF; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
-                  <i class="fa-solid fa-check"></i> Valider
-                </button>
-              </div>
+          <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.15rem; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+            <span style="font-size: 0.72rem; color: #606C38; font-weight: 700; text-transform: uppercase;">
+              <i class="fa-solid fa-check-double" style="color: #606C38;"></i> Remis & Livrés
+            </span>
+            <div style="font-size: 1.85rem; font-weight: 900; color: #606C38; margin-top: 0.35rem;">
+              {{ commandesLivreesCount() }}
             </div>
+            <span style="font-size: 0.75rem; color: #6E5A56;">Service validé avec succès</span>
+          </div>
 
-            <!-- Raccourcis Rapides de Simulation de Retrait -->
-            <div style="background: #FAF8F4; padding: 0.85rem; border-radius: 12px; border: 1px solid #EDE7DC;">
-              <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; margin-bottom: 0.5rem;">
-                Tester avec des scans rapides :
-              </div>
-              <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
-                <button 
-                  type="button"
-                  (click)="traiterScanQr('KT-TOT-9842-SITE1-20261106')"
-                  style="padding: 0.35rem 0.65rem; background: #FFFFFF; border: 1px solid #EDE7DC; border-radius: 8px; font-size: 0.72rem; font-weight: 700; color: #721513; cursor: pointer;">
-                  TOT-9842 (Babacar Ndiaye)
-                </button>
-                <button 
-                  type="button"
-                  (click)="traiterScanQr('KT-TOT-9843-SITE1-20261106')"
-                  style="padding: 0.35rem 0.65rem; background: #FFFFFF; border: 1px solid #EDE7DC; border-radius: 8px; font-size: 0.72rem; font-weight: 700; color: #721513; cursor: pointer;">
-                  TOT-9843 (Fatou Fall)
-                </button>
-                <button 
-                  type="button"
-                  (click)="traiterScanQr('KT-TOT-9847-SITE2-20261106')"
-                  style="padding: 0.35rem 0.65rem; background: #FFFFFF; border: 1px solid #EDE7DC; border-radius: 8px; font-size: 0.72rem; font-weight: 700; color: #721513; cursor: pointer;">
-                  TOT-9847 (Khady Sarr)
-                </button>
-              </div>
+          <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.15rem; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+            <span style="font-size: 0.72rem; color: #D97706; font-weight: 700; text-transform: uppercase;">
+              <i class="fa-regular fa-clock" style="color: #D97706;"></i> En Cours (Non Scannés)
+            </span>
+            <div style="font-size: 1.85rem; font-weight: 900; color: #D97706; margin-top: 0.35rem;">
+              {{ commandesEnAttenteCount() }}
             </div>
-
-            @if (scanMessage()) {
-              <div style="margin-top: 1rem; background: rgba(96, 108, 56, 0.15); border: 1.5px solid #606C38; color: #606C38; padding: 0.85rem; border-radius: 12px; font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
-                <i class="fa-solid fa-circle-check"></i> {{ scanMessage() }}
-              </div>
-            }
-          </div>
-
-          <!-- Récapitulatif du Dernier Scan et Compteurs en direct -->
-          <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-            
-            <!-- Compteurs Live -->
-            <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 20px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
-              <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 800; text-transform: uppercase;">
-                <i class="fa-solid fa-list-check" style="color: #606C38;"></i> TOTAL PLATEAUX RETIRÉS AUJOURD'HUI
-              </div>
-              <div style="font-size: 2.8rem; font-weight: 900; color: #606C38; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0.25rem 0;">
-                {{ nbTotalScannesAujourdhui() }} <span style="font-size: 1.1rem; color: #721513;">/ {{ totalPlateauxSites() }}</span>
-              </div>
-              <div style="font-size: 0.8rem; color: #6E5A56;">
-                Taux de retrait en temps réel : <strong>{{ ((nbTotalScannesAujourdhui() / totalPlateauxSites()) * 100).toFixed(1) }}%</strong>
-              </div>
-            </div>
-
-            <!-- Fiche Bénéficiaire Scanné -->
-            <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 20px; padding: 1.5rem; flex: 1; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
-              <h4 style="margin: 0 0 1rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.15rem; color: #721513; font-weight: 800;">
-                Dernière Délivrance Confirmée
-              </h4>
-
-              @if (dernierScanValide()) {
-                <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 1.25rem;">
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                    <span style="font-size: 0.72rem; color: #606C38; font-weight: 800; background: rgba(96, 108, 56, 0.15); padding: 0.2rem 0.6rem; border-radius: 9999px;">
-                      <i class="fa-solid fa-check"></i> Scanné à {{ dernierScanValide()!.heure }}
-                    </span>
-                    <strong style="color: #721513; font-family: monospace; font-size: 0.9rem;">
-                      {{ dernierScanValide()!.matricule }}
-                    </strong>
-                  </div>
-
-                  <div style="font-size: 0.95rem; font-weight: 800; color: #332724; margin-bottom: 0.25rem;">
-                    {{ dernierScanValide()!.nom }}
-                  </div>
-                  <div style="font-size: 0.8rem; color: #6E5A56; margin-bottom: 0.75rem;">
-                    <i class="fa-solid fa-location-dot" style="color: #E51D24;"></i> {{ dernierScanValide()!.site }}
-                  </div>
-
-                  <div style="background: #FFFFFF; border: 1px solid #EDE7DC; border-radius: 8px; padding: 0.65rem 0.85rem; font-size: 0.8rem; color: #721513; font-weight: 700;">
-                    <i class="fa-solid fa-utensils"></i> {{ dernierScanValide()!.plat }}
-                  </div>
-                </div>
-              } @else {
-                <div style="text-align: center; padding: 2rem 1rem; color: #6E5A56; font-size: 0.85rem;">
-                  <i class="fa-solid fa-qrcode" style="font-size: 2rem; color: #EDE7DC; display: block; margin-bottom: 0.5rem;"></i>
-                  Scannez le QR Code d'un salarié pour afficher sa fiche de délivrance.
-                </div>
-              }
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-    }
-
-    <!-- ============================================================== -->
-    <!-- SECTION 3 (MENTOR) : GESTION DES COMMANDES PERSONNELLES        -->
-    <!-- ============================================================== -->
-    @if (activeTab() === 'AUTONOME') {
-      <div>
-        
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-          <div>
-            <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
-              Commandes Personnelles Autonomes (Payées hors subvention)
-            </h2>
-            <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #6E5A56;">
-              Salariés sans subvention ou ajouts personnels réglés par Wave / CB. Suivi du workflow de préparation.
-            </p>
-          </div>
-
-          <!-- Filtres sur période (Aujourd'hui, Semaine, Mois, Tout) -->
-          <div style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; background: #FFFFFF; border: 1.5px solid #EDE7DC; padding: 0.35rem 0.5rem; border-radius: 16px;">
-            <span style="font-size: 0.75rem; font-weight: 800; color: #721513; padding-left: 0.5rem;"><i class="fa-regular fa-calendar"></i> Période :</span>
-            <button 
-              type="button"
-              (click)="periodeAutonome.set('TOUT')"
-              [style.background]="periodeAutonome() === 'TOUT' ? '#721513' : 'transparent'"
-              [style.color]="periodeAutonome() === 'TOUT' ? '#FFFFFF' : '#6E5A56'"
-              style="border: none; border-radius: 9999px; padding: 0.35rem 0.75rem; font-size: 0.72rem; font-weight: 800; cursor: pointer;">
-              Tout
-            </button>
-            <button 
-              type="button"
-              (click)="periodeAutonome.set('AUJOURDHUI')"
-              [style.background]="periodeAutonome() === 'AUJOURDHUI' ? '#721513' : 'transparent'"
-              [style.color]="periodeAutonome() === 'AUJOURDHUI' ? '#FFFFFF' : '#6E5A56'"
-              style="border: none; border-radius: 9999px; padding: 0.35rem 0.75rem; font-size: 0.72rem; font-weight: 800; cursor: pointer;">
-              Aujourd'hui
-            </button>
-            <button 
-              type="button"
-              (click)="periodeAutonome.set('SEMAINE')"
-              [style.background]="periodeAutonome() === 'SEMAINE' ? '#721513' : 'transparent'"
-              [style.color]="periodeAutonome() === 'SEMAINE' ? '#FFFFFF' : '#6E5A56'"
-              style="border: none; border-radius: 9999px; padding: 0.35rem 0.75rem; font-size: 0.72rem; font-weight: 800; cursor: pointer;">
-              Semaine
-            </button>
-            <button 
-              type="button"
-              (click)="periodeAutonome.set('MOIS')"
-              [style.background]="periodeAutonome() === 'MOIS' ? '#721513' : 'transparent'"
-              [style.color]="periodeAutonome() === 'MOIS' ? '#FFFFFF' : '#6E5A56'"
-              style="border: none; border-radius: 9999px; padding: 0.35rem 0.75rem; font-size: 0.72rem; font-weight: 800; cursor: pointer;">
-              Mois
-            </button>
+            <span style="font-size: 0.75rem; color: #6E5A56;">En attente de scan à la cantine</span>
           </div>
         </div>
 
-        <div class="cuisine-table-card">
-          <div class="cuisine-table-wrap">
-            <table class="cuisine-table">
-              <thead>
-                <tr>
-                  <th>Réf. Commande</th>
-                  <th>Client & Contact</th>
-                  <th>Site de Livraison</th>
-                  <th>Plats & Boissons</th>
-                  <th>Montant Réglé</th>
-                  <th>Créneau</th>
-                  <th>Statut de Préparation</th>
-                  <th>Changer Statut</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (cmd of commandesAutonomes(); track cmd.id) {
-                  <tr>
-                    <td data-label="Réf. Commande" style="font-weight: 800; color: #721513; font-family: monospace;">{{ cmd.codeCommande }}</td>
-                    <td data-label="Client & Contact">
-                      <strong style="color: #332724;">{{ cmd.clientNom }}</strong>
-                      <div style="font-size: 0.75rem; color: #6E5A56;">{{ cmd.telephone }}</div>
-                    </td>
-                    <td data-label="Site de Livraison" style="font-size: 0.85rem; color: #332724;">{{ cmd.siteNom }}</td>
-                    <td data-label="Plats & Boissons" style="font-weight: 600; color: #332724; font-size: 0.85rem;">{{ cmd.articles }}</td>
-                    <td data-label="Montant Réglé" style="font-weight: 900; color: #E51D24;">{{ (cmd.montantTotal | number) }} FCFA</td>
-                    <td data-label="Créneau" style="font-weight: 700; color: #6E5A56; font-size: 0.8rem;">{{ cmd.heurePrevue }}</td>
-                    <td data-label="Statut" style="white-space: nowrap;">
-                      @if (cmd.statut === 'EN_PREPARATION') {
-                        <span style="background: rgba(229, 29, 36, 0.12); color: #E51D24; padding: 0.35rem 0.75rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
-                          <i class="fa-solid fa-fire-burner"></i> En Préparation
-                        </span>
-                      }
-                      @if (cmd.statut === 'PRET_AU_RETRAIT') {
-                        <span style="background: rgba(203, 153, 126, 0.25); color: #721513; padding: 0.35rem 0.75rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
-                          <i class="fa-solid fa-box"></i> Prêt au Retrait
-                        </span>
-                      }
-                      @if (cmd.statut === 'LIVRE') {
-                        <span style="background: rgba(96, 108, 56, 0.15); color: #606C38; padding: 0.35rem 0.75rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
-                          <i class="fa-solid fa-circle-check"></i> Récupéré / Livré
-                        </span>
-                      }
-                    </td>
-                    <td data-label="Action">
-                      <div style="display: flex; gap: 0.35rem;">
-                        <button 
-                          (click)="changerStatutAutonome(cmd.id, 'EN_PREPARATION')"
-                          title="Mettre en préparation"
-                          style="padding: 0.3rem 0.5rem; background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 6px; cursor: pointer; color: #E51D24;">
-                          <i class="fa-solid fa-fire"></i>
-                        </button>
-                        <button 
-                          (click)="changerStatutAutonome(cmd.id, 'PRET_AU_RETRAIT')"
-                          title="Marquer comme Prêt"
-                          style="padding: 0.3rem 0.5rem; background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 6px; cursor: pointer; color: #721513;">
-                          <i class="fa-solid fa-box"></i>
-                        </button>
-                        <button 
-                          (click)="changerStatutAutonome(cmd.id, 'LIVRE')"
-                          title="Marquer comme Récupéré"
-                          style="padding: 0.3rem 0.5rem; background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 6px; cursor: pointer; color: #606C38;">
-                          <i class="fa-solid fa-check"></i>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-      </div>
-    }
-
-    <!-- ============================================================== -->
-    <!-- SECTION 2 : BORDEREAUX DE LIVRAISON PAR SITE                   -->
-    <!-- ============================================================== -->
-    @if (activeTab() === 'BORDEREAUX') {
-      <div>
-        
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-          <div>
-            <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
-              Bordereaux d'Expédition & Émargement par Site
-            </h2>
-            <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #6E5A56;">
-              Feuilles de route des chauffeurs-livreurs et listes d'émargement nominatives pour la distribution.
-            </p>
-          </div>
-        </div>
-
-        <div class="cuisine-bl-grid">
-          @for (bl of bonsLivraison(); track bl.id) {
-            <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
-              
-              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-                <div>
-                  <span style="font-size: 0.72rem; color: #E51D24; font-weight: 800;"><i class="fa-solid fa-receipt"></i> {{ bl.numeroBL }}</span>
-                  <h3 style="margin: 0.25rem 0 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.25rem; color: #721513; font-weight: 800;">{{ bl.siteNom }}</h3>
-                </div>
-
-                @if (bl.statut === 'EXPEDIE') {
-                  <span style="background: rgba(229, 29, 36, 0.1); color: #E51D24; border: 1px solid rgba(229, 29, 36, 0.25); padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 700;">
-                    <i class="fa-solid fa-van-shuttle"></i> En Transit
-                  </span>
-                } @else if (bl.statut === 'LIVRE') {
-                  <span style="background: rgba(96, 108, 56, 0.12); color: #606C38; border: 1px solid rgba(96, 108, 56, 0.25); padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 700;">
-                    <i class="fa-solid fa-check-double"></i> Livré & Émargé
-                  </span>
-                } @else {
-                  <span style="background: #FAF8F4; color: #6E5A56; border: 1px solid #EDE7DC; padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 700;">
-                    <i class="fa-solid fa-box-open"></i> En Préparation
-                  </span>
-                }
-              </div>
-
-              <div style="background: #FAF8F4; border-radius: 14px; padding: 1.15rem; font-size: 0.85rem; line-height: 2; margin-bottom: 1.25rem; border: 1.5px solid #EDE7DC;">
-                <div style="display: flex; align-items: center; gap: 0.65rem;">
-                  <i class="fa-solid fa-box" style="color: #721513; width: 18px; text-align: center;"></i>
-                  <span><strong>Nombre de plateaux :</strong> <span style="color: #721513; font-weight: 900; font-size: 1.05rem;">{{ bl.nbPlateauxTotal }}</span></span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 0.65rem;">
-                  <i class="fa-solid fa-location-dot" style="color: #E51D24; width: 18px; text-align: center;"></i>
-                  <span><strong>Adresse :</strong> {{ bl.adresseLivraison }}</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 0.65rem;">
-                  <i class="fa-regular fa-clock" style="color: #E51D24; width: 18px; text-align: center;"></i>
-                  <span><strong>Créneau distribution :</strong> <span style="color: #E51D24; font-weight: 800;">{{ bl.creneau }}</span></span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 0.65rem;">
-                  <i class="fa-solid fa-truck" style="color: #6E5A56; width: 18px; text-align: center;"></i>
-                  <span><strong>Livreur :</strong> {{ bl.chauffeurLivreur }}</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 0.65rem;">
-                  <i class="fa-solid fa-user-tie" style="color: #6E5A56; width: 18px; text-align: center;"></i>
-                  <span><strong>Contact sur site :</strong> {{ bl.contactReferent }} ({{ bl.telephoneReferent }})</span>
-                </div>
-              </div>
-
-              <button 
-                (click)="ouvrirBordereau(bl)"
-                style="width: 100%; padding: 0.85rem; background: linear-gradient(135deg, #721513, #E51D24); color: #FFFFFF; border: none; border-radius: 9999px; font-weight: 700; font-size: 0.82rem; cursor: pointer; box-shadow: 0 4px 15px rgba(114, 21, 19, 0.25); display: flex; align-items: center; justify-content: center; gap: 0.65rem;">
-                <i class="fa-solid fa-clipboard-list"></i>
-                <span>Consulter la Fiche d'Émargement</span>
-              </button>
-            </div>
-          }
-        </div>
-
-      </div>
-    }
-
-    <!-- ============================================================== -->
-    <!-- SECTION 3 : PLANNING SEMAINE DES MENUS DU RESTAURATEUR        -->
-    <!-- ============================================================== -->
-    @if (activeTab() === 'PLANNING_SEMAINE') {
-      <div>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-          <div>
-            <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
-              Planning Hebdomadaire & Personnalisation Menus (Lun - Ven)
-            </h2>
-            <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #6E5A56;">
-              En tant que Responsable de Site, ajustez les thèmes, plats vedettes et validez le calendrier des menus de votre site.
-            </p>
-          </div>
-        </div>
-
-        <div class="cuisine-planning-grid">
-          @for (p of planningSemaine(); track p.jour) {
-            <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.25rem; box-shadow: 0 4px 15px rgba(114, 21, 19, 0.03); display: flex; flex-direction: column; justify-content: space-between;">
-              <div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                  <span style="font-weight: 800; color: #721513; font-size: 0.95rem;">{{ p.jour }}</span>
-                  <span style="font-size: 0.75rem; color: #6E5A56;">{{ p.date }}</span>
-                </div>
-
-                <div style="font-size: 0.72rem; color: #606C38; font-weight: 700; text-transform: uppercase;">{{ p.theme }}</div>
-                <div style="font-size: 0.9rem; font-weight: 700; color: #332724; margin: 0.5rem 0 1rem; min-height: 44px; line-height: 1.4;">
-                  {{ p.platVedette }}
-                </div>
-              </div>
-
-              <div>
-                <div style="border-top: 1px solid #EDE7DC; padding-top: 0.75rem; font-size: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
-                  @if (p.statut === 'EN_COURS') {
-                    <span style="color: #E51D24; font-weight: 700;"><i class="fa-solid fa-circle" style="font-size: 0.5rem;"></i> Service en cours</span>
-                  } @else if (p.statut === 'VALIDE') {
-                    <span style="color: #606C38; font-weight: 700;"><i class="fa-solid fa-check"></i> Validé par le chef</span>
-                  } @else if (p.statut === 'SERVI') {
-                    <span style="color: #6E5A56;"><i class="fa-solid fa-check-double"></i> Clôturé</span>
-                  } @else {
-                    <span style="color: #721513;"><i class="fa-regular fa-clock"></i> À préparer</span>
-                  }
-
-                  <button 
-                    type="button"
-                    (click)="ouvrirModalEditPlanning(p)"
-                    style="background: #FAF8F4; border: 1.5px solid #EDE7DC; color: #721513; border-radius: 9999px; padding: 0.25rem 0.65rem; font-size: 0.72rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem;">
-                    <i class="fa-regular fa-pen-to-square"></i> Modifier
-                  </button>
-                </div>
-              </div>
-            </div>
-          }
-        </div>
-
-        <!-- SÉLECTION DES PLATS PROPOSÉS SUR LE SITE (RÉCUPÉRATION DU CATALOGUE CENTRAL) -->
-        <div style="margin-top: 2.5rem; background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
-            <div>
-              <span style="font-size: 0.72rem; color: #C05621; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(192, 86, 33, 0.1); padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.4rem;">
-                <i class="fa-solid fa-utensils"></i> CATALOGUE GLOBAL KIKI TRAITEUR
-              </span>
-              <h3 style="margin: 0.35rem 0 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.35rem; color: #721513; font-weight: 900;">
-                Activer / Désactiver les Plats Proposés sur ce Site
-              </h3>
-              <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #6E5A56;">
-                Le Responsable de Site choisit en direct les recettes du catalogue central qu'il met à la carte selon son stock et approvisionnement.
-              </p>
-            </div>
+        <!-- TABLEAU DES COMMANDES DU JOUR AVEC PROCESSUS STRICT DE SCAN & LIVRAISON -->
+        <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+          <div style="padding: 1rem 1.25rem; background: #FAF8F4; border-bottom: 1px solid #EDE7DC; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 800; font-size: 0.88rem; color: #721513;">
+              <i class="fa-solid fa-list-check"></i> File des commandes du jour (Distribution Réfectoire)
+            </span>
+            <span style="font-size: 0.75rem; color: #6E5A56;">
+              Règle : l'employé scanne le QR code cantine $\rightarrow$ Statut passe à « Scanné » $\rightarrow$ Vous pouvez cliquer sur « Marquer Livré ».
+            </span>
           </div>
 
-          <div class="cuisine-catalogue-grid">
-            @for (plat of b2b.catalogueJour(); track plat.id) {
-              <div [style.background]="plat.disponible !== false ? '#FFFFFF' : '#FAF8F4'"
-                   [style.border-color]="plat.disponible !== false ? '#EDE7DC' : '#CBD5E1'"
-                   [style.opacity]="plat.disponible !== false ? '1' : '0.65'"
-                   style="border: 1.5px solid; border-radius: 14px; padding: 1rem; display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; transition: all 0.2s;">
-                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                  <img [src]="plat.image" [alt]="plat.nom" style="width: 48px; height: 48px; border-radius: 10px; object-fit: cover; border: 1px solid #EDE7DC;">
-                  <div>
-                    <div style="font-size: 0.82rem; font-weight: 800; color: #332724; line-height: 1.3;">{{ plat.nom }}</div>
-                    <div style="font-size: 0.72rem; color: #6E5A56; margin-top: 0.2rem;">
-                      <span style="font-weight: 700; color: #721513;">{{ plat.categorie }}</span> • {{ (plat.prixUnitaire | number) }} FCFA
-                    </div>
-                  </div>
-                </div>
-
-                <button 
-                  type="button"
-                  (click)="b2b.toggleDisponibilitePlat(plat.id)"
-                  [style.background]="plat.disponible !== false ? '#FAF5EA' : '#EDE7DC'"
-                  [style.color]="plat.disponible !== false ? '#606C38' : '#6E5A56'"
-                  [style.border-color]="plat.disponible !== false ? '#606C38' : '#CBD5E1'"
-                  style="border: 1.5px solid; padding: 0.4rem 0.85rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 800; cursor: pointer; white-space: nowrap; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.45rem;">
-                  <i class="fa-solid" [class.fa-check]="plat.disponible !== false" [class.fa-ban]="plat.disponible === false"></i>
-                  <span>{{ plat.disponible !== false ? 'Proposé' : 'Désactivé' }}</span>
-                </button>
-              </div>
-            }
-          </div>
-        </div>
-
-      </div>
-    }
-
-  </main>
-
-  <!-- MODAL BORDEREAU D'ÉMARGEMENT -->
-  @if (showBLModal() && selectedBL()) {
-    <div class="cuisine-modal-overlay">
-      <div class="cuisine-modal-card">
-        
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #EDE7DC; padding-bottom: 1rem; margin-bottom: 1.25rem;">
-          <div>
-            <div style="font-size: 0.75rem; color: #E51D24; font-weight: 800;"><i class="fa-solid fa-receipt"></i> {{ selectedBL()!.numeroBL }}</div>
-            <h3 style="margin: 0.25rem 0 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.3rem; color: #721513; font-weight: 800;">
-              Bordereau d'Émargement • {{ selectedBL()!.siteNom }}
-            </h3>
-          </div>
-          <button (click)="showBLModal.set(false)" style="background: none; border: none; color: #6E5A56; font-size: 1.25rem; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-
-        <div style="background: #FAF8F4; border-radius: 14px; padding: 1.15rem; font-size: 0.85rem; line-height: 2; margin-bottom: 1.25rem; border: 1.5px solid #EDE7DC;">
-          <div style="display: flex; align-items: center; gap: 0.65rem;">
-            <i class="fa-solid fa-truck" style="color: #721513; width: 18px; text-align: center;"></i>
-            <span><strong>Livreur :</strong> {{ selectedBL()!.chauffeurLivreur }} • Départ {{ selectedBL()!.heureDepartPrevue }}</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 0.65rem;">
-            <i class="fa-solid fa-location-dot" style="color: #E51D24; width: 18px; text-align: center;"></i>
-            <span><strong>Lieu de livraison :</strong> {{ selectedBL()!.adresseLivraison }}</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 0.65rem;">
-            <i class="fa-solid fa-box" style="color: #721513; width: 18px; text-align: center;"></i>
-            <span><strong>Total plateaux :</strong> {{ selectedBL()!.nbPlateauxTotal }} plateaux individuels étiquetés</span>
-          </div>
-        </div>
-
-        <!-- Tableau d'émargement nominatif -->
-        <div style="max-height: 280px; overflow-y: auto; overflow-x: auto; background: #FFFFFF; border-radius: 14px; border: 1.5px solid #EDE7DC; margin-bottom: 1.5rem;">
-          <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: left;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
             <thead>
-              <tr style="border-bottom: 1.5px solid #EDE7DC; color: #721513; background: #FAF8F4;">
-                <th style="padding: 0.75rem;">Bénéficiaire</th>
-                <th style="padding: 0.75rem;">Composition Repas</th>
-                <th style="padding: 0.75rem;">Signature</th>
+              <tr style="background: #FAF8F4; color: #6E5A56; font-size: 0.72rem; text-transform: uppercase; font-weight: 800; border-bottom: 1.5px solid #EDE7DC;">
+                <th style="padding: 0.85rem 1.25rem;">Heure</th>
+                <th style="padding: 0.85rem 1.25rem;">Matricule</th>
+                <th style="padding: 0.85rem 1.25rem;">Salarié</th>
+                <th style="padding: 0.85rem 1.25rem;">Plat Commandé</th>
+                <th style="padding: 0.85rem 1.25rem; text-align: center;">Statut</th>
+                <th style="padding: 0.85rem 1.25rem; text-align: right;">Action Responsable</th>
               </tr>
             </thead>
             <tbody>
-              @for (ligne of selectedBL()!.lignes; track ligne.matricule) {
-                <tr style="border-bottom: 1px solid #EDE7DC;">
-                  <td style="padding: 0.75rem; color: #332724; font-weight: 700;">
-                    {{ ligne.employeNom }} <br>
-                    <code style="color: #721513; font-size: 0.7rem; background: #FAF5EA; padding: 0.15rem 0.4rem; border-radius: 4px;">{{ ligne.matricule }}</code>
+              @for (cmd of commandesSite(); track cmd.id) {
+                <tr style="border-bottom: 1px solid #F0EAE1;">
+                  <td style="padding: 0.85rem 1.25rem; font-weight: 700; color: #6E5A56;">
+                    {{ cmd.heure }}
                   </td>
-                  <td style="padding: 0.75rem; color: #6E5A56; font-size: 0.75rem;">
-                    {{ ligne.detailPlateau }}
+                  <td style="padding: 0.85rem 1.25rem;">
+                    <span style="font-family: monospace; font-size: 0.78rem; font-weight: 800; color: #721513; background: #FAF5EA; padding: 0.2rem 0.5rem; border-radius: 6px;">
+                      {{ cmd.matricule }}
+                    </span>
                   </td>
-                  <td style="padding: 0.75rem;">
-                    @if (selectedBL()!.emargementEffectue) {
-                      <span style="color: #606C38; font-weight: 700;"><i class="fa-solid fa-check"></i> Émargé</span>
+                  <td style="padding: 0.85rem 1.25rem;">
+                    <strong style="color: #332724;">{{ cmd.employeNom }}</strong>
+                  </td>
+                  <td style="padding: 0.85rem 1.25rem; color: #332724;">
+                    {{ cmd.platNom }}
+                  </td>
+                  <td style="padding: 0.85rem 1.25rem; text-align: center;">
+                    @if (cmd.statut === 'LIVRE') {
+                      <span style="background: rgba(96, 108, 56, 0.15); color: #606C38; font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #606C38; display: inline-flex; align-items: center; gap: 0.35rem;">
+                        <i class="fa-solid fa-check-double"></i> Livré ({{ cmd.livreAt || '12h14' }})
+                      </span>
+                    } @else if (cmd.statut === 'SCANNE') {
+                      <span style="background: #DBEAFE; color: #1D4ED8; font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #93C5FD; display: inline-flex; align-items: center; gap: 0.35rem;">
+                        <i class="fa-solid fa-qrcode"></i> Scanné ({{ cmd.scanneAt || '12h20' }})
+                      </span>
                     } @else {
-                      <span style="color: #6E5A56; font-style: italic;">En attente</span>
+                      <span style="background: #FEF3C7; color: #B45309; font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #FCD34D; display: inline-flex; align-items: center; gap: 0.35rem;">
+                        <i class="fa-regular fa-clock"></i> En cours
+                      </span>
+                    }
+                  </td>
+                  <td style="padding: 0.85rem 1.25rem; text-align: right;">
+                    @if (cmd.statut === 'EN_COURS') {
+                      <!-- Simulation du scan employé si l'employé n'a pas son smartphone ou pour test -->
+                      <button 
+                        type="button" 
+                        (click)="simulerScanEmploye(cmd.id)"
+                        style="background: #EFF6FF; color: #1D4ED8; border: 1.5px solid #93C5FD; border-radius: 8px; padding: 0.45rem 0.85rem; font-size: 0.78rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;">
+                        <i class="fa-solid fa-qrcode"></i> Valider Scan
+                      </button>
+                    } @else if (cmd.statut === 'SCANNE') {
+                      <!-- Bouton autorisant le Responsable à marquer livré -->
+                      <button 
+                        type="button" 
+                        (click)="marquerLivre(cmd.id)"
+                        style="background: #606C38; color: #FFFFFF; border: none; border-radius: 8px; padding: 0.45rem 0.95rem; font-size: 0.78rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 2px 8px rgba(96, 108, 56, 0.3);">
+                        <i class="fa-solid fa-check"></i> Marquer Livré
+                      </button>
+                    } @else {
+                      <span style="font-size: 0.75rem; color: #9CA3AF; font-weight: 700;">
+                        <i class="fa-solid fa-circle-check" style="color: #606C38;"></i> Remis
+                      </span>
                     }
                   </td>
                 </tr>
@@ -766,70 +395,377 @@
           </table>
         </div>
 
-        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-          <button (click)="showBLModal.set(false)" style="flex: 1 1 140px; padding: 0.85rem; background: #FAF8F4; color: #6E5A56; border: 1.5px solid #EDE7DC; border-radius: 9999px; font-weight: 700; cursor: pointer;">
-            Fermer
-          </button>
+      </div>
+    }
+
+    <!-- ============================================================== -->
+    <!-- ONGLET 3 : PROJECTION DU QR CODE CANTINE DU JOUR                -->
+    <!-- ============================================================== -->
+    @if (activeTab() === 'PROJECTION_QR') {
+      <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 20px; padding: 2.5rem 1.5rem; text-align: center; max-width: 680px; margin: 0 auto; box-shadow: 0 8px 30px rgba(114, 21, 19, 0.08);">
+        
+        <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: #FAF5EA; color: #721513; padding: 0.35rem 0.85rem; border-radius: 9999px; font-weight: 800; font-size: 0.78rem; margin-bottom: 1rem; border: 1px solid #E2D5BE;">
+          <i class="fa-solid fa-tv"></i> ÉCRAN DE PROJECTION CANTINE KIKI TRAITEUR
+        </div>
+
+        <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.85rem; color: #721513; font-weight: 900;">
+          Scannez pour récupérer votre repas
+        </h2>
+        <p style="margin: 0.5rem 0 1.75rem; font-size: 0.95rem; color: #6E5A56;">
+          Approchez l'appareil photo de votre smartphone pour enregistrer votre arrivée et débloquer la remise de votre plateau.
+        </p>
+
+        <!-- CARTE DU QR CODE GRAND FORMAT -->
+        <div style="background: #FAF8F4; border: 2.5px solid #721513; border-radius: 24px; padding: 2rem; max-width: 340px; margin: 0 auto 1.5rem; box-shadow: 0 10px 35px rgba(114, 21, 19, 0.12);">
+          
+          <div style="display: flex; justify-content: center; align-items: center; margin: 0 auto; background: #FFFFFF; padding: 1rem; border-radius: 16px; border: 1px solid #EDE7DC;">
+            <svg viewBox="0 0 25 25" width="240" height="240" shape-rendering="crispEdges">
+              <rect width="25" height="25" fill="#FFFFFF"/>
+              @for (row of qrCantineMatrix(); track $index; let r = $index) {
+                @for (cell of row; track $index; let c = $index) {
+                  @if (cell) {
+                    <rect [attr.x]="c" [attr.y]="r" width="1" height="1" fill="#721513"/>
+                  }
+                }
+              }
+            </svg>
+          </div>
+
+          <div style="margin-top: 1.25rem;">
+            <span style="font-family: monospace; font-size: 0.95rem; font-weight: 900; color: #721513; background: #FFFFFF; padding: 0.35rem 0.85rem; border-radius: 8px; border: 1.5px solid #E2D5BE; display: inline-block;">
+              {{ qrCantineString() }}
+            </span>
+          </div>
+
+          <div style="font-size: 0.8rem; color: #606C38; font-weight: 800; margin-top: 0.65rem;">
+            <i class="fa-solid fa-circle-check"></i> Synchronisé en direct avec la brigade
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: center; gap: 1rem;">
           <button 
-            (click)="validerEmargement()"
-            style="flex: 1.5 1 200px; padding: 0.85rem; background: linear-gradient(135deg, #606C38, #283618); color: #FFFFFF; border: none; border-radius: 9999px; font-weight: 800; cursor: pointer;">
-            <i class="fa-solid fa-signature"></i> Valider la Réception & Signature
+            type="button" 
+            (click)="setTab('COMMANDES')"
+            style="background: #721513; color: #FFFFFF; border: none; border-radius: 12px; padding: 0.75rem 1.75rem; font-weight: 800; font-size: 0.88rem; cursor: pointer;">
+            <i class="fa-solid fa-receipt"></i> Voir les commandes scannées
           </button>
+        </div>
+      </div>
+    }
+
+    <!-- ============================================================== -->
+    <!-- ONGLET 4 : GESTION DES RÉCLAMATIONS (RETARDATAIRES CUT-OFF)    -->
+    <!-- ============================================================== -->
+    @if (activeTab() === 'RECLAMATIONS') {
+      <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+        
+        <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h3 style="margin: 0; font-size: 1.25rem; color: #721513; font-weight: 900; display: flex; align-items: center; gap: 0.5rem;">
+              <i class="fa-solid fa-triangle-exclamation" style="color: #E51D24;"></i> Réclamations & Alertes Retardataires (Cut-off Dépassé)
+            </h3>
+            <p style="margin: 0.35rem 0 0; font-size: 0.82rem; color: #6E5A56;">
+              Employés n'ayant pas pu commander avant l'heure limite (Cut-off {{ entreprise().cutOffHeure }}). Débloquez-les pour leur permettre de passer commande aujourd'hui.
+            </p>
+          </div>
+
+          <span style="background: #FAF5EA; color: #721513; font-weight: 800; font-size: 0.8rem; padding: 0.35rem 0.85rem; border-radius: 9999px; border: 1px solid #E2D5BE;">
+            {{ reclamationsEnAttenteCount() }} demande(s) en attente
+          </span>
+        </div>
+
+        <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+            <thead>
+              <tr style="background: #FAF8F4; color: #6E5A56; font-size: 0.72rem; text-transform: uppercase; font-weight: 800; border-bottom: 1.5px solid #EDE7DC;">
+                <th style="padding: 0.85rem 1.25rem;">Date & Heure</th>
+                <th style="padding: 0.85rem 1.25rem;">Matricule</th>
+                <th style="padding: 0.85rem 1.25rem;">Salarié</th>
+                <th style="padding: 0.85rem 1.25rem;">Département</th>
+                <th style="padding: 0.85rem 1.25rem;">Motif du retard</th>
+                <th style="padding: 0.85rem 1.25rem; text-align: center;">Statut</th>
+                <th style="padding: 0.85rem 1.25rem; text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (rec of reclamations(); track rec.id) {
+                <tr style="border-bottom: 1px solid #F0EAE1;">
+                  <td style="padding: 0.85rem 1.25rem; font-weight: 700; color: #6E5A56;">
+                    {{ rec.date }} • {{ rec.heureDemande }}
+                  </td>
+                  <td style="padding: 0.85rem 1.25rem;">
+                    <span style="font-family: monospace; font-size: 0.78rem; font-weight: 800; color: #721513; background: #FAF5EA; padding: 0.2rem 0.5rem; border-radius: 6px;">
+                      {{ rec.matricule }}
+                    </span>
+                  </td>
+                  <td style="padding: 0.85rem 1.25rem;">
+                    <strong style="color: #332724;">{{ rec.employeNom }}</strong>
+                  </td>
+                  <td style="padding: 0.85rem 1.25rem; color: #6E5A56;">
+                    {{ rec.departement }}
+                  </td>
+                  <td style="padding: 0.85rem 1.25rem; color: #332724; max-width: 280px;">
+                    "{{ rec.motif }}"
+                  </td>
+                  <td style="padding: 0.85rem 1.25rem; text-align: center;">
+                    @if (rec.statut === 'DEBLOQUE') {
+                      <span style="background: rgba(96, 108, 56, 0.15); color: #606C38; font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #606C38; display: inline-flex; align-items: center; gap: 0.35rem;">
+                        <i class="fa-solid fa-lock-open"></i> Débloqué ({{ rec.debloqueAt || '10:45' }})
+                      </span>
+                    } @else {
+                      <span style="background: #FEE2E2; color: #DC2626; font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #FCA5A5; display: inline-flex; align-items: center; gap: 0.35rem;">
+                        <i class="fa-solid fa-triangle-exclamation"></i> En attente
+                      </span>
+                    }
+                  </td>
+                  <td style="padding: 0.85rem 1.25rem; text-align: right;">
+                    @if (rec.statut === 'EN_ATTENTE') {
+                      <button 
+                        type="button" 
+                        (click)="debloquerEmploye(rec.id)"
+                        style="background: #606C38; color: #FFFFFF; border: none; border-radius: 8px; padding: 0.45rem 0.95rem; font-size: 0.78rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 2px 8px rgba(96, 108, 56, 0.3);">
+                        <i class="fa-solid fa-lock-open"></i> Débloquer pour aujourd'hui
+                      </button>
+                    } @else {
+                      <span style="font-size: 0.75rem; color: #606C38; font-weight: 700;">
+                        <i class="fa-solid fa-check"></i> Autorisé à commander
+                      </span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
 
       </div>
-    </div>
-  }
+    }
 
-  <!-- MODAL D'ÉDITION DU PLANNING PAR LE RESPONSABLE DE SITE -->
-  @if (showEditPlanningModal() && planningEnEdition()) {
-    <div class="cuisine-modal-overlay">
-      <div class="cuisine-modal-card" style="max-width: 520px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #EDE7DC; padding-bottom: 0.85rem; margin-bottom: 1.25rem;">
-          <h3 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.35rem; color: #721513; font-weight: 800;">
-            <i class="fa-regular fa-calendar-days"></i> Modifier le Menu : {{ planningEnEdition()!.jour }}
-          </h3>
-          <button (click)="showEditPlanningModal.set(false)" style="background: none; border: none; color: #6E5A56; font-size: 1.25rem; cursor: pointer;">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 1rem;">
+    <!-- ============================================================== -->
+    <!-- ONGLET 5 : UTILISATEURS DU SITE                                -->
+    <!-- ============================================================== -->
+    @if (activeTab() === 'UTILISATEURS') {
+      <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+        <div style="padding: 1.15rem 1.25rem; background: #FAF8F4; border-bottom: 1px solid #EDE7DC; display: flex; justify-content: space-between; align-items: center;">
           <div>
-            <label style="font-size: 0.78rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Thème Culinaire du Jour</label>
-            <input 
-              type="text" 
-              [(ngModel)]="planningEnEdition()!.theme"
-              style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem 0.85rem; font-size: 0.85rem; font-weight: 700; color: #332724; background: #FFFFFF;">
-          </div>
-
-          <div>
-            <label style="font-size: 0.78rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Plats Vedettes & Suggestions</label>
-            <textarea 
-              [(ngModel)]="planningEnEdition()!.platVedette"
-              rows="3"
-              style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem 0.85rem; font-size: 0.85rem; font-weight: 600; color: #332724; background: #FFFFFF; resize: vertical;"></textarea>
-          </div>
-
-          <div>
-            <label style="font-size: 0.78rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Statut de Validation</label>
-            <select 
-              [(ngModel)]="planningEnEdition()!.statut"
-              style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem 0.85rem; font-size: 0.85rem; font-weight: 700; color: #721513; background: #FFFFFF;">
-              <option value="PROGRAMME">À préparer / Programmé</option>
-              <option value="VALIDE">Validé par le Responsable Site</option>
-              <option value="EN_COURS">Service en cours</option>
-              <option value="SERVI">Clôturé / Servi</option>
-            </select>
+            <h3 style="margin: 0; font-size: 1.15rem; color: #721513; font-weight: 900;">
+              Effectifs du Site • {{ entreprise().sites[0]?.nom || 'Siège Plateau' }}
+            </h3>
+            <p style="margin: 0.2rem 0 0; font-size: 0.8rem; color: #6E5A56;">
+              {{ employesSubventionnesCount() }} salarié(s) subventionné(s) • {{ employesSite().length - employesSubventionnesCount() }} autonome(s)
+            </p>
           </div>
         </div>
 
-        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-          <button (click)="showEditPlanningModal.set(false)" style="flex: 1; padding: 0.75rem; background: #FAF8F4; color: #6E5A56; border: 1.5px solid #EDE7DC; border-radius: 9999px; font-weight: 700; cursor: pointer;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+          <thead>
+            <tr style="background: #FAF8F4; color: #6E5A56; font-size: 0.72rem; text-transform: uppercase; font-weight: 800; border-bottom: 1.5px solid #EDE7DC;">
+              <th style="padding: 0.85rem 1.25rem;">Matricule</th>
+              <th style="padding: 0.85rem 1.25rem;">Nom & Prénom</th>
+              <th style="padding: 0.85rem 1.25rem;">Département</th>
+              <th style="padding: 0.85rem 1.25rem; text-align: center;">Taux Subvention</th>
+              <th style="padding: 0.85rem 1.25rem; text-align: center;">Repas ce Mois</th>
+              <th style="padding: 0.85rem 1.25rem; text-align: center;">Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (emp of employesSite(); track emp.id) {
+              <tr style="border-bottom: 1px solid #F0EAE1;">
+                <td style="padding: 0.85rem 1.25rem;">
+                  <span style="font-family: monospace; font-size: 0.78rem; font-weight: 800; color: #721513; background: #FAF5EA; padding: 0.2rem 0.5rem; border-radius: 6px;">
+                    {{ emp.matricule }}
+                  </span>
+                </td>
+                <td style="padding: 0.85rem 1.25rem;">
+                  <strong style="color: #332724;">{{ emp.prenom }} {{ emp.nom }}</strong>
+                  <div style="font-size: 0.75rem; color: #6E5A56;">{{ emp.email }}</div>
+                </td>
+                <td style="padding: 0.85rem 1.25rem; color: #6E5A56;">
+                  {{ emp.departement }}
+                </td>
+                <td style="padding: 0.85rem 1.25rem; text-align: center;">
+                  <span [style.background]="emp.tauxSubvention > 0 ? 'rgba(96, 108, 56, 0.12)' : '#F1F5F9'"
+                        [style.color]="emp.tauxSubvention > 0 ? '#606C38' : '#64748B'"
+                        style="padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.78rem; font-weight: 800;">
+                    {{ emp.tauxSubvention }}%
+                  </span>
+                </td>
+                <td style="padding: 0.85rem 1.25rem; text-align: center; font-weight: 800; color: #332724;">
+                  {{ emp.repasConsommesMois }}
+                </td>
+                <td style="padding: 0.85rem 1.25rem; text-align: center;">
+                  <span style="color: #606C38; font-weight: 800; font-size: 0.75rem;">
+                    <i class="fa-solid fa-circle-check"></i> Actif
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    <!-- ============================================================== -->
+    <!-- ONGLET 6 : FACTURATION JOURNALIÈRE DU SITE                     -->
+    <!-- ============================================================== -->
+    @if (activeTab() === 'FACTURATION') {
+      <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+        
+        <!-- KPIs FACTURATION -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+          <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.25rem; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+            <span style="font-size: 0.72rem; color: #721513; font-weight: 700; text-transform: uppercase;">
+              <i class="fa-solid fa-receipt" style="color: #721513;"></i> Total Plats Livrés (Mois en Cours)
+            </span>
+            <div style="font-size: 2rem; font-weight: 900; color: #721513; margin-top: 0.35rem;">
+              {{ totalPlatsLivresMoisSite() }} <span style="font-size: 1rem; color: #6E5A56; font-weight: 600;">plats</span>
+            </div>
+            <span style="font-size: 0.75rem; color: #606C38; font-weight: 700;">Émargés & validés sur site</span>
+          </div>
+
+          <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.25rem; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+            <span style="font-size: 0.72rem; color: #606C38; font-weight: 700; text-transform: uppercase;">
+              <i class="fa-solid fa-file-invoice-dollar" style="color: #606C38;"></i> Montant Imputé Entreprise
+            </span>
+            <div style="font-size: 2rem; font-weight: 900; color: #606C38; margin-top: 0.35rem;">
+              {{ totalFactureMoisSite() | number }} <span style="font-size: 1rem; font-weight: 600;">FCFA</span>
+            </div>
+            <span style="font-size: 0.75rem; color: #6E5A56;">Base 5 000 FCFA HT/repas</span>
+          </div>
+        </div>
+
+        <!-- TABLEAU JOURNALIER DES REPAS LIVRÉS -->
+        <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+          <div style="padding: 1.15rem 1.25rem; background: #FAF8F4; border-bottom: 1px solid #EDE7DC; font-weight: 800; font-size: 0.88rem; color: #721513;">
+            <i class="fa-solid fa-calendar-check"></i> Relevé journalier de facturation
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+            <thead>
+              <tr style="background: #FAF8F4; color: #6E5A56; font-size: 0.72rem; text-transform: uppercase; font-weight: 800; border-bottom: 1.5px solid #EDE7DC;">
+                <th style="padding: 0.85rem 1.25rem;">Date</th>
+                <th style="padding: 0.85rem 1.25rem; text-align: center;">Plats Livrés</th>
+                <th style="padding: 0.85rem 1.25rem; text-align: right;">Montant Total</th>
+                <th style="padding: 0.85rem 1.25rem; text-align: right;">Part Entreprise</th>
+                <th style="padding: 0.85rem 1.25rem; text-align: center;">Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (ligne of facturationJournaliere(); track ligne.date) {
+                <tr style="border-bottom: 1px solid #F0EAE1;">
+                  <td style="padding: 0.85rem 1.25rem; font-weight: 700; color: #332724;">
+                    {{ ligne.dateAffichee }}
+                  </td>
+                  <td style="padding: 0.85rem 1.25rem; text-align: center; font-weight: 900; color: #721513;">
+                    {{ ligne.nbPlatsLivres }}
+                  </td>
+                  <td style="padding: 0.85rem 1.25rem; text-align: right; font-weight: 800; color: #332724;">
+                    {{ ligne.montantTotal | number }} FCFA
+                  </td>
+                  <td style="padding: 0.85rem 1.25rem; text-align: right; font-weight: 900; color: #606C38;">
+                    {{ ligne.montantPartEntreprise | number }} FCFA
+                  </td>
+                  <td style="padding: 0.85rem 1.25rem; text-align: center;">
+                    <span [style.background]="ligne.statut === 'FACTURE' ? 'rgba(96, 108, 56, 0.15)' : '#FAF5EA'"
+                          [style.color]="ligne.statut === 'FACTURE' ? '#606C38' : '#721513'"
+                          style="padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800;">
+                      {{ ligne.statut }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    }
+
+    <!-- ============================================================== -->
+    <!-- ONGLET 7 : INFORMATIONS DU SITE & CONVENTION                    -->
+    <!-- ============================================================== -->
+    @if (activeTab() === 'INFOS') {
+      <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.75rem; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+        <h3 style="margin: 0 0 1.25rem; font-size: 1.25rem; color: #721513; font-weight: 900;">
+          Paramètres du Contrat & Modalités de Prestation
+        </h3>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+          <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 12px; padding: 1.15rem;">
+            <div style="font-size: 0.75rem; color: #6E5A56; font-weight: 800; text-transform: uppercase;">Entreprise Cliente</div>
+            <div style="font-size: 1.1rem; font-weight: 900; color: #721513; margin-top: 0.25rem;">{{ entreprise().nom }}</div>
+            <div style="font-size: 0.82rem; color: #6E5A56; margin-top: 0.25rem;">Code : {{ entreprise().codeEntreprise }} • NINEA : {{ entreprise().ninea || 'SN-DKR-2023-0982' }}</div>
+          </div>
+
+          <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 12px; padding: 1.15rem;">
+            <div style="font-size: 0.75rem; color: #6E5A56; font-weight: 800; text-transform: uppercase;">Heure Limite (Cut-Off)</div>
+            <div style="font-size: 1.1rem; font-weight: 900; color: #E51D24; margin-top: 0.25rem;">{{ getLibelleCutOff(entreprise()) }}</div>
+            <div style="font-size: 0.82rem; color: #6E5A56; margin-top: 0.25rem;">Au-delà, une réclamation est requise</div>
+          </div>
+
+          <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 12px; padding: 1.15rem;">
+            <div style="font-size: 0.75rem; color: #6E5A56; font-weight: 800; text-transform: uppercase;">Mode de Prestation</div>
+            <div style="font-size: 1.1rem; font-weight: 900; color: #332724; margin-top: 0.25rem;">{{ getLibellePrestation(entreprise().typePrestation) }}</div>
+            <div style="font-size: 0.82rem; color: #606C38; font-weight: 700; margin-top: 0.25rem;">Composantes autorisées : Entrée, Plat, Dessert, Boisson</div>
+          </div>
+
+          <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 12px; padding: 1.15rem;">
+            <div style="font-size: 0.75rem; color: #6E5A56; font-weight: 800; text-transform: uppercase;">Prise en charge Kiki</div>
+            <div style="font-size: 1.1rem; font-weight: 900; color: #606C38; margin-top: 0.25rem;">{{ entreprise().montantPriseEnChargeRepas | number }} FCFA / repas</div>
+            <div style="font-size: 0.82rem; color: #6E5A56; margin-top: 0.25rem;">Facturation bimensuelle consolidée</div>
+          </div>
+        </div>
+      </div>
+    }
+
+  </main>
+
+  <!-- ============================================================== -->
+  <!-- MODAL D'AJOUT D'UN PLAT AU PROGRAMME DU JOUR                   -->
+  <!-- ============================================================== -->
+  @if (showModalAjoutPlat()) {
+    <div style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem;">
+      <div style="background: #FFFFFF; border-radius: 18px; max-width: 500px; width: 100%; padding: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+        <h3 style="margin: 0 0 1rem; color: #721513; font-size: 1.25rem; font-weight: 900;">
+          Ajouter un plat au programme • {{ jourSelectionne() }}
+        </h3>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="font-size: 0.8rem; font-weight: 800; color: #332724; display: block; margin-bottom: 0.35rem;">Sélectionnez le plat :</label>
+          <select 
+            [ngModel]="platSelectionnePourAjout()"
+            (ngModelChange)="platSelectionnePourAjout.set($event)"
+            style="width: 100%; padding: 0.65rem; border: 1.5px solid #CBD5E1; border-radius: 8px; font-size: 0.88rem; font-weight: 700;">
+            <option value="" disabled>-- Choisir un plat du Catalogue Global --</option>
+            @for (plat of catalogueGlobal(); track plat.id) {
+              <option [value]="plat.id">[{{ plat.categorie }}] {{ plat.nom }}</option>
+            }
+          </select>
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <label style="font-size: 0.8rem; font-weight: 800; color: #332724; display: block; margin-bottom: 0.35rem;">Quantité initiale prévue :</label>
+          <input 
+            type="number"
+            min="1"
+            [ngModel]="quantiteInitialeAjout()"
+            (ngModelChange)="quantiteInitialeAjout.set($event)"
+            style="width: 100%; padding: 0.65rem; border: 1.5px solid #CBD5E1; border-radius: 8px; font-size: 0.88rem; font-weight: 800;">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+          <button 
+            type="button" 
+            (click)="fermerModalAjoutPlat()"
+            style="padding: 0.65rem 1.25rem; border: 1.5px solid #EDE7DC; background: #FAF8F4; border-radius: 10px; font-weight: 800; color: #6E5A56; cursor: pointer;">
             Annuler
           </button>
-          <button (click)="enregistrerModifPlanning()" style="flex: 1.5; padding: 0.75rem; background: #721513; color: #FFFFFF; border: none; border-radius: 9999px; font-weight: 800; cursor: pointer;">
-            <i class="fa-solid fa-check"></i> Enregistrer les Modifications
+          <button 
+            type="button" 
+            [disabled]="!platSelectionnePourAjout()"
+            (click)="confirmerAjoutPlat()"
+            style="padding: 0.65rem 1.5rem; border: none; background: #721513; color: #FFFFFF; border-radius: 10px; font-weight: 800; cursor: pointer;">
+            Ajouter au menu
           </button>
         </div>
       </div>

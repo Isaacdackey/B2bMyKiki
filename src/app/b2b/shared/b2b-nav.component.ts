@@ -32,7 +32,7 @@ export class B2bNavComponent {
     }
   }
 
-  navigerCuisine(tab: 'PRODUCTION' | 'PLANNING_SEMAINE' | 'SCAN_QR' | 'AUTONOME' | 'BORDEREAUX') {
+  navigerCuisine(tab: 'INFOS' | 'UTILISATEURS' | 'MENU' | 'COMMANDES' | 'FACTURATION' | 'RECLAMATIONS' | 'PROJECTION_QR') {
     this.b2b.cuisineActiveTab.set(tab);
     this.router.navigate(['/b2b/cuisine']);
     this.b2b.closeMobileDrawer();

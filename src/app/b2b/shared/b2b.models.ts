@@ -211,6 +211,22 @@ export interface CommandeHistoriqueB2B {
   statut: 'LIVRE' | 'VALIDE' | 'EN_PREPARATION';
 }
 
+export interface ReclamationCutOffB2B {
+  id: string;
+  entrepriseId: string;
+  siteId?: string;
+  employeId: string;
+  employeNom: string;
+  matricule: string;
+  departement: string;
+  date: string; // YYYY-MM-DD
+  heureDemande: string; // HH:mm
+  motif: string;
+  statut: 'EN_ATTENTE' | 'DEBLOQUE' | 'REFUSE';
+  debloquePar?: string;
+  debloqueAt?: string;
+}
+
 export interface PlanningMenuSiteB2B {
   id: string;
   jour: string; // Ex: 'Lundi', 'Mardi (Aujourd\'hui)', etc.

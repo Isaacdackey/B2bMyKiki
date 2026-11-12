@@ -255,21 +255,21 @@
       </button>
     }
 
-    <!-- 2. CAS DU RESPONSABLE DE SITE KIKI (Gérant Cantine & Dispatch) -->
+    <!-- 2. CAS DU RESPONSABLE DE SITE KIKI (Gérant Cantine & Exploitation) -->
     @if (b2b.currentSession().role === 'RESPONSABLE_SITE_KIKI') {
       <button 
         type="button" 
         class="b2b-sidebar-link"
-        [class.active]="b2b.cuisineActiveTab() === 'PRODUCTION'"
-        (click)="navigerCuisine('PRODUCTION')"
-        title="Portions & Plats du Jour">
+        [class.active]="b2b.cuisineActiveTab() === 'MENU'"
+        (click)="navigerCuisine('MENU')"
+        title="Menu Planifié & Quantités">
         <div class="b2b-link-icon-wrap">
-          <i class="fa-solid fa-fire-burner" aria-hidden="true"></i>
+          <i class="fa-solid fa-calendar-days" aria-hidden="true"></i>
         </div>
         @if (!b2b.isSidebarCollapsed()) {
           <div class="b2b-link-text">
-            <span class="b2b-link-title">Portions &amp; Plats</span>
-            <span class="b2b-link-subtitle">Production du jour en cuisine</span>
+            <span class="b2b-link-title">Menu &amp; Quantités</span>
+            <span class="b2b-link-subtitle">Planning, portions &amp; conformité</span>
           </div>
         }
       </button>
@@ -277,16 +277,16 @@
       <button 
         type="button" 
         class="b2b-sidebar-link"
-        [class.active]="b2b.cuisineActiveTab() === 'PLANNING_SEMAINE'"
-        (click)="navigerCuisine('PLANNING_SEMAINE')"
-        title="Planning & Menus Semaine">
+        [class.active]="b2b.cuisineActiveTab() === 'COMMANDES'"
+        (click)="navigerCuisine('COMMANDES')"
+        title="Commandes du Jour & Distribution">
         <div class="b2b-link-icon-wrap">
-          <i class="fa-regular fa-calendar-days" aria-hidden="true"></i>
+          <i class="fa-solid fa-receipt" aria-hidden="true"></i>
         </div>
         @if (!b2b.isSidebarCollapsed()) {
           <div class="b2b-link-text">
-            <span class="b2b-link-title">Planning Semaine</span>
-            <span class="b2b-link-subtitle">Menus &amp; prévisions de service</span>
+            <span class="b2b-link-title">Commandes &amp; Retrait</span>
+            <span class="b2b-link-subtitle">Scanné &amp; Marquer Livré</span>
           </div>
         }
       </button>
@@ -294,16 +294,16 @@
       <button 
         type="button" 
         class="b2b-sidebar-link"
-        [class.active]="b2b.cuisineActiveTab() === 'SCAN_QR'"
-        (click)="navigerCuisine('SCAN_QR')"
-        title="Scanner QR Retrait">
-        <div class="b2b-link-icon-wrap">
+        [class.active]="b2b.cuisineActiveTab() === 'PROJECTION_QR'"
+        (click)="navigerCuisine('PROJECTION_QR')"
+        title="QR Code Cantine du Jour">
+        <div class="b2b-link-icon-wrap" style="color: #E51D24;">
           <i class="fa-solid fa-qrcode" aria-hidden="true"></i>
         </div>
         @if (!b2b.isSidebarCollapsed()) {
           <div class="b2b-link-text">
-            <span class="b2b-link-title">Scanner QR Retrait</span>
-            <span class="b2b-link-subtitle">Émargement au comptoir réfectoire</span>
+            <span class="b2b-link-title" style="color: #E51D24; font-weight: 800;">Projeter QR Code</span>
+            <span class="b2b-link-subtitle">Écran cantine pour les employés</span>
           </div>
         }
       </button>
@@ -311,16 +311,21 @@
       <button 
         type="button" 
         class="b2b-sidebar-link"
-        [class.active]="b2b.cuisineActiveTab() === 'AUTONOME'"
-        (click)="navigerCuisine('AUTONOME')"
-        title="Commandes Personnelles">
-        <div class="b2b-link-icon-wrap">
-          <i class="fa-solid fa-utensils" aria-hidden="true"></i>
+        [class.active]="b2b.cuisineActiveTab() === 'RECLAMATIONS'"
+        (click)="navigerCuisine('RECLAMATIONS')"
+        title="Gestion des Réclamations (Cut-Off)">
+        <div class="b2b-link-icon-wrap" style="position: relative;">
+          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+          @if (b2b.listeReclamations().length > 0) {
+            <span style="position: absolute; top: -4px; right: -4px; background: #E51D24; color: #FFF; font-size: 0.6rem; font-weight: 900; width: 14px; height: 14px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+              {{ b2b.listeReclamations().length }}
+            </span>
+          }
         </div>
         @if (!b2b.isSidebarCollapsed()) {
           <div class="b2b-link-text">
-            <span class="b2b-link-title">Commandes Personnelles</span>
-            <span class="b2b-link-subtitle">Salariés autonomes (Wave)</span>
+            <span class="b2b-link-title">Réclamations</span>
+            <span class="b2b-link-subtitle">Retardataires cut-off</span>
           </div>
         }
       </button>
@@ -328,16 +333,50 @@
       <button 
         type="button" 
         class="b2b-sidebar-link"
-        [class.active]="b2b.cuisineActiveTab() === 'BORDEREAUX'"
-        (click)="navigerCuisine('BORDEREAUX')"
-        title="Bordereaux de Livraison (BL)">
+        [class.active]="b2b.cuisineActiveTab() === 'UTILISATEURS'"
+        (click)="navigerCuisine('UTILISATEURS')"
+        title="Utilisateurs & Salariés du Site">
         <div class="b2b-link-icon-wrap">
-          <i class="fa-solid fa-truck-ramp-box" aria-hidden="true"></i>
+          <i class="fa-solid fa-users-gear" aria-hidden="true"></i>
         </div>
         @if (!b2b.isSidebarCollapsed()) {
           <div class="b2b-link-text">
-            <span class="b2b-link-title">Bordereaux de Livraison</span>
-            <span class="b2b-link-subtitle">BL signés &amp; réconciliation</span>
+            <span class="b2b-link-title">Utilisateurs</span>
+            <span class="b2b-link-subtitle">Comptes du site</span>
+          </div>
+        }
+      </button>
+
+      <button 
+        type="button" 
+        class="b2b-sidebar-link"
+        [class.active]="b2b.cuisineActiveTab() === 'FACTURATION'"
+        (click)="navigerCuisine('FACTURATION')"
+        title="Facturation & Rapprochement">
+        <div class="b2b-link-icon-wrap">
+          <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i>
+        </div>
+        @if (!b2b.isSidebarCollapsed()) {
+          <div class="b2b-link-text">
+            <span class="b2b-link-title">Facturation</span>
+            <span class="b2b-link-subtitle">Relevé des repas livrés</span>
+          </div>
+        }
+      </button>
+
+      <button 
+        type="button" 
+        class="b2b-sidebar-link"
+        [class.active]="b2b.cuisineActiveTab() === 'INFOS'"
+        (click)="navigerCuisine('INFOS')"
+        title="Informations du Site / Entreprise">
+        <div class="b2b-link-icon-wrap">
+          <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+        </div>
+        @if (!b2b.isSidebarCollapsed()) {
+          <div class="b2b-link-text">
+            <span class="b2b-link-title">Infos Entreprise</span>
+            <span class="b2b-link-subtitle">Convention, prestation &amp; cut-off</span>
           </div>
         }
       </button>
