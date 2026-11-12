@@ -408,8 +408,8 @@
                   <td style="padding: 0.85rem 1.25rem; font-weight: 700; color: #6E5A56;">
                     {{ rec.date }} • {{ rec.heureDemande }}
                   </td>
-                  <td style="padding: 0.85rem 1.25rem;">
-                    <span style="font-family: monospace; font-size: 0.78rem; font-weight: 800; color: #721513; background: #FAF5EA; padding: 0.2rem 0.5rem; border-radius: 6px;">
+                  <td style="padding: 0.85rem 1.25rem; white-space: nowrap;">
+                    <span style="font-family: monospace; font-size: 0.78rem; font-weight: 800; color: #721513; background: #FAF5EA; padding: 0.2rem 0.5rem; border-radius: 6px; white-space: nowrap; display: inline-block;">
                       {{ rec.matricule }}
                     </span>
                   </td>
@@ -438,8 +438,8 @@
                       <button 
                         type="button" 
                         (click)="debloquerEmploye(rec.id)"
-                        style="background: #606C38; color: #FFFFFF; border: none; border-radius: 8px; padding: 0.45rem 0.95rem; font-size: 0.78rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 2px 8px rgba(96, 108, 56, 0.3);">
-                        <i class="fa-solid fa-lock-open"></i> Débloquer pour aujourd'hui
+                        style="background: #606C38; color: #FFFFFF; border: none; border-radius: 6px; padding: 0.35rem 0.75rem; font-size: 0.74rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 2px 6px rgba(96, 108, 56, 0.25); white-space: nowrap;">
+                        <i class="fa-solid fa-lock-open" style="font-size: 0.75rem;"></i> Débloquer pour aujourd'hui
                       </button>
                     } @else {
                       <span style="font-size: 0.75rem; color: #606C38; font-weight: 700;">
