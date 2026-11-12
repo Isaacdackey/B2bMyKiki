@@ -167,6 +167,10 @@ export class B2bLoginComponent {
   selectionnerProfilDemo(p: ProfilDemo) {
     this.loading.set(true);
 
+    if (p.role === 'SUPER_ADMIN') {
+      this.b2b.superAdminActiveSection.set('DASHBOARD');
+    }
+
     this.b2b.setSessionRole({
       role: p.role,
       nomComplet: p.nom,
@@ -181,6 +185,9 @@ export class B2bLoginComponent {
     setTimeout(() => {
       this.loading.set(false);
       this.router.navigateByUrl(p.destinationUrl);
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }, 350);
   }
 
