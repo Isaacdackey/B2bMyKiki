@@ -582,17 +582,17 @@
                 </div>
               </div>
 
-              <div style="border-top: 1px solid #EDE7DC; padding-top: 0.85rem; margin-top: 1rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+              <div style="border-top: 1px solid #EDE7DC; padding-top: 0.85rem; margin-top: 1rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: nowrap;">
                 <span [style.background]="item.statut === 'EN_PRODUCTION' ? 'rgba(229, 29, 36, 0.12)' : item.statut === 'VALIDE' ? 'rgba(96, 108, 56, 0.12)' : 'rgba(51, 39, 36, 0.08)'"
                       [style.color]="item.statut === 'EN_PRODUCTION' ? '#E51D24' : item.statut === 'VALIDE' ? '#606C38' : '#6E5A56'"
-                      style="font-size: 0.7rem; font-weight: 800; padding: 0.25rem 0.55rem; border-radius: 9999px;">
-                  {{ item.statut }}
+                      style="font-size: 0.68rem; font-weight: 800; padding: 0.3rem 0.65rem; border-radius: 9999px; white-space: nowrap; display: inline-flex; align-items: center;">
+                  {{ item.statut === 'EN_PRODUCTION' ? 'EN PRODUCTION' : item.statut === 'VALIDE' ? 'VALIDÉ' : item.statut === 'PROGRAMME' ? 'PROGRAMMÉ' : 'CLÔTURÉ' }}
                 </span>
-                <div style="display: flex; gap: 0.35rem;">
-                  <button (click)="ouvrirModalEditPlanningGlobal(item)" class="sa-btn-action" title="Modifier le menu">
+                <div style="display: flex; gap: 0.35rem; flex-shrink: 0;">
+                  <button (click)="ouvrirModalEditPlanningGlobal(item)" class="sa-btn-action" style="padding: 0.4rem 0.6rem;" title="Modifier le menu">
                     <i class="fa-regular fa-pen-to-square"></i>
                   </button>
-                  <button (click)="supprimerMenuPlanning(item.id)" class="sa-btn-action" style="color: #E51D24;" title="Supprimer ce menu">
+                  <button (click)="supprimerMenuPlanning(item.id)" class="sa-btn-action" style="color: #E51D24; padding: 0.4rem 0.6rem;" title="Supprimer ce menu">
                     <i class="fa-solid fa-trash-can"></i>
                   </button>
                 </div>
