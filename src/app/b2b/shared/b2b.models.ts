@@ -12,6 +12,17 @@ export interface UserSessionB2B {
   badgeColor: string;
 }
 
+export type CategoriePlatB2B = 'ENTREE' | 'PLAT' | 'DESSERT' | 'BOISSON';
+
+export type TypePrestationB2B = 'COMPLETE' | 'ENTREE_PLAT_DESSERT' | 'PLAT_DESSERT_BOISSON' | 'ENTREE_PLAT' | 'PLAT_DESSERT' | 'PLAT_BOISSON' | 'PLAT_SEUL' | 'BUFFET_SUR_MESURE';
+
+export interface PrestationConfigB2B {
+  type: TypePrestationB2B;
+  libelle: string;
+  description?: string;
+  categoriesAutorisees: CategoriePlatB2B[]; // Ex: ['PLAT', 'BOISSON']
+}
+
 export interface SiteB2B {
   id: string;
   nom: string;
@@ -20,6 +31,8 @@ export interface SiteB2B {
   contactReferent: string;
   telephoneReferent: string;
   creneauxDisponibles?: string[];
+  typePrestation?: TypePrestationB2B;
+  categoriesAutorisees?: CategoriePlatB2B[];
 }
 
 export interface EntrepriseB2B {
@@ -35,6 +48,8 @@ export interface EntrepriseB2B {
   tarifNegocieHtva?: number; // ex: 4500 FCFA
   cadenceFacturation?: 'HEBDOMADAIRE' | 'MENSUELLE' | 'BIMESTRIELLE';
   isArchivee?: boolean;
+  typePrestation?: TypePrestationB2B; // Formule par défaut de l'entreprise
+  categoriesAutorisees?: CategoriePlatB2B[]; // Catégories activées
   sites: SiteB2B[];
 }
 
@@ -108,4 +123,21 @@ export interface CommandeHistoriqueB2B {
   partEntreprise: number;
   partEmploye: number;
   statut: 'LIVRE' | 'VALIDE' | 'EN_PREPARATION';
+}
+
+export interface PlanningMenuSiteB2B {
+  id: string;
+  jour: string; // Ex: 'Lundi', 'Mardi (Aujourd\'hui)', etc.
+  date: string; // Ex: '04 Nov'
+  cadence: 'HEBDO' | 'MENSUEL';
+  theme: string;
+  platVedette: string;
+  entreeProposee?: string;
+  dessertPropose?: string;
+  boissonProposee?: string;
+  siteId: string; // 'TOUS' ou id spécifique (ex: 'site-1')
+  siteNom: string; // Ex: 'Tous les sites (Global)' ou 'Siège Plateau - Dakar'
+  entrepriseNom?: string; // Ex: 'TotalEnergies Sénégal'
+  totalPrevu: number;
+  statut: 'CLOTURE' | 'EN_PRODUCTION' | 'VALIDE' | 'PROGRAMME';
 }

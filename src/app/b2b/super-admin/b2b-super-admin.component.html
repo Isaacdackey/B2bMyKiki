@@ -4,72 +4,125 @@
   <app-b2b-nav></app-b2b-nav>
 
   <!-- CONTENU PRINCIPAL CENTRÉ -->
-  <main style="max-width: 1320px; width: 100%; margin: auto; padding: 1.5rem 0;">
+  <main style="max-width: 1320px; width: 100%; margin: 0 auto; padding: 1.5rem 0;">
 
-    <!-- BANDEAU OFFICIEL DIRECTION SUPER ADMIN KIKI TRAITEUR -->
-    <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 20px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-      <div>
-        <span style="font-size: 0.72rem; color: #721513; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(114, 21, 19, 0.08); padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.4rem;">
-          <i class="fa-solid fa-crown"></i> DIRECTION GÉNÉRALE • SUPER ADMIN KIKI TRAITEUR
-        </span>
-        <h1 style="margin: 0.35rem 0 0; font-family: 'Playfair Display', serif; font-size: 1.6rem; color: #721513; font-weight: 900;">
-          Supervision Globale : Entreprises, Sites, Menus & Facturation
-        </h1>
-        <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #6E5A56;">
-          Pilotage centralisé multi-entreprises, conventions tarifaires, dispatch logistique et catalogue des chefs.
-        </p>
+    <!-- BANDEAU TOP BAR OPÉRATIONNEL (INSPIRÉ DU DASHBOARD PRO) -->
+    <div class="sa-topbar-header">
+      <div class="sa-topbar-entity-pill">
+        <i class="fa-solid fa-crown" style="color: #721513;"></i>
+        <strong>Direction Kiki Traiteur</strong>
+        <span style="color: #D6C9B8;">|</span>
+        <span style="color: #6E5A56; font-weight: 500;"><i class="fa-solid fa-location-dot" style="color: #C05621;"></i> Hann Maristes, Dakar</span>
       </div>
 
-      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+      <div class="sa-topbar-search input-with-icon">
+        <i class="fa-solid fa-magnifying-glass input-icon"></i>
+        <input 
+          type="text" 
+          class="input-with-icon-el"
+          [ngModel]="searchEntreprise()"
+          (ngModelChange)="searchEntreprise.set($event); pageEntreprises.set(1)"
+          placeholder="Rechercher une entreprise, un code contrat, un site...">
+      </div>
+
+      <div class="sa-topbar-actions">
         <button (click)="ouvrirModalNouvelleEntreprise()" class="sa-btn-primary">
-          <i class="fa-solid fa-plus"></i> Conventionner une Entreprise
+          <i class="fa-solid fa-plus"></i> Conventionner Entreprise
         </button>
-        <button (click)="ouvrirModalAjoutPlat()" class="sa-btn-action" style="padding: 0.65rem 1.15rem; font-size: 0.82rem; border-radius: 9999px;">
-          <i class="fa-solid fa-bowl-food"></i> Ajouter un Plat au Catalogue
+        <button (click)="ouvrirModalAjoutPlat()" class="sa-btn-action" style="padding: 0.6rem 1.1rem; font-size: 0.8rem; border-radius: 9999px;">
+          <i class="fa-solid fa-bowl-food"></i> + Recette
         </button>
       </div>
     </div>
 
-    <!-- KPIS STRATÉGIQUES GLOBAUX -->
-    <div class="sa-kpi-grid">
-      <div class="sa-kpi-card">
-        <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
-          <i class="fa-solid fa-building" style="color: #721513;"></i> ENTREPRISES SOUS CONTRAT
+    <!-- EN-TÊTE TABLEAU DE BORD AVEC SÉLECTEURS DE DATES (STYLE CAPTURE) -->
+    <div class="sa-dashboard-title-row">
+      <div>
+        <div style="display: flex; align-items: baseline; gap: 0.75rem; flex-wrap: wrap;">
+          <h1 class="sa-dashboard-main-title">Tableau de bord</h1>
+          <span class="sa-dashboard-date-label">{{ dateAfficheeDashboard }}</span>
         </div>
-        <div style="font-size: 2.2rem; font-weight: 900; color: #721513; margin: 0.4rem 0 0.2rem; font-family: 'Playfair Display', serif;">
-          {{ b2b.listeEntreprises().length }} <span style="font-size: 1rem; color: #606C38; font-weight: 600;">partenaires</span>
-        </div>
-        <div style="font-size: 0.75rem; color: #6E5A56;">Grands comptes (Total, Orange, Bolloré...)</div>
+        <p class="sa-dashboard-subtitle">
+          Supervision des entreprises partenaires, suivi des portions en production, contrôle du Cut-off et facturation consolidée.
+        </p>
       </div>
 
-      <div class="sa-kpi-card">
-        <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
-          <i class="fa-solid fa-location-dot" style="color: #E51D24;"></i> SITES PHYSIQUES DESSERVIS
+      <div class="sa-dashboard-date-pickers">
+        <div class="sa-date-input-box">
+          <input type="date" [ngModel]="dateDebutDashboard()" (ngModelChange)="dateDebutDashboard.set($event)">
         </div>
-        <div style="font-size: 2.2rem; font-weight: 900; color: #E51D24; margin: 0.4rem 0 0.2rem; font-family: 'Playfair Display', serif;">
-          {{ totalSitesActifs() }} <span style="font-size: 1rem; color: #332724;">sites</span>
+        <div class="sa-date-input-box">
+          <input type="date" [ngModel]="dateFinDashboard()" (ngModelChange)="dateFinDashboard.set($event)">
         </div>
-        <div style="font-size: 0.75rem; color: #6E5A56;">Sièges, dépôts & usines avec points de retrait</div>
+      </div>
+    </div>
+
+    <!-- 5 CARTES KPI OPÉRATIONNELLES (DESIGN INSPIRÉ DE LA CAPTURE) -->
+    <div class="sa-kpi-grid-5">
+      <!-- KPI 1 : Entreprises sous contrat -->
+      <div class="sa-kpi-card-pro">
+        <div class="sa-kpi-card-top">
+          <span class="sa-kpi-title">ENTREPRISES PARTENAIRES</span>
+          <span class="sa-kpi-status-tag green">
+            <i class="fa-solid fa-circle-check"></i> Réseau actif
+          </span>
+        </div>
+        <div class="sa-kpi-number">{{ nbEntreprisesActives() }}</div>
+        <div class="sa-kpi-desc">
+          Grands comptes conventionnés · {{ nbEntreprisesArchivees() }} archivée(s)
+        </div>
       </div>
 
-      <div class="sa-kpi-card">
-        <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
-          <i class="fa-solid fa-utensils" style="color: #606C38;"></i> RECETTES CATALOGUE CENTRAL
+      <!-- KPI 2 : Sites physiques desservis -->
+      <div class="sa-kpi-card-pro">
+        <div class="sa-kpi-card-top">
+          <span class="sa-kpi-title">SITES DE LIVRAISON</span>
+          <span class="sa-kpi-status-tag wine">
+            <i class="fa-solid fa-truck-fast"></i> En tournée
+          </span>
         </div>
-        <div style="font-size: 2.2rem; font-weight: 900; color: #606C38; margin: 0.4rem 0 0.2rem; font-family: 'Playfair Display', serif;">
-          {{ totalPlatsCatalogue() }} <span style="font-size: 1rem; color: #6E5A56;">spécialités</span>
+        <div class="sa-kpi-number">{{ totalSitesActifs() }}</div>
+        <div class="sa-kpi-desc">
+          Sièges, dépôts &amp; agences avec points de retrait actifs
         </div>
-        <div style="font-size: 0.75rem; color: #6E5A56;">Entrées, plats chauds, desserts & boissons</div>
       </div>
 
-      <div class="sa-kpi-card">
-        <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
-          <i class="fa-solid fa-coins" style="color: #721513;"></i> VOLUME CONVENTIONNÉ MENSUEL
+      <!-- KPI 3 : Repas du jour / Production -->
+      <div class="sa-kpi-card-pro">
+        <div class="sa-kpi-card-top">
+          <span class="sa-kpi-title">REPAS VALIDÉS DU JOUR</span>
+          <span class="sa-kpi-status-tag amber">Aujourd'hui</span>
         </div>
-        <div style="font-size: 1.8rem; font-weight: 900; color: #721513; margin: 0.4rem 0 0.2rem; font-family: 'Playfair Display', serif;">
-          {{ (totalVolumeMensuelPrevu() | number) }} <span style="font-size: 0.85rem; color: #332724;">F CFA</span>
+        <div class="sa-kpi-number">440</div>
+        <div class="sa-kpi-desc">
+          Commandes validées avant Cut-off · 100% pris en charge
         </div>
-        <div style="font-size: 0.75rem; color: #606C38; font-weight: 600;">Facturation B2B garantie</div>
+      </div>
+
+      <!-- KPI 4 : Catalogue & Spécialités -->
+      <div class="sa-kpi-card-pro">
+        <div class="sa-kpi-card-top">
+          <span class="sa-kpi-title">CATALOGUE DES CHEFS</span>
+          <span class="sa-kpi-status-tag blue">4 catégories</span>
+        </div>
+        <div class="sa-kpi-number">{{ totalPlatsCatalogue() }}</div>
+        <div class="sa-kpi-desc">
+          Entrées, plats chauds, desserts &amp; boissons disponibles
+        </div>
+      </div>
+
+      <!-- KPI 5 : Volume Conventionné -->
+      <div class="sa-kpi-card-pro">
+        <div class="sa-kpi-card-top">
+          <span class="sa-kpi-title">CA MENSUEL GARANTI</span>
+          <span class="sa-kpi-status-tag red">Facturation B2B</span>
+        </div>
+        <div class="sa-kpi-number" style="font-size: 1.55rem;">
+          {{ (totalVolumeMensuelPrevu() | number) }} <small style="font-size: 0.72rem; font-weight: 700;">F CFA</small>
+        </div>
+        <div class="sa-kpi-desc">
+          Cumul des budgets mensuels alloués par les entreprises
+        </div>
       </div>
     </div>
 
@@ -80,39 +133,69 @@
       <div>
         
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
-          <div style="display: flex; gap: 0.75rem; flex: 1; max-width: 500px;">
-            <input 
-              type="text" 
-              [ngModel]="searchEntreprise()"
-              (ngModelChange)="searchEntreprise.set($event)"
-              placeholder="Rechercher une entreprise par nom ou code..."
-              style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 12px; padding: 0.65rem 1rem; font-size: 0.85rem; background: #FFFFFF; color: #332724;">
+          <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+            <span style="font-size: 0.82rem; font-weight: 800; color: #721513;">
+              <i class="fa-solid fa-building"></i> Répertoire des Entreprises ({{ entreprisesFiltrees().length }})
+            </span>
           </div>
 
-          <div style="display: flex; align-items: center; gap: 0.5rem; background: #FFFFFF; border: 1.5px solid #EDE7DC; padding: 0.35rem 0.5rem; border-radius: 9999px;">
-            <span style="font-size: 0.75rem; font-weight: 800; color: #721513; padding-left: 0.5rem;">Filtre Statut :</span>
-            <button 
-              type="button" 
-              (click)="filtreArchiveEntreprise.set('ACTIVES')"
-              [style.background]="filtreArchiveEntreprise() === 'ACTIVES' ? '#721513' : 'transparent'"
-              [style.color]="filtreArchiveEntreprise() === 'ACTIVES' ? '#FFFFFF' : '#6E5A56'"
-              style="border: none; border-radius: 9999px; padding: 0.35rem 0.75rem; font-size: 0.72rem; font-weight: 800; cursor: pointer;">
-              Actives ({{ b2b.listeEntreprises().length }})
-            </button>
-            <button 
-              type="button" 
-              (click)="filtreArchiveEntreprise.set('ARCHIVEES')"
-              [style.background]="filtreArchiveEntreprise() === 'ARCHIVEES' ? '#721513' : 'transparent'"
-              [style.color]="filtreArchiveEntreprise() === 'ARCHIVEES' ? '#FFFFFF' : '#6E5A56'"
-              style="border: none; border-radius: 9999px; padding: 0.35rem 0.75rem; font-size: 0.72rem; font-weight: 800; cursor: pointer;">
-              Archivées
-            </button>
+          <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+            <div class="sa-filter-pill-box">
+              <span class="sa-filter-label"><i class="fa-solid fa-filter"></i> Filtre Statut :</span>
+              <button 
+                type="button" 
+                (click)="filtreArchiveEntreprise.set('ACTIVES'); pageEntreprises.set(1)"
+                [class.active]="filtreArchiveEntreprise() === 'ACTIVES'"
+                class="sa-filter-btn">
+                Actives ({{ nbEntreprisesActives() }})
+              </button>
+              <button 
+                type="button" 
+                (click)="filtreArchiveEntreprise.set('ARCHIVEES'); pageEntreprises.set(1)"
+                [class.active]="filtreArchiveEntreprise() === 'ARCHIVEES'"
+                class="sa-filter-btn">
+                Archivées ({{ nbEntreprisesArchivees() }})
+              </button>
+              <button 
+                type="button" 
+                (click)="filtreArchiveEntreprise.set('TOUTES'); pageEntreprises.set(1)"
+                [class.active]="filtreArchiveEntreprise() === 'TOUTES'"
+                class="sa-filter-btn">
+                Toutes ({{ b2b.listeEntreprises().length }})
+              </button>
+            </div>
           </div>
         </div>
 
+        <!-- ÉTAT VIDE SI AUCUNE ENTREPRISE NE CORRESPOND AU FILTRE -->
+        @if (entreprisesFiltrees().length === 0) {
+          <div style="background: #FFFFFF; border: 1.5px dashed #E2D5BE; border-radius: 18px; padding: 3rem 1.5rem; text-align: center; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.03);">
+            <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(114, 21, 19, 0.06); color: #721513; display: inline-flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-bottom: 1rem;">
+              <i class="fa-solid" [class.fa-box-archive]="filtreArchiveEntreprise() === 'ARCHIVEES'" [class.fa-building-circle-xmark]="filtreArchiveEntreprise() !== 'ARCHIVEES'"></i>
+            </div>
+            <h3 style="margin: 0 0 0.4rem; font-family: 'Playfair Display', serif; font-size: 1.25rem; color: #721513; font-weight: 800;">
+              {{ filtreArchiveEntreprise() === 'ARCHIVEES' ? 'Aucune entreprise archivée pour le moment' : 'Aucune entreprise trouvée' }}
+            </h3>
+            <p style="margin: 0 auto 1.25rem; max-width: 440px; font-size: 0.85rem; color: #6E5A56; line-height: 1.5;">
+              {{ filtreArchiveEntreprise() === 'ARCHIVEES' 
+                ? 'Toutes vos entreprises clientes sont actuellement sous contrat actif.' 
+                : 'Aucune entreprise ne correspond à votre recherche ou au filtre sélectionné.' }}
+            </p>
+            @if (filtreArchiveEntreprise() !== 'ACTIVES' || searchEntreprise()) {
+              <button 
+                type="button" 
+                (click)="filtreArchiveEntreprise.set('ACTIVES'); searchEntreprise.set('')"
+                class="sa-btn-action"
+                style="padding: 0.6rem 1.2rem; border-radius: 9999px; font-weight: 800; color: #721513; border-color: #721513;">
+                <i class="fa-solid fa-rotate-left"></i> Afficher les entreprises actives ({{ nbEntreprisesActives() }})
+              </button>
+            }
+          </div>
+        }
+
         <!-- LISTE DÉTAILLÉE DES ENTREPRISES ET LEURS SITES DÉDIÉS -->
         <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-          @for (ent of entreprisesFiltrees(); track ent.id) {
+          @for (ent of entreprisesPaginees(); track ent.id) {
             <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
               
               <!-- En-tête de l'Entreprise -->
@@ -132,11 +215,33 @@
                     </span>
                   </div>
 
-                  <div style="font-size: 0.8rem; color: #6E5A56; margin-top: 0.35rem; display: flex; gap: 1.25rem; flex-wrap: wrap;">
+                  <div style="font-size: 0.8rem; color: #6E5A56; margin-top: 0.35rem; display: flex; gap: 1.25rem; flex-wrap: wrap; align-items: center;">
                     <span><i class="fa-solid fa-id-card"></i> NINEA : <strong>{{ ent.ninea || 'Non renseigné' }}</strong></span>
                     <span><i class="fa-solid fa-envelope"></i> Contact : <strong>{{ ent.emailContact || 'contact@client.sn' }}</strong></span>
-                    <span><i class="fa-solid fa-calendar-check"></i> Cadence Facture : <strong style="color: #721513;">{{ ent.cadenceFacturation || 'MENSUELLE' }}</strong></span>
+                    <span><i class="fa-solid fa-calendar-check"></i> Cadence : <strong style="color: #721513;">{{ ent.cadenceFacturation || 'MENSUELLE' }}</strong></span>
                     <span><i class="fa-solid fa-hand-holding-dollar"></i> Prise en charge : <strong style="color: #606C38;">{{ ent.tauxPriseEnCharge }}% (Plf. {{ (ent.plafondJournalier | number) }} F)</strong></span>
+                  </div>
+
+                  <!-- Type de prestation & catégories autorisées entreprise -->
+                  <div style="margin-top: 0.65rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                    <span style="font-size: 0.73rem; font-weight: 800; color: #721513; background: #FAF5EA; border: 1px solid #E2D5BE; padding: 0.2rem 0.6rem; border-radius: 8px;">
+                      <i class="fa-solid fa-utensils"></i> Prestation : {{ getLibellePrestation(ent.typePrestation) }}
+                    </span>
+                    <div style="display: inline-flex; gap: 0.35rem; flex-wrap: wrap;">
+                      @for (cat of ent.categoriesAutorisees; track cat) {
+                        <span style="font-size: 0.68rem; font-weight: 700; background: #FFFFFF; border: 1px solid #EDE7DC; color: #6E5A56; padding: 0.15rem 0.5rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.3rem;">
+                          @if (cat === 'ENTREE') {
+                            <i class="fa-solid fa-leaf" style="color: #606C38;"></i> Entrée
+                          } @else if (cat === 'PLAT') {
+                            <i class="fa-solid fa-bowl-food" style="color: #721513;"></i> Plat
+                          } @else if (cat === 'DESSERT') {
+                            <i class="fa-solid fa-cake-candles" style="color: #C05621;"></i> Dessert
+                          } @else {
+                            <i class="fa-solid fa-wine-glass" style="color: #332724;"></i> Boisson
+                          }
+                        </span>
+                      }
+                    </div>
                   </div>
                 </div>
 
@@ -174,8 +279,13 @@
                         <div style="font-size: 0.8rem; color: #6E5A56; margin-bottom: 0.5rem;">
                           <i class="fa-solid fa-location-dot" style="color: #721513;"></i> {{ site.adresse }}
                         </div>
-                        <div style="font-size: 0.75rem; color: #6E5A56;">
+                        <div style="font-size: 0.75rem; color: #6E5A56; margin-bottom: 0.5rem;">
                           <i class="fa-solid fa-user-tie"></i> Référent : <strong>{{ site.contactReferent }}</strong> ({{ site.telephoneReferent }})
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; margin-top: 0.25rem;">
+                          <span style="font-size: 0.7rem; font-weight: 700; color: #721513; background: #FFFFFF; border: 1px solid #EDE7DC; padding: 0.15rem 0.45rem; border-radius: 6px;">
+                            <i class="fa-solid fa-bell-concierge"></i> {{ getLibellePrestation(site.typePrestation) }}
+                          </span>
                         </div>
                       </div>
 
@@ -195,6 +305,43 @@
             </div>
           }
         </div>
+
+        <!-- BARRE DE PAGINATION ENTREPRISES -->
+        @if (entreprisesFiltrees().length > 0) {
+          <div class="sa-pagination-bar">
+            <div class="sa-pagination-info">
+              Affichage de <strong>{{ ((pageEntreprises() - 1) * pageSizeEntreprises()) + 1 }}</strong> à <strong>{{ ((pageEntreprises() * pageSizeEntreprises()) > entreprisesFiltrees().length) ? entreprisesFiltrees().length : (pageEntreprises() * pageSizeEntreprises()) }}</strong> sur <strong>{{ entreprisesFiltrees().length }}</strong> entreprises
+            </div>
+
+            <div class="sa-pagination-controls">
+              <button 
+                type="button" 
+                class="sa-page-btn" 
+                [disabled]="pageEntreprises() <= 1"
+                (click)="changerPageEntreprises(pageEntreprises() - 1)">
+                <i class="fa-solid fa-chevron-left"></i> Précédent
+              </button>
+
+              @for (p of pagesEntreprisesArray(); track p) {
+                <button 
+                  type="button" 
+                  class="sa-page-num" 
+                  [class.active]="pageEntreprises() === p"
+                  (click)="changerPageEntreprises(p)">
+                  {{ p }}
+                </button>
+              }
+
+              <button 
+                type="button" 
+                class="sa-page-btn" 
+                [disabled]="pageEntreprises() >= totalPagesEntreprises()"
+                (click)="changerPageEntreprises(pageEntreprises() + 1)">
+                Suivant <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        }
 
       </div>
     }
@@ -243,9 +390,31 @@
           </div>
         </div>
 
+        <!-- ÉTAT VIDE CATALOGUE -->
+        @if (platsFiltres().length === 0) {
+          <div style="background: #FFFFFF; border: 1.5px dashed #E2D5BE; border-radius: 18px; padding: 3rem 1.5rem; text-align: center; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.03);">
+            <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(114, 21, 19, 0.06); color: #721513; display: inline-flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-bottom: 1rem;">
+              <i class="fa-solid fa-utensils"></i>
+            </div>
+            <h3 style="margin: 0 0 0.4rem; font-family: 'Playfair Display', serif; font-size: 1.25rem; color: #721513; font-weight: 800;">
+              {{ filtreArchivePlat() === 'ARCHIVES' ? 'Aucun plat archivé' : 'Aucune recette trouvée dans cette catégorie' }}
+            </h3>
+            <p style="margin: 0 auto 1.25rem; max-width: 440px; font-size: 0.85rem; color: #6E5A56; line-height: 1.5;">
+              Modifiez vos critères de filtre ou ajoutez une nouvelle spécialité au catalogue central.
+            </p>
+            <button 
+              type="button" 
+              (click)="filtreArchivePlat.set('ACTIFS'); filtreCategorieCatalogue.set('TOUS')"
+              class="sa-btn-action"
+              style="padding: 0.6rem 1.2rem; border-radius: 9999px; font-weight: 800; color: #721513; border-color: #721513;">
+              <i class="fa-solid fa-rotate-left"></i> Réinitialiser les filtres
+            </button>
+          </div>
+        }
+
         <!-- Grille du Catalogue Central -->
         <div class="sa-catalogue-grid">
-          @for (plat of platsFiltres(); track plat.id) {
+          @for (plat of platsPagines(); track plat.id) {
             <div [style.opacity]="plat.isArchive ? '0.6' : '1'"
                  style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(114, 21, 19, 0.04); display: flex; flex-direction: column; justify-content: space-between;">
               <div>
@@ -288,11 +457,49 @@
           }
         </div>
 
+        <!-- BARRE DE PAGINATION CATALOGUE -->
+        @if (platsFiltres().length > 0) {
+          <div class="sa-pagination-bar">
+            <div class="sa-pagination-info">
+              Affichage de <strong>{{ ((pageCatalogue() - 1) * pageSizeCatalogue()) + 1 }}</strong> à <strong>{{ ((pageCatalogue() * pageSizeCatalogue()) > platsFiltres().length) ? platsFiltres().length : (pageCatalogue() * pageSizeCatalogue()) }}</strong> sur <strong>{{ platsFiltres().length }}</strong> spécialités
+            </div>
+
+            <div class="sa-pagination-controls">
+              <button 
+                type="button" 
+                class="sa-page-btn" 
+                [disabled]="pageCatalogue() <= 1"
+                (click)="changerPageCatalogue(pageCatalogue() - 1)">
+                <i class="fa-solid fa-chevron-left"></i> Précédent
+              </button>
+
+              @for (p of pagesCatalogueArray(); track p) {
+                <button 
+                  type="button" 
+                  class="sa-page-num" 
+                  [class.active]="pageCatalogue() === p"
+                  (click)="changerPageCatalogue(p)">
+                  {{ p }}
+                </button>
+              }
+
+              <button 
+                type="button" 
+                class="sa-page-btn" 
+                [disabled]="pageCatalogue() >= totalPagesCatalogue()"
+                (click)="changerPageCatalogue(pageCatalogue() + 1)">
+                Suivant <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        }
+
       </div>
     }
 
     <!-- ============================================================== -->
-    <!-- SECTION 3 : PLANNING GLOBAL DE PRODUCTION (SUPERVISION HEBDO)   -->
+    <!-- ============================================================== -->
+    <!-- SECTION 3 : PLANNING GLOBAL DE PRODUCTION (SUPERVISION PAR SITE)-->
     <!-- ============================================================== -->
     @if (activeSection() === 'PLANNING') {
       <div>
@@ -300,43 +507,95 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
           <div>
             <h2 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
-              Planning Centralisé des Menus & Supervision Hebdomadaire
+              Planning Centralisé des Menus & Supervision par Site
             </h2>
             <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #6E5A56;">
-              Planification des thèmes, volumes prévisionnels et dispatch vers l'ensemble des sites clients.
+              Planification des thèmes, menus dédiés par site client, portions prévisionnelles et dispatch logistique.
             </p>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+            <!-- SÉLECTEUR DE SITE POUR LE PLANNING -->
+            <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 12px; padding: 0.35rem 0.75rem;">
+              <span style="font-size: 0.75rem; font-weight: 800; color: #721513; display: inline-flex; align-items: center; gap: 0.35rem;">
+                <i class="fa-solid fa-location-dot"></i> Site :
+              </span>
+              <select 
+                [ngModel]="filtreSitePlanning()"
+                (ngModelChange)="filtreSitePlanning.set($event)"
+                style="background: transparent; border: none; font-size: 0.82rem; font-weight: 700; color: #332724; cursor: pointer; outline: none;">
+                <option value="TOUS">Tous les sites (Vue consolidée)</option>
+                @for (s of tousLesSites(); track s.id) {
+                  <option [value]="s.id">{{ s.entrepriseNom }} • {{ s.nom }}</option>
+                }
+              </select>
+            </div>
+
+            <button (click)="ouvrirModalNouveauMenuSite()" class="sa-btn-primary">
+              <i class="fa-solid fa-plus"></i> Planifier un Menu de Site
+            </button>
           </div>
         </div>
 
+        <!-- GRILLE DES MENUS PLANIFIÉS PAR SITE -->
         <div class="sa-planning-grid">
-          @for (item of planningSemaineGlobal(); track item.id) {
+          @for (item of planningFiltreParSite(); track item.id) {
             <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.25rem; box-shadow: 0 4px 18px rgba(114, 21, 19, 0.04); display: flex; flex-direction: column; justify-content: space-between;">
               <div>
+                <!-- En-tête jour & badge site -->
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
                   <strong style="color: #721513; font-size: 1rem;">{{ item.jour }}</strong>
                   <span style="font-size: 0.75rem; color: #6E5A56; background: #FAF8F4; border: 1px solid #EDE7DC; padding: 0.2rem 0.5rem; border-radius: 6px;">{{ item.date }}</span>
                 </div>
 
-                <div style="font-size: 0.72rem; color: #606C38; font-weight: 800; text-transform: uppercase;">{{ item.theme }}</div>
-                <div style="font-size: 0.88rem; font-weight: 700; color: #332724; margin: 0.45rem 0 1rem; line-height: 1.4;">
-                  {{ item.platVedette }}
+                <!-- Site Cible -->
+                <div style="margin-bottom: 0.75rem;">
+                  <span [style.background]="item.siteId === 'TOUS' ? 'rgba(96, 108, 56, 0.12)' : 'rgba(114, 21, 19, 0.08)'"
+                        [style.color]="item.siteId === 'TOUS' ? '#606C38' : '#721513'"
+                        style="font-size: 0.72rem; font-weight: 800; padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.35rem;">
+                    <i class="fa-solid" [class.fa-globe]="item.siteId === 'TOUS'" [class.fa-location-dot]="item.siteId !== 'TOUS'"></i>
+                    {{ item.siteNom }} {{ item.entrepriseNom ? '(' + item.entrepriseNom + ')' : '' }}
+                  </span>
+                </div>
+
+                <div style="font-size: 0.72rem; color: #C05621; font-weight: 800; text-transform: uppercase;">{{ item.theme }}</div>
+                
+                <div style="font-size: 0.95rem; font-weight: 800; color: #332724; margin: 0.45rem 0 0.85rem; line-height: 1.4;">
+                  <i class="fa-solid fa-bowl-food" style="color: #721513; margin-right: 0.35rem;"></i>{{ item.platVedette }}
+                </div>
+
+                <!-- Menu complet 4 composantes si renseigné -->
+                <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 10px; padding: 0.65rem 0.85rem; margin-bottom: 0.85rem; font-size: 0.75rem; color: #6E5A56; line-height: 1.6;">
+                  @if (item.entreeProposee) {
+                    <div><i class="fa-solid fa-leaf" style="color: #606C38; width: 14px;"></i> Entrée : <strong>{{ item.entreeProposee }}</strong></div>
+                  }
+                  @if (item.dessertPropose) {
+                    <div><i class="fa-solid fa-cake-candles" style="color: #C05621; width: 14px;"></i> Dessert : <strong>{{ item.dessertPropose }}</strong></div>
+                  }
+                  @if (item.boissonProposee) {
+                    <div><i class="fa-solid fa-wine-glass" style="color: #332724; width: 14px;"></i> Boisson : <strong>{{ item.boissonProposee }}</strong></div>
+                  }
                 </div>
                 
-                <div style="font-size: 0.78rem; color: #6E5A56; line-height: 1.8;">
-                  <div><i class="fa-solid fa-store" style="color: #721513;"></i> Sites desservis : <strong>{{ item.sitesCouverts }} sites</strong></div>
+                <div style="font-size: 0.78rem; color: #6E5A56; line-height: 1.6;">
                   <div><i class="fa-solid fa-box" style="color: #E51D24;"></i> Portions prévues : <strong>{{ item.totalPrevu }} repas</strong></div>
                 </div>
               </div>
 
-              <div style="border-top: 1px solid #EDE7DC; padding-top: 0.85rem; margin-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
-                <span [style.background]="item.statut === 'EN_PRODUCTION' ? 'rgba(229, 29, 36, 0.12)' : 'rgba(96, 108, 56, 0.12)'"
-                      [style.color]="item.statut === 'EN_PRODUCTION' ? '#E51D24' : '#606C38'"
+              <div style="border-top: 1px solid #EDE7DC; padding-top: 0.85rem; margin-top: 1rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <span [style.background]="item.statut === 'EN_PRODUCTION' ? 'rgba(229, 29, 36, 0.12)' : item.statut === 'VALIDE' ? 'rgba(96, 108, 56, 0.12)' : 'rgba(51, 39, 36, 0.08)'"
+                      [style.color]="item.statut === 'EN_PRODUCTION' ? '#E51D24' : item.statut === 'VALIDE' ? '#606C38' : '#6E5A56'"
                       style="font-size: 0.7rem; font-weight: 800; padding: 0.25rem 0.55rem; border-radius: 9999px;">
                   {{ item.statut }}
                 </span>
-                <button (click)="ouvrirModalEditPlanningGlobal(item)" class="sa-btn-action">
-                  <i class="fa-regular fa-pen-to-square"></i> Modifier
-                </button>
+                <div style="display: flex; gap: 0.35rem;">
+                  <button (click)="ouvrirModalEditPlanningGlobal(item)" class="sa-btn-action" title="Modifier le menu">
+                    <i class="fa-regular fa-pen-to-square"></i>
+                  </button>
+                  <button (click)="supprimerMenuPlanning(item.id)" class="sa-btn-action" style="color: #E51D24;" title="Supprimer ce menu">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </div>
               </div>
             </div>
           }
@@ -365,12 +624,33 @@
         <div class="sa-form-grid-2">
           <div class="sa-form-span-2">
             <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Raison Sociale de l'Entreprise</label>
-            <input type="text" [(ngModel)]="entrepriseEnEdition().nom" placeholder="Ex: TotalEnergies Sénégal" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700;">
+            <input 
+              type="text" 
+              [(ngModel)]="entrepriseEnEdition().nom" 
+              (ngModelChange)="onNomEntrepriseChange($event)"
+              placeholder="Ex: TotalEnergies Sénégal" 
+              style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700;">
           </div>
 
           <div>
-            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Code Entreprise (Réf.)</label>
-            <input type="text" [(ngModel)]="entrepriseEnEdition().codeEntreprise" placeholder="Ex: TOT-SN" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <label style="font-size: 0.75rem; font-weight: 800; color: #721513;">Code Entreprise (Généré auto)</label>
+              <button 
+                type="button" 
+                (click)="regenererCodeEntreprise()" 
+                style="background: none; border: none; font-size: 0.7rem; color: #E51D24; font-weight: 700; cursor: pointer; padding: 0;">
+                <i class="fa-solid fa-rotate"></i> Régénérer
+              </button>
+            </div>
+            <div style="position: relative;">
+              <input 
+                type="text" 
+                [(ngModel)]="entrepriseEnEdition().codeEntreprise" 
+                placeholder="Ex: TOT-SN" 
+                readonly
+                style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem 2.2rem 0.65rem 0.65rem; font-size: 0.85rem; font-weight: 800; color: #721513; background: #FAF8F4; font-family: monospace;">
+              <i class="fa-solid fa-lock" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); font-size: 0.75rem; color: #94A3B8;"></i>
+            </div>
           </div>
 
           <div>
@@ -400,6 +680,73 @@
               <option value="MENSUELLE">Mensuelle (Fin de mois)</option>
               <option value="BIMESTRIELLE">Bimestrielle</option>
             </select>
+          </div>
+
+          <!-- TYPE DE PRESTATION PAR DÉFAUT -->
+          <div class="sa-form-span-2" style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 1.15rem; margin-top: 0.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
+              <label style="font-size: 0.8rem; font-weight: 800; color: #721513; margin: 0;">
+                <i class="fa-solid fa-utensils"></i> Type de Prestation & Formule Entreprise
+              </label>
+              <span style="font-size: 0.72rem; color: #606C38; font-weight: 700;">Règle contractuelle</span>
+            </div>
+
+            <select 
+              [ngModel]="entrepriseEnEdition().typePrestation || 'COMPLETE'"
+              (ngModelChange)="onTypePrestationEntrepriseChange($event)"
+              style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 800; color: #721513; background: #FFFFFF; margin-bottom: 0.85rem;">
+              @for (tp of typesPrestationDisponibles; track tp.code) {
+                <option [value]="tp.code">{{ tp.libelle }} — {{ tp.desc }}</option>
+              }
+            </select>
+
+            <div>
+              <div style="font-size: 0.73rem; font-weight: 800; color: #6E5A56; margin-bottom: 0.45rem;">
+                Composantes alimentaires autorisées aux salariés subventionnés :
+              </div>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button 
+                  type="button"
+                  (click)="toggleCategorieEntreprise('ENTREE')"
+                  [style.background]="isCategorieEntrepriseActive('ENTREE') ? '#721513' : '#FFFFFF'"
+                  [style.color]="isCategorieEntrepriseActive('ENTREE') ? '#FFFFFF' : '#6E5A56'"
+                  [style.border-color]="isCategorieEntrepriseActive('ENTREE') ? '#721513' : '#EDE7DC'"
+                  style="border: 1.5px solid; padding: 0.4rem 0.85rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.4rem;">
+                  <i class="fa-solid" [class.fa-check]="isCategorieEntrepriseActive('ENTREE')" [class.fa-plus]="!isCategorieEntrepriseActive('ENTREE')"></i>
+                  <i class="fa-solid fa-leaf"></i> Entrée
+                </button>
+                <button 
+                  type="button"
+                  (click)="toggleCategorieEntreprise('PLAT')"
+                  [style.background]="isCategorieEntrepriseActive('PLAT') ? '#721513' : '#FFFFFF'"
+                  [style.color]="isCategorieEntrepriseActive('PLAT') ? '#FFFFFF' : '#6E5A56'"
+                  [style.border-color]="isCategorieEntrepriseActive('PLAT') ? '#721513' : '#EDE7DC'"
+                  style="border: 1.5px solid; padding: 0.4rem 0.85rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.4rem;">
+                  <i class="fa-solid" [class.fa-check]="isCategorieEntrepriseActive('PLAT')" [class.fa-plus]="!isCategorieEntrepriseActive('PLAT')"></i>
+                  <i class="fa-solid fa-bowl-food"></i> Plat Chaud
+                </button>
+                <button 
+                  type="button"
+                  (click)="toggleCategorieEntreprise('DESSERT')"
+                  [style.background]="isCategorieEntrepriseActive('DESSERT') ? '#721513' : '#FFFFFF'"
+                  [style.color]="isCategorieEntrepriseActive('DESSERT') ? '#FFFFFF' : '#6E5A56'"
+                  [style.border-color]="isCategorieEntrepriseActive('DESSERT') ? '#721513' : '#EDE7DC'"
+                  style="border: 1.5px solid; padding: 0.4rem 0.85rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.4rem;">
+                  <i class="fa-solid" [class.fa-check]="isCategorieEntrepriseActive('DESSERT')" [class.fa-plus]="!isCategorieEntrepriseActive('DESSERT')"></i>
+                  <i class="fa-solid fa-cake-candles"></i> Dessert
+                </button>
+                <button 
+                  type="button"
+                  (click)="toggleCategorieEntreprise('BOISSON')"
+                  [style.background]="isCategorieEntrepriseActive('BOISSON') ? '#721513' : '#FFFFFF'"
+                  [style.color]="isCategorieEntrepriseActive('BOISSON') ? '#FFFFFF' : '#6E5A56'"
+                  [style.border-color]="isCategorieEntrepriseActive('BOISSON') ? '#721513' : '#EDE7DC'"
+                  style="border: 1.5px solid; padding: 0.4rem 0.85rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.4rem;">
+                  <i class="fa-solid" [class.fa-check]="isCategorieEntrepriseActive('BOISSON')" [class.fa-plus]="!isCategorieEntrepriseActive('BOISSON')"></i>
+                  <i class="fa-solid fa-wine-glass"></i> Boisson
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -450,6 +797,73 @@
             <div>
               <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Contact Référent Site</label>
               <input type="text" [(ngModel)]="siteEnEdition().contactReferent" placeholder="Ex: M. Ndiaye (RH)" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem;">
+            </div>
+          </div>
+
+          <!-- TYPE DE PRESTATION PROPRE AU SITE -->
+          <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 1.15rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
+              <label style="font-size: 0.8rem; font-weight: 800; color: #721513; margin: 0;">
+                <i class="fa-solid fa-bell-concierge"></i> Type de Prestation & Formule sur ce Site
+              </label>
+              <span style="font-size: 0.72rem; color: #C05621; font-weight: 700;">Spécifique au site</span>
+            </div>
+
+            <select 
+              [ngModel]="siteEnEdition().typePrestation || 'COMPLETE'"
+              (ngModelChange)="onTypePrestationSiteChange($event)"
+              style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 800; color: #721513; background: #FFFFFF; margin-bottom: 0.85rem;">
+              @for (tp of typesPrestationDisponibles; track tp.code) {
+                <option [value]="tp.code">{{ tp.libelle }} — {{ tp.desc }}</option>
+              }
+            </select>
+
+            <div>
+              <div style="font-size: 0.73rem; font-weight: 800; color: #6E5A56; margin-bottom: 0.45rem;">
+                Composantes alimentaires distribuées sur ce site :
+              </div>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button 
+                  type="button"
+                  (click)="toggleCategorieSite('ENTREE')"
+                  [style.background]="isCategorieSiteActive('ENTREE') ? '#721513' : '#FFFFFF'"
+                  [style.color]="isCategorieSiteActive('ENTREE') ? '#FFFFFF' : '#6E5A56'"
+                  [style.border-color]="isCategorieSiteActive('ENTREE') ? '#721513' : '#EDE7DC'"
+                  style="border: 1.5px solid; padding: 0.4rem 0.85rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.4rem;">
+                  <i class="fa-solid" [class.fa-check]="isCategorieSiteActive('ENTREE')" [class.fa-plus]="!isCategorieSiteActive('ENTREE')"></i>
+                  <i class="fa-solid fa-leaf"></i> Entrée
+                </button>
+                <button 
+                  type="button"
+                  (click)="toggleCategorieSite('PLAT')"
+                  [style.background]="isCategorieSiteActive('PLAT') ? '#721513' : '#FFFFFF'"
+                  [style.color]="isCategorieSiteActive('PLAT') ? '#FFFFFF' : '#6E5A56'"
+                  [style.border-color]="isCategorieSiteActive('PLAT') ? '#721513' : '#EDE7DC'"
+                  style="border: 1.5px solid; padding: 0.4rem 0.85rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.4rem;">
+                  <i class="fa-solid" [class.fa-check]="isCategorieSiteActive('PLAT')" [class.fa-plus]="!isCategorieSiteActive('PLAT')"></i>
+                  <i class="fa-solid fa-bowl-food"></i> Plat Chaud
+                </button>
+                <button 
+                  type="button"
+                  (click)="toggleCategorieSite('DESSERT')"
+                  [style.background]="isCategorieSiteActive('DESSERT') ? '#721513' : '#FFFFFF'"
+                  [style.color]="isCategorieSiteActive('DESSERT') ? '#FFFFFF' : '#6E5A56'"
+                  [style.border-color]="isCategorieSiteActive('DESSERT') ? '#721513' : '#EDE7DC'"
+                  style="border: 1.5px solid; padding: 0.4rem 0.85rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.4rem;">
+                  <i class="fa-solid" [class.fa-check]="isCategorieSiteActive('DESSERT')" [class.fa-plus]="!isCategorieSiteActive('DESSERT')"></i>
+                  <i class="fa-solid fa-cake-candles"></i> Dessert
+                </button>
+                <button 
+                  type="button"
+                  (click)="toggleCategorieSite('BOISSON')"
+                  [style.background]="isCategorieSiteActive('BOISSON') ? '#721513' : '#FFFFFF'"
+                  [style.color]="isCategorieSiteActive('BOISSON') ? '#FFFFFF' : '#6E5A56'"
+                  [style.border-color]="isCategorieSiteActive('BOISSON') ? '#721513' : '#EDE7DC'"
+                  style="border: 1.5px solid; padding: 0.4rem 0.85rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.4rem;">
+                  <i class="fa-solid" [class.fa-check]="isCategorieSiteActive('BOISSON')" [class.fa-plus]="!isCategorieSiteActive('BOISSON')"></i>
+                  <i class="fa-solid fa-wine-glass"></i> Boisson
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -523,14 +937,14 @@
   }
 
   <!-- ============================================================== -->
-  <!-- MODAL ÉDITION PLANNING CENTRALISÉ                            -->
+  <!-- MODAL ÉDITION / AJOUT PLANNING DE SITE                         -->
   <!-- ============================================================== -->
   @if (showModalPlanning() && planningEnEdition()) {
     <div class="sa-modal-overlay">
       <div class="sa-modal-card">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #EDE7DC; padding-bottom: 0.85rem; margin-bottom: 1.25rem;">
           <h3 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.35rem; color: #721513; font-weight: 800;">
-            <i class="fa-regular fa-calendar"></i> Supervision Menu : {{ planningEnEdition().jour }}
+            <i class="fa-regular fa-calendar"></i> {{ isNouveauMenuPlanning() ? 'Planifier un Menu de Site' : 'Supervision Menu : ' + planningEnEdition().jour }}
           </h3>
           <button (click)="showModalPlanning.set(false)" style="background: none; border: none; font-size: 1.25rem; color: #6E5A56; cursor: pointer;">
             <i class="fa-solid fa-xmark"></i>
@@ -538,14 +952,79 @@
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <!-- Choix du site cible -->
           <div>
-            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Thème Central</label>
-            <input type="text" [(ngModel)]="planningEnEdition().theme" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700;">
+            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">
+              <i class="fa-solid fa-location-dot"></i> Site Bénéficiaire de ce Menu
+            </label>
+            <select 
+              [ngModel]="planningEnEdition().siteId || 'TOUS'"
+              (ngModelChange)="onSitePlanningSelectChange($event)"
+              style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 800; color: #721513; background: #FAF8F4;">
+              <option value="TOUS">Tous les sites (Menu Standard Global)</option>
+              @for (s of tousLesSites(); track s.id) {
+                <option [value]="s.id">{{ s.entrepriseNom }} — {{ s.nom }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="sa-form-grid-2">
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Jour de Service</label>
+              <select [(ngModel)]="planningEnEdition().jour" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700;">
+                <option value="Lundi">Lundi</option>
+                <option value="Mardi (Aujourd'hui)">Mardi</option>
+                <option value="Mercredi">Mercredi</option>
+                <option value="Jeudi">Jeudi</option>
+                <option value="Vendredi">Vendredi</option>
+                <option value="Samedi">Samedi</option>
+              </select>
+            </div>
+
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Date Prévue</label>
+              <input type="text" [(ngModel)]="planningEnEdition().date" placeholder="Ex: 10 Nov" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700;">
+            </div>
           </div>
 
           <div>
-            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Plats Vedettes Recommandés</label>
-            <input type="text" [(ngModel)]="planningEnEdition().platVedette" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700;">
+            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Thème Culinaire du Jour</label>
+            <input type="text" [(ngModel)]="planningEnEdition().theme" placeholder="Ex: Grillades & Saveurs Locales" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700;">
+          </div>
+
+          <div>
+            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Plat Chaud Principal (Vedette)</label>
+            <input type="text" [(ngModel)]="planningEnEdition().platVedette" placeholder="Ex: Poulet Yassa Braisé au Feu de Bois" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700;">
+          </div>
+
+          <div class="sa-form-grid-2">
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 800; color: #606C38; display: block; margin-bottom: 0.35rem;">
+                <i class="fa-solid fa-leaf"></i> Entrée Proposée
+              </label>
+              <input type="text" [(ngModel)]="planningEnEdition().entreeProposee" placeholder="Ex: Salade Gourmet & Pastels" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem;">
+            </div>
+
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 800; color: #C05621; display: block; margin-bottom: 0.35rem;">
+                <i class="fa-solid fa-cake-candles"></i> Dessert Proposé
+              </label>
+              <input type="text" [(ngModel)]="planningEnEdition().dessertPropose" placeholder="Ex: Thiagree Onctueux" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem;">
+            </div>
+          </div>
+
+          <div class="sa-form-grid-2">
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 800; color: #332724; display: block; margin-bottom: 0.35rem;">
+                <i class="fa-solid fa-wine-glass"></i> Boisson Proposée
+              </label>
+              <input type="text" [(ngModel)]="planningEnEdition().boissonProposee" placeholder="Ex: Jus de Bissap Frais" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem;">
+            </div>
+
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 800; color: #E51D24; display: block; margin-bottom: 0.35rem;">Portions Prévisionnelles</label>
+              <input type="number" [(ngModel)]="planningEnEdition().totalPrevu" min="10" max="2000" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 800; color: #E51D24;">
+            </div>
           </div>
 
           <div class="sa-form-grid-2">
@@ -574,7 +1053,7 @@
             Annuler
           </button>
           <button (click)="enregistrerPlanningGlobal()" class="sa-btn-primary" style="flex: 1.5; justify-content: center;">
-            <i class="fa-solid fa-check"></i> Enregistrer
+            <i class="fa-solid fa-check"></i> Enregistrer le Menu
           </button>
         </div>
       </div>

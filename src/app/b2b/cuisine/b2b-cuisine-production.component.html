@@ -4,7 +4,7 @@
   <app-b2b-nav></app-b2b-nav>
 
   <!-- CONTENU PRINCIPAL CENTRÉ -->
-  <main style="max-width: 1280px; width: 100%; margin: auto; padding: 1.5rem 0;">
+  <main style="max-width: 1280px; width: 100%; margin: 0 auto; padding: 1.5rem 0;">
 
     <!-- BANDEAU OFFICIEL RESPONSABLE DE SITE KIKI -->
     <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.25rem 1.5rem; margin-bottom: 1.75rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; box-shadow: 0 4px 18px rgba(192, 86, 33, 0.05);">
@@ -689,9 +689,9 @@
                   [style.background]="plat.disponible !== false ? '#FAF5EA' : '#EDE7DC'"
                   [style.color]="plat.disponible !== false ? '#606C38' : '#6E5A56'"
                   [style.border-color]="plat.disponible !== false ? '#606C38' : '#CBD5E1'"
-                  style="border: 1.5px solid; padding: 0.4rem 0.85rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 800; cursor: pointer; white-space: nowrap; transition: all 0.2s;">
+                  style="border: 1.5px solid; padding: 0.4rem 0.85rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 800; cursor: pointer; white-space: nowrap; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.45rem;">
                   <i class="fa-solid" [class.fa-check]="plat.disponible !== false" [class.fa-ban]="plat.disponible === false"></i>
-                  {{ plat.disponible !== false ? 'Proposé' : 'Désactivé' }}
+                  <span>{{ plat.disponible !== false ? 'Proposé' : 'Désactivé' }}</span>
                 </button>
               </div>
             }

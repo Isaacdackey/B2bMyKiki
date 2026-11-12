@@ -265,10 +265,11 @@ textarea {
    CORRECTION DES CHEVAUCHEMENTS ICÔNES / TEXTES
    ============================================= */
 div.input-with-icon input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]),
+div.sa-topbar-search input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]),
 .input-with-icon .form-control,
 .input-with-icon input.form-control,
 input.input-with-icon-el {
-  padding-left: 3rem !important;
+  padding-left: 2.75rem !important;
 }
 
 div.password-field.input-with-icon input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]) {

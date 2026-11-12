@@ -177,6 +177,8 @@ export class B2bStateService {
       tarifNegocieHtva: 4500,
       cadenceFacturation: 'MENSUELLE',
       isArchivee: false,
+      typePrestation: 'COMPLETE',
+      categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'],
       sites: [
         { 
           id: 'site-1', 
@@ -185,6 +187,8 @@ export class B2bStateService {
           heureCutOff: '10:30', 
           contactReferent: 'M. Babacar Ndiaye (RH)', 
           telephoneReferent: '+221 77 123 45 67',
+          typePrestation: 'COMPLETE',
+          categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'],
           creneauxDisponibles: [
             '11h30 - 12h00 (Service Anticipé)',
             '12h00 - 12h30 (Premier Service)',
@@ -201,6 +205,8 @@ export class B2bStateService {
           heureCutOff: '09:45', 
           contactReferent: 'Mme Aminata Sow (Logistique)', 
           telephoneReferent: '+221 78 234 56 78',
+          typePrestation: 'PLAT_BOISSON',
+          categoriesAutorisees: ['PLAT', 'BOISSON'],
           creneauxDisponibles: [
             '11h30 - 12h00 (Quart Matin)',
             '12h00 - 12h45 (Service Midi)',
@@ -215,6 +221,8 @@ export class B2bStateService {
           heureCutOff: '10:00', 
           contactReferent: 'M. Cheikh Diop', 
           telephoneReferent: '+221 76 345 67 89',
+          typePrestation: 'ENTREE_PLAT',
+          categoriesAutorisees: ['ENTREE', 'PLAT'],
           creneauxDisponibles: [
             '12h00 - 12h30 (Premier Service)',
             '12h30 - 13h15 (Service Principal)',
@@ -236,6 +244,8 @@ export class B2bStateService {
       tarifNegocieHtva: 4200,
       cadenceFacturation: 'HEBDOMADAIRE',
       isArchivee: false,
+      typePrestation: 'PLAT_DESSERT_BOISSON',
+      categoriesAutorisees: ['PLAT', 'DESSERT', 'BOISSON'],
       sites: [
         {
           id: 'site-sona-1',
@@ -244,6 +254,8 @@ export class B2bStateService {
           heureCutOff: '10:15',
           contactReferent: 'Mme Awa Cissé (RH)',
           telephoneReferent: '+221 77 450 99 88',
+          typePrestation: 'PLAT_DESSERT_BOISSON',
+          categoriesAutorisees: ['PLAT', 'DESSERT', 'BOISSON'],
           creneauxDisponibles: ['12h00 - 13h00', '13h00 - 14h00']
         },
         {
@@ -253,6 +265,8 @@ export class B2bStateService {
           heureCutOff: '10:30',
           contactReferent: 'M. Mansour Sy',
           telephoneReferent: '+221 78 112 33 44',
+          typePrestation: 'PLAT_BOISSON',
+          categoriesAutorisees: ['PLAT', 'BOISSON'],
           creneauxDisponibles: ['12h30 - 13h30']
         }
       ]
@@ -270,6 +284,8 @@ export class B2bStateService {
       tarifNegocieHtva: 4600,
       cadenceFacturation: 'MENSUELLE',
       isArchivee: false,
+      typePrestation: 'COMPLETE',
+      categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'],
       sites: [
         {
           id: 'site-boll-1',
@@ -278,7 +294,107 @@ export class B2bStateService {
           heureCutOff: '09:30',
           contactReferent: 'M. Alioune Gueye',
           telephoneReferent: '+221 76 990 12 34',
+          typePrestation: 'COMPLETE',
+          categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'],
           creneauxDisponibles: ['11h30 - 12h30', '12h30 - 13h30']
+        }
+      ]
+    },
+    {
+      id: 'ent-004',
+      nom: 'CBAO Groupe Attijariwafa Bank',
+      codeEntreprise: 'CBAO-812',
+      ninea: '004192837 1B2',
+      emailContact: 'services.generaux@cbao.sn',
+      telephone: '+221 33 849 96 96',
+      tauxPriseEnCharge: 80,
+      plafondJournalier: 4500,
+      budgetMensuelAlloue: 16000000,
+      tarifNegocieHtva: 4300,
+      cadenceFacturation: 'MENSUELLE',
+      isArchivee: false,
+      typePrestation: 'ENTREE_PLAT_DESSERT',
+      categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT'],
+      sites: [
+        {
+          id: 'site-cbao-1',
+          nom: 'Siège Place de l\'Indépendance',
+          adresse: '1 Place de l\'Indépendance, Dakar Plateau',
+          heureCutOff: '10:30',
+          contactReferent: 'Mme Marième Diallo (DRH)',
+          telephoneReferent: '+221 77 310 22 11',
+          typePrestation: 'ENTREE_PLAT_DESSERT',
+          categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT'],
+          creneauxDisponibles: ['12h30 - 13h30', '13h30 - 14h30']
+        },
+        {
+          id: 'site-cbao-2',
+          nom: 'Centre Monétique & IT Bourguiba',
+          adresse: 'Avenue Bourguiba, Dakar',
+          heureCutOff: '10:15',
+          contactReferent: 'M. Ibrahima Sarr',
+          telephoneReferent: '+221 77 889 44 55',
+          typePrestation: 'PLAT_BOISSON',
+          categoriesAutorisees: ['PLAT', 'BOISSON'],
+          creneauxDisponibles: ['12h30 - 13h30']
+        }
+      ]
+    },
+    {
+      id: 'ent-005',
+      nom: 'Port Autonome de Dakar (PAD)',
+      codeEntreprise: 'PAD-490',
+      ninea: '001029384 2G9',
+      emailContact: 'intendance@portdakar.sn',
+      telephone: '+221 33 849 45 45',
+      tauxPriseEnCharge: 100,
+      plafondJournalier: 5000,
+      budgetMensuelAlloue: 21000000,
+      tarifNegocieHtva: 4500,
+      cadenceFacturation: 'MENSUELLE',
+      isArchivee: false,
+      typePrestation: 'COMPLETE',
+      categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'],
+      sites: [
+        {
+          id: 'site-pad-1',
+          nom: 'Direction Générale Boulevard de la Libération',
+          adresse: '21 Boulevard de la Libération, Dakar',
+          heureCutOff: '10:00',
+          contactReferent: 'M. Ousmane Ndoye',
+          telephoneReferent: '+221 77 612 90 00',
+          typePrestation: 'COMPLETE',
+          categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'],
+          creneauxDisponibles: ['12h00 - 13h00', '13h00 - 14h00']
+        }
+      ]
+    },
+    {
+      id: 'ent-006',
+      nom: 'Free Sénégal (Saga Africa Holdings)',
+      codeEntreprise: 'FRE-604',
+      ninea: '005918273 3F1',
+      emailContact: 'office.manager@free.sn',
+      telephone: '+221 33 889 10 00',
+      tauxPriseEnCharge: 75,
+      plafondJournalier: 4000,
+      budgetMensuelAlloue: 11500000,
+      tarifNegocieHtva: 4000,
+      cadenceFacturation: 'HEBDOMADAIRE',
+      isArchivee: false,
+      typePrestation: 'PLAT_BOISSON',
+      categoriesAutorisees: ['PLAT', 'BOISSON'],
+      sites: [
+        {
+          id: 'site-free-1',
+          nom: 'Campus Almadies Route de Ngor',
+          adresse: 'Route des Almadies, Dakar',
+          heureCutOff: '10:30',
+          contactReferent: 'Mme Khady Mbengue',
+          telephoneReferent: '+221 76 222 11 00',
+          typePrestation: 'PLAT_BOISSON',
+          categoriesAutorisees: ['PLAT', 'BOISSON'],
+          creneauxDisponibles: ['12h30 - 13h30', '13h30 - 14h30']
         }
       ]
     }
