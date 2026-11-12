@@ -127,7 +127,7 @@
                   <th style="padding: 0.85rem 1.25rem; text-align: center;">Quantité Prévue (Portions)</th>
                   <th style="padding: 0.85rem 1.25rem; text-align: center;">Déjà Commandé</th>
                   <th style="padding: 0.85rem 1.25rem; text-align: center;">Reste Disponible</th>
-                  <th style="padding: 0.85rem 1.25rem; text-align: right;">Action</th>
+                  <th style="padding: 0.85rem 1.25rem; text-align: center;">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -160,13 +160,13 @@
                         {{ stock.resteDisponible }}
                       </span>
                     </td>
-                    <td style="padding: 0.85rem 1.25rem; text-align: right;">
+                    <td style="padding: 0.85rem 1.25rem; text-align: center;">
                       <button 
                         type="button" 
                         (click)="supprimerLigneMenu(ligne.id)"
-                        style="background: none; border: none; color: #9CA3AF; cursor: pointer; padding: 0.4rem; font-size: 0.95rem;"
+                        style="background: none; border: none; color: #DC2626; cursor: pointer; padding: 0.4rem; font-size: 1rem; display: inline-flex; align-items: center; justify-content: center; margin: 0 auto;"
                         title="Retirer ce plat du programme">
-                        <i class="fa-regular fa-trash-can" style="color: #DC2626;"></i>
+                        <i class="fa-regular fa-trash-can"></i>
                       </button>
                     </td>
                   </tr>
