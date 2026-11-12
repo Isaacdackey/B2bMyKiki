@@ -493,7 +493,7 @@
                 <th>Nombre de plats livrés</th>
                 <th>Montant Total</th>
                 <th>Part Prise en Charge Entreprise</th>
-                <th>Statut</th>
+                <th style="text-align: center;">Statut</th>
               </tr>
             </thead>
             <tbody>
@@ -512,10 +512,10 @@
                   <td data-label="Part Entreprise" style="font-weight: 900; color: #E51D24; font-size: 1.05rem;">
                     {{ (l.montantPartEntreprise | number) }} FCFA
                   </td>
-                  <td data-label="Statut">
+                  <td data-label="Statut" style="text-align: center;">
                     <span [style.background]="l.statut === 'FACTURE' ? 'rgba(96, 108, 56, 0.12)' : 'rgba(114, 21, 19, 0.08)'"
                           [style.color]="l.statut === 'FACTURE' ? '#606C38' : '#721513'"
-                          style="padding: 0.3rem 0.65rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem;">
+                          style="padding: 0.3rem 0.65rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;">
                       <i class="fa-solid" [class.fa-circle-check]="l.statut === 'FACTURE'" [class.fa-clock]="l.statut !== 'FACTURE'"></i>
                       {{ l.statut === 'FACTURE' ? 'Facturé' : l.statut === 'VALIDE' ? 'Validé' : 'En cours' }}
                     </span>
