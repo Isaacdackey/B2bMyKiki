@@ -312,11 +312,7 @@ div.badge i[class*="fa-"]:not(:only-child),
   margin-right: 0.45rem;
 }
 
-/* Centrage parfait et forme 100% arrondie (cercle) pour toutes les boîtes et boutons d'icônes du projet */
-button > i[class*="fa-"]:only-child,
-a > i[class*="fa-"]:only-child,
-div > i[class*="fa-"]:only-child,
-span > i[class*="fa-"]:only-child,
+/* Centrage parfait et forme 100% arrondie (cercle) pour les boîtes d'icônes explicites du projet */
 .panier-bouton-top > i[class*="fa-"],
 .dish-fav-btn > i[class*="fa-"],
 .btn-dish-action > i[class*="fa-"],
@@ -326,7 +322,13 @@ span > i[class*="fa-"]:only-child,
 .b2b-sidebar-enterprise-mini > i[class*="fa-"],
 .b2b-sidebar-toggle-btn > i[class*="fa-"],
 .ent-icon > i[class*="fa-"],
-.demo-card-icon > i[class*="fa-"] {
+.demo-card-icon > i[class*="fa-"],
+.slot-icon > i[class*="fa-"],
+.b2b-icon-box-red > i[class*="fa-"],
+.b2b-icon-box-blue > i[class*="fa-"],
+.btn-remove-slot > i[class*="fa-"],
+.btn-icon > i[class*="fa-"],
+.btn-icon-action > i[class*="fa-"] {
   margin: 0 !important;
   padding: 0 !important;
 }
