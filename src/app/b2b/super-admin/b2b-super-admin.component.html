@@ -1541,14 +1541,14 @@
           <!-- Filtres Recherche, Catégorie & Archivage -->
           <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
             <!-- Recherche instantanée -->
-            <div style="position: relative; display: flex; align-items: center;">
-              <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 0.75rem; color: #6E5A56; font-size: 0.8rem; pointer-events: none;"></i>
+            <div style="display: flex; align-items: center; gap: 0.55rem; background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.5rem 0.85rem; width: 220px;">
+              <i class="fa-solid fa-magnifying-glass" style="color: #6E5A56; font-size: 0.85rem; flex-shrink: 0;"></i>
               <input 
                 type="text" 
                 [ngModel]="recherchePlatCatalogue()" 
                 (ngModelChange)="recherchePlatCatalogue.set($event)" 
                 placeholder="Rechercher un plat..." 
-                style="padding: 0.55rem 0.85rem 0.55rem 2.1rem; border: 1.5px solid #EDE7DC; border-radius: 10px; font-size: 0.82rem; width: 190px; outline: none; background: #FFFFFF; color: #332724; font-weight: 600;">
+                style="border: none; outline: none; background: transparent; font-size: 0.82rem; width: 100%; color: #332724; font-weight: 600; padding: 0; margin: 0;">
             </div>
 
             <select 
@@ -1614,11 +1614,6 @@
                         style="position: absolute; top: 12px; left: 12px; color: #FAF8F4; padding: 0.3rem 0.75rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,0.25); display: flex; align-items: center; gap: 0.35rem;">
                     <i class="fa-solid" [class.fa-bowl-food]="plat.categorie === 'PLAT'" [class.fa-leaf]="plat.categorie === 'ENTREE'" [class.fa-cake-candles]="plat.categorie === 'DESSERT'" [class.fa-wine-glass]="plat.categorie === 'BOISSON'"></i>
                     {{ plat.categorie === 'PLAT' ? 'Plat Chaud' : plat.categorie === 'ENTREE' ? 'Entrée' : plat.categorie === 'DESSERT' ? 'Dessert' : 'Boisson' }}
-                  </span>
-
-                  <!-- Badge Vue Top-Down Traiteur -->
-                  <span style="position: absolute; bottom: 10px; right: 12px; background: rgba(51, 39, 36, 0.85); backdrop-filter: blur(4px); color: #FAF8F4; padding: 0.2rem 0.55rem; border-radius: 6px; font-size: 0.65rem; font-weight: 700;">
-                    <i class="fa-solid fa-camera"></i> Cadrage Haut
                   </span>
 
                   @if (plat.isArchive) {
@@ -2441,7 +2436,19 @@
               <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">
                 <i class="fa-solid fa-triangle-exclamation"></i> Allergènes
               </label>
-              <input type="text" [(ngModel)]="platEnEdition().allergene" placeholder="Ex: Gluten, Arachides, Aucun" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem;">
+              <select [(ngModel)]="platEnEdition().allergene" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700; color: #332724; background: #FFFFFF;">
+                <option value="Aucun allergène majeur">Aucun allergène majeur</option>
+                <option value="Gluten">Gluten</option>
+                <option value="Arachides">Arachides</option>
+                <option value="Poisson">Poisson</option>
+                <option value="Crustacés">Crustacés</option>
+                <option value="Œufs">Œufs</option>
+                <option value="Lait / Lactose">Lait / Lactose</option>
+                <option value="Soja">Soja</option>
+                <option value="Fruits à coque">Fruits à coque</option>
+                <option value="Sésame">Sésame</option>
+                <option value="Moutarde">Moutarde</option>
+              </select>
             </div>
 
             <div>
