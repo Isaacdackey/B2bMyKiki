@@ -950,5 +950,299 @@ export class B2bSuperAdminComponent {
       this.planningSemaineGlobal.update(list => list.filter(item => item.id !== id));
     }
   }
+
+  // ==============================================================
+  // ÉTAPE 2 : GESTION DE L'ENTREPRISE (5 ONGLETS)
+  // ==============================================================
+  entrepriseEnGestion = signal<EntrepriseB2B | null>(null);
+  gererActiveTab = signal<'INFOS' | 'UTILISATEURS' | 'MENU' | 'COMMANDES' | 'FACTURATION'>('INFOS');
+
+  // Onglet 2 : Utilisateurs
+  modalNouvelEmploye = signal<boolean>(false);
+  employeEnCreation = signal({
+    matricule: '',
+    nom: '',
+    prenom: '',
+    email: '',
+    telephone: '',
+    departement: 'Opérations',
+    tauxSubvention: 100
+  });
+
+  modalInvitationAdmin = signal<boolean>(false);
+  invitationEnCreation = signal({
+    nomComplet: '',
+    email: '',
+    role: 'RESPONSABLE_ENTREPRISE' as 'RESPONSABLE_ENTREPRISE' | 'RESPONSABLE_SITE_KIKI'
+  });
+  invitationGenereeLien = signal<string | null>(null);
+
+  // Onglet 3 : Menu Planifié
+  jourMenuActif = signal<'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche'>('Lundi');
+  modalDupliquerMenu = signal<boolean>(false);
+  jourCibleDuplication = signal<'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche'>('Mercredi');
+
+  // Onglet 4 : Commandes
+  dateDebutCommandes = signal<string>('2026-11-12');
+  dateFinCommandes = signal<string>('2026-11-12');
+  filtreStatutCommande = signal<'TOUS' | 'EN_COURS' | 'SCANNE' | 'LIVRE'>('TOUS');
+  filtreCategorieCommande = signal<string>('TOUTES');
+  filtrePlatCommande = signal<string>('TOUS');
+
+  // Onglet 5 : Facturation
+  dateDebutFacturation = signal<string>('2026-11-01');
+  dateFinFacturation = signal<string>('2026-11-30');
+
+  // Méthodes pour ouvrir / fermer la gestion de l'entreprise
+  ouvrirGestionEntreprise(ent: EntrepriseB2B) {
+    this.entrepriseEnGestion.set(ent);
+    this.gererActiveTab.set('INFOS');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  fermerGestionEntreprise() {
+    this.entrepriseEnGestion.set(null);
+  }
+
+  // Effectif des employés subventionnés (taux > 0%) de l'entreprise en gestion
+  nbEmployesSubventionnesEntreprise = computed(() => {
+    const ent = this.entrepriseEnGestion();
+    if (!ent) return 0;
+    return this.b2b.listeEmployes().filter(e => e.tauxSubvention > 0).length;
+  });
+
+  // Employés de l'entreprise en gestion
+  employesEntrepriseEnGestion = computed(() => {
+    return this.b2b.listeEmployes();
+  });
+
+  // Invitations pour l'entreprise en gestion
+  invitationsEntrepriseEnGestion = computed(() => {
+    const ent = this.entrepriseEnGestion();
+    if (!ent) return [];
+    return this.b2b.listeInvitationsAdmins().filter(inv => inv.entrepriseId === ent.id || inv.entrepriseId === 'ent-001' || inv.entrepriseId === 'ent-1');
+  });
+
+  // Menu du jour actif pour l'entreprise en gestion
+  menuJourActifEntreprise = computed(() => {
+    const ent = this.entrepriseEnGestion();
+    const jour = this.jourMenuActif();
+    if (!ent) return null;
+    return this.b2b.menusPlanifiesEntreprises().find(m => 
+      (m.entrepriseId === ent.id || m.entrepriseId === 'ent-001' || m.entrepriseId === 'ent-1') && m.jourNom === jour
+    ) || null;
+  });
+
+  // Catégories autorisées pour l'entreprise en gestion
+  categoriesAutoriseesEntreprise = computed(() => {
+    const ent = this.entrepriseEnGestion();
+    if (!ent || !ent.categoriesAutorisees) return ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'];
+    return ent.categoriesAutorisees;
+  });
+
+  // Lignes de menu filtrées par les catégories autorisées
+  lignesMenuFiltreesParCategories = computed(() => {
+    const menu = this.menuJourActifEntreprise();
+    const catsAutorisees = this.categoriesAutoriseesEntreprise();
+    if (!menu) return [];
+    return menu.lignes.filter(l => catsAutorisees.includes(l.categorie));
+  });
+
+  // Statut de conformité du jour actif (Total prévu par catégorie >= nb employés subventionnés)
+  statutConformiteJourActif = computed(() => {
+    const lignes = this.lignesMenuFiltreesParCategories();
+    const subventionnesCount = this.nbEmployesSubventionnesEntreprise();
+    if (lignes.length === 0) return { statut: 'NON_SAISI', message: 'Aucun plat planifié pour ce jour' };
+
+    const totalQuantites = lignes.reduce((s, l) => s + (l.quantitePrevue || 0), 0);
+    if (totalQuantites === 0) {
+      return { statut: 'NON_SAISI', message: 'Quantités non renseignées (menu non affiché aux collaborateurs)' };
+    }
+
+    const categories = Array.from(new Set(lignes.map(l => l.categorie)));
+    for (const cat of categories) {
+      const somme = lignes.filter(l => l.categorie === cat).reduce((s, l) => s + (l.quantitePrevue || 0), 0);
+      if (somme < subventionnesCount) {
+        return {
+          statut: 'NON_CONFORME',
+          message: `Non conforme : seulement ${somme} portions prévues en ${cat} pour ${subventionnesCount} employés subventionnés.`
+        };
+      }
+    }
+
+    return {
+      statut: 'CONFORME',
+      message: `Conforme : les quantités prévues (${totalQuantites} au total) couvrent l'effectif subventionné (${subventionnesCount} pers.).`
+    };
+  });
+
+  // Modification quantité plat du jour
+  onQuantitePlatChange(ligneId: string, event: Event) {
+    const input = event.target as HTMLInputElement;
+    const val = parseInt(input.value, 10) || 0;
+    const menu = this.menuJourActifEntreprise();
+    if (menu) {
+      this.b2b.updateQuantitePlatMenu(menu.id, ligneId, val, this.nbEmployesSubventionnesEntreprise());
+    }
+  }
+
+  // Duplication menu
+  lancerDuplicationMenu() {
+    const menu = this.menuJourActifEntreprise();
+    const ent = this.entrepriseEnGestion();
+    if (!menu || !ent) return;
+    this.b2b.dupliquerMenuJour(menu.id, this.jourCibleDuplication(), ent.id);
+    this.jourMenuActif.set(this.jourCibleDuplication());
+    this.modalDupliquerMenu.set(false);
+  }
+
+  // Création employé
+  enregistrerNouvelEmploye() {
+    const cur = this.employeEnCreation();
+    const ent = this.entrepriseEnGestion();
+    if (!cur.nom || !cur.prenom) {
+      alert('Veuillez renseigner le nom et le prénom de l\'employé.');
+      return;
+    }
+    const matricule = cur.matricule || `${ent?.codeEntreprise || 'EMP'}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const email = cur.email || `${cur.prenom.toLowerCase()}.${cur.nom.toLowerCase()}@client.sn`;
+    this.b2b.ajouterEmploye({
+      matricule,
+      nom: cur.nom,
+      prenom: cur.prenom,
+      email,
+      telephone: cur.telephone || '+221 77 000 00 00',
+      siteId: ent?.id || 'site-1',
+      siteNom: ent?.nom || 'Siège',
+      departement: cur.departement || 'Général',
+      type: cur.tauxSubvention === 0 ? 'AUTONOME' : 'SUBVENTIONNE',
+      tauxSubvention: cur.tauxSubvention,
+      actif: true,
+      repasConsommesMois: 0,
+      montantPrisEnChargeMois: 0
+    });
+    this.modalNouvelEmploye.set(false);
+    this.employeEnCreation.set({ matricule: '', nom: '', prenom: '', email: '', telephone: '', departement: 'Opérations', tauxSubvention: 100 });
+  }
+
+  importerFichierEmployes() {
+    const ent = this.entrepriseEnGestion();
+    const code = ent?.codeEntreprise || 'TOT';
+    const importes = [
+      { matricule: `${code}-9850`, nom: 'Sene', prenom: 'Awa', email: `a.sene@${ent?.codeEntreprise.toLowerCase()}.sn`, telephone: '+221 77 810 20 30', departement: 'Comptabilité', tauxSubvention: 100 },
+      { matricule: `${code}-9851`, nom: 'Thiam', prenom: 'Moussa', email: `m.thiam@${ent?.codeEntreprise.toLowerCase()}.sn`, telephone: '+221 78 920 30 40', departement: 'Logistique', tauxSubvention: 50 },
+      { matricule: `${code}-9852`, nom: 'Gueye', prenom: 'Ndeye', email: `n.gueye@${ent?.codeEntreprise.toLowerCase()}.sn`, telephone: '+221 76 112 23 34', departement: 'Marketing', tauxSubvention: 100 },
+      { matricule: `${code}-EXT-04`, nom: 'Cisse', prenom: 'Djibril (Prestataire)', email: `d.cisse@prestataire.sn`, telephone: '+221 77 444 55 66', departement: 'Sécurité Informatique', tauxSubvention: 0 }
+    ];
+    importes.forEach(imp => {
+      this.b2b.ajouterEmploye({
+        ...imp,
+        siteId: ent?.id || 'site-1',
+        siteNom: ent?.nom || 'Siège',
+        type: imp.tauxSubvention === 0 ? 'AUTONOME' : 'SUBVENTIONNE',
+        actif: true,
+        repasConsommesMois: 0,
+        montantPrisEnChargeMois: 0
+      });
+    });
+    alert(`Importation réussie : ${importes.length} collaborateurs ont été ajoutés avec leurs taux de prise en charge respectifs.`);
+  }
+
+  // Création invitation admin
+  lancerInvitationAdmin() {
+    const cur = this.invitationEnCreation();
+    const ent = this.entrepriseEnGestion();
+    if (!cur.email || !cur.nomComplet) {
+      alert('Veuillez renseigner le nom et l\'adresse email du gestionnaire.');
+      return;
+    }
+    if (!ent) return;
+    const inv = this.b2b.creerInvitationAdmin(cur.email, cur.nomComplet, cur.role, ent);
+    const lien = `https://kikitraiteur.sn/b2b/activation?token=${inv.tokenActivation}&email=${encodeURIComponent(inv.email)}`;
+    this.invitationGenereeLien.set(lien);
+  }
+
+  fermerModalInvitation() {
+    this.modalInvitationAdmin.set(false);
+    this.invitationGenereeLien.set(null);
+    this.invitationEnCreation.set({ nomComplet: '', email: '', role: 'RESPONSABLE_ENTREPRISE' });
+  }
+
+  copierLienActivation(lien: string) {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(lien);
+      alert('Lien d\'activation copié dans le presse-papier !');
+    } else {
+      prompt('Copiez ce lien d\'activation :', lien);
+    }
+  }
+
+  // Commandes filtrées de l'entreprise
+  commandesFiltreesEntreprise = computed(() => {
+    const ent = this.entrepriseEnGestion();
+    if (!ent) return [];
+    let list = this.b2b.listeCommandesSite().filter(c => c.entrepriseId === ent.id || c.entrepriseId === 'ent-001' || c.entrepriseId === 'ent-1');
+
+    // Filtre période
+    const debut = this.dateDebutCommandes();
+    const fin = this.dateFinCommandes();
+    if (debut && fin) {
+      list = list.filter(c => c.date >= debut && c.date <= fin);
+    }
+
+    // Filtre statut
+    const st = this.filtreStatutCommande();
+    if (st !== 'TOUS') {
+      list = list.filter(c => c.statut === st);
+    }
+
+    // Filtre catégorie
+    const cat = this.filtreCategorieCommande();
+    if (cat !== 'TOUTES') {
+      list = list.filter(c => c.categorie === cat);
+    }
+
+    // Filtre plat
+    const plat = this.filtrePlatCommande();
+    if (plat !== 'TOUS') {
+      list = list.filter(c => c.platNom === plat);
+    }
+
+    return list;
+  });
+
+  // Plats uniques dans les commandes
+  platsUniquesCommandes = computed(() => {
+    const cmds = this.b2b.listeCommandesSite();
+    return Array.from(new Set(cmds.map(c => c.platNom)));
+  });
+
+  // Actions Statuts Commandes
+  simulerScanCommande(cmdId: string) {
+    this.b2b.scannerCommandeSite(cmdId);
+  }
+
+  marquerLivree(cmdId: string) {
+    this.b2b.marquerCommandeLivree(cmdId);
+  }
+
+  // Facturation journalière filtrée
+  lignesFacturationFiltrees = computed(() => {
+    const debut = this.dateDebutFacturation();
+    const fin = this.dateFinFacturation();
+    return this.b2b.lignesFacturationEntreprise().filter(l => l.date >= debut && l.date <= fin);
+  });
+
+  totalFacturationPeriode = computed(() => {
+    const lignes = this.lignesFacturationFiltrees();
+    return lignes.reduce((acc, l) => ({
+      repas: acc.repas + l.nbPlatsLivres,
+      presents: acc.presents + l.nbPresents,
+      montantTotal: acc.montantTotal + l.montantTotal,
+      partEntreprise: acc.partEntreprise + l.montantPartEntreprise,
+      partEmploye: acc.partEmploye + l.montantPartEmploye
+    }), { repas: 0, presents: 0, montantTotal: 0, partEntreprise: 0, partEmploye: 0 });
+  });
 }
+
 

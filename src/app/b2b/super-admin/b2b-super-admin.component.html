@@ -521,6 +521,769 @@
     @if (activeSection() === 'ENTREPRISES' || activeSection() === 'SITES') {
       <div>
         
+        <!-- ============================================================== -->
+        <!-- VUE A : INTERFACE DÉTAILLÉE « GÉRER L'ENTREPRISE » (5 ONGLETS)  -->
+        <!-- ============================================================== -->
+        @if (entrepriseEnGestion(); as entGestion) {
+          <div style="margin-bottom: 2.5rem; animation: fadeIn 0.25s ease;">
+            
+            <!-- Fil d'Ariane & En-tête Entreprise en gestion -->
+            <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.25rem 1.5rem; margin-bottom: 1.25rem; box-shadow: 0 4px 18px rgba(114, 21, 19, 0.04);">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #6E5A56; margin-bottom: 0.35rem;">
+                    <a (click)="fermerGestionEntreprise()" style="color: #721513; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
+                      <i class="fa-solid fa-arrow-left"></i> Répertoire Entreprises
+                    </a>
+                    <span>/</span>
+                    <span style="font-weight: 800; color: #332724;">{{ entGestion.nom }}</span>
+                    <span style="background: rgba(114, 21, 19, 0.08); color: #721513; font-weight: 800; font-size: 0.72rem; padding: 0.15rem 0.5rem; border-radius: 4px;">
+                      {{ entGestion.codeEntreprise }}
+                    </span>
+                  </div>
+                  <h1 style="margin: 0; font-size: 1.65rem; color: #721513; font-weight: 900; letter-spacing: -0.02em;">
+                    Gestion & Administration • {{ entGestion.nom }}
+                  </h1>
+                  <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #6E5A56;">
+                    Convention {{ entGestion.montantPriseEnChargeRepas | number }} FCFA/repas • Prestation : {{ getLibellePrestation(entGestion.typePrestation) }} • Cut-Off : {{ getLibelleCutOff(entGestion) }}
+                  </p>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <button (click)="fermerGestionEntreprise()" class="sa-btn-action" style="background: #FFFFFF;">
+                    <i class="fa-solid fa-xmark"></i> Quitter la gestion
+                  </button>
+                  <button (click)="ouvrirModalModifierEntreprise(entGestion)" class="sa-btn-action" style="background: #FAF5EA; color: #721513; border-color: #C5A880; font-weight: 700;">
+                    <i class="fa-regular fa-pen-to-square"></i> Modifier convention
+                  </button>
+                </div>
+              </div>
+
+              <!-- BARRE DES 5 ONGLETS DE GESTION -->
+              <div style="display: flex; gap: 0.5rem; margin-top: 1.25rem; border-top: 1px solid #F0EAE1; padding-top: 1rem; overflow-x: auto;">
+                <button 
+                  type="button" 
+                  (click)="gererActiveTab.set('INFOS')"
+                  [style.background]="gererActiveTab() === 'INFOS' ? '#721513' : '#FAF8F4'"
+                  [style.color]="gererActiveTab() === 'INFOS' ? '#FFFFFF' : '#332724'"
+                  [style.border-color]="gererActiveTab() === 'INFOS' ? '#721513' : '#EDE7DC'"
+                  class="sa-btn-action" style="font-weight: 800; font-size: 0.85rem; padding: 0.6rem 1.1rem; border-radius: 10px;">
+                  <i class="fa-solid fa-circle-info"></i> Informations de l'entreprise
+                </button>
+
+                <button 
+                  type="button" 
+                  (click)="gererActiveTab.set('UTILISATEURS')"
+                  [style.background]="gererActiveTab() === 'UTILISATEURS' ? '#721513' : '#FAF8F4'"
+                  [style.color]="gererActiveTab() === 'UTILISATEURS' ? '#FFFFFF' : '#332724'"
+                  [style.border-color]="gererActiveTab() === 'UTILISATEURS' ? '#721513' : '#EDE7DC'"
+                  class="sa-btn-action" style="font-weight: 800; font-size: 0.85rem; padding: 0.6rem 1.1rem; border-radius: 10px;">
+                  <i class="fa-solid fa-users-gear"></i> Utilisateurs & Comptes ({{ employesEntrepriseEnGestion().length }})
+                </button>
+
+                <button 
+                  type="button" 
+                  (click)="gererActiveTab.set('MENU')"
+                  [style.background]="gererActiveTab() === 'MENU' ? '#721513' : '#FAF8F4'"
+                  [style.color]="gererActiveTab() === 'MENU' ? '#FFFFFF' : '#332724'"
+                  [style.border-color]="gererActiveTab() === 'MENU' ? '#721513' : '#EDE7DC'"
+                  class="sa-btn-action" style="font-weight: 800; font-size: 0.85rem; padding: 0.6rem 1.1rem; border-radius: 10px;">
+                  <i class="fa-solid fa-calendar-days"></i> Menu Planifié (Calendrier)
+                </button>
+
+                <button 
+                  type="button" 
+                  (click)="gererActiveTab.set('COMMANDES')"
+                  [style.background]="gererActiveTab() === 'COMMANDES' ? '#721513' : '#FAF8F4'"
+                  [style.color]="gererActiveTab() === 'COMMANDES' ? '#FFFFFF' : '#332724'"
+                  [style.border-color]="gererActiveTab() === 'COMMANDES' ? '#721513' : '#EDE7DC'"
+                  class="sa-btn-action" style="font-weight: 800; font-size: 0.85rem; padding: 0.6rem 1.1rem; border-radius: 10px;">
+                  <i class="fa-solid fa-receipt"></i> Commandes du Jour & Suivi
+                </button>
+
+                <button 
+                  type="button" 
+                  (click)="gererActiveTab.set('FACTURATION')"
+                  [style.background]="gererActiveTab() === 'FACTURATION' ? '#721513' : '#FAF8F4'"
+                  [style.color]="gererActiveTab() === 'FACTURATION' ? '#FFFFFF' : '#332724'"
+                  [style.border-color]="gererActiveTab() === 'FACTURATION' ? '#721513' : '#EDE7DC'"
+                  class="sa-btn-action" style="font-weight: 800; font-size: 0.85rem; padding: 0.6rem 1.1rem; border-radius: 10px;">
+                  <i class="fa-solid fa-file-invoice-dollar"></i> Facturation Journalière
+                </button>
+              </div>
+            </div>
+
+            <!-- ============================================================== -->
+            <!-- ONGLET 1 : INFORMATIONS DE L'ENTREPRISE                         -->
+            <!-- ============================================================== -->
+            @if (gererActiveTab() === 'INFOS') {
+              <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.25rem;">
+                
+                <!-- Carte Informations Générales & Contrat -->
+                <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 18px rgba(114, 21, 19, 0.04);">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+                    <h3 style="margin: 0; font-size: 1.15rem; color: #721513; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+                      <i class="fa-solid fa-building"></i> Convention & Données Juridiques
+                    </h3>
+                    <span style="font-size: 0.75rem; font-weight: 800; color: #606C38; background: rgba(96, 108, 56, 0.1); padding: 0.25rem 0.6rem; border-radius: 9999px;">
+                      <i class="fa-solid fa-circle-check"></i> Convention Active
+                    </span>
+                  </div>
+
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div style="background: #FAF8F4; padding: 0.85rem; border-radius: 10px; border: 1px solid #EDE7DC;">
+                      <div style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">Raison Sociale (1 Site = 1 Entreprise)</div>
+                      <div style="font-size: 1rem; font-weight: 800; color: #332724; margin-top: 0.2rem;">{{ entGestion.nom }}</div>
+                    </div>
+                    <div style="background: #FAF8F4; padding: 0.85rem; border-radius: 10px; border: 1px solid #EDE7DC;">
+                      <div style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">Code Entreprise</div>
+                      <div style="font-size: 1rem; font-weight: 800; color: #721513; margin-top: 0.2rem;">{{ entGestion.codeEntreprise }}</div>
+                    </div>
+
+                    <div style="background: #FAF8F4; padding: 0.85rem; border-radius: 10px; border: 1px solid #EDE7DC;">
+                      <div style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">NINEA</div>
+                      <div style="font-size: 0.95rem; font-weight: 700; color: #332724; margin-top: 0.2rem;">{{ entGestion.ninea || 'Non renseigné' }}</div>
+                    </div>
+                    <div style="background: #FAF8F4; padding: 0.85rem; border-radius: 10px; border: 1px solid #EDE7DC;">
+                      <div style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">RCCM (Registre du Commerce)</div>
+                      <div style="font-size: 0.95rem; font-weight: 700; color: #332724; margin-top: 0.2rem;">{{ entGestion.rccm || 'Non renseigné' }}</div>
+                    </div>
+
+                    <div style="background: #FAF8F4; padding: 0.85rem; border-radius: 10px; border: 1px solid #EDE7DC;">
+                      <div style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">Adresse Physique</div>
+                      <div style="font-size: 0.9rem; font-weight: 600; color: #332724; margin-top: 0.2rem;">{{ entGestion.adresse || 'Dakar' }}</div>
+                    </div>
+                    <div style="background: #FAF8F4; padding: 0.85rem; border-radius: 10px; border: 1px solid #EDE7DC;">
+                      <div style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">Cadence de Facturation</div>
+                      <div style="font-size: 0.95rem; font-weight: 700; color: #332724; margin-top: 0.2rem;">{{ entGestion.cadenceFacturation || 'MENSUELLE' }}</div>
+                    </div>
+
+                    <div style="background: #FAF8F4; padding: 0.85rem; border-radius: 10px; border: 1px solid #EDE7DC;">
+                      <div style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">Email Contact Référent</div>
+                      <div style="font-size: 0.9rem; font-weight: 600; color: #721513; margin-top: 0.2rem;">{{ entGestion.emailContact || 'contact@client.sn' }}</div>
+                    </div>
+                    <div style="background: #FAF8F4; padding: 0.85rem; border-radius: 10px; border: 1px solid #EDE7DC;">
+                      <div style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">Téléphone Contact</div>
+                      <div style="font-size: 0.9rem; font-weight: 600; color: #332724; margin-top: 0.2rem;">{{ entGestion.telephone || '+221 33 000 00 00' }}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Carte Paramètres Opérationnels : Prestation, Catégories, Cut-off -->
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                  
+                  <!-- Bloc Offre Repas -->
+                  <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 1.25rem;">
+                    <div style="font-size: 0.75rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">
+                      <i class="fa-solid fa-hand-holding-dollar" style="color: #606C38;"></i> Offre Kiki par Repas
+                    </div>
+                    <div style="font-size: 1.85rem; font-weight: 900; color: #721513; margin: 0.35rem 0 0.15rem;">
+                      {{ (entGestion.montantPriseEnChargeRepas || 5000 | number) }} <span style="font-size: 0.95rem; font-weight: 700; color: #6E5A56;">FCFA</span>
+                    </div>
+                    <div style="font-size: 0.75rem; color: #6E5A56;">
+                      Prix forfaitaire unitaire conventionné pour chaque formule servie.
+                    </div>
+                  </div>
+
+                  <!-- Bloc Cut-off -->
+                  <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 1.25rem;">
+                    <div style="font-size: 0.75rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">
+                      <i class="fa-regular fa-clock" style="color: #E51D24;"></i> Heure Limite de Commande (Cut-Off)
+                    </div>
+                    <div style="font-size: 1.25rem; font-weight: 800; color: #332724; margin: 0.35rem 0 0.15rem;">
+                      {{ getLibelleCutOff(entGestion) }}
+                    </div>
+                    <div style="font-size: 0.75rem; color: #6E5A56;">
+                      Au-delà de cette heure, la commande pour la journée est automatiquement verrouillée.
+                    </div>
+                  </div>
+
+                  <!-- Bloc Prestation & Catégories -->
+                  <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 1.25rem;">
+                    <div style="font-size: 0.75rem; font-weight: 800; color: #6E5A56; text-transform: uppercase; margin-bottom: 0.35rem;">
+                      <i class="fa-solid fa-utensils" style="color: #C5A880;"></i> Prestation & Catégories Autorisées
+                    </div>
+                    <div style="font-weight: 800; color: #721513; font-size: 0.95rem; margin-bottom: 0.5rem;">
+                      {{ getLibellePrestation(entGestion.typePrestation) }}
+                    </div>
+                    <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+                      @for (cat of entGestion.categoriesAutorisees; track cat) {
+                        <span style="background: #FFFFFF; border: 1px solid #EDE7DC; font-size: 0.72rem; font-weight: 700; color: #332724; padding: 0.2rem 0.55rem; border-radius: 6px;">
+                          {{ cat }}
+                        </span>
+                      }
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+            }
+
+            <!-- ============================================================== -->
+            <!-- ONGLET 2 : UTILISATEURS (COMPTES, EMPLOYÉS & INVITATIONS)       -->
+            <!-- ============================================================== -->
+            @if (gererActiveTab() === 'UTILISATEURS') {
+              <div>
+                
+                <!-- Sous-section A : Administrateurs (Invitations par email) -->
+                <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 4px 18px rgba(114, 21, 19, 0.04);">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+                    <div>
+                      <h3 style="margin: 0; font-size: 1.15rem; color: #721513; font-weight: 800;">
+                        <i class="fa-solid fa-envelope-open-text"></i> Administrateurs Référents (Invitations par Email)
+                      </h3>
+                      <p style="margin: 0.2rem 0 0; font-size: 0.8rem; color: #6E5A56;">
+                        Accès pour l'Admin Entreprise (RH) et pour le Responsable de Site Kiki via lien sécurisé de première activation.
+                      </p>
+                    </div>
+
+                    <button (click)="modalInvitationAdmin.set(true)" class="sa-btn-primary" style="font-size: 0.82rem; padding: 0.5rem 0.95rem;">
+                      <i class="fa-solid fa-paper-plane"></i> Inviter un Administrateur
+                    </button>
+                  </div>
+
+                  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem;">
+                    @for (inv of invitationsEntrepriseEnGestion(); track inv.id) {
+                      <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 12px; padding: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                          <div>
+                            <span style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; padding: 0.2rem 0.55rem; border-radius: 9999px;"
+                              [style.background]="inv.role === 'RESPONSABLE_ENTREPRISE' ? 'rgba(114, 21, 19, 0.1)' : 'rgba(96, 108, 56, 0.1)'"
+                              [style.color]="inv.role === 'RESPONSABLE_ENTREPRISE' ? '#721513' : '#606C38'">
+                              {{ inv.roleLibelle }}
+                            </span>
+                            <div style="font-size: 0.95rem; font-weight: 800; color: #332724; margin-top: 0.35rem;">
+                              {{ inv.nomComplet }}
+                            </div>
+                            <div style="font-size: 0.8rem; color: #6E5A56;">
+                              <i class="fa-regular fa-envelope"></i> {{ inv.email }}
+                            </div>
+                          </div>
+
+                          <span style="font-size: 0.72rem; font-weight: 800; padding: 0.2rem 0.5rem; border-radius: 6px;"
+                            [style.background]="inv.statut === 'ACTIVE' ? 'rgba(96, 108, 56, 0.1)' : 'rgba(197, 168, 128, 0.2)'"
+                            [style.color]="inv.statut === 'ACTIVE' ? '#606C38' : '#721513'">
+                            {{ inv.statut === 'ACTIVE' ? 'Compte Activé' : 'Invitation Envoyée' }}
+                          </span>
+                        </div>
+
+                        <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed #EDE7DC; display: flex; justify-content: space-between; align-items: center;">
+                          <div style="font-size: 0.72rem; color: #6E5A56;">
+                            Jeton : <code>{{ inv.tokenActivation }}</code>
+                          </div>
+                          <button 
+                            type="button"
+                            (click)="copierLienActivation('https://kikitraiteur.sn/b2b/activation?token=' + inv.tokenActivation + '&email=' + inv.email)"
+                            class="sa-btn-action" style="font-size: 0.72rem; padding: 0.3rem 0.65rem;">
+                            <i class="fa-regular fa-copy"></i> Copier lien d'activation
+                          </button>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- Sous-section B : Répertoire des Employés et Taux de prise en charge -->
+                <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.25rem 1.5rem; box-shadow: 0 4px 18px rgba(114, 21, 19, 0.04);">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+                    <div>
+                      <h3 style="margin: 0; font-size: 1.15rem; color: #721513; font-weight: 800;">
+                        <i class="fa-solid fa-users"></i> Liste des Employés de l'Entreprise ({{ employesEntrepriseEnGestion().length }})
+                      </h3>
+                      <p style="margin: 0.2rem 0 0; font-size: 0.8rem; color: #6E5A56;">
+                        Taux individuel de subvention repas Kiki : 100%, 50%, 25% ou 0% (Autonome).
+                      </p>
+                    </div>
+
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                      <button (click)="importerFichierEmployes()" class="sa-btn-action" style="font-size: 0.82rem; padding: 0.5rem 0.95rem; font-weight: 700; color: #606C38; border-color: #606C38;">
+                        <i class="fa-solid fa-file-import"></i> Importer un Fichier (CSV/Excel)
+                      </button>
+                      <button (click)="modalNouvelEmploye.set(true)" class="sa-btn-primary" style="font-size: 0.82rem; padding: 0.5rem 0.95rem;">
+                        <i class="fa-solid fa-user-plus"></i> Ajouter un Employé
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Tableau des Collaborateurs -->
+                  <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
+                      <thead>
+                        <tr style="background: #FAF8F4; border-bottom: 2px solid #EDE7DC; color: #6E5A56; font-size: 0.75rem; text-transform: uppercase;">
+                          <th style="padding: 0.75rem 1rem;">Matricule</th>
+                          <th style="padding: 0.75rem 1rem;">Nom & Prénom</th>
+                          <th style="padding: 0.75rem 1rem;">Département</th>
+                          <th style="padding: 0.75rem 1rem;">Email & Téléphone</th>
+                          <th style="padding: 0.75rem 1rem; text-align: center;">Taux Prise en Charge</th>
+                          <th style="padding: 0.75rem 1rem; text-align: center;">Profil</th>
+                          <th style="padding: 0.75rem 1rem; text-align: right;">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (emp of employesEntrepriseEnGestion(); track emp.id) {
+                          <tr style="border-bottom: 1px solid #F0EAE1;">
+                            <td style="padding: 0.75rem 1rem; font-weight: 800; color: #721513;">
+                              {{ emp.matricule }}
+                            </td>
+                            <td style="padding: 0.75rem 1rem; font-weight: 800; color: #332724;">
+                              {{ emp.prenom }} {{ emp.nom }}
+                            </td>
+                            <td style="padding: 0.75rem 1rem; color: #6E5A56;">
+                              {{ emp.departement }}
+                            </td>
+                            <td style="padding: 0.75rem 1rem; color: #6E5A56; font-size: 0.8rem;">
+                              <div>{{ emp.email }}</div>
+                              <div>{{ emp.telephone }}</div>
+                            </td>
+                            <td style="padding: 0.75rem 1rem; text-align: center;">
+                              <!-- Sélecteur rapide de taux de prise en charge -->
+                              <select 
+                                [value]="emp.tauxSubvention" 
+                                (change)="b2b.setTauxSubventionEmploye(emp.id, +$any($event.target).value)"
+                                style="height: 32px; padding: 0 0.5rem; font-size: 0.8rem; font-weight: 800; border-radius: 6px; border: 1.5px solid #EDE7DC; background: #FFFFFF; min-width: 175px;"
+                                [style.color]="emp.tauxSubvention === 100 ? '#606C38' : (emp.tauxSubvention === 0 ? '#6E5A56' : '#C05621')">
+                                <option [value]="100" [selected]="emp.tauxSubvention === 100">100% (Prise en charge intégrale)</option>
+                                <option [value]="70" [selected]="emp.tauxSubvention === 70">70% subventionné</option>
+                                <option [value]="50" [selected]="emp.tauxSubvention === 50">50% subventionné</option>
+                                <option [value]="25" [selected]="emp.tauxSubvention === 25">25% subventionné</option>
+                                <option [value]="0" [selected]="emp.tauxSubvention === 0">0% (Frais perso. / Autonome)</option>
+                              </select>
+                            </td>
+                            <td style="padding: 0.75rem 1rem; text-align: center;">
+                              <span style="font-size: 0.72rem; font-weight: 800; padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.35rem;"
+                                [style.background]="emp.tauxSubvention > 0 ? 'rgba(96, 108, 56, 0.12)' : 'rgba(110, 90, 86, 0.1)'"
+                                [style.color]="emp.tauxSubvention > 0 ? '#606C38' : '#6E5A56'">
+                                @if (emp.tauxSubvention > 0) {
+                                  <i class="fa-solid fa-circle-check"></i> Subventionné ({{ emp.tauxSubvention }}%)
+                                } @else {
+                                  <i class="fa-solid fa-user"></i> Autonome (0%)
+                                }
+                              </span>
+                            </td>
+                            <td style="padding: 0.75rem 1rem; text-align: right;">
+                              <span style="font-size: 0.78rem; font-weight: 700; color: #606C38;">
+                                <i class="fa-solid fa-check"></i> Actif
+                              </span>
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+              </div>
+            }
+
+            <!-- ============================================================== -->
+            <!-- ONGLET 3 : MENU PLANIFIÉ (CALENDRIER, DUPLICATION & QUANTITÉS)  -->
+            <!-- ============================================================== -->
+            @if (gererActiveTab() === 'MENU') {
+              <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 18px rgba(114, 21, 19, 0.04);">
+                
+                <!-- En-tête Titre & Boutons -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+                  <div>
+                    <h3 style="margin: 0; font-size: 1.25rem; color: #721513; font-weight: 800;">
+                      <i class="fa-solid fa-calendar-week"></i> Menu de la semaine
+                    </h3>
+                    <p style="margin: 0.2rem 0 0; font-size: 0.85rem; color: #6E5A56;">
+                      Un menu par jour — cliquez sur un jour pour gérer ses plats et ses quantités prévues.
+                    </p>
+                  </div>
+
+                  <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                    <button (click)="modalDupliquerMenu.set(true)" class="sa-btn-action" style="font-weight: 800; color: #721513; border-color: #C5A880; background: #FAF5EA;">
+                      <i class="fa-regular fa-copy"></i> Dupliquer ce jour...
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 3 CARTES KPIs INSPIRÉES DE LA CAPTURE FOURNIE -->
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                  <!-- KPI 1 : Jours Configurés -->
+                  <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 1.15rem 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                      <div style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase; letter-spacing: 0.05em;">
+                        Jours Configurés
+                      </div>
+                      <div style="font-size: 1.85rem; font-weight: 900; color: #721513; margin-top: 0.25rem; line-height: 1;">
+                        5 <span style="font-size: 1rem; color: #6E5A56; font-weight: 700;">/ 7</span>
+                      </div>
+                    </div>
+                    <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(114, 21, 19, 0.1); color: #721513; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
+                      <i class="fa-solid fa-calendar-check"></i>
+                    </div>
+                  </div>
+
+                  <!-- KPI 2 : Jours Restants -->
+                  <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 1.15rem 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                      <div style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase; letter-spacing: 0.05em;">
+                        Jours Restants à Saisir
+                      </div>
+                      <div style="font-size: 1.85rem; font-weight: 900; color: #C05621; margin-top: 0.25rem; line-height: 1;">
+                        2 <span style="font-size: 1rem; color: #6E5A56; font-weight: 700;">jours</span>
+                      </div>
+                    </div>
+                    <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(192, 86, 33, 0.1); color: #C05621; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
+                      <i class="fa-solid fa-hourglass-half"></i>
+                    </div>
+                  </div>
+
+                  <!-- KPI 3 : Plats au Total -->
+                  <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 1.15rem 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                      <div style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase; letter-spacing: 0.05em;">
+                        Plats au Total
+                      </div>
+                      <div style="font-size: 1.85rem; font-weight: 900; color: #606C38; margin-top: 0.25rem; line-height: 1;">
+                        18 <span style="font-size: 1rem; color: #6E5A56; font-weight: 700;">variétés</span>
+                      </div>
+                    </div>
+                    <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(96, 108, 56, 0.1); color: #606C38; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
+                      <i class="fa-solid fa-bowl-food"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Navigation des Jours de la Semaine -->
+                <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; margin-bottom: 1.5rem;">
+                  @for (jour of ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']; track jour) {
+                    <button 
+                      type="button"
+                      (click)="jourMenuActif.set($any(jour))"
+                      style="padding: 0.75rem 0.5rem; border-radius: 10px; border: 1.5px solid; text-align: center; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center;"
+                      [style.background]="jourMenuActif() === jour ? '#721513' : '#FAF8F4'"
+                      [style.color]="jourMenuActif() === jour ? '#FFFFFF' : '#332724'"
+                      [style.border-color]="jourMenuActif() === jour ? '#721513' : '#EDE7DC'">
+                      <div style="font-size: 0.88rem; font-weight: 800; line-height: 1;">{{ jour }}</div>
+                    </button>
+                  }
+                </div>
+
+                <!-- Bandeau Thème du jour & Alerte de Conformité -->
+                <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                  <div>
+                    <span style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">
+                      Menu du {{ jourMenuActif() }} • Thème Culinaire
+                    </span>
+                    <div style="font-size: 1.15rem; font-weight: 900; color: #721513; margin-top: 0.2rem;">
+                      {{ menuJourActifEntreprise()?.theme || 'Menu Gourmand & Équilibré' }}
+                    </div>
+                  </div>
+
+                  <!-- Indicateur Conforme / Non conforme automatique -->
+                  <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    @if (statutConformiteJourActif().statut === 'CONFORME') {
+                      <div style="background: rgba(96, 108, 56, 0.12); border: 1.5px solid #606C38; color: #606C38; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fa-solid fa-circle-check" style="font-size: 1.1rem;"></i>
+                        <span>{{ statutConformiteJourActif().message }}</span>
+                      </div>
+                    } @else if (statutConformiteJourActif().statut === 'NON_CONFORME') {
+                      <div style="background: rgba(229, 29, 36, 0.1); border: 1.5px solid #E51D24; color: #E51D24; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.1rem;"></i>
+                        <span>{{ statutConformiteJourActif().message }}</span>
+                      </div>
+                    } @else {
+                      <div style="background: rgba(197, 168, 128, 0.2); border: 1.5px solid #C5A880; color: #721513; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fa-solid fa-circle-exclamation" style="font-size: 1.1rem;"></i>
+                        <span>{{ statutConformiteJourActif().message }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- Grille des Plats du Jour (filtrée selon les catégories autorisées) -->
+                @if (lignesMenuFiltreesParCategories().length === 0) {
+                  <div style="text-align: center; padding: 3rem 1rem; background: #FAF8F4; border-radius: 12px; border: 1.5px dashed #EDE7DC;">
+                    <i class="fa-solid fa-utensils" style="font-size: 2rem; color: #C5A880; margin-bottom: 0.5rem;"></i>
+                    <p style="margin: 0; font-size: 0.95rem; font-weight: 700; color: #721513;">
+                      Aucun plat planifié pour ce jour ou aucune catégorie autorisée correspondante.
+                    </p>
+                    <p style="margin: 0.25rem 0 0; font-size: 0.8rem; color: #6E5A56;">
+                      Utilisez le bouton « Dupliquer ce jour » pour importer les plats d'un autre jour.
+                    </p>
+                  </div>
+                } @else {
+                  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;">
+                    @for (ligne of lignesMenuFiltreesParCategories(); track ligne.id) {
+                      <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 12px; padding: 1rem; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <span style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; padding: 0.2rem 0.5rem; border-radius: 6px; background: #FAF8F4; color: #721513; border: 1px solid #EDE7DC;">
+                              {{ ligne.categorie }}
+                            </span>
+                            <span style="font-size: 0.72rem; color: #606C38; font-weight: 700;">
+                              <i class="fa-solid fa-check"></i> Au menu
+                            </span>
+                          </div>
+
+                          <div style="font-size: 0.95rem; font-weight: 800; color: #332724; line-height: 1.35; margin-bottom: 0.75rem;">
+                            {{ ligne.nomPlat }}
+                          </div>
+                        </div>
+
+                        <!-- Saisie de la quantité prévue pour ce plat -->
+                        <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 8px; padding: 0.65rem 0.75rem; display: flex; justify-content: space-between; align-items: center;">
+                          <label [for]="'qte-' + ligne.id" style="font-size: 0.75rem; font-weight: 800; color: #6E5A56;">
+                            Quantité prévue :
+                          </label>
+                          <div style="display: flex; align-items: center; gap: 0.35rem;">
+                            <input 
+                              [id]="'qte-' + ligne.id" 
+                              type="number" 
+                              min="0"
+                              [value]="ligne.quantitePrevue || 0"
+                              (input)="onQuantitePlatChange(ligne.id, $event)"
+                              style="width: 70px; height: 32px; border-radius: 6px; border: 1.5px solid #EDE7DC; font-size: 0.9rem; font-weight: 900; color: #721513; text-align: center; background: #FFFFFF;" />
+                            <span style="font-size: 0.75rem; font-weight: 700; color: #6E5A56;">portions</span>
+                          </div>
+                        </div>
+
+                      </div>
+                    }
+                  </div>
+                }
+
+              </div>
+            }
+
+            <!-- ============================================================== -->
+            <!-- ONGLET 4 : COMMANDES (DU JOUR PAR DÉFAUT + FILTRES + 3 STATUTS) -->
+            <!-- ============================================================== -->
+            @if (gererActiveTab() === 'COMMANDES') {
+              <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 18px rgba(114, 21, 19, 0.04);">
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+                  <div>
+                    <h3 style="margin: 0; font-size: 1.25rem; color: #721513; font-weight: 800;">
+                      <i class="fa-solid fa-list-check"></i> Commandes & Distribution du Jour ({{ commandesFiltreesEntreprise().length }})
+                    </h3>
+                    <p style="margin: 0.2rem 0 0; font-size: 0.85rem; color: #6E5A56;">
+                      Suivi du cycle de distribution : En cours &rarr; Scanné (QR cantine) &rarr; Livré.
+                    </p>
+                  </div>
+
+                  <!-- Sélecteur rapide de dates & filtres -->
+                  <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 0.35rem; background: #FAF8F4; padding: 0.35rem 0.65rem; border-radius: 8px; border: 1px solid #EDE7DC;">
+                      <span style="font-size: 0.75rem; font-weight: 800; color: #6E5A56;">Du :</span>
+                      <input type="date" [(ngModel)]="dateDebutCommandes" style="height: 30px; font-size: 0.78rem; border: 1px solid #EDE7DC; border-radius: 4px; padding: 0 0.4rem;" />
+                      <span style="font-size: 0.75rem; font-weight: 800; color: #6E5A56;">Au :</span>
+                      <input type="date" [(ngModel)]="dateFinCommandes" style="height: 30px; font-size: 0.78rem; border: 1px solid #EDE7DC; border-radius: 4px; padding: 0 0.4rem;" />
+                    </div>
+
+                    <!-- Filtre Statut -->
+                    <select [(ngModel)]="filtreStatutCommande" style="height: 38px; padding: 0 0.6rem; font-size: 0.8rem; font-weight: 700; border-radius: 8px; border: 1.5px solid #EDE7DC; background: #FFFFFF; color: #332724;">
+                      <option value="TOUS">Tous les statuts</option>
+                      <option value="EN_COURS">En cours (Non récupéré)</option>
+                      <option value="SCANNE">Scanné (Présent à la cantine)</option>
+                      <option value="LIVRE">Livré (Plateau remis)</option>
+                    </select>
+
+                    <!-- Filtre Plat -->
+                    <select [(ngModel)]="filtrePlatCommande" style="height: 38px; padding: 0 0.6rem; font-size: 0.8rem; font-weight: 700; border-radius: 8px; border: 1.5px solid #EDE7DC; background: #FFFFFF; color: #332724;">
+                      <option value="TOUS">Tous les plats</option>
+                      @for (p of platsUniquesCommandes(); track p) {
+                        <option [value]="p">{{ p }}</option>
+                      }
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Tableau des commandes -->
+                <div style="overflow-x: auto;">
+                  <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
+                    <thead>
+                      <tr style="background: #FAF8F4; border-bottom: 2px solid #EDE7DC; color: #6E5A56; font-size: 0.75rem; text-transform: uppercase;">
+                        <th style="padding: 0.75rem 1rem;">Réf. Commande</th>
+                        <th style="padding: 0.75rem 1rem;">Date & Heure</th>
+                        <th style="padding: 0.75rem 1rem;">Matricule & Salarié</th>
+                        <th style="padding: 0.75rem 1rem;">Plat Commandé</th>
+                        <th style="padding: 0.75rem 1rem; text-align: right;">Total & Prise en charge</th>
+                        <th style="padding: 0.75rem 1rem; text-align: center;">Statut Distribution</th>
+                        <th style="padding: 0.75rem 1rem; text-align: right;">Action Cantine</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (cmd of commandesFiltreesEntreprise(); track cmd.id) {
+                        <tr style="border-bottom: 1px solid #F0EAE1;">
+                          <td style="padding: 0.75rem 1rem; font-weight: 800; color: #721513;">
+                            {{ cmd.codeCommande }}
+                          </td>
+                          <td style="padding: 0.75rem 1rem; color: #6E5A56; font-size: 0.8rem;">
+                            {{ cmd.date }} • {{ cmd.heure }}
+                          </td>
+                          <td style="padding: 0.75rem 1rem;">
+                            <div style="font-weight: 800; color: #332724;">{{ cmd.employeNom }}</div>
+                            <div style="font-size: 0.75rem; color: #6E5A56;">{{ cmd.matricule }}</div>
+                          </td>
+                          <td style="padding: 0.75rem 1rem; font-weight: 700; color: #332724;">
+                            {{ cmd.platNom }}
+                          </td>
+                          <td style="padding: 0.75rem 1rem; text-align: right;">
+                            <div style="font-weight: 800; color: #721513;">{{ cmd.montantTotal | number }} FCFA</div>
+                            <div style="font-size: 0.72rem; color: #606C38;">Kiki : {{ cmd.partEntreprise | number }} | Emp : {{ cmd.partEmploye | number }}</div>
+                          </td>
+                          <td style="padding: 0.75rem 1rem; text-align: center;">
+                            @if (cmd.statut === 'EN_COURS') {
+                              <span style="background: rgba(110, 90, 86, 0.1); color: #6E5A56; font-size: 0.72rem; font-weight: 800; padding: 0.25rem 0.65rem; border-radius: 9999px;">
+                                <i class="fa-regular fa-clock"></i> En cours
+                              </span>
+                            } @else if (cmd.statut === 'SCANNE') {
+                              <span style="background: rgba(197, 168, 128, 0.25); color: #721513; font-size: 0.72rem; font-weight: 800; padding: 0.25rem 0.65rem; border-radius: 9999px;">
+                                <i class="fa-solid fa-qrcode"></i> Scanné ({{ cmd.scanneAt || 'Cantine' }})
+                              </span>
+                            } @else {
+                              <span style="background: rgba(96, 108, 56, 0.12); color: #606C38; font-size: 0.72rem; font-weight: 800; padding: 0.25rem 0.65rem; border-radius: 9999px;">
+                                <i class="fa-solid fa-circle-check"></i> Livré ({{ cmd.livreAt || '12h' }})
+                              </span>
+                            }
+                          </td>
+                          <td style="padding: 0.75rem 1rem; text-align: right;">
+                            @if (cmd.statut === 'EN_COURS') {
+                              <button 
+                                type="button" 
+                                (click)="simulerScanCommande(cmd.id)"
+                                class="sa-btn-action" style="font-size: 0.75rem; padding: 0.35rem 0.65rem; color: #721513; border-color: #C5A880;">
+                                <i class="fa-solid fa-qrcode"></i> Valider scan
+                              </button>
+                            } @else if (cmd.statut === 'SCANNE') {
+                              <button 
+                                type="button" 
+                                (click)="marquerLivree(cmd.id)"
+                                class="sa-btn-primary" style="font-size: 0.75rem; padding: 0.35rem 0.75rem; background: #606C38; border-color: #606C38;">
+                                <i class="fa-solid fa-check"></i> Marquer Livré
+                              </button>
+                            } @else {
+                              <span style="font-size: 0.78rem; font-weight: 700; color: #606C38;">
+                                <i class="fa-solid fa-check-double"></i> Remis
+                              </span>
+                            }
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+
+              </div>
+            }
+
+            <!-- ============================================================== -->
+            <!-- ONGLET 5 : FACTURATION (DÉTAIL JOURNALIER + FILTRE PÉRIODE)     -->
+            <!-- ============================================================== -->
+            @if (gererActiveTab() === 'FACTURATION') {
+              <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 18px rgba(114, 21, 19, 0.04);">
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                  <div>
+                    <h3 style="margin: 0; font-size: 1.25rem; color: #721513; font-weight: 800;">
+                      <i class="fa-solid fa-file-invoice-dollar"></i> Détail Journalier de Facturation
+                    </h3>
+                    <p style="margin: 0.2rem 0 0; font-size: 0.85rem; color: #6E5A56;">
+                      Nombre de plats livrés, effectif des présents et montants facturés jour par jour.
+                    </p>
+                  </div>
+
+                  <!-- Filtre Date début / Date fin -->
+                  <div style="display: flex; align-items: center; gap: 0.5rem; background: #FAF8F4; padding: 0.4rem 0.75rem; border-radius: 10px; border: 1px solid #EDE7DC;">
+                    <span style="font-size: 0.75rem; font-weight: 800; color: #6E5A56;">Date début :</span>
+                    <input type="date" [(ngModel)]="dateDebutFacturation" style="height: 32px; font-size: 0.8rem; border: 1px solid #EDE7DC; border-radius: 6px; padding: 0 0.5rem;" />
+                    <span style="font-size: 0.75rem; font-weight: 800; color: #6E5A56;">Date fin :</span>
+                    <input type="date" [(ngModel)]="dateFinFacturation" style="height: 32px; font-size: 0.8rem; border: 1px solid #EDE7DC; border-radius: 6px; padding: 0 0.5rem;" />
+                  </div>
+                </div>
+
+                <!-- KPIs Récapitulatifs de la Période -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                  <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 12px; padding: 1rem;">
+                    <div style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">Total Plats Livrés</div>
+                    <div style="font-size: 1.65rem; font-weight: 900; color: #721513; margin-top: 0.2rem;">
+                      {{ totalFacturationPeriode().repas | number }} <span style="font-size: 0.85rem; color: #6E5A56; font-weight: 700;">repas</span>
+                    </div>
+                  </div>
+                  <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 12px; padding: 1rem;">
+                    <div style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">Cumul Présents Badgés</div>
+                    <div style="font-size: 1.65rem; font-weight: 900; color: #332724; margin-top: 0.2rem;">
+                      {{ totalFacturationPeriode().presents | number }} <span style="font-size: 0.85rem; color: #6E5A56; font-weight: 700;">émargements</span>
+                    </div>
+                  </div>
+                  <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 12px; padding: 1rem;">
+                    <div style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">Total Facturé Kiki (HT)</div>
+                    <div style="font-size: 1.65rem; font-weight: 900; color: #606C38; margin-top: 0.2rem;">
+                      {{ totalFacturationPeriode().montantTotal | number }} <span style="font-size: 0.85rem; font-weight: 700;">FCFA</span>
+                    </div>
+                  </div>
+                  <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 12px; padding: 1rem;">
+                    <div style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">Part Entreprise</div>
+                    <div style="font-size: 1.65rem; font-weight: 900; color: #721513; margin-top: 0.2rem;">
+                      {{ totalFacturationPeriode().partEntreprise | number }} <span style="font-size: 0.85rem; color: #6E5A56; font-weight: 700;">FCFA</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Tableau Journalier par Date -->
+                <div style="overflow-x: auto;">
+                  <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
+                    <thead>
+                      <tr style="background: #FAF8F4; border-bottom: 2px solid #EDE7DC; color: #6E5A56; font-size: 0.75rem; text-transform: uppercase;">
+                        <th style="padding: 0.85rem 1rem;">Date de Prestation</th>
+                        <th style="padding: 0.85rem 1rem; text-align: center;">Plats Livrés</th>
+                        <th style="padding: 0.85rem 1rem; text-align: center;">Nombre de Présents</th>
+                        <th style="padding: 0.85rem 1rem; text-align: right;">Part Entreprise</th>
+                        <th style="padding: 0.85rem 1rem; text-align: right;">Part Employés</th>
+                        <th style="padding: 0.85rem 1rem; text-align: right;">Montant Total</th>
+                        <th style="padding: 0.85rem 1rem; text-align: center;">Statut</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (ligne of lignesFacturationFiltrees(); track ligne.date) {
+                        <tr style="border-bottom: 1px solid #F0EAE1;">
+                          <td style="padding: 0.85rem 1rem; font-weight: 800; color: #332724;">
+                            <i class="fa-regular fa-calendar" style="color: #721513; margin-right: 0.35rem;"></i>
+                            {{ ligne.dateAffichee }}
+                          </td>
+                          <td style="padding: 0.85rem 1rem; text-align: center; font-weight: 800; color: #721513;">
+                            {{ ligne.nbPlatsLivres }} plats
+                          </td>
+                          <td style="padding: 0.85rem 1rem; text-align: center; font-weight: 700; color: #332724;">
+                            {{ ligne.nbPresents }}
+                          </td>
+                          <td style="padding: 0.85rem 1rem; text-align: right; font-weight: 800; color: #721513;">
+                            {{ ligne.montantPartEntreprise | number }} FCFA
+                          </td>
+                          <td style="padding: 0.85rem 1rem; text-align: right; color: #6E5A56;">
+                            {{ ligne.montantPartEmploye | number }} FCFA
+                          </td>
+                          <td style="padding: 0.85rem 1rem; text-align: right; font-weight: 900; color: #606C38; font-size: 0.95rem;">
+                            {{ ligne.montantTotal | number }} FCFA
+                          </td>
+                          <td style="padding: 0.85rem 1rem; text-align: center;">
+                            <span style="font-size: 0.72rem; font-weight: 800; padding: 0.25rem 0.6rem; border-radius: 9999px;"
+                              [style.background]="ligne.statut === 'FACTURE' ? 'rgba(96, 108, 56, 0.12)' : (ligne.statut === 'VALIDE' ? 'rgba(197, 168, 128, 0.2)' : 'rgba(110, 90, 86, 0.1)')"
+                              [style.color]="ligne.statut === 'FACTURE' ? '#606C38' : (ligne.statut === 'VALIDE' ? '#721513' : '#6E5A56')">
+                              {{ ligne.statut === 'FACTURE' ? 'Facturé' : (ligne.statut === 'VALIDE' ? 'Validé' : 'En cours') }}
+                            </span>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+
+              </div>
+            }
+
+          </div>
+        }
+
+        <!-- ============================================================== -->
+        <!-- VUE B : RÉPERTOIRE DES ENTREPRISES PARTENAIRES (LISTE DE CARTES)-->
+        <!-- ============================================================== -->
+        @if (!entrepriseEnGestion()) {
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
           <div>
             <h2 style="margin: 0; font-size: 1.5rem; color: #721513; font-weight: 800;">
@@ -631,6 +1394,10 @@
 
                 <!-- Actions directes sur la fiche entreprise -->
                 <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                  <!-- BOUTON PRINCIPAL GÉRER L'ENTREPRISE (ÉTAPE 2) -->
+                  <button (click)="ouvrirGestionEntreprise(ent)" class="sa-btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem;" title="Gérer l'entreprise : Utilisateurs, Menus, Commandes & Facturation">
+                    <i class="fa-solid fa-sliders"></i> Gérer l'entreprise
+                  </button>
                   <button (click)="ouvrirModalModifierEntreprise(ent)" class="sa-btn-action" title="Modifier la convention">
                     <i class="fa-regular fa-pen-to-square"></i> Modifier
                   </button>
@@ -749,6 +1516,8 @@
             </div>
           </div>
         }
+
+        } <!-- FIN DE @if (!entrepriseEnGestion()) -->
 
       </div>
     }
@@ -1560,6 +2329,194 @@
           </button>
           <button (click)="enregistrerPlanningGlobal()" class="sa-btn-primary" style="flex: 1.5; justify-content: center;">
             <i class="fa-solid fa-check"></i> Enregistrer le Menu
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ============================================================== -->
+  <!-- MODAL : AJOUTER UN EMPLOYÉ (ONGLET 2)                          -->
+  <!-- ============================================================== -->
+  @if (modalNouvelEmploye()) {
+    <div class="sa-modal-backdrop" (click)="modalNouvelEmploye.set(false)">
+      <div class="sa-modal-card" (click)="$event.stopPropagation()" style="max-width: 600px; padding: 1.75rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <h3 style="margin: 0; font-size: 1.25rem; color: #721513; font-weight: 800;">
+            <i class="fa-solid fa-user-plus"></i> Ajouter un Employé
+          </h3>
+          <button (click)="modalNouvelEmploye.set(false)" style="background: none; border: none; font-size: 1.25rem; color: #6E5A56; cursor: pointer;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 800; color: #332724; display: block; margin-bottom: 0.35rem;">Prénom *</label>
+              <input type="text" [(ngModel)]="employeEnCreation().prenom" placeholder="Ex: Moussa" style="width: 100%; height: 38px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.85rem;">
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 800; color: #332724; display: block; margin-bottom: 0.35rem;">Nom *</label>
+              <input type="text" [(ngModel)]="employeEnCreation().nom" placeholder="Ex: Diagne" style="width: 100%; height: 38px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.85rem;">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 800; color: #332724; display: block; margin-bottom: 0.35rem;">Matricule (laisser vide si auto)</label>
+              <input type="text" [(ngModel)]="employeEnCreation().matricule" placeholder="Ex: TOT-1042" style="width: 100%; height: 38px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.85rem;">
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 800; color: #332724; display: block; margin-bottom: 0.35rem;">Département</label>
+              <input type="text" [(ngModel)]="employeEnCreation().departement" placeholder="Ex: Finance, Logistique..." style="width: 100%; height: 38px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.85rem;">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 800; color: #332724; display: block; margin-bottom: 0.35rem;">Email Professionnel</label>
+              <input type="email" [(ngModel)]="employeEnCreation().email" placeholder="moussa.diagne@entreprise.sn" style="width: 100%; height: 38px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.85rem;">
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 800; color: #332724; display: block; margin-bottom: 0.35rem;">Téléphone</label>
+              <input type="tel" [(ngModel)]="employeEnCreation().telephone" placeholder="+221 77 123 45 67" style="width: 100%; height: 38px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.85rem;">
+            </div>
+          </div>
+
+          <div>
+            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">
+              <i class="fa-solid fa-hand-holding-dollar"></i> Taux de Prise en Charge par l'Entreprise
+            </label>
+            <select [(ngModel)]="employeEnCreation().tauxSubvention" style="width: 100%; height: 38px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.85rem; font-weight: 800; color: #721513; background: #FFFFFF;">
+              <option [ngValue]="100">100% (Prise en charge intégrale par l'entreprise)</option>
+              <option [ngValue]="70">70% subventionné (30% reste à charge)</option>
+              <option [ngValue]="50">50% subventionné (50% reste à charge)</option>
+              <option [ngValue]="25">25% subventionné (75% reste à charge)</option>
+              <option [ngValue]="0">0% (Frais personnels / Collaborateur autonome)</option>
+            </select>
+            <div style="font-size: 0.72rem; color: #6E5A56; margin-top: 0.25rem;">
+              Ce taux détermine la part payée par l'entreprise sur chaque repas commandé.
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem; justify-content: flex-end;">
+          <button (click)="modalNouvelEmploye.set(false)" class="sa-btn-action">Annuler</button>
+          <button (click)="enregistrerNouvelEmploye()" class="sa-btn-primary">
+            <i class="fa-solid fa-check"></i> Enregistrer l'Employé
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ============================================================== -->
+  <!-- MODAL : INVITATION ADMINISTRATEUR EMAIL (ONGLET 2)             -->
+  <!-- ============================================================== -->
+  @if (modalInvitationAdmin()) {
+    <div class="sa-modal-backdrop" (click)="fermerModalInvitation()">
+      <div class="sa-modal-card" (click)="$event.stopPropagation()" style="max-width: 580px; padding: 1.75rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <h3 style="margin: 0; font-size: 1.25rem; color: #721513; font-weight: 800;">
+            <i class="fa-solid fa-paper-plane"></i> Invitation Administrateur par Email
+          </h3>
+          <button (click)="fermerModalInvitation()" style="background: none; border: none; font-size: 1.25rem; color: #6E5A56; cursor: pointer;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        @if (!invitationGenereeLien()) {
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 800; color: #332724; display: block; margin-bottom: 0.35rem;">Rôle à attribuer *</label>
+              <select [(ngModel)]="invitationEnCreation().role" style="width: 100%; height: 38px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.85rem; font-weight: 700; color: #721513; background: #FFFFFF;">
+                <option value="RESPONSABLE_ENTREPRISE">Admin Entreprise (RH / DAF)</option>
+                <option value="RESPONSABLE_SITE_KIKI">Responsable de Site Kiki (Exploitation cantine)</option>
+              </select>
+            </div>
+
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 800; color: #332724; display: block; margin-bottom: 0.35rem;">Nom & Prénom du Référent *</label>
+              <input type="text" [(ngModel)]="invitationEnCreation().nomComplet" placeholder="Ex: Mme Mariama Diop" style="width: 100%; height: 38px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.85rem;">
+            </div>
+
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 800; color: #332724; display: block; margin-bottom: 0.35rem;">Adresse Email de réception *</label>
+              <input type="email" [(ngModel)]="invitationEnCreation().email" placeholder="mariama.diop@client.sn" style="width: 100%; height: 38px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.85rem;">
+              <div style="font-size: 0.72rem; color: #6E5A56; margin-top: 0.25rem;">
+                Un email contenant le lien de première activation et de définition de mot de passe sera généré.
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 0.75rem; margin-top: 1rem; justify-content: flex-end;">
+              <button (click)="fermerModalInvitation()" class="sa-btn-action">Annuler</button>
+              <button (click)="lancerInvitationAdmin()" class="sa-btn-primary">
+                <i class="fa-solid fa-paper-plane"></i> Générer le Lien d'Activation
+              </button>
+            </div>
+          </div>
+        } @else {
+          <!-- Écran de confirmation avec lien généré -->
+          <div style="background: rgba(96, 108, 56, 0.08); border: 1.5px solid #606C38; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; font-weight: 800; color: #606C38; margin-bottom: 0.5rem;">
+              <i class="fa-solid fa-circle-check"></i> Invitation générée avec succès !
+            </div>
+            <p style="margin: 0; font-size: 0.82rem; color: #332724;">
+              Le lien de première activation a été créé pour <strong>{{ invitationEnCreation().nomComplet }}</strong> ({{ invitationEnCreation().email }}).
+            </p>
+            <div style="background: #FFFFFF; border: 1px solid #EDE7DC; border-radius: 8px; padding: 0.65rem; margin-top: 0.75rem; font-family: monospace; font-size: 0.78rem; word-break: break-all; color: #721513;">
+              {{ invitationGenereeLien() }}
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+            <button (click)="copierLienActivation(invitationGenereeLien()!)" class="sa-btn-primary" style="background: #606C38; border-color: #606C38;">
+              <i class="fa-regular fa-copy"></i> Copier le lien
+            </button>
+            <button (click)="fermerModalInvitation()" class="sa-btn-action">Terminer</button>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- ============================================================== -->
+  <!-- MODAL : DUPLIQUER UN JOUR DE MENU (ONGLET 3)                   -->
+  <!-- ============================================================== -->
+  @if (modalDupliquerMenu()) {
+    <div class="sa-modal-backdrop" (click)="modalDupliquerMenu.set(false)">
+      <div class="sa-modal-card" (click)="$event.stopPropagation()" style="max-width: 500px; padding: 1.75rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <h3 style="margin: 0; font-size: 1.25rem; color: #721513; font-weight: 800;">
+            <i class="fa-regular fa-copy"></i> Dupliquer le Menu du Jour
+          </h3>
+          <button (click)="modalDupliquerMenu.set(false)" style="background: none; border: none; font-size: 1.25rem; color: #6E5A56; cursor: pointer;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <p style="font-size: 0.85rem; color: #6E5A56; margin: 0 0 1rem;">
+          Vous allez copier l'intégralité des plats et des quantités du <strong>{{ jourMenuActif() }}</strong> vers un autre jour de la semaine.
+        </p>
+
+        <div>
+          <label style="font-size: 0.75rem; font-weight: 800; color: #332724; display: block; margin-bottom: 0.35rem;">
+            Choisir le jour de destination :
+          </label>
+          <select [(ngModel)]="jourCibleDuplication" style="width: 100%; height: 40px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.9rem; font-weight: 800; color: #721513; background: #FFFFFF;">
+            @for (j of ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']; track j) {
+              @if (j !== jourMenuActif()) {
+                <option [value]="j">{{ j }}</option>
+              }
+            }
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem; justify-content: flex-end;">
+          <button (click)="modalDupliquerMenu.set(false)" class="sa-btn-action">Annuler</button>
+          <button (click)="lancerDuplicationMenu()" class="sa-btn-primary">
+            <i class="fa-solid fa-clone"></i> Confirmer la Duplication
           </button>
         </div>
       </div>

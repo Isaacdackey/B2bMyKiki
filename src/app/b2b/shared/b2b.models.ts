@@ -129,6 +129,72 @@ export interface LignePanierAutonome {
   quantite: number;
 }
 
+export type StatutCommandeSite = 'EN_COURS' | 'SCANNE' | 'LIVRE';
+
+export interface CommandeEntrepriseSite {
+  id: string;
+  codeCommande: string;
+  entrepriseId: string;
+  entrepriseNom: string;
+  matricule: string;
+  employeNom: string;
+  categorie: 'ENTREE' | 'PLAT' | 'DESSERT' | 'BOISSON';
+  platNom: string;
+  date: string; // YYYY-MM-DD
+  heure: string; // HH:mm
+  montantTotal: number;
+  partEntreprise: number;
+  partEmploye: number;
+  statut: StatutCommandeSite;
+  scanneAt?: string;
+  livreAt?: string;
+}
+
+export interface FacturationLigneJournaliere {
+  date: string; // YYYY-MM-DD
+  dateAffichee: string; // ex: 12 nov. 2026
+  nbPlatsLivres: number;
+  nbPresents: number; // effectif ayant émargé/badgé
+  montantTotal: number;
+  montantPartEntreprise: number;
+  montantPartEmploye: number;
+  statut: 'FACTURE' | 'EN_COURS' | 'VALIDE';
+}
+
+export interface LigneMenuPlanifie {
+  id: string;
+  categorie: CategoriePlatB2B;
+  platId: string;
+  nomPlat: string;
+  image?: string;
+  quantitePrevue: number; // Saisie par le Responsable Site / Admin
+  disponible?: boolean;
+}
+
+export interface MenuPlanifieJourEntreprise {
+  id: string;
+  entrepriseId: string;
+  jourNom: 'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche';
+  dateStr: string; // YYYY-MM-DD
+  theme?: string;
+  lignes: LigneMenuPlanifie[];
+  quantitesSaisies: boolean; // Tant que false => ne s'affiche pas chez les salariés
+  statutConformite: 'CONFORME' | 'NON_CONFORME' | 'NON_SAISI';
+}
+
+export interface InvitationAdminB2B {
+  id: string;
+  email: string;
+  nomComplet: string;
+  role: 'RESPONSABLE_ENTREPRISE' | 'RESPONSABLE_SITE_KIKI';
+  roleLibelle: string;
+  entrepriseId: string;
+  entrepriseNom: string;
+  dateEnvoi: string;
+  tokenActivation: string;
+  statut: 'EN_ATTENTE' | 'ACTIVE';
+}
+
 export interface CommandeHistoriqueB2B {
   id: string;
   date: string; // YYYY-MM-DD
