@@ -118,16 +118,33 @@
       <button 
         type="button" 
         class="b2b-sidebar-link"
+        [class.active]="b2b.superAdminActiveSection() === 'DASHBOARD'"
+        (click)="navigerSuperAdmin('DASHBOARD')"
+        title="Tableau de bord">
+        <div class="b2b-link-icon-wrap">
+          <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
+        </div>
+        @if (!b2b.isSidebarCollapsed()) {
+          <div class="b2b-link-text">
+            <span class="b2b-link-title">Tableau de bord</span>
+            <span class="b2b-link-subtitle">Analytiques &amp; performances</span>
+          </div>
+        }
+      </button>
+
+      <button 
+        type="button" 
+        class="b2b-sidebar-link"
         [class.active]="b2b.superAdminActiveSection() === 'ENTREPRISES'"
         (click)="navigerSuperAdmin('ENTREPRISES')"
-        title="Entreprises & Sites">
+        title="Entreprises Partenaires">
         <div class="b2b-link-icon-wrap">
           <i class="fa-solid fa-building" aria-hidden="true"></i>
         </div>
         @if (!b2b.isSidebarCollapsed()) {
           <div class="b2b-link-text">
-            <span class="b2b-link-title">Entreprises &amp; Sites</span>
-            <span class="b2b-link-subtitle">Réseau client &amp; points de livraison</span>
+            <span class="b2b-link-title">Entreprises Partenaires</span>
+            <span class="b2b-link-subtitle">Répertoire &amp; conventions B2B</span>
           </div>
         }
       </button>

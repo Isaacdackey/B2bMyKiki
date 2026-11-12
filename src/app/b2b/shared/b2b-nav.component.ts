@@ -14,7 +14,7 @@ export class B2bNavComponent {
   b2b = inject(B2bStateService);
   private router = inject(Router);
 
-  navigerSuperAdmin(section: 'ENTREPRISES' | 'CATALOGUE' | 'PLANNING') {
+  navigerSuperAdmin(section: 'DASHBOARD' | 'ENTREPRISES' | 'CATALOGUE' | 'PLANNING') {
     this.b2b.superAdminActiveSection.set(section);
     this.router.navigate(['/b2b/super-admin']);
     this.b2b.closeMobileDrawer();

@@ -4,7 +4,7 @@
 
 :host {
   display: block;
-  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   color: #1E293B;
   overflow-y: visible;
   overflow-x: clip;
@@ -1358,7 +1358,7 @@
 }
 
 .b2b-brand-title {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 1.35rem;
   font-weight: 900;
   color: #721513;
@@ -1371,7 +1371,7 @@
 .b2b-badge-pro {
   background-color: #E51D24;
   color: #FFFFFF;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 0.65rem;
   font-weight: 800;
   padding: 0.2rem 0.6rem;
@@ -1649,7 +1649,7 @@
 }
 
 .b2b-card-title {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 1.15rem;
   font-weight: 700;
   color: #721513;
@@ -1702,7 +1702,7 @@
 }
 
 .b2b-plateau-title {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 1.3rem;
   font-weight: 800;
   color: #721513;
@@ -2618,7 +2618,7 @@
 }
 
 .dish-title {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 1.05rem;
   font-weight: 800;
   color: #332724;

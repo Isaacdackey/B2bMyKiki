@@ -29,7 +29,325 @@ export class B2bSuperAdminComponent {
   // Filtre Date du Tableau de Bord (style inspiré de la capture)
   dateDebutDashboard = signal<string>('2026-11-12');
   dateFinDashboard = signal<string>('2026-11-12');
+  periodeRapideDashboard = signal<'AUJOURD_HUI' | 'SEMAINE' | 'MOIS' | 'TRIMESTRE' | 'ANNEE'>('AUJOURD_HUI');
   dateAfficheeDashboard = 'jeudi 12 novembre 2026';
+
+  // États d'interactivité des graphes (Survol / Tooltips & Zoom Courbe)
+  hoveredLineIndex = signal<number | null>(null);
+  hoveredVBarIndex = signal<number | null>(null);
+  hoveredHBarIndex = signal<number | null>(null);
+  hoveredTopProdIndex = signal<number | null>(null);
+
+  // Zoom sur la courbe (plage d'index start / end)
+  zoomStartIndex = signal<number>(0);
+  zoomEndIndex = signal<number>(100);
+  isDraggingZoom = signal<boolean>(false);
+  dragStartIdx = signal<number | null>(null);
+
+  selectionnerPeriodeRapide(periode: 'AUJOURD_HUI' | 'SEMAINE' | 'MOIS' | 'TRIMESTRE' | 'ANNEE') {
+    this.periodeRapideDashboard.set(periode);
+    this.reinitialiserZoomCourbe();
+    if (periode === 'AUJOURD_HUI') {
+      this.dateDebutDashboard.set('2026-11-12');
+      this.dateFinDashboard.set('2026-11-12');
+    } else if (periode === 'SEMAINE') {
+      this.dateDebutDashboard.set('2026-11-09');
+      this.dateFinDashboard.set('2026-11-15');
+    } else if (periode === 'MOIS') {
+      this.dateDebutDashboard.set('2026-11-01');
+      this.dateFinDashboard.set('2026-11-30');
+    } else if (periode === 'TRIMESTRE') {
+      this.dateDebutDashboard.set('2026-10-01');
+      this.dateFinDashboard.set('2026-12-31');
+    } else if (periode === 'ANNEE') {
+      this.dateDebutDashboard.set('2026-01-01');
+      this.dateFinDashboard.set('2026-12-31');
+    }
+  }
+
+  onDateDashboardChange() {
+    this.reinitialiserZoomCourbe();
+    if (this.dateDebutDashboard() === this.dateFinDashboard()) {
+      this.periodeRapideDashboard.set('AUJOURD_HUI');
+    } else {
+      this.periodeRapideDashboard.set('SEMAINE');
+    }
+  }
+
+  statsDashboard = computed(() => {
+    const p = this.periodeRapideDashboard();
+    if (p === 'AUJOURD_HUI') {
+      return {
+        ca: 2200000,
+        caPrecedent: 1980000,
+        variationCa: '+11,1%',
+        isPositiveCa: true,
+        commandes: 440,
+        commandesPrecedent: 396,
+        variationCmd: '+11,1%',
+        isPositiveCmd: true,
+        seriesPoints: [
+          { label: '08:00', dateFull: '2026-11-12 · 08h00', total: 45, livrees: 42, annulees: 3, ca: 225000 },
+          { label: '09:00', dateFull: '2026-11-12 · 09h00', total: 95, livrees: 91, annulees: 4, ca: 475000 },
+          { label: '10:00', dateFull: '2026-11-12 · 10h00', total: 165, livrees: 160, annulees: 5, ca: 825000 },
+          { label: '11:00', dateFull: '2026-11-12 · 11h00', total: 245, livrees: 238, annulees: 7, ca: 1225000 },
+          { label: '12:00', dateFull: '2026-11-12 · 12h00', total: 361, livrees: 346, annulees: 15, ca: 1805000 },
+          { label: '13:00', dateFull: '2026-11-12 · 13h00', total: 410, livrees: 398, annulees: 12, ca: 2050000 },
+          { label: '14:00', dateFull: '2026-11-12 · 14h00', total: 432, livrees: 422, annulees: 10, ca: 2160000 },
+          { label: '15:00', dateFull: '2026-11-12 · 15h00', total: 440, livrees: 432, annulees: 8, ca: 2200000 }
+        ],
+        revenusParEntreprise: [
+          { nom: 'TotalEnergies Plateau', montant: 700000, pct: '31.8%', color: '#721513', heightPct: 92 },
+          { nom: 'Sonatel Almadies', montant: 575000, pct: '26.1%', color: '#606C38', heightPct: 78 },
+          { nom: 'CBAO Siège', montant: 425000, pct: '19.3%', color: '#C5A880', heightPct: 58 },
+          { nom: 'Port Autonome Dakar', montant: 310000, pct: '14.1%', color: '#D97706', heightPct: 42 },
+          { nom: 'Free Sénégal', montant: 190000, pct: '8.6%', color: '#E51D24', heightPct: 26 }
+        ],
+        commandesParPrestation: [
+          { label: 'Livraison en barquettes (12:00)', count: 245, revenu: 1225000, pct: 92 },
+          { label: 'Service sur place • Réfectoire (12:30)', count: 135, revenu: 675000, pct: 58 },
+          { label: 'Cuisine & service sur place (13:00)', count: 60, revenu: 300000, pct: 28 }
+        ],
+        topProduits: [
+          { rang: 1, nom: 'Thiéboudienne Penda Mbaye', qte: 148, ca: 740000, pct: 95 },
+          { rang: 2, nom: 'Poulet Yassa Braisé au Feu de Bois', qte: 112, ca: 560000, pct: 76 },
+          { rang: 3, nom: 'Mafé de Bœuf Mijoté aux Légumes', qte: 78, ca: 390000, pct: 54 },
+          { rang: 4, nom: 'Pastels au Poisson & Crevettes', qte: 64, ca: 96000, pct: 44 },
+          { rang: 5, nom: 'Bissap Frais Menthe (33cl)', qte: 52, ca: 52000, pct: 35 }
+        ]
+      };
+    } else if (p === 'SEMAINE') {
+      return {
+        ca: 11450000,
+        caPrecedent: 10600000,
+        variationCa: '+8,0%',
+        isPositiveCa: true,
+        commandes: 2290,
+        commandesPrecedent: 2120,
+        variationCmd: '+8,0%',
+        isPositiveCmd: true,
+        seriesPoints: [
+          { label: '2026-11-06', dateFull: '2026-11-06', total: 340, livrees: 328, annulees: 12, ca: 1700000 },
+          { label: '2026-11-07', dateFull: '2026-11-07', total: 361, livrees: 344, annulees: 15, ca: 1805000 },
+          { label: '2026-11-08', dateFull: '2026-11-08', total: 295, livrees: 285, annulees: 10, ca: 1475000 },
+          { label: '2026-11-09', dateFull: '2026-11-09', total: 420, livrees: 412, annulees: 8, ca: 2100000 },
+          { label: '2026-11-10', dateFull: '2026-11-10', total: 465, livrees: 454, annulees: 11, ca: 2325000 },
+          { label: '2026-11-11', dateFull: '2026-11-11', total: 450, livrees: 441, annulees: 9, ca: 2250000 },
+          { label: '2026-11-12', dateFull: '2026-11-12', total: 440, livrees: 432, annulees: 8, ca: 2200000 }
+        ],
+        revenusParEntreprise: [
+          { nom: 'TotalEnergies Plateau', montant: 3650000, pct: '31.9%', color: '#721513', heightPct: 94 },
+          { nom: 'Sonatel Almadies', montant: 2980000, pct: '26.0%', color: '#606C38', heightPct: 79 },
+          { nom: 'CBAO Siège', montant: 2210000, pct: '19.3%', color: '#C5A880', heightPct: 60 },
+          { nom: 'Port Autonome Dakar', montant: 1620000, pct: '14.1%', color: '#D97706', heightPct: 44 },
+          { nom: 'Free Sénégal', montant: 990000, pct: '8.6%', color: '#E51D24', heightPct: 28 }
+        ],
+        commandesParPrestation: [
+          { label: 'Livraison en barquettes (12:00)', count: 1280, revenu: 6400000, pct: 95 },
+          { label: 'Service sur place • Réfectoire (12:30)', count: 690, revenu: 3450000, pct: 56 },
+          { label: 'Cuisine & service sur place (13:00)', count: 320, revenu: 1600000, pct: 27 }
+        ],
+        topProduits: [
+          { rang: 1, nom: 'Thiéboudienne Penda Mbaye', qte: 760, ca: 3800000, pct: 96 },
+          { rang: 2, nom: 'Poulet Yassa Braisé au Feu de Bois', qte: 590, ca: 2950000, pct: 78 },
+          { rang: 3, nom: 'Dibi d\'Agneau Kiki & Alloco', qte: 420, ca: 2100000, pct: 58 },
+          { rang: 4, nom: 'Filet de Mérou Sauce Tomate', qte: 310, ca: 1550000, pct: 43 },
+          { rang: 5, nom: 'Thiagree Onctueux à la Vanille', qte: 210, ca: 315000, pct: 30 }
+        ]
+      };
+    } else {
+      const mult = p === 'MOIS' ? 4.2 : p === 'TRIMESTRE' ? 12.5 : 48;
+      const caCalc = Math.round(11450000 * mult);
+      const caPrecCalc = Math.round(10600000 * mult);
+      const cmdCalc = Math.round(2290 * mult);
+      const cmdPrecCalc = Math.round(2120 * mult);
+      return {
+        ca: caCalc,
+        caPrecedent: caPrecCalc,
+        variationCa: '+14,2%',
+        isPositiveCa: true,
+        commandes: cmdCalc,
+        commandesPrecedent: cmdPrecCalc,
+        variationCmd: '+12,8%',
+        isPositiveCmd: true,
+        seriesPoints: [
+          { label: '2026-11-01', dateFull: '2026-11-01', total: 310, livrees: 298, annulees: 12, ca: 1550000 },
+          { label: '2026-11-03', dateFull: '2026-11-03', total: 385, livrees: 372, annulees: 13, ca: 1925000 },
+          { label: '2026-11-05', dateFull: '2026-11-05', total: 430, livrees: 418, annulees: 12, ca: 2150000 },
+          { label: '2026-11-07', dateFull: '2026-11-07', total: 361, livrees: 344, annulees: 15, ca: 1805000 },
+          { label: '2026-11-09', dateFull: '2026-11-09', total: 415, livrees: 405, annulees: 10, ca: 2075000 },
+          { label: '2026-11-11', dateFull: '2026-11-11', total: 460, livrees: 449, annulees: 11, ca: 2300000 },
+          { label: '2026-11-13', dateFull: '2026-11-13', total: 490, livrees: 481, annulees: 9, ca: 2450000 },
+          { label: '2026-11-15', dateFull: '2026-11-15', total: 515, livrees: 506, annulees: 9, ca: 2575000 }
+        ],
+        revenusParEntreprise: [
+          { nom: 'TotalEnergies Plateau', montant: Math.round(caCalc * 0.32), pct: '32.0%', color: '#721513', heightPct: 95 },
+          { nom: 'Sonatel Almadies', montant: Math.round(caCalc * 0.26), pct: '26.0%', color: '#606C38', heightPct: 80 },
+          { nom: 'CBAO Siège', montant: Math.round(caCalc * 0.19), pct: '19.0%', color: '#C5A880', heightPct: 60 },
+          { nom: 'Port Autonome Dakar', montant: Math.round(caCalc * 0.14), pct: '14.0%', color: '#D97706', heightPct: 45 },
+          { nom: 'Free Sénégal', montant: Math.round(caCalc * 0.09), pct: '9.0%', color: '#E51D24', heightPct: 30 }
+        ],
+        commandesParPrestation: [
+          { label: 'Livraison en barquettes (12:00)', count: Math.round(cmdCalc * 0.56), revenu: Math.round(caCalc * 0.56), pct: 95 },
+          { label: 'Service sur place • Réfectoire (12:30)', count: Math.round(cmdCalc * 0.30), revenu: Math.round(caCalc * 0.30), pct: 56 },
+          { label: 'Cuisine & service sur place (13:00)', count: Math.round(cmdCalc * 0.14), revenu: Math.round(caCalc * 0.14), pct: 28 }
+        ],
+        topProduits: [
+          { rang: 1, nom: 'Thiéboudienne Penda Mbaye', qte: Math.round(760 * mult), ca: Math.round(3800000 * mult), pct: 96 },
+          { rang: 2, nom: 'Poulet Yassa Braisé au Feu de Bois', qte: Math.round(590 * mult), ca: Math.round(2950000 * mult), pct: 78 },
+          { rang: 3, nom: 'Dibi d\'Agneau Kiki & Alloco', qte: Math.round(420 * mult), ca: Math.round(2100000 * mult), pct: 58 },
+          { rang: 4, nom: 'Filet de Mérou Sauce Tomate', qte: Math.round(310 * mult), ca: Math.round(1550000 * mult), pct: 43 },
+          { rang: 5, nom: 'Thiagree Onctueux à la Vanille', qte: Math.round(210 * mult), ca: Math.round(315000 * mult), pct: 30 }
+        ]
+      };
+    }
+  });
+
+  // Points filtrés par le zoom actif sur la courbe
+  visibleSeriesPoints = computed(() => {
+    const all = this.statsDashboard().seriesPoints;
+    const start = Math.max(0, Math.min(this.zoomStartIndex(), all.length - 2));
+    const end = Math.max(start + 2, Math.min(this.zoomEndIndex(), all.length));
+    return all.slice(start, end);
+  });
+
+  isCourbeZoomee = computed(() => {
+    const all = this.statsDashboard().seriesPoints;
+    return this.zoomStartIndex() > 0 || this.zoomEndIndex() < all.length;
+  });
+
+  zoomInCourbe() {
+    const all = this.statsDashboard().seriesPoints;
+    const curStart = this.zoomStartIndex();
+    const curEnd = Math.min(this.zoomEndIndex(), all.length);
+    if (curEnd - curStart <= 3) return; // Garder au moins 3 points visibles
+    const center = this.hoveredLineIndex() !== null ? curStart + this.hoveredLineIndex()! : Math.floor((curStart + curEnd) / 2);
+    const nextSpan = Math.max(3, curEnd - curStart - 2);
+    const newStart = Math.max(0, Math.min(all.length - nextSpan, Math.floor(center - nextSpan / 2)));
+    this.zoomStartIndex.set(newStart);
+    this.zoomEndIndex.set(newStart + nextSpan);
+    this.hoveredLineIndex.set(null);
+  }
+
+  zoomOutCourbe() {
+    const all = this.statsDashboard().seriesPoints;
+    const curStart = this.zoomStartIndex();
+    const curEnd = Math.min(this.zoomEndIndex(), all.length);
+    const newStart = Math.max(0, curStart - 1);
+    const newEnd = Math.min(all.length, curEnd + 1);
+    this.zoomStartIndex.set(newStart);
+    this.zoomEndIndex.set(newEnd);
+    this.hoveredLineIndex.set(null);
+  }
+
+  reinitialiserZoomCourbe() {
+    this.zoomStartIndex.set(0);
+    this.zoomEndIndex.set(100);
+    this.hoveredLineIndex.set(null);
+  }
+
+  onWheelLineChart(event: WheelEvent) {
+    event.preventDefault();
+    if (event.deltaY < 0) {
+      this.zoomInCourbe();
+    } else {
+      this.zoomOutCourbe();
+    }
+  }
+
+  // Coordonnées SVG calculées dynamiquement pour la courbe d'évolution
+  lineChartGeometry = computed(() => {
+    const pts = this.visibleSeriesPoints();
+    const maxVal = Math.max(500, ...pts.map(p => p.total)) * 1.1;
+    const xLeft = 45;
+    const xRight = 535;
+    const yTop = 22;
+    const yBottom = 160;
+    const width = xRight - xLeft;
+    const height = yBottom - yTop;
+
+    const coords = pts.map((pt, i) => {
+      const x = pts.length > 1 ? xLeft + (i / (pts.length - 1)) * width : xLeft + width / 2;
+      const yTotal = yBottom - (pt.total / maxVal) * height;
+      const yLivrees = yBottom - (pt.livrees / maxVal) * height;
+      const yAnnulees = yBottom - (pt.annulees / maxVal) * height;
+      const pctX = ((x / 560) * 100);
+      const pctY = ((yTotal / 190) * 100);
+      return {
+        ...pt,
+        index: i,
+        x,
+        yTotal,
+        yLivrees,
+        yAnnulees,
+        pctX,
+        pctY
+      };
+    });
+
+    const buildSmoothPath = (key: 'yTotal' | 'yLivrees' | 'yAnnulees') => {
+      if (coords.length === 0) return '';
+      if (coords.length === 1) return `M ${coords[0].x} ${coords[0][key]}`;
+      let d = `M ${coords[0].x} ${coords[0][key]}`;
+      for (let i = 0; i < coords.length - 1; i++) {
+        const curr = coords[i];
+        const next = coords[i + 1];
+        const ctrlX1 = curr.x + (next.x - curr.x) * 0.42;
+        const ctrlY1 = curr[key];
+        const ctrlX2 = curr.x + (next.x - curr.x) * 0.58;
+        const ctrlY2 = next[key];
+        d += ` C ${ctrlX1} ${ctrlY1}, ${ctrlX2} ${ctrlY2}, ${next.x} ${next[key]}`;
+      }
+      return d;
+    };
+
+    const pathTotal = buildSmoothPath('yTotal');
+    const pathLivrees = buildSmoothPath('yLivrees');
+    const pathAnnulees = buildSmoothPath('yAnnulees');
+
+    const areaTotal = coords.length > 1
+      ? `${pathTotal} L ${coords[coords.length - 1].x} ${yBottom} L ${coords[0].x} ${yBottom} Z`
+      : '';
+    const areaLivrees = coords.length > 1
+      ? `${pathLivrees} L ${coords[coords.length - 1].x} ${yBottom} L ${coords[0].x} ${yBottom} Z`
+      : '';
+
+    const yTicks = [
+      Math.round(maxVal),
+      Math.round(maxVal * 0.75),
+      Math.round(maxVal * 0.5),
+      Math.round(maxVal * 0.25),
+      0
+    ];
+
+    return {
+      coords,
+      pathTotal,
+      pathLivrees,
+      pathAnnulees,
+      areaTotal,
+      areaLivrees,
+      yTicks
+    };
+  });
+
+  hoveredLinePoint = computed(() => {
+    const idx = this.hoveredLineIndex();
+    const coords = this.lineChartGeometry().coords;
+    if (idx === null || idx < 0 || idx >= coords.length) return null;
+    return coords[idx];
+  });
+
+  dernieresCommandesDashboard = signal([
+    { code: 'CMD-026934', employe: 'Babacar Ndiaye', entreprise: 'TotalEnergies Plateau', creneau: 'Déjeuner', dateHeure: '12/11 12:40', statut: 'Livré', montant: 5000 },
+    { code: 'CMD-026933', employe: 'Fatou Fall', entreprise: 'TotalEnergies Plateau', creneau: 'Déjeuner', dateHeure: '12/11 12:38', statut: 'Livré', montant: 5000 },
+    { code: 'CMD-026932', employe: 'Ousmane Wassa', entreprise: 'Sonatel Almadies', creneau: 'Déjeuner', dateHeure: '12/11 12:35', statut: 'Scanné', montant: 5000 },
+    { code: 'CMD-026931', employe: 'Diayla Mbengue', entreprise: 'CBAO Siège', creneau: 'Déjeuner', dateHeure: '12/11 12:32', statut: 'Livré', montant: 5000 },
+    { code: 'CMD-026930', employe: 'Mamadou Diallo', entreprise: 'TotalEnergies Bel-Air', creneau: 'Déjeuner', dateHeure: '12/11 12:29', statut: 'Livré', montant: 5000 },
+    { code: 'CMD-026929', employe: 'Aminata Sow', entreprise: 'Port Autonome Dakar', creneau: 'Déjeuner', dateHeure: '12/11 12:24', statut: 'En cours', montant: 5000 },
+    { code: 'CMD-026928', employe: 'Cheikh Diop', entreprise: 'Free Sénégal', creneau: 'Déjeuner', dateHeure: '12/11 12:18', statut: 'Livré', montant: 5000 },
+    { code: 'CMD-026927', employe: 'Aïssatou Ba', entreprise: 'Sonatel Almadies', creneau: 'Déjeuner', dateHeure: '12/11 12:15', statut: 'Livré', montant: 5000 }
+  ]);
 
   nbEntreprisesActives = computed(() => {
     return this.b2b.listeEntreprises().filter(e => !e.isArchivee).length;
@@ -72,37 +390,41 @@ export class B2bSuperAdminComponent {
     }
   }
 
-  // Types de prestation disponibles
-  typesPrestationDisponibles: { code: TypePrestationB2B; libelle: string; desc: string; categoriesDefaut: CategoriePlatB2B[] }[] = [
-    { code: 'COMPLETE', libelle: 'Formule Complète (4 composantes)', desc: 'Entrée + Plat chaud + Dessert + Boisson', categoriesDefaut: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'] },
-    { code: 'ENTREE_PLAT_DESSERT', libelle: 'Entrée + Plat + Dessert', desc: 'Sans boisson incluse', categoriesDefaut: ['ENTREE', 'PLAT', 'DESSERT'] },
-    { code: 'PLAT_DESSERT_BOISSON', libelle: 'Plat + Dessert + Boisson', desc: 'Sans entrée', categoriesDefaut: ['PLAT', 'DESSERT', 'BOISSON'] },
-    { code: 'ENTREE_PLAT', libelle: 'Entrée + Plat chaud', desc: 'Déjeuner express 2 composantes', categoriesDefaut: ['ENTREE', 'PLAT'] },
-    { code: 'PLAT_DESSERT', libelle: 'Plat + Dessert', desc: 'Formule gourmande 2 composantes', categoriesDefaut: ['PLAT', 'DESSERT'] },
-    { code: 'PLAT_BOISSON', libelle: 'Plat + Boisson', desc: 'Formule équilibrée la plus populaire', categoriesDefaut: ['PLAT', 'BOISSON'] },
-    { code: 'PLAT_SEUL', libelle: 'Plat chaud Seul', desc: 'Plat de résistance uniquement', categoriesDefaut: ['PLAT'] },
-    { code: 'BUFFET_SUR_MESURE', libelle: 'Buffet & Cocktail sur mesure', desc: 'Prestation événementielle ou convention spéciale', categoriesDefaut: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'] }
-  ];
-
-  // Modal Nouvelle Entreprise
+  // Modal Nouvelle / Modification Entreprise
   showModalEntreprise = signal<boolean>(false);
   entrepriseEnEdition = signal<Partial<EntrepriseB2B>>({
     nom: '',
     codeEntreprise: '',
     ninea: '',
+    rccm: '',
+    adresse: '',
     emailContact: '',
     telephone: '+221 ',
-    tauxPriseEnCharge: 100,
-    plafondJournalier: 5000,
-    budgetMensuelAlloue: 10000000,
-    tarifNegocieHtva: 4500,
+    contactReferent: '',
+    montantPriseEnChargeRepas: 5000,
+    cutOffType: 'J_MOINS_1',
+    cutOffHeure: '18:00',
     cadenceFacturation: 'MENSUELLE',
-    typePrestation: 'COMPLETE',
+    typePrestation: 'CUISINE_SUR_PLACE',
     categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON']
   });
   isEditModeEntreprise = signal<boolean>(false);
 
-  // Modal Nouveau Site
+  // Modal Paramètres (Types de prestation et Catégories personnalisables)
+  showModalParametres = signal<boolean>(false);
+  nouveauTypePrestation = signal<{ code: string; libelle: string; desc: string }>({
+    code: '',
+    libelle: '',
+    desc: ''
+  });
+  nouvelleCategorie = signal<{ code: string; libelle: string; icone: string; couleur: string }>({
+    code: '',
+    libelle: '',
+    icone: 'fa-utensils',
+    couleur: '#721513'
+  });
+
+  // Modal Nouveau Site (maintenu si besoin pour rétrocompatibilité)
   showModalSite = signal<boolean>(false);
   entrepriseCibleSiteId = signal<string>('');
   siteEnEdition = signal<Partial<SiteB2B>>({
@@ -111,7 +433,7 @@ export class B2bSuperAdminComponent {
     heureCutOff: '10:30',
     contactReferent: '',
     telephoneReferent: '+221 ',
-    typePrestation: 'COMPLETE',
+    typePrestation: 'CUISINE_SUR_PLACE',
     categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON']
   });
   isEditModeSite = signal<boolean>(false);
@@ -242,20 +564,22 @@ export class B2bSuperAdminComponent {
   });
 
   // GESTION DU TYPE DE PRESTATION & DES CATÉGORIES
-  onTypePrestationEntrepriseChange(type: TypePrestationB2B) {
-    const trouv = this.typesPrestationDisponibles.find(t => t.code === type);
+  onTypePrestationEntrepriseChange(type: string) {
+    const trouv = this.b2b.typesPrestationConfigurables().find(t => t.code === type);
     if (trouv) {
       this.entrepriseEnEdition.update(e => ({
         ...e,
         typePrestation: type,
         categoriesAutorisees: [...trouv.categoriesDefaut]
       }));
+    } else {
+      this.entrepriseEnEdition.update(e => ({ ...e, typePrestation: type }));
     }
   }
 
-  toggleCategorieEntreprise(cat: CategoriePlatB2B) {
+  toggleCategorieEntreprise(cat: string) {
     this.entrepriseEnEdition.update(e => {
-      const actuelles: CategoriePlatB2B[] = e.categoriesAutorisees ? [...e.categoriesAutorisees] : ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'];
+      const actuelles: string[] = e.categoriesAutorisees ? [...e.categoriesAutorisees] : ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'];
       const idx = actuelles.indexOf(cat);
       if (idx > -1) {
         if (actuelles.length === 1) return e; // Toujours garder au moins 1 catégorie
@@ -267,47 +591,62 @@ export class B2bSuperAdminComponent {
     });
   }
 
-  isCategorieEntrepriseActive(cat: CategoriePlatB2B): boolean {
+  isCategorieEntrepriseActive(cat: string): boolean {
     const cats = this.entrepriseEnEdition().categoriesAutorisees;
     return !!cats?.includes(cat);
   }
 
-  onTypePrestationSiteChange(type: TypePrestationB2B) {
-    const trouv = this.typesPrestationDisponibles.find(t => t.code === type);
-    if (trouv) {
-      this.siteEnEdition.update(s => ({
-        ...s,
-        typePrestation: type,
-        categoriesAutorisees: [...trouv.categoriesDefaut]
-      }));
+  getLibellePrestation(code?: string): string {
+    const trouv = this.b2b.typesPrestationConfigurables().find(t => t.code === code);
+    return trouv ? trouv.libelle : (code || 'Service de Restauration B2B');
+  }
+
+  getLibelleCutOff(ent: Partial<EntrepriseB2B>): string {
+    if (!ent.cutOffType) return ent.cutOffHeure || '18:00 (J-1)';
+    const prefix = ent.cutOffType === 'J_MOINS_1' ? 'J - 1 (Veille)' : 'Jour J (Jour même)';
+    return `${prefix} à ${ent.cutOffHeure || '18:00'}`;
+  }
+
+  // PARAMÈTRES PERSONNALISABLES
+  ouvrirModalParametres() {
+    this.nouveauTypePrestation.set({ code: '', libelle: '', desc: '' });
+    this.nouvelleCategorie.set({ code: '', libelle: '', icone: 'fa-utensils', couleur: '#721513' });
+    this.showModalParametres.set(true);
+  }
+
+  creerNouveauTypePrestation() {
+    const tp = this.nouveauTypePrestation();
+    if (!tp.libelle) {
+      alert('Veuillez renseigner un libellé pour la prestation.');
+      return;
     }
-  }
-
-  toggleCategorieSite(cat: CategoriePlatB2B) {
-    this.siteEnEdition.update(s => {
-      const actuelles: CategoriePlatB2B[] = s.categoriesAutorisees ? [...s.categoriesAutorisees] : ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'];
-      const idx = actuelles.indexOf(cat);
-      if (idx > -1) {
-        if (actuelles.length === 1) return s;
-        actuelles.splice(idx, 1);
-      } else {
-        actuelles.push(cat);
-      }
-      return { ...s, categoriesAutorisees: actuelles };
+    const code = tp.code || tp.libelle.toUpperCase().replace(/[^A-Z0-9]/g, '_');
+    this.b2b.ajouterTypePrestation({
+      code,
+      libelle: tp.libelle,
+      desc: tp.desc || 'Prestation sur mesure Kiki Traiteur',
+      categoriesDefaut: ['PLAT', 'BOISSON']
     });
+    this.nouveauTypePrestation.set({ code: '', libelle: '', desc: '' });
   }
 
-  isCategorieSiteActive(cat: CategoriePlatB2B): boolean {
-    const cats = this.siteEnEdition().categoriesAutorisees;
-    return !!cats?.includes(cat);
+  creerNouvelleCategorie() {
+    const cat = this.nouvelleCategorie();
+    if (!cat.libelle) {
+      alert('Veuillez renseigner un libellé pour la catégorie.');
+      return;
+    }
+    const code = cat.code || cat.libelle.toUpperCase().replace(/[^A-Z0-9]/g, '_');
+    this.b2b.ajouterCategorie({
+      code,
+      libelle: cat.libelle,
+      icone: cat.icone || 'fa-utensils',
+      couleur: cat.couleur || '#721513'
+    });
+    this.nouvelleCategorie.set({ code: '', libelle: '', icone: 'fa-utensils', couleur: '#721513' });
   }
 
-  getLibellePrestation(code?: TypePrestationB2B): string {
-    const trouv = this.typesPrestationDisponibles.find(t => t.code === code);
-    return trouv ? trouv.libelle : 'Formule Complète (4 composantes)';
-  }
-
-  // ACTIONS ENTREPRISE
+  // ACTIONS ENTREPRISE (1 Site = 1 Entreprise)
   genererCodeAuto(nomEntreprise?: string): string {
     const base = (nomEntreprise || '')
       .trim()
@@ -342,14 +681,16 @@ export class B2bSuperAdminComponent {
       nom: '',
       codeEntreprise: this.genererCodeAuto(''),
       ninea: '',
+      rccm: '',
+      adresse: '',
       emailContact: '',
       telephone: '+221 ',
-      tauxPriseEnCharge: 100,
-      plafondJournalier: 5000,
-      budgetMensuelAlloue: 12000000,
-      tarifNegocieHtva: 4500,
+      contactReferent: '',
+      montantPriseEnChargeRepas: 5000,
+      cutOffType: 'J_MOINS_1',
+      cutOffHeure: '18:00',
       cadenceFacturation: 'MENSUELLE',
-      typePrestation: 'COMPLETE',
+      typePrestation: 'CUISINE_SUR_PLACE',
       categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON']
     });
     this.showModalEntreprise.set(true);
@@ -359,7 +700,13 @@ export class B2bSuperAdminComponent {
     this.isEditModeEntreprise.set(true);
     this.entrepriseEnEdition.set({
       ...ent,
-      typePrestation: ent.typePrestation || 'COMPLETE',
+      rccm: ent.rccm || '',
+      adresse: ent.adresse || (ent.sites && ent.sites[0] ? ent.sites[0].adresse : ''),
+      contactReferent: ent.contactReferent || (ent.sites && ent.sites[0] ? ent.sites[0].contactReferent : ''),
+      montantPriseEnChargeRepas: ent.montantPriseEnChargeRepas || 5000,
+      cutOffType: ent.cutOffType || 'J_MOINS_1',
+      cutOffHeure: ent.cutOffHeure || '18:00',
+      typePrestation: ent.typePrestation || 'CUISINE_SUR_PLACE',
       categoriesAutorisees: ent.categoriesAutorisees ? [...ent.categoriesAutorisees] : ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON']
     });
     this.showModalEntreprise.set(true);
@@ -368,25 +715,45 @@ export class B2bSuperAdminComponent {
   enregistrerEntreprise() {
     const val = this.entrepriseEnEdition();
     if (!val.nom || !val.codeEntreprise) {
-      alert('Veuillez saisir au moins la raison sociale et le code entreprise.');
+      alert('Veuillez renseigner au moins le nom de l\'entreprise et son code.');
       return;
     }
 
     if (this.isEditModeEntreprise() && val.id) {
-      this.b2b.modifierEntreprise(val.id, val);
+      this.b2b.modifierEntreprise(val.id, {
+        ...val,
+        sites: [
+          {
+            id: 'site-' + val.id,
+            nom: val.nom!,
+            adresse: val.adresse || 'Dakar',
+            heureCutOff: `${val.cutOffHeure || '18:00'} (${val.cutOffType === 'JOUR_J' ? 'Jour J' : 'J-1'})`,
+            contactReferent: val.contactReferent || 'Contact RH',
+            telephoneReferent: val.telephone || '+221',
+            typePrestation: val.typePrestation || 'CUISINE_SUR_PLACE',
+            categoriesAutorisees: val.categoriesAutorisees || ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON']
+          }
+        ]
+      });
     } else {
       this.b2b.ajouterEntreprise({
         nom: val.nom!,
         codeEntreprise: val.codeEntreprise!,
-        ninea: val.ninea,
-        emailContact: val.emailContact,
-        telephone: val.telephone,
-        tauxPriseEnCharge: val.tauxPriseEnCharge || 100,
-        plafondJournalier: val.plafondJournalier || 5000,
-        budgetMensuelAlloue: val.budgetMensuelAlloue || 10000000,
-        tarifNegocieHtva: val.tarifNegocieHtva || 4500,
+        ninea: val.ninea || '',
+        rccm: val.rccm || '',
+        adresse: val.adresse || '',
+        emailContact: val.emailContact || '',
+        telephone: val.telephone || '',
+        contactReferent: val.contactReferent || '',
+        montantPriseEnChargeRepas: val.montantPriseEnChargeRepas || 5000,
+        tauxPriseEnCharge: 100,
+        plafondJournalier: val.montantPriseEnChargeRepas || 5000,
+        budgetMensuelAlloue: 15000000,
+        tarifNegocieHtva: val.montantPriseEnChargeRepas || 5000,
         cadenceFacturation: val.cadenceFacturation || 'MENSUELLE',
-        typePrestation: val.typePrestation || 'COMPLETE',
+        cutOffType: val.cutOffType || 'J_MOINS_1',
+        cutOffHeure: val.cutOffHeure || '18:00',
+        typePrestation: val.typePrestation || 'CUISINE_SUR_PLACE',
         categoriesAutorisees: val.categoriesAutorisees || ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'],
         isArchivee: false
       });

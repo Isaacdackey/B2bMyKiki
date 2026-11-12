@@ -12,15 +12,22 @@ export interface UserSessionB2B {
   badgeColor: string;
 }
 
-export type CategoriePlatB2B = 'ENTREE' | 'PLAT' | 'DESSERT' | 'BOISSON';
+export type CategoriePlatB2B = 'ENTREE' | 'PLAT' | 'DESSERT' | 'BOISSON' | string;
 
-export type TypePrestationB2B = 'COMPLETE' | 'ENTREE_PLAT_DESSERT' | 'PLAT_DESSERT_BOISSON' | 'ENTREE_PLAT' | 'PLAT_DESSERT' | 'PLAT_BOISSON' | 'PLAT_SEUL' | 'BUFFET_SUR_MESURE';
+export type TypePrestationB2B = 'CUISINE_SUR_PLACE' | 'SERVICE_SUR_PLACE' | 'LIVRAISON_BARQUETTES' | string;
 
 export interface PrestationConfigB2B {
-  type: TypePrestationB2B;
+  type: string;
   libelle: string;
   description?: string;
-  categoriesAutorisees: CategoriePlatB2B[]; // Ex: ['PLAT', 'BOISSON']
+  categoriesAutorisees: string[]; // Ex: ['PLAT', 'BOISSON']
+}
+
+export type TypeCutOffB2B = 'J_MOINS_1' | 'JOUR_J';
+
+export interface CutOffConfigB2B {
+  type: TypeCutOffB2B; // 'J_MOINS_1' (La veille) ou 'JOUR_J' (Le jour même)
+  heure: string; // ex: "18:00" ou "09:00"
 }
 
 export interface SiteB2B {
@@ -40,17 +47,30 @@ export interface EntrepriseB2B {
   nom: string;
   codeEntreprise: string;
   ninea?: string;
+  rccm?: string; // Registre de Commerce et du Crédit Mobilier
+  adresse?: string; // Adresse physique directe (1 Site = 1 Entreprise)
   emailContact?: string;
   telephone?: string;
-  tauxPriseEnCharge: number; // ex: 100 ou 70 (%)
-  plafondJournalier: number; // en FCFA
-  budgetMensuelAlloue: number; // ex: 15 000 000 FCFA
+  contactReferent?: string;
+  
+  // Prise en charge & Tarification par repas
+  montantPriseEnChargeRepas: number; // Ex: 5000 FCFA (tarif/offre du repas vendu par Kiki)
+  tauxPriseEnCharge?: number; // compatibilité legacy si nécessaire
+  plafondJournalier?: number; // en FCFA
+  budgetMensuelAlloue?: number; // ex: 15 000 000 FCFA
   tarifNegocieHtva?: number; // ex: 4500 FCFA
   cadenceFacturation?: 'HEBDOMADAIRE' | 'MENSUELLE' | 'BIMESTRIELLE';
+  
+  // Cut-off heure limite de commande
+  cutOffType: TypeCutOffB2B; // 'J_MOINS_1' ou 'JOUR_J'
+  cutOffHeure: string; // Ex: '18:00' ou '09:00'
+
+  // Prestation et catégories
+  typePrestation: TypePrestationB2B; // 'CUISINE_SUR_PLACE' | 'SERVICE_SUR_PLACE' | 'LIVRAISON_BARQUETTES'
+  categoriesAutorisees: CategoriePlatB2B[]; // ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON']
+  
   isArchivee?: boolean;
-  typePrestation?: TypePrestationB2B; // Formule par défaut de l'entreprise
-  categoriesAutorisees?: CategoriePlatB2B[]; // Catégories activées
-  sites: SiteB2B[];
+  sites: SiteB2B[]; // Garanti non-optionnel pour la rétro-compatibilité
 }
 
 export interface PlatB2B {

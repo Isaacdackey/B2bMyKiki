@@ -18,10 +18,50 @@ export class B2bStateService {
   });
 
   // Section active dans l'Espace Super Admin Kiki Traiteur
-  superAdminActiveSection = signal<'ENTREPRISES' | 'SITES' | 'CATALOGUE' | 'PLANNING' | 'FACTURATION'>('ENTREPRISES');
+  superAdminActiveSection = signal<'DASHBOARD' | 'ENTREPRISES' | 'SITES' | 'CATALOGUE' | 'PLANNING' | 'FACTURATION'>('DASHBOARD');
 
   // Section active dans l'Espace Responsable Entreprise (RH) : Dashboard Vue Globale par défaut
   rhActiveSection = signal<'STATISTIQUES' | 'COMMANDES_SITE' | 'EMPLOYES' | 'FACTURATION' | 'SITES'>('STATISTIQUES');
+
+  // Types de prestation configurables
+  typesPrestationConfigurables = signal<{ code: string; libelle: string; desc: string; categoriesDefaut: string[] }[]>([
+    { 
+      code: 'CUISINE_SUR_PLACE', 
+      libelle: 'Cuisine et service sur place', 
+      desc: 'Préparation et dressage en restaurant d’entreprise sur place', 
+      categoriesDefaut: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'] 
+    },
+    { 
+      code: 'SERVICE_SUR_PLACE', 
+      libelle: 'Service sur place (Réfectoire)', 
+      desc: 'Plats cuisinés acheminés chauds et servis à l’assiette au réfectoire', 
+      categoriesDefaut: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'] 
+    },
+    { 
+      code: 'LIVRAISON_BARQUETTES', 
+      libelle: 'Livraison en barquettes', 
+      desc: 'Conditionnement individuel hermétique scellé et étiqueté', 
+      categoriesDefaut: ['PLAT', 'BOISSON'] 
+    }
+  ]);
+
+  // Catégories alimentaires configurables
+  categoriesConfigurables = signal<{ code: string; libelle: string; icone: string; couleur: string }[]>([
+    { code: 'ENTREE', libelle: 'Entrée', icone: 'fa-leaf', couleur: '#606C38' },
+    { code: 'PLAT', libelle: 'Plat chaud', icone: 'fa-bowl-food', couleur: '#721513' },
+    { code: 'DESSERT', libelle: 'Dessert', icone: 'fa-cake-candles', couleur: '#C5A880' },
+    { code: 'BOISSON', libelle: 'Boisson', icone: 'fa-wine-glass', couleur: '#332724' }
+  ]);
+
+  // Ajouter un nouveau type de prestation
+  ajouterTypePrestation(item: { code: string; libelle: string; desc: string; categoriesDefaut: string[] }) {
+    this.typesPrestationConfigurables.update(list => [...list, item]);
+  }
+
+  // Ajouter une nouvelle catégorie alimentaire
+  ajouterCategorie(item: { code: string; libelle: string; icone: string; couleur: string }) {
+    this.categoriesConfigurables.update(list => [...list, item]);
+  }
 
   // Méthode pour ajouter une entreprise cliente
   ajouterEntreprise(nouvelle: Omit<EntrepriseB2B, 'id' | 'sites'>) {
@@ -162,239 +202,209 @@ export class B2bStateService {
   // Panier libre pour le salarié autonome / prestataire
   panierAutonome = signal<LignePanierAutonome[]>([]);
 
-  // Liste des entreprises clientes conventionnées (gérées par le Super Admin Kiki Traiteur)
+  // Liste des entreprises clientes conventionnées (1 Site = 1 Entreprise)
   listeEntreprises = signal<EntrepriseB2B[]>([
     {
       id: 'ent-001',
-      nom: 'TotalEnergies Sénégal',
-      codeEntreprise: 'TOT-SN',
+      nom: 'TotalEnergies — Siège Plateau',
+      codeEntreprise: 'TOT-PLA',
       ninea: '001294829 2V1',
+      rccm: 'SN-DKR-2012-B-1428',
+      adresse: 'Boulevard de la République, Dakar Plateau',
       emailContact: 'moyens.generaux@totalenergies.sn',
       telephone: '+221 33 832 29 66',
+      contactReferent: 'M. Babacar Ndiaye (RH)',
+      montantPriseEnChargeRepas: 5000,
       tauxPriseEnCharge: 100,
       plafondJournalier: 5000,
       budgetMensuelAlloue: 18500000,
       tarifNegocieHtva: 4500,
       cadenceFacturation: 'MENSUELLE',
-      isArchivee: false,
-      typePrestation: 'COMPLETE',
+      cutOffType: 'J_MOINS_1',
+      cutOffHeure: '18:00',
+      typePrestation: 'CUISINE_SUR_PLACE',
       categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'],
+      isArchivee: false,
       sites: [
         { 
           id: 'site-1', 
-          nom: 'Siège Plateau - Dakar', 
+          nom: 'TotalEnergies — Siège Plateau', 
           adresse: 'Boulevard de la République, Dakar Plateau', 
-          heureCutOff: '10:30', 
+          heureCutOff: '18:00 (J-1)', 
           contactReferent: 'M. Babacar Ndiaye (RH)', 
           telephoneReferent: '+221 77 123 45 67',
-          typePrestation: 'COMPLETE',
-          categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'],
-          creneauxDisponibles: [
-            '11h30 - 12h00 (Service Anticipé)',
-            '12h00 - 12h30 (Premier Service)',
-            '12h30 - 13h00 (Deuxième Service)',
-            '13h00 - 13h30 (Troisième Service)',
-            '13h30 - 14h00 (Service Tardif)',
-            '14h00 - 14h30 (Dernier Service)'
-          ]
-        },
-        { 
-          id: 'site-2', 
-          nom: 'Dépôt Bel-Air / Port', 
-          adresse: 'Zone Industrielle Bel-Air, Port Autonome de Dakar', 
-          heureCutOff: '09:45', 
-          contactReferent: 'Mme Aminata Sow (Logistique)', 
-          telephoneReferent: '+221 78 234 56 78',
-          typePrestation: 'PLAT_BOISSON',
-          categoriesAutorisees: ['PLAT', 'BOISSON'],
-          creneauxDisponibles: [
-            '11h30 - 12h00 (Quart Matin)',
-            '12h00 - 12h45 (Service Midi)',
-            '13h00 - 13h45 (Service Relève)',
-            '19h00 - 20h00 (Dîner Équipe de Nuit)'
-          ]
-        },
-        { 
-          id: 'site-3', 
-          nom: 'Plateforme Diamniadio', 
-          adresse: 'Pôle Urbain de Diamniadio, Dakar', 
-          heureCutOff: '10:00', 
-          contactReferent: 'M. Cheikh Diop', 
-          telephoneReferent: '+221 76 345 67 89',
-          typePrestation: 'ENTREE_PLAT',
-          categoriesAutorisees: ['ENTREE', 'PLAT'],
-          creneauxDisponibles: [
-            '12h00 - 12h30 (Premier Service)',
-            '12h30 - 13h15 (Service Principal)',
-            '13h15 - 14h00 (Service Décalé)'
-          ]
+          typePrestation: 'CUISINE_SUR_PLACE',
+          categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON']
         }
       ]
     },
     {
       id: 'ent-002',
-      nom: 'Sonatel Orange Sénégal',
-      codeEntreprise: 'SONA-SN',
-      ninea: '003849182 2K4',
-      emailContact: 'comite.entreprise@orange-sonatel.sn',
-      telephone: '+221 33 839 12 00',
-      tauxPriseEnCharge: 70,
-      plafondJournalier: 4000,
-      budgetMensuelAlloue: 25000000,
-      tarifNegocieHtva: 4200,
-      cadenceFacturation: 'HEBDOMADAIRE',
+      nom: 'TotalEnergies — Dépôt Bel-Air Port',
+      codeEntreprise: 'TOT-BEL',
+      ninea: '001294829 2V1',
+      rccm: 'SN-DKR-2012-B-1428',
+      adresse: 'Zone Industrielle Bel-Air, Port Autonome de Dakar',
+      emailContact: 'logistique.belair@totalenergies.sn',
+      telephone: '+221 33 849 11 22',
+      contactReferent: 'Mme Aminata Sow (Logistique)',
+      montantPriseEnChargeRepas: 5000,
+      tauxPriseEnCharge: 100,
+      plafondJournalier: 5000,
+      budgetMensuelAlloue: 12000000,
+      tarifNegocieHtva: 4500,
+      cadenceFacturation: 'MENSUELLE',
+      cutOffType: 'JOUR_J',
+      cutOffHeure: '09:00',
+      typePrestation: 'LIVRAISON_BARQUETTES',
+      categoriesAutorisees: ['PLAT', 'BOISSON'],
       isArchivee: false,
-      typePrestation: 'PLAT_DESSERT_BOISSON',
-      categoriesAutorisees: ['PLAT', 'DESSERT', 'BOISSON'],
       sites: [
-        {
-          id: 'site-sona-1',
-          nom: 'Siège Technopole Pikine',
-          adresse: 'Parc Technologique de la Sonatel, Pikine',
-          heureCutOff: '10:15',
-          contactReferent: 'Mme Awa Cissé (RH)',
-          telephoneReferent: '+221 77 450 99 88',
-          typePrestation: 'PLAT_DESSERT_BOISSON',
-          categoriesAutorisees: ['PLAT', 'DESSERT', 'BOISSON'],
-          creneauxDisponibles: ['12h00 - 13h00', '13h00 - 14h00']
-        },
-        {
-          id: 'site-sona-2',
-          nom: 'Agence Commerciale Cheikh Anta Diop',
-          adresse: 'Avenue Cheikh Anta Diop, Fann',
-          heureCutOff: '10:30',
-          contactReferent: 'M. Mansour Sy',
-          telephoneReferent: '+221 78 112 33 44',
-          typePrestation: 'PLAT_BOISSON',
-          categoriesAutorisees: ['PLAT', 'BOISSON'],
-          creneauxDisponibles: ['12h30 - 13h30']
+        { 
+          id: 'site-2', 
+          nom: 'TotalEnergies — Dépôt Bel-Air Port', 
+          adresse: 'Zone Industrielle Bel-Air, Port Autonome de Dakar', 
+          heureCutOff: '09:00 (Jour J)', 
+          contactReferent: 'Mme Aminata Sow (Logistique)', 
+          telephoneReferent: '+221 78 234 56 78',
+          typePrestation: 'LIVRAISON_BARQUETTES',
+          categoriesAutorisees: ['PLAT', 'BOISSON']
         }
       ]
     },
     {
       id: 'ent-003',
-      nom: 'Bolloré Transport & Logistics',
-      codeEntreprise: 'BOLL-SN',
-      ninea: '009847120 3M1',
-      emailContact: 'direction.rh@bollore-logistics.sn',
-      telephone: '+221 33 849 50 00',
-      tauxPriseEnCharge: 100,
+      nom: 'Sonatel Orange — Siège Technopole Pikine',
+      codeEntreprise: 'SONA-PIK',
+      ninea: '003849182 2K4',
+      rccm: 'SN-DKR-1997-B-5821',
+      adresse: 'Parc Technologique de la Sonatel, Pikine',
+      emailContact: 'comite.entreprise@orange-sonatel.sn',
+      telephone: '+221 33 839 12 00',
+      contactReferent: 'Mme Awa Cissé (RH)',
+      montantPriseEnChargeRepas: 5000,
+      tauxPriseEnCharge: 70,
       plafondJournalier: 5000,
-      budgetMensuelAlloue: 14000000,
-      tarifNegocieHtva: 4600,
-      cadenceFacturation: 'MENSUELLE',
+      budgetMensuelAlloue: 25000000,
+      tarifNegocieHtva: 4500,
+      cadenceFacturation: 'HEBDOMADAIRE',
+      cutOffType: 'J_MOINS_1',
+      cutOffHeure: '17:30',
+      typePrestation: 'SERVICE_SUR_PLACE',
+      categoriesAutorisees: ['PLAT', 'DESSERT', 'BOISSON'],
       isArchivee: false,
-      typePrestation: 'COMPLETE',
-      categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'],
       sites: [
         {
-          id: 'site-boll-1',
-          nom: 'Terminal Maritime Dakar',
-          adresse: 'Zone Portuaire Mole 2, Dakar',
-          heureCutOff: '09:30',
-          contactReferent: 'M. Alioune Gueye',
-          telephoneReferent: '+221 76 990 12 34',
-          typePrestation: 'COMPLETE',
-          categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'],
-          creneauxDisponibles: ['11h30 - 12h30', '12h30 - 13h30']
+          id: 'site-sona-1',
+          nom: 'Sonatel Orange — Siège Technopole Pikine',
+          adresse: 'Parc Technologique de la Sonatel, Pikine',
+          heureCutOff: '17:30 (J-1)',
+          contactReferent: 'Mme Awa Cissé (RH)',
+          telephoneReferent: '+221 77 450 99 88',
+          typePrestation: 'SERVICE_SUR_PLACE',
+          categoriesAutorisees: ['PLAT', 'DESSERT', 'BOISSON']
         }
       ]
     },
     {
       id: 'ent-004',
-      nom: 'CBAO Groupe Attijariwafa Bank',
-      codeEntreprise: 'CBAO-812',
-      ninea: '004192837 1B2',
-      emailContact: 'services.generaux@cbao.sn',
-      telephone: '+221 33 849 96 96',
-      tauxPriseEnCharge: 80,
-      plafondJournalier: 4500,
-      budgetMensuelAlloue: 16000000,
-      tarifNegocieHtva: 4300,
-      cadenceFacturation: 'MENSUELLE',
+      nom: 'Sonatel Orange — Agence Cheikh Anta Diop',
+      codeEntreprise: 'SONA-FANN',
+      ninea: '003849182 2K4',
+      rccm: 'SN-DKR-1997-B-5821',
+      adresse: 'Avenue Cheikh Anta Diop, Fann',
+      emailContact: 'agence.fann@orange-sonatel.sn',
+      telephone: '+221 33 869 40 00',
+      contactReferent: 'M. Mansour Sy',
+      montantPriseEnChargeRepas: 5000,
+      tauxPriseEnCharge: 70,
+      plafondJournalier: 5000,
+      budgetMensuelAlloue: 8000000,
+      tarifNegocieHtva: 4500,
+      cadenceFacturation: 'HEBDOMADAIRE',
+      cutOffType: 'JOUR_J',
+      cutOffHeure: '09:30',
+      typePrestation: 'LIVRAISON_BARQUETTES',
+      categoriesAutorisees: ['PLAT', 'BOISSON'],
       isArchivee: false,
-      typePrestation: 'ENTREE_PLAT_DESSERT',
-      categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT'],
       sites: [
         {
-          id: 'site-cbao-1',
-          nom: 'Siège Place de l\'Indépendance',
-          adresse: '1 Place de l\'Indépendance, Dakar Plateau',
-          heureCutOff: '10:30',
-          contactReferent: 'Mme Marième Diallo (DRH)',
-          telephoneReferent: '+221 77 310 22 11',
-          typePrestation: 'ENTREE_PLAT_DESSERT',
-          categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT'],
-          creneauxDisponibles: ['12h30 - 13h30', '13h30 - 14h30']
-        },
-        {
-          id: 'site-cbao-2',
-          nom: 'Centre Monétique & IT Bourguiba',
-          adresse: 'Avenue Bourguiba, Dakar',
-          heureCutOff: '10:15',
-          contactReferent: 'M. Ibrahima Sarr',
-          telephoneReferent: '+221 77 889 44 55',
-          typePrestation: 'PLAT_BOISSON',
-          categoriesAutorisees: ['PLAT', 'BOISSON'],
-          creneauxDisponibles: ['12h30 - 13h30']
+          id: 'site-sona-2',
+          nom: 'Sonatel Orange — Agence Cheikh Anta Diop',
+          adresse: 'Avenue Cheikh Anta Diop, Fann',
+          heureCutOff: '09:30 (Jour J)',
+          contactReferent: 'M. Mansour Sy',
+          telephoneReferent: '+221 78 112 33 44',
+          typePrestation: 'LIVRAISON_BARQUETTES',
+          categoriesAutorisees: ['PLAT', 'BOISSON']
         }
       ]
     },
     {
       id: 'ent-005',
-      nom: 'Port Autonome de Dakar (PAD)',
-      codeEntreprise: 'PAD-490',
-      ninea: '001029384 2G9',
-      emailContact: 'intendance@portdakar.sn',
-      telephone: '+221 33 849 45 45',
-      tauxPriseEnCharge: 100,
+      nom: 'CBAO Attijariwafa — Place Indépendance',
+      codeEntreprise: 'CBAO-IND',
+      ninea: '004192837 1B2',
+      rccm: 'SN-DKR-2005-B-3104',
+      adresse: '1 Place de l\'Indépendance, Dakar Plateau',
+      emailContact: 'services.generaux@cbao.sn',
+      telephone: '+221 33 849 96 96',
+      contactReferent: 'Mme Marième Diallo (DRH)',
+      montantPriseEnChargeRepas: 5000,
+      tauxPriseEnCharge: 80,
       plafondJournalier: 5000,
-      budgetMensuelAlloue: 21000000,
+      budgetMensuelAlloue: 16000000,
       tarifNegocieHtva: 4500,
       cadenceFacturation: 'MENSUELLE',
+      cutOffType: 'J_MOINS_1',
+      cutOffHeure: '18:00',
+      typePrestation: 'SERVICE_SUR_PLACE',
+      categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT'],
       isArchivee: false,
-      typePrestation: 'COMPLETE',
-      categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'],
       sites: [
         {
-          id: 'site-pad-1',
-          nom: 'Direction Générale Boulevard de la Libération',
-          adresse: '21 Boulevard de la Libération, Dakar',
-          heureCutOff: '10:00',
-          contactReferent: 'M. Ousmane Ndoye',
-          telephoneReferent: '+221 77 612 90 00',
-          typePrestation: 'COMPLETE',
-          categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'],
-          creneauxDisponibles: ['12h00 - 13h00', '13h00 - 14h00']
+          id: 'site-cbao-1',
+          nom: 'CBAO Attijariwafa — Place Indépendance',
+          adresse: '1 Place de l\'Indépendance, Dakar Plateau',
+          heureCutOff: '18:00 (J-1)',
+          contactReferent: 'Mme Marième Diallo (DRH)',
+          telephoneReferent: '+221 77 310 22 11',
+          typePrestation: 'SERVICE_SUR_PLACE',
+          categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT']
         }
       ]
     },
     {
       id: 'ent-006',
-      nom: 'Free Sénégal (Saga Africa Holdings)',
-      codeEntreprise: 'FRE-604',
-      ninea: '005918273 3F1',
-      emailContact: 'office.manager@free.sn',
-      telephone: '+221 33 889 10 00',
-      tauxPriseEnCharge: 75,
-      plafondJournalier: 4000,
-      budgetMensuelAlloue: 11500000,
-      tarifNegocieHtva: 4000,
-      cadenceFacturation: 'HEBDOMADAIRE',
+      nom: 'Port Autonome de Dakar (PAD) — Direction',
+      codeEntreprise: 'PAD-DIR',
+      ninea: '001029384 2G9',
+      rccm: 'SN-DKR-1988-B-0941',
+      adresse: '21 Boulevard de la Libération, Dakar',
+      emailContact: 'intendance@portdakar.sn',
+      telephone: '+221 33 849 45 45',
+      contactReferent: 'M. Ousmane Ndoye',
+      montantPriseEnChargeRepas: 5000,
+      tauxPriseEnCharge: 100,
+      plafondJournalier: 5000,
+      budgetMensuelAlloue: 21000000,
+      tarifNegocieHtva: 4500,
+      cadenceFacturation: 'MENSUELLE',
+      cutOffType: 'JOUR_J',
+      cutOffHeure: '08:45',
+      typePrestation: 'CUISINE_SUR_PLACE',
+      categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'],
       isArchivee: false,
-      typePrestation: 'PLAT_BOISSON',
-      categoriesAutorisees: ['PLAT', 'BOISSON'],
       sites: [
         {
-          id: 'site-free-1',
-          nom: 'Campus Almadies Route de Ngor',
-          adresse: 'Route des Almadies, Dakar',
-          heureCutOff: '10:30',
-          contactReferent: 'Mme Khady Mbengue',
-          telephoneReferent: '+221 76 222 11 00',
-          typePrestation: 'PLAT_BOISSON',
-          categoriesAutorisees: ['PLAT', 'BOISSON'],
-          creneauxDisponibles: ['12h30 - 13h30', '13h30 - 14h30']
+          id: 'site-pad-1',
+          nom: 'Port Autonome de Dakar (PAD) — Direction',
+          adresse: '21 Boulevard de la Libération, Dakar',
+          heureCutOff: '08:45 (Jour J)',
+          contactReferent: 'M. Ousmane Ndoye',
+          telephoneReferent: '+221 77 612 90 00',
+          typePrestation: 'CUISINE_SUR_PLACE',
+          categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON']
         }
       ]
     }
@@ -543,8 +553,8 @@ export class B2bStateService {
   partPriseEnChargeEntreprise = computed(() => {
     const emp = this.currentEmploye();
     if (emp.type === 'AUTONOME') return 0;
-    // Taux spécifique au salarié s'il est défini, sinon taux par défaut entreprise
-    const taux = emp.tauxSubvention !== undefined ? emp.tauxSubvention : this.currentEntreprise().tauxPriseEnCharge;
+    // Taux spécifique au salarié s'il est défini, sinon taux par défaut entreprise (ou 100%)
+    const taux = emp.tauxSubvention !== undefined ? emp.tauxSubvention : (this.currentEntreprise().tauxPriseEnCharge ?? 100);
     return Math.round((this.formuleActuelle().prixForfait * taux) / 100);
   });
 

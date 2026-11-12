@@ -20,7 +20,7 @@
               <span style="font-size: 0.72rem; color: #721513; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(114, 21, 19, 0.08); padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.4rem;">
                 <i class="fa-solid fa-briefcase"></i> PORTAIL RESPONSABLE DE L’ENTREPRISE • {{ b2b.currentEntreprise().nom }}
               </span>
-              <h2 style="margin: 0.35rem 0 0; font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
+              <h2 style="margin: 0.35rem 0 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
                 Pilotage Entreprise : Quotas, Salariés & Facturation par Site
               </h2>
             </div>
@@ -124,21 +124,21 @@
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.25rem;">
             <div style="background: #FAF8F4; padding: 0.85rem 1.15rem; border-radius: 12px; border: 1px solid #EDE7DC;">
               <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">Repas sur la Période</div>
-              <div style="font-size: 1.6rem; font-weight: 900; color: #721513; font-family: 'Playfair Display', serif;">
+              <div style="font-size: 1.6rem; font-weight: 900; color: #721513; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
                 {{ totalRepasPeriode() }} <span style="font-size: 0.85rem; color: #606C38;">plateaux</span>
               </div>
             </div>
 
             <div style="background: #FAF8F4; padding: 0.85rem 1.15rem; border-radius: 12px; border: 1px solid #EDE7DC;">
               <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">Total Facturé Entreprise (100%)</div>
-              <div style="font-size: 1.6rem; font-weight: 900; color: #E51D24; font-family: 'Playfair Display', serif;">
+              <div style="font-size: 1.6rem; font-weight: 900; color: #E51D24; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
                 {{ (totalPriseEnChargePeriode() | number) }} <span style="font-size: 0.85rem; color: #332724;">FCFA</span>
               </div>
             </div>
 
             <div style="background: #FAF8F4; padding: 0.85rem 1.15rem; border-radius: 12px; border: 1px solid #EDE7DC;">
               <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">Reste à Charge Salariés</div>
-              <div style="font-size: 1.6rem; font-weight: 900; color: #606C38; font-family: 'Playfair Display', serif;">
+              <div style="font-size: 1.6rem; font-weight: 900; color: #606C38; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
                 0 <span style="font-size: 0.85rem; color: #332724;">FCFA</span>
               </div>
             </div>
@@ -209,13 +209,13 @@
               </tbody>
               <tfoot>
                 <tr style="background: #FAF8F4; border-top: 2px solid #721513;">
-                  <td colspan="4" style="font-weight: 800; color: #721513; font-size: 0.95rem; padding: 1rem 1.25rem; font-family: 'Playfair Display', serif;">
+                  <td colspan="4" style="font-weight: 800; color: #721513; font-size: 0.95rem; padding: 1rem 1.25rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
                     TOTAL FACTURÉ POUR CETTE PÉRIODE :
                   </td>
                   <td style="font-weight: 900; color: #721513; font-size: 1.05rem;">
                     {{ totalRepasPeriode() }} repas
                   </td>
-                  <td style="font-weight: 900; color: #E51D24; font-size: 1.2rem; font-family: 'Playfair Display', serif;">
+                  <td style="font-weight: 900; color: #E51D24; font-size: 1.2rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
                     {{ (totalPriseEnChargePeriode() | number) }} FCFA
                   </td>
                   <td></td>
@@ -286,7 +286,7 @@
             <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
               <i class="fa-solid fa-bowl-food" style="color: #721513;"></i> REPAS LIVRÉS CE MOIS
             </div>
-            <div style="font-size: 2.2rem; font-weight: 900; color: #721513; margin: 0.5rem 0 0.25rem; font-family: 'Playfair Display', serif;">
+            <div style="font-size: 2.2rem; font-weight: 900; color: #721513; margin: 0.5rem 0 0.25rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
               {{ b2b.totalRepasMois() }} <span style="font-size: 1rem; color: #606C38; font-weight: 600;">repas</span>
             </div>
             <div style="font-size: 0.75rem; color: #6E5A56;">Sur l'ensemble des 3 sites conventionnés</div>
@@ -296,7 +296,7 @@
             <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
               <i class="fa-solid fa-hand-holding-dollar" style="color: #E51D24;"></i> PRISE EN CHARGE ENTREPRISE
             </div>
-            <div style="font-size: 2.2rem; font-weight: 900; color: #E51D24; margin: 0.5rem 0 0.25rem; font-family: 'Playfair Display', serif;">
+            <div style="font-size: 2.2rem; font-weight: 900; color: #E51D24; margin: 0.5rem 0 0.25rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
               {{ (b2b.totalFactureMois() | number) }} <span style="font-size: 1rem; color: #332724;">FCFA</span>
             </div>
             <div style="font-size: 0.75rem; color: #606C38; font-weight: 600;">Taux contractuel : {{ b2b.currentEntreprise().tauxPriseEnCharge }}% du forfait</div>
@@ -306,7 +306,7 @@
             <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
               <i class="fa-solid fa-chart-pie" style="color: #721513;"></i> BUDGET ALLOUÉ & CONSOMMATION
             </div>
-            <div style="font-size: 2.2rem; font-weight: 900; color: #721513; margin: 0.5rem 0 0.25rem; font-family: 'Playfair Display', serif;">
+            <div style="font-size: 2.2rem; font-weight: 900; color: #721513; margin: 0.5rem 0 0.25rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
               {{ b2b.tauxUtilisationBudget() }}%
             </div>
             <div style="font-size: 0.75rem; color: #6E5A56;">
@@ -318,7 +318,7 @@
             <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
               <i class="fa-solid fa-user-check" style="color: #606C38;"></i> COLLABORATEURS ACTIFS
             </div>
-            <div style="font-size: 2.2rem; font-weight: 900; color: #332724; margin: 0.5rem 0 0.25rem; font-family: 'Playfair Display', serif;">
+            <div style="font-size: 2.2rem; font-weight: 900; color: #332724; margin: 0.5rem 0 0.25rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
               {{ b2b.listeEmployes().length }} <span style="font-size: 1rem; color: #6E5A56;">bénéficiaires</span>
             </div>
             <div style="font-size: 0.75rem; color: #6E5A56;">Rattachés aux services RH et opérationnels</div>
@@ -331,7 +331,7 @@
           
           <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
-              <h3 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.25rem; color: #721513; font-weight: 800;">
+              <h3 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.25rem; color: #721513; font-weight: 800;">
                 Consommation Hebdomadaire par Site
               </h3>
               <span style="font-size: 0.75rem; color: #6E5A56; font-weight: 600;"><i class="fa-regular fa-calendar"></i> Mois de Novembre 2026</span>
@@ -360,7 +360,7 @@
 
           <!-- Actions Rapides RH -->
           <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
-            <h3 style="margin: 0 0 1.25rem; font-family: 'Playfair Display', serif; font-size: 1.25rem; color: #721513; font-weight: 800;">
+            <h3 style="margin: 0 0 1.25rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.25rem; color: #721513; font-weight: 800;">
               Actions Rapides RH
             </h3>
             <div style="display: flex; flex-direction: column; gap: 0.85rem;">
@@ -396,7 +396,7 @@
         
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
           <div>
-            <h2 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
+            <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
               Annuaire des Salariés & Droits à la Cantine
             </h2>
             <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #6E5A56;">
@@ -539,7 +539,7 @@
         
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
           <div>
-            <h2 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
+            <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
               Rapprochement & Facturation Mensuelle Kiki Traiteur
             </h2>
             <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #6E5A56;">
@@ -587,14 +587,14 @@
             </tbody>
             <tfoot>
               <tr style="background: #FAF8F4; border-top: 2px solid #721513;">
-                <td colspan="2" style="font-weight: 800; color: #721513; font-size: 1rem; padding: 1.25rem; font-family: 'Playfair Display', serif;">
+                <td colspan="2" style="font-weight: 800; color: #721513; font-size: 1rem; padding: 1.25rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
                   TOTAL CONSOLIDÉ DU MOIS :
                 </td>
                 <td style="font-weight: 900; color: #721513; font-size: 1.15rem; padding: 1.25rem;">
                   {{ b2b.totalRepasMois() }} repas
                 </td>
                 <td colspan="2"></td>
-                <td style="font-weight: 900; color: #E51D24; font-size: 1.35rem; padding: 1.25rem; font-family: 'Playfair Display', serif;">
+                <td style="font-weight: 900; color: #E51D24; font-size: 1.35rem; padding: 1.25rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
                   {{ (b2b.totalFactureMois() | number) }} FCFA
                 </td>
                 <td style="padding: 1.25rem;">
@@ -614,7 +614,7 @@
     @if (activeSection() === 'SITES') {
       <div>
         
-        <h2 style="margin: 0 0 1.5rem; font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
+        <h2 style="margin: 0 0 1.5rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
           Sites Physiques de Livraison Conventionnés
         </h2>
 
@@ -623,7 +623,7 @@
             <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.5rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
               <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
                 <div>
-                  <h3 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.2rem; color: #721513; font-weight: 800;">{{ site.nom }}</h3>
+                  <h3 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.2rem; color: #721513; font-weight: 800;">{{ site.nom }}</h3>
                   <div style="font-size: 0.8rem; color: #6E5A56; margin-top: 0.25rem;"><i class="fa-solid fa-location-dot" style="color: #E51D24;"></i> {{ site.adresse }}</div>
                 </div>
                 <span class="rh-badge-subv">Actif</span>
@@ -666,7 +666,7 @@
           <div style="display: flex; align-items: center; gap: 0.85rem;">
             <img src="assets/images/logo.png" alt="Kiki Traiteur" style="height: 52px; object-fit: contain;">
             <div>
-              <div style="font-family: 'Playfair Display', serif; font-size: 1.35rem; font-weight: 900; color: #721513;">Kiki Traiteur B2B</div>
+              <div style="font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.35rem; font-weight: 900; color: #721513;">Kiki Traiteur B2B</div>
               <div style="font-size: 0.72rem; color: #6E5A56;">Restauration Entreprise & Traiteur Agréé</div>
             </div>
           </div>
@@ -725,10 +725,10 @@
             </tbody>
             <tfoot style="background: #FAF8F4;">
               <tr>
-                <td colspan="3" style="padding: 1rem; font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 900; color: #721513;">
+                <td colspan="3" style="padding: 1rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.1rem; font-weight: 900; color: #721513;">
                   NET À PAYER PAR L'ENTREPRISE :
                 </td>
-                <td style="padding: 1rem; text-align: right; font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 900; color: #E51D24;">
+                <td style="padding: 1rem; text-align: right; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.25rem; font-weight: 900; color: #E51D24;">
                   {{ (totalPriseEnChargePeriode() | number) }} FCFA
                 </td>
               </tr>
@@ -754,7 +754,7 @@
   @if (showAddEmployeeModal()) {
     <div class="rh-modal-overlay">
       <div class="rh-modal-card">
-        <h3 style="margin: 0 0 1.25rem; font-family: 'Playfair Display', serif; font-size: 1.4rem; color: #721513; font-weight: 800;">
+        <h3 style="margin: 0 0 1.25rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.4rem; color: #721513; font-weight: 800;">
           <i class="fa-solid fa-user-plus"></i> Enrôler un Nouveau Collaborateur
         </h3>
 

@@ -12,7 +12,7 @@
         <span style="font-size: 0.72rem; color: #C05621; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(192, 86, 33, 0.1); padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.4rem;">
           <i class="fa-solid fa-clipboard-check"></i> PORTAIL RESPONSABLE DE SITE KIKI • EXPLOITATION & CANTINE
         </span>
-        <h2 style="margin: 0.35rem 0 0; font-family: 'Playfair Display', serif; font-size: 1.45rem; color: #721513; font-weight: 900;">
+        <h2 style="margin: 0.35rem 0 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.45rem; color: #721513; font-weight: 900;">
           Gestion d'Exploitation Cantine, Suivi des Portions & Distribution
         </h2>
       </div>
@@ -36,7 +36,7 @@
             <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
               <i class="fa-solid fa-box" style="color: #721513;"></i> TOTAL PLATEAUX À LIVRER
             </div>
-            <div style="font-size: 2.2rem; font-weight: 900; color: #721513; margin: 0.5rem 0 0.25rem; font-family: 'Playfair Display', serif;">
+            <div style="font-size: 2.2rem; font-weight: 900; color: #721513; margin: 0.5rem 0 0.25rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
               {{ totalPlateauxSites() }} <span style="font-size: 1rem; color: #E51D24; font-weight: 600;">plateaux</span>
             </div>
             <div style="font-size: 0.75rem; color: #6E5A56;">Cut-Off 10h30 terminé • Dispatch en cours</div>
@@ -46,7 +46,7 @@
             <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
               <i class="fa-solid fa-fire" style="color: #E51D24;"></i> PLATS CHAUDS EN CUISSON
             </div>
-            <div style="font-size: 2.2rem; font-weight: 900; color: #E51D24; margin: 0.5rem 0 0.25rem; font-family: 'Playfair Display', serif;">
+            <div style="font-size: 2.2rem; font-weight: 900; color: #E51D24; margin: 0.5rem 0 0.25rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
               {{ totalPortionsPlats() }} <span style="font-size: 1rem; color: #332724;">portions</span>
             </div>
             <div style="font-size: 0.75rem; color: #606C38; font-weight: 600;">Poulet Yassa, Capitaine, Bœuf & Thiéboudienne</div>
@@ -56,7 +56,7 @@
             <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
               <i class="fa-solid fa-snowflake" style="color: #606C38;"></i> ENTRÉES CONDITIONNÉES
             </div>
-            <div style="font-size: 2.2rem; font-weight: 900; color: #606C38; margin: 0.5rem 0 0.25rem; font-family: 'Playfair Display', serif;">
+            <div style="font-size: 2.2rem; font-weight: 900; color: #606C38; margin: 0.5rem 0 0.25rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
               {{ totalPortionsEntrees() }} <span style="font-size: 1rem; color: #332724;">barquettes</span>
             </div>
             <div style="font-size: 0.75rem; color: #6E5A56;">Mise en cellule frigorifique à 4°C</div>
@@ -66,7 +66,7 @@
             <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
               <i class="fa-solid fa-truck-moving" style="color: #721513;"></i> TOURNÉES & CAMIONNETTES
             </div>
-            <div style="font-size: 2.2rem; font-weight: 900; color: #721513; margin: 0.5rem 0 0.25rem; font-family: 'Playfair Display', serif;">
+            <div style="font-size: 2.2rem; font-weight: 900; color: #721513; margin: 0.5rem 0 0.25rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
               3 <span style="font-size: 1rem; color: #6E5A56;">départs prévus</span>
             </div>
             <div style="font-size: 0.75rem; color: #6E5A56;">Plateau (11h15), Bel-Air (11h00), Diamniadio (10h45)</div>
@@ -122,7 +122,7 @@
         <!-- Tableau de Production Consolidé Clair -->
         <div class="cuisine-table-card">
           <div class="cuisine-table-header">
-            <h3 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.2rem; color: #721513; font-weight: 800;">
+            <h3 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.2rem; color: #721513; font-weight: 800;">
               Consolidation par Plat du Jour & Statut de Cuisson (Midi)
             </h3>
             <span style="font-size: 0.8rem; color: #E51D24; font-weight: 700;">
@@ -152,7 +152,7 @@
                       @if (l.categorie === 'BOISSON') { <span style="color: #6E5A56; font-weight: 700;"><i class="fa-solid fa-glass-water"></i> Boisson</span> }
                     </td>
                     <td data-label="Intitulé du Plat" style="font-weight: 700; color: #332724; font-size: 0.95rem;">{{ l.nomPlat }}</td>
-                    <td data-label="Quantité Consolidée" style="font-size: 1.25rem; font-weight: 900; color: #721513; font-family: 'Playfair Display', serif;">{{ l.quantiteTotale }}</td>
+                    <td data-label="Quantité Consolidée" style="font-size: 1.25rem; font-weight: 900; color: #721513; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">{{ l.quantiteTotale }}</td>
                     <td data-label="Conditionnement" style="color: #6E5A56; font-weight: 500;">{{ l.unite }}</td>
                     <td data-label="Statut Cuisine">
                       @if (l.statut === 'PREPARATION_TERMINEE') {
@@ -253,7 +253,7 @@
                 <i class="fa-solid fa-qrcode" style="margin: 0 !important;"></i>
               </div>
               <div>
-                <h3 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.35rem; color: #721513; font-weight: 900;">
+                <h3 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.35rem; color: #721513; font-weight: 900;">
                   Scanner de Retrait Salarié
                 </h3>
                 <p style="margin: 0.2rem 0 0; font-size: 0.8rem; color: #6E5A56;">
@@ -337,7 +337,7 @@
               <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 800; text-transform: uppercase;">
                 <i class="fa-solid fa-list-check" style="color: #606C38;"></i> TOTAL PLATEAUX RETIRÉS AUJOURD'HUI
               </div>
-              <div style="font-size: 2.8rem; font-weight: 900; color: #606C38; font-family: 'Playfair Display', serif; margin: 0.25rem 0;">
+              <div style="font-size: 2.8rem; font-weight: 900; color: #606C38; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0.25rem 0;">
                 {{ nbTotalScannesAujourdhui() }} <span style="font-size: 1.1rem; color: #721513;">/ {{ totalPlateauxSites() }}</span>
               </div>
               <div style="font-size: 0.8rem; color: #6E5A56;">
@@ -347,7 +347,7 @@
 
             <!-- Fiche Bénéficiaire Scanné -->
             <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 20px; padding: 1.5rem; flex: 1; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
-              <h4 style="margin: 0 0 1rem; font-family: 'Playfair Display', serif; font-size: 1.15rem; color: #721513; font-weight: 800;">
+              <h4 style="margin: 0 0 1rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.15rem; color: #721513; font-weight: 800;">
                 Dernière Délivrance Confirmée
               </h4>
 
@@ -396,7 +396,7 @@
         
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
           <div>
-            <h2 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
+            <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
               Commandes Personnelles Autonomes (Payées hors subvention)
             </h2>
             <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #6E5A56;">
@@ -526,7 +526,7 @@
         
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
           <div>
-            <h2 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
+            <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
               Bordereaux d'Expédition & Émargement par Site
             </h2>
             <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #6E5A56;">
@@ -542,7 +542,7 @@
               <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
                 <div>
                   <span style="font-size: 0.72rem; color: #E51D24; font-weight: 800;"><i class="fa-solid fa-receipt"></i> {{ bl.numeroBL }}</span>
-                  <h3 style="margin: 0.25rem 0 0; font-family: 'Playfair Display', serif; font-size: 1.25rem; color: #721513; font-weight: 800;">{{ bl.siteNom }}</h3>
+                  <h3 style="margin: 0.25rem 0 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.25rem; color: #721513; font-weight: 800;">{{ bl.siteNom }}</h3>
                 </div>
 
                 @if (bl.statut === 'EXPEDIE') {
@@ -603,7 +603,7 @@
       <div>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
           <div>
-            <h2 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
+            <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
               Planning Hebdomadaire & Personnalisation Menus (Lun - Ven)
             </h2>
             <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #6E5A56;">
@@ -658,7 +658,7 @@
               <span style="font-size: 0.72rem; color: #C05621; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(192, 86, 33, 0.1); padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.4rem;">
                 <i class="fa-solid fa-utensils"></i> CATALOGUE GLOBAL KIKI TRAITEUR
               </span>
-              <h3 style="margin: 0.35rem 0 0; font-family: 'Playfair Display', serif; font-size: 1.35rem; color: #721513; font-weight: 900;">
+              <h3 style="margin: 0.35rem 0 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.35rem; color: #721513; font-weight: 900;">
                 Activer / Désactiver les Plats Proposés sur ce Site
               </h3>
               <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #6E5A56;">
@@ -711,7 +711,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #EDE7DC; padding-bottom: 1rem; margin-bottom: 1.25rem;">
           <div>
             <div style="font-size: 0.75rem; color: #E51D24; font-weight: 800;"><i class="fa-solid fa-receipt"></i> {{ selectedBL()!.numeroBL }}</div>
-            <h3 style="margin: 0.25rem 0 0; font-family: 'Playfair Display', serif; font-size: 1.3rem; color: #721513; font-weight: 800;">
+            <h3 style="margin: 0.25rem 0 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.3rem; color: #721513; font-weight: 800;">
               Bordereau d'Émargement • {{ selectedBL()!.siteNom }}
             </h3>
           </div>
@@ -786,7 +786,7 @@
     <div class="cuisine-modal-overlay">
       <div class="cuisine-modal-card" style="max-width: 520px;">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #EDE7DC; padding-bottom: 0.85rem; margin-bottom: 1.25rem;">
-          <h3 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.35rem; color: #721513; font-weight: 800;">
+          <h3 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.35rem; color: #721513; font-weight: 800;">
             <i class="fa-regular fa-calendar-days"></i> Modifier le Menu : {{ planningEnEdition()!.jour }}
           </h3>
           <button (click)="showEditPlanningModal.set(false)" style="background: none; border: none; color: #6E5A56; font-size: 1.25rem; cursor: pointer;">
