@@ -4,43 +4,43 @@
   <app-b2b-nav></app-b2b-nav>
 
   <!-- CONTENU PRINCIPAL CENTRÉ -->
-  <main style="max-width: 1320px; width: 100%; margin: 0 auto; padding: 1.25rem 0 4rem;">
+  <main style="max-width: 1320px; width: 100%; margin: 0 auto; padding: 0.5rem 0 1.5rem;">
 
     <!-- ============================================================== -->
     <!-- EN-TÊTE OFFICIEL RESPONSABLE DE SITE KIKI                      -->
     <!-- ============================================================== -->
-    <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; box-shadow: 0 4px 18px rgba(114, 21, 19, 0.05);">
+    <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1rem 1.35rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; box-shadow: 0 4px 18px rgba(114, 21, 19, 0.05);">
       <div>
-        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
-          <span style="font-size: 0.72rem; color: #721513; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; background: #FAF5EA; padding: 0.25rem 0.65rem; border-radius: 9999px; border: 1px solid #E2D5BE; display: inline-flex; align-items: center; gap: 0.4rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+          <span style="font-size: 0.72rem; color: #721513; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; background: #FAF5EA; padding: 0.2rem 0.65rem; border-radius: 9999px; border: 1px solid #E2D5BE; display: inline-flex; align-items: center; gap: 0.4rem;">
             <i class="fa-solid fa-store"></i> RESPONSABLE DE SITE KIKI • EXPLOITATION & CANTINE
           </span>
-          <span style="font-size: 0.72rem; color: #606C38; font-weight: 700; background: rgba(96, 108, 56, 0.1); padding: 0.25rem 0.65rem; border-radius: 9999px;">
+          <span style="font-size: 0.72rem; color: #606C38; font-weight: 700; background: rgba(96, 108, 56, 0.1); padding: 0.2rem 0.65rem; border-radius: 9999px;">
             <i class="fa-solid fa-shield-check"></i> Site : {{ entreprise().sites[0]?.nom || 'Siège Plateau' }}
           </span>
         </div>
 
-        <h1 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.55rem; color: #721513; font-weight: 900;">
+        <h1 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.35rem; color: #721513; font-weight: 900;">
           Gestion d'Exploitation Cantine • {{ entreprise().nom }}
         </h1>
-        <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #6E5A56;">
+        <p style="margin: 0.2rem 0 0; font-size: 0.8rem; color: #6E5A56;">
           Convention {{ entreprise().montantPriseEnChargeRepas | number }} FCFA/repas • Prestation : {{ getLibellePrestation(entreprise().typePrestation) }} • Cut-Off : {{ getLibelleCutOff(entreprise()) }}
         </p>
       </div>
 
       <!-- BOUTONS D'ACTIONS RAPIDES : PROJETER QR CODE & RECLAMATIONS -->
-      <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+      <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
         <button 
           type="button"
           (click)="setTab('PROJECTION_QR')"
-          style="background: #E51D24; color: #FFFFFF; border: none; border-radius: 12px; padding: 0.65rem 1.15rem; font-weight: 800; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; box-shadow: 0 4px 14px rgba(229, 29, 36, 0.28);">
-          <i class="fa-solid fa-qrcode" style="font-size: 1rem;"></i> Projeter QR Code Cantine
+          style="background: #E51D24; color: #FFFFFF; border: none; border-radius: 10px; padding: 0.55rem 1rem; font-weight: 800; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.45rem; cursor: pointer; box-shadow: 0 4px 14px rgba(229, 29, 36, 0.25);">
+          <i class="fa-solid fa-qrcode" style="font-size: 0.95rem;"></i> Projeter QR Code Cantine
         </button>
 
         <button 
           type="button"
           (click)="setTab('RECLAMATIONS')"
-          style="background: #FAF8F4; color: #721513; border: 1.5px solid #EDE7DC; border-radius: 12px; padding: 0.65rem 1.15rem; font-weight: 800; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; position: relative;">
+          style="background: #FAF8F4; color: #721513; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.55rem 1rem; font-weight: 800; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.45rem; cursor: pointer; position: relative;">
           <i class="fa-solid fa-triangle-exclamation" style="color: #E51D24;"></i> Réclamations ({{ reclamationsEnAttenteCount() }})
           @if (reclamationsEnAttenteCount() > 0) {
             <span style="position: absolute; top: -5px; right: -5px; background: #E51D24; color: #FFF; font-size: 0.65rem; font-weight: 900; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
@@ -317,24 +317,24 @@
     <!-- ONGLET 3 : PROJECTION DU QR CODE CANTINE DU JOUR                -->
     <!-- ============================================================== -->
     @if (activeTab() === 'PROJECTION_QR') {
-      <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 20px; padding: 2.5rem 1.5rem; text-align: center; max-width: 680px; margin: 0 auto; box-shadow: 0 8px 30px rgba(114, 21, 19, 0.08);">
+      <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 20px; padding: 1.5rem 1.5rem 1.25rem; text-align: center; max-width: 580px; margin: 0 auto; box-shadow: 0 8px 30px rgba(114, 21, 19, 0.08);">
         
-        <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: #FAF5EA; color: #721513; padding: 0.35rem 0.85rem; border-radius: 9999px; font-weight: 800; font-size: 0.78rem; margin-bottom: 1rem; border: 1px solid #E2D5BE;">
+        <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: #FAF5EA; color: #721513; padding: 0.25rem 0.75rem; border-radius: 9999px; font-weight: 800; font-size: 0.72rem; margin-bottom: 0.5rem; border: 1px solid #E2D5BE;">
           <i class="fa-solid fa-tv"></i> ÉCRAN DE PROJECTION CANTINE KIKI TRAITEUR
         </div>
 
-        <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.85rem; color: #721513; font-weight: 900;">
+        <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.45rem; color: #721513; font-weight: 900;">
           Scannez pour récupérer votre repas
         </h2>
-        <p style="margin: 0.5rem 0 1.75rem; font-size: 0.95rem; color: #6E5A56;">
-          Approchez l'appareil photo de votre smartphone pour enregistrer votre arrivée et débloquer la remise de votre plateau.
+        <p style="margin: 0.25rem 0 1rem; font-size: 0.82rem; color: #6E5A56;">
+          Approchez l'appareil photo de votre smartphone pour débloquer votre plateau.
         </p>
 
-        <!-- CARTE DU QR CODE GRAND FORMAT -->
-        <div style="background: #FAF8F4; border: 2.5px solid #721513; border-radius: 24px; padding: 2rem; max-width: 340px; margin: 0 auto 1.5rem; box-shadow: 0 10px 35px rgba(114, 21, 19, 0.12);">
+        <!-- CARTE DU QR CODE GRAND FORMAT COMPACTE SANS SCROLL -->
+        <div style="background: #FAF8F4; border: 2px solid #721513; border-radius: 20px; padding: 1.15rem; max-width: 270px; margin: 0 auto 1rem; box-shadow: 0 6px 20px rgba(114, 21, 19, 0.1);">
           
-          <div style="display: flex; justify-content: center; align-items: center; margin: 0 auto; background: #FFFFFF; padding: 1rem; border-radius: 16px; border: 1px solid #EDE7DC;">
-            <svg viewBox="0 0 25 25" width="240" height="240" shape-rendering="crispEdges">
+          <div style="display: flex; justify-content: center; align-items: center; margin: 0 auto; background: #FFFFFF; padding: 0.75rem; border-radius: 14px; border: 1px solid #EDE7DC;">
+            <svg viewBox="0 0 25 25" width="170" height="170" shape-rendering="crispEdges">
               <rect width="25" height="25" fill="#FFFFFF"/>
               @for (row of qrCantineMatrix(); track $index; let r = $index) {
                 @for (cell of row; track $index; let c = $index) {
@@ -346,22 +346,22 @@
             </svg>
           </div>
 
-          <div style="margin-top: 1.25rem;">
-            <span style="font-family: monospace; font-size: 0.95rem; font-weight: 900; color: #721513; background: #FFFFFF; padding: 0.35rem 0.85rem; border-radius: 8px; border: 1.5px solid #E2D5BE; display: inline-block;">
+          <div style="margin-top: 0.75rem;">
+            <span style="font-family: monospace; font-size: 0.8rem; font-weight: 900; color: #721513; background: #FFFFFF; padding: 0.25rem 0.65rem; border-radius: 6px; border: 1.5px solid #E2D5BE; display: inline-block;">
               {{ qrCantineString() }}
             </span>
           </div>
 
-          <div style="font-size: 0.8rem; color: #606C38; font-weight: 800; margin-top: 0.65rem;">
+          <div style="font-size: 0.72rem; color: #606C38; font-weight: 800; margin-top: 0.45rem;">
             <i class="fa-solid fa-circle-check"></i> Synchronisé en direct avec la brigade
           </div>
         </div>
 
-        <div style="display: flex; justify-content: center; gap: 1rem;">
+        <div style="display: flex; justify-content: center; gap: 0.75rem;">
           <button 
             type="button" 
             (click)="setTab('COMMANDES')"
-            style="background: #721513; color: #FFFFFF; border: none; border-radius: 12px; padding: 0.75rem 1.75rem; font-weight: 800; font-size: 0.88rem; cursor: pointer;">
+            style="background: #721513; color: #FFFFFF; border: none; border-radius: 10px; padding: 0.55rem 1.35rem; font-weight: 800; font-size: 0.82rem; cursor: pointer;">
             <i class="fa-solid fa-receipt"></i> Voir les commandes scannées
           </button>
         </div>

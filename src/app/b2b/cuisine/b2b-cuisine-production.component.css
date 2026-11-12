@@ -11,8 +11,8 @@
 .cuisine-wrapper {
   background-color: transparent !important;
   color: #332724 !important;
-  min-height: 100dvh;
-  padding: 1.75rem clamp(1rem, 2vw, 2rem) 5rem;
+  min-height: 100vh;
+  padding: 1rem clamp(1rem, 2vw, 2rem) 1.5rem;
   max-width: 100%;
   width: auto;
   min-width: 0;
