@@ -180,8 +180,8 @@
           
           <!-- KPI 1 : Consommation Journalière -->
           <div class="rh-kpi-card">
-            <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
-              <i class="fa-solid fa-utensils" style="color: #721513;"></i> CONSOMMATION JOURNALIÈRE (AUJOURD'HUI)
+            <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 0.55rem;">
+              <i class="fa-solid fa-utensils" style="color: #721513;"></i> <span>CONSOMMATION JOURNALIÈRE (AUJOURD'HUI)</span>
             </div>
             <div style="font-size: 2.2rem; font-weight: 900; color: #721513; margin: 0.5rem 0 0.25rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
               {{ consommationJournaliereRepas() }} <span style="font-size: 1rem; color: #606C38; font-weight: 600;">plats commandés</span>
@@ -193,8 +193,8 @@
 
           <!-- KPI 2 : Employés Pris en Charge -->
           <div class="rh-kpi-card">
-            <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
-              <i class="fa-solid fa-user-check" style="color: #606C38;"></i> EMPLOYÉS PRIS EN CHARGE
+            <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 0.55rem;">
+              <i class="fa-solid fa-user-check" style="color: #606C38;"></i> <span>EMPLOYÉS PRIS EN CHARGE</span>
             </div>
             <div style="font-size: 2.2rem; font-weight: 900; color: #332724; margin: 0.5rem 0 0.25rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
               {{ employesPrisEnChargeCount() }} <span style="font-size: 1rem; color: #6E5A56;">salariés</span>
@@ -206,8 +206,8 @@
 
           <!-- KPI 3 : Prise en Charge Totale Entreprise -->
           <div class="rh-kpi-card">
-            <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase;">
-              <i class="fa-solid fa-hand-holding-dollar" style="color: #E51D24;"></i> TOTAL DU MOIS EN COURS
+            <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 0.55rem;">
+              <i class="fa-solid fa-hand-holding-dollar" style="color: #E51D24;"></i> <span>TOTAL DU MOIS EN COURS</span>
             </div>
             <div style="font-size: 2.2rem; font-weight: 900; color: #E51D24; margin: 0.5rem 0 0.25rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
               {{ (totalMontantEntrepriseMoisEnCours() | number) }} <span style="font-size: 1rem; color: #332724;">FCFA</span>
