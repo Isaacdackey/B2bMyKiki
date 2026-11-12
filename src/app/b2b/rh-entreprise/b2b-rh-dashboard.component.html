@@ -73,7 +73,7 @@
                   <th>Nom & Prénom</th>
                   <th>Plat(s)</th>
                   <th>Prise en charge</th>
-                  <th>Statut</th>
+                  <th style="text-align: center;">Statut</th>
                 </tr>
               </thead>
               <tbody>
@@ -102,18 +102,18 @@
                         Total : {{ (c.montantTotal | number) }} F (Reste : {{ (c.partEmploye | number) }} F)
                       </div>
                     </td>
-                    <td data-label="Statut">
+                    <td data-label="Statut" style="text-align: center;">
                       <!-- UN SEUL BADGE À LA FOIS SELON LE STATUT STRICT : EN_COURS -> SCANNE -> LIVRE -->
                       @if (c.statut === 'LIVRE') {
-                        <span style="background: rgba(96, 108, 56, 0.12); color: #606C38; border: 1px solid rgba(96, 108, 56, 0.3); padding: 0.35rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
+                        <span style="background: rgba(96, 108, 56, 0.12); color: #606C38; border: 1px solid rgba(96, 108, 56, 0.3); padding: 0.35rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem; white-space: nowrap;">
                           <i class="fa-solid fa-circle-check"></i> Livré
                         </span>
                       } @else if (c.statut === 'SCANNE') {
-                        <span style="background: rgba(192, 86, 33, 0.12); color: #C05621; border: 1px solid rgba(192, 86, 33, 0.3); padding: 0.35rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
+                        <span style="background: rgba(192, 86, 33, 0.12); color: #C05621; border: 1px solid rgba(192, 86, 33, 0.3); padding: 0.35rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem; white-space: nowrap;">
                           <i class="fa-solid fa-qrcode"></i> Scanné
                         </span>
                       } @else {
-                        <span style="background: rgba(114, 21, 19, 0.1); color: #721513; border: 1px solid rgba(114, 21, 19, 0.3); padding: 0.35rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
+                        <span style="background: rgba(114, 21, 19, 0.1); color: #721513; border: 1px solid rgba(114, 21, 19, 0.3); padding: 0.35rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem; white-space: nowrap;">
                           <i class="fa-solid fa-hourglass-half"></i> En cours
                         </span>
                       }
@@ -309,10 +309,10 @@
                 <th class="col-matricule">Matricule</th>
                 <th>Collaborateur (Nom & Prénom)</th>
                 <th>Département</th>
-                <th>Taux Subventionné (%)</th>
-                <th>Repas Consommés</th>
-                <th>Total Subventionné</th>
-                <th>Statut Compte</th>
+                <th style="text-align: center;">Taux Subventionné (%)</th>
+                <th style="text-align: center;">Repas Consommés</th>
+                <th style="text-align: right;">Total Subventionné</th>
+                <th style="text-align: center;">Statut Compte</th>
               </tr>
             </thead>
             <tbody>
@@ -324,18 +324,18 @@
                     <div style="font-size: 0.75rem; color: #6E5A56;">{{ emp.email }}</div>
                   </td>
                   <td data-label="Département" style="font-weight: 600; color: #332724;">{{ emp.departement }}</td>
-                  <td data-label="Taux Subventionné">
+                  <td data-label="Taux Subventionné" style="text-align: center;">
                     <span [style.background]="emp.tauxSubvention > 0 ? 'rgba(96, 108, 56, 0.15)' : 'rgba(29, 78, 216, 0.12)'"
                           [style.color]="emp.tauxSubvention > 0 ? '#606C38' : '#1D4ED8'"
                           [style.border]="emp.tauxSubvention > 0 ? '1px solid rgba(96, 108, 56, 0.3)' : '1px solid rgba(29, 78, 216, 0.3)'"
-                          style="padding: 0.3rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem;">
+                          style="padding: 0.3rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;">
                       <i class="fa-solid" [class.fa-percent]="emp.tauxSubvention > 0" [class.fa-wallet]="emp.tauxSubvention === 0"></i>
                       {{ emp.tauxSubvention }}%
                     </span>
                   </td>
-                  <td data-label="Repas Consommés" style="font-weight: 800; color: #332724;">{{ emp.repasConsommesMois }} repas</td>
-                  <td data-label="Total Subventionné" style="font-weight: 800; color: #606C38;">{{ (emp.montantPrisEnChargeMois | number) }} FCFA</td>
-                  <td data-label="Statut Compte">
+                  <td data-label="Repas Consommés" style="font-weight: 800; color: #332724; text-align: center;">{{ emp.repasConsommesMois }} repas</td>
+                  <td data-label="Total Subventionné" style="font-weight: 800; color: #606C38; text-align: right;">{{ (emp.montantPrisEnChargeMois | number) }} FCFA</td>
+                  <td data-label="Statut Compte" style="text-align: center;">
                     <button 
                       (click)="b2b.toggleStatutEmploye(emp.id)"
                       [style.background]="emp.actif ? '#FAF8F4' : '#EDE7DC'"
