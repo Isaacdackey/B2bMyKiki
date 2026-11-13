@@ -1440,6 +1440,35 @@ export class B2bStateService {
     return item ? item.quantite : 0;
   }
 
+  // Transition cinématique de changement de page (double rideau rouge)
+  curtainPhase = signal<'idle' | 'covering' | 'revealing'>('idle');
+  private curtainTimer?: ReturnType<typeof setTimeout>;
+  private curtainEndTimer?: ReturnType<typeof setTimeout>;
+
+  naviguerAvecRideau(url: string, navigateFn: (target: string) => Promise<boolean> | void) {
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      navigateFn(url);
+      return;
+    }
+
+    if (this.curtainTimer) clearTimeout(this.curtainTimer);
+    if (this.curtainEndTimer) clearTimeout(this.curtainEndTimer);
+
+    this.curtainPhase.set('covering');
+
+    this.curtainTimer = setTimeout(() => {
+      navigateFn(url);
+      if (typeof window !== 'undefined') {
+        window.scrollTo(0, 0);
+      }
+      this.curtainPhase.set('revealing');
+
+      this.curtainEndTimer = setTimeout(() => {
+        this.curtainPhase.set('idle');
+      }, 640);
+    }, 480);
+  }
+
   viderPanierAutonome() {
     this.panierAutonome.set([]);
   }

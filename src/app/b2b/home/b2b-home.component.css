@@ -485,6 +485,12 @@
   margin: 0 auto 2.5rem;
 }
 
+.section-head.section-head-left {
+  text-align: left;
+  margin: 0 0 1.5rem;
+  max-width: none;
+}
+
 .section-tag {
   display: inline-block;
   font-size: 0.72rem;
@@ -946,12 +952,113 @@
 }
 
 /* ==========================================================
-   MOTION DESIGN INSPIRÉ DE KIKI TRAITEUR
+   MOTION DESIGN AVANCÉ (INSPIRATION SEBAS SUR IDENTITÉ KIKI B2B)
    ========================================================== */
+
+/* Courbes d'inertie */
+:host {
+  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-curtain: cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+/* 1. Barre de progression de scroll */
+.b2b-scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #721513 0%, #E51D24 65%, #C5A880 100%);
+  transform-origin: left center;
+  transform: scaleX(0);
+  z-index: 99990;
+  pointer-events: none;
+}
+
+/* 2. Double Rideau cinématique d'ouverture */
+.b2b-page-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 99995;
+  pointer-events: none;
+}
+
+.b2b-curtain-layer {
+  position: fixed;
+  inset: 0;
+  transform-origin: top center;
+  will-change: transform;
+}
+
+.b2b-curtain-primary {
+  background: #721513;
+  animation: b2bCurtainUp 0.78s var(--ease-curtain) 0.14s forwards;
+}
+
+.b2b-curtain-accent {
+  background: #E51D24;
+  animation: b2bCurtainUp 0.72s var(--ease-curtain) 0s forwards;
+}
+
+@keyframes b2bCurtainUp {
+  0% {
+    transform: scaleY(1);
+  }
+  100% {
+    transform: scaleY(0);
+  }
+}
+
+/* 3. Curseur inertiel contextuel (Desktop pointer fine) */
+.b2b-cursor-dot,
+.b2b-cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 99999;
+  transition: opacity 0.2s ease, width 0.28s var(--ease-premium), height 0.28s var(--ease-premium), background-color 0.25s ease, border-color 0.25s ease;
+  will-change: transform;
+}
+
+.b2b-cursor-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #E51D24;
+}
+
+.b2b-cursor-ring {
+  width: 38px;
+  height: 38px;
+  border-radius: 9999px;
+  border: 1.5px solid rgba(114, 21, 19, 0.45);
+}
+
+.b2b-cursor-ring.is-pointer {
+  width: 18px;
+  height: 18px;
+  border-color: #E51D24;
+  background: rgba(229, 29, 36, 0.12);
+}
+
+.b2b-cursor-dot.is-hidden,
+.b2b-cursor-ring.is-hidden {
+  opacity: 0;
+}
+
+@media (hover: none), (pointer: coarse), (max-width: 1024px) {
+  .b2b-cursor-dot,
+  .b2b-cursor-ring {
+    display: none !important;
+  }
+}
+
+/* 4. Entrées Hero & Parallaxe fluide */
 @keyframes b2bFadeUp {
   from {
     opacity: 0;
-    transform: translateY(26px);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
@@ -977,33 +1084,59 @@
   }
 }
 
-.b2b-hero-content {
-  animation: b2bFadeUp 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+.b2b-hero-content .b2b-pill-tag {
+  animation: b2bFadeUp 0.7s var(--ease-premium) 0.35s both;
+}
+
+.b2b-hero-title {
+  animation: b2bFadeUp 0.8s var(--ease-premium) 0.45s both;
+}
+
+.b2b-hero-desc {
+  animation: b2bFadeUp 0.8s var(--ease-premium) 0.55s both;
+}
+
+.b2b-hero-cta {
+  animation: b2bFadeUp 0.8s var(--ease-premium) 0.65s both;
+}
+
+.b2b-hero-kpis {
+  animation: b2bFadeUp 0.8s var(--ease-premium) 0.75s both;
 }
 
 .b2b-hero-visual {
-  animation: b2bFadeUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.14s both;
+  animation: b2bFadeUp 0.9s var(--ease-premium) 0.5s both;
+  will-change: transform;
 }
 
 .b2b-preview-card {
-  animation: b2bFloat 5.5s ease-in-out infinite;
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  animation: b2bFloat 5.8s ease-in-out infinite;
+  transition: box-shadow 0.35s ease, transform 0.35s var(--ease-premium);
 }
 
 .b2b-preview-card:hover {
   animation-play-state: paused;
-  box-shadow: 0 26px 55px rgba(114, 21, 19, 0.12);
+  box-shadow: 0 28px 60px rgba(114, 21, 19, 0.14);
 }
 
-/* Ruban défilant bordeaux style Kiki Traiteur */
+/* Effet magnétique fluide sur boutons */
+.b2b-btn-primary,
+.b2b-btn-outline,
+.b2b-btn-login,
+.b2b-btn-white {
+  transition: transform 0.22s var(--ease-premium), background 0.2s ease, box-shadow 0.25s ease;
+  will-change: transform;
+}
+
+/* 5. Marquee cinétique à losanges */
 .b2b-marquee-bar {
   background: #721513;
   color: #FAF5EA;
   overflow: hidden;
   white-space: nowrap;
-  padding: 0.85rem 0;
-  border-top: 1px solid rgba(230, 218, 186, 0.2);
-  border-bottom: 1px solid rgba(230, 218, 186, 0.2);
+  padding: 0.9rem 0;
+  border-top: 1px solid rgba(230, 218, 186, 0.22);
+  border-bottom: 1px solid rgba(230, 218, 186, 0.22);
 }
 
 .b2b-marquee-track {
@@ -1012,8 +1145,8 @@
   gap: 2.75rem;
   font-size: 0.78rem;
   font-weight: 800;
-  letter-spacing: 0.08em;
-  animation: b2bMarquee 28s linear infinite;
+  letter-spacing: 0.1em;
+  animation: b2bMarquee 26s linear infinite;
 }
 
 .b2b-marquee-bar:hover .b2b-marquee-track {
@@ -1023,19 +1156,467 @@
 .b2b-marquee-track span {
   display: inline-flex;
   align-items: center;
-  gap: 0.7rem;
+  gap: 0.8rem;
 }
 
 .b2b-marquee-track i {
-  font-size: 0.38rem;
+  font-size: 0.45rem;
+  color: #C5A880;
+}
+
+/* 6. Sceau circulaire rotatif 360° au scroll */
+.section-head-with-seal {
+  position: relative;
+  margin-bottom: 2.5rem;
+}
+
+.section-head-with-seal .section-head {
+  margin: 0 auto;
+}
+
+.b2b-rotating-seal {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 112px;
+  height: 112px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.b2b-seal-svg {
+  will-change: transform;
+  transition: transform 0.08s linear;
+}
+
+.b2b-seal-center {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #721513;
+  color: #FAF5EA;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(114, 21, 19, 0.22);
+}
+
+@media (max-width: 960px) {
+  .section-head-with-seal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  .b2b-rotating-seal {
+    position: relative;
+    right: auto;
+    top: auto;
+    transform: none;
+    width: 94px;
+    height: 94px;
+  }
+}
+
+/* 7. Cartes Piliers Interactives (Bascule sombre + Ligne inférieure animée) */
+.offre-card {
+  position: relative;
+  overflow: hidden;
+  transition: background-color 0.35s var(--ease-premium), transform 0.35s var(--ease-premium), box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+.offre-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.offre-num {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #C5A880;
+  line-height: 1;
+  transition: color 0.3s ease, transform 0.3s var(--ease-premium);
+}
+
+.offre-card h3,
+.offre-card p,
+.offre-badge,
+.offre-icon {
+  transition: color 0.3s ease, background-color 0.3s ease, transform 0.35s var(--ease-premium);
+}
+
+.offre-bottom-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #E51D24 0%, #C5A880 100%);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.45s var(--ease-premium);
+}
+
+.offre-card:hover {
+  background: #721513;
+  border-color: #721513;
+  transform: translateY(-6px);
+  box-shadow: 0 18px 38px rgba(114, 21, 19, 0.22);
+}
+
+.offre-card:hover h3 {
+  color: #FFFFFF;
+}
+
+.offre-card:hover p {
+  color: #FAF5EA;
+  opacity: 0.92;
+}
+
+.offre-card:hover .offre-badge {
+  background: rgba(255, 255, 255, 0.14);
+  color: #FAF5EA;
+}
+
+.offre-card:hover .offre-icon {
+  background: #E51D24;
+  transform: scale(1.08) rotate(-4deg);
+}
+
+.offre-card:hover .offre-num {
+  color: #E51D24;
+  transform: scale(1.08);
+}
+
+.offre-card:hover .offre-bottom-line {
+  transform: scaleX(1);
+}
+
+/* 8. Workflow Split Asymétrique + Timeline Verticale + Numéro Filigrane */
+.b2b-workflow-section {
+  position: relative;
+  overflow: clip;
+}
+
+.b2b-workflow-watermark {
+  position: absolute;
+  left: max(1rem, 3vw);
+  bottom: -0.15em;
+  font-size: clamp(8rem, 18vw, 15rem);
+  font-weight: 800;
+  line-height: 0.8;
+  letter-spacing: -0.05em;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(114, 21, 19, 0.08);
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+  transition: transform 0.45s var(--ease-premium), opacity 0.35s ease;
+}
+
+.b2b-workflow-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.b2b-workflow-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  gap: clamp(2rem, 5vw, 4.25rem);
+  align-items: start;
+}
+
+.b2b-workflow-aside {
+  position: sticky;
+  top: 108px;
+}
+
+.b2b-workflow-spotlight {
+  background: #FFFFFF;
+  border: 1.5px solid #EDE7DC;
+  border-radius: 26px;
+  padding: 1.35rem 1.5rem;
+  box-shadow: 0 12px 28px rgba(114, 21, 19, 0.06);
+}
+
+.b2b-spotlight-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.b2b-spotlight-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #721513;
+  background: rgba(114, 21, 19, 0.08);
+  padding: 0.3rem 0.8rem;
+  border-radius: 9999px;
+}
+
+.b2b-spotlight-pills {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.b2b-spotlight-dot {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1.5px solid #EDE7DC;
+  background: #FAF8F4;
+  color: #6E5A56;
+  font-family: inherit;
+  font-size: 0.74rem;
+  font-weight: 800;
+  line-height: 1;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.b2b-spotlight-dot:hover {
+  border-color: #721513;
+  color: #721513;
+  transform: translateY(-1px);
+}
+
+.b2b-spotlight-dot.is-active {
+  background: #E51D24;
+  border-color: #E51D24;
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(229, 29, 36, 0.28);
+  transform: scale(1.06);
+}
+
+.b2b-workflow-spotlight h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #721513;
+}
+
+.b2b-workflow-spotlight p {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: #6E5A56;
+}
+
+.b2b-workflow-timeline {
+  position: relative;
+}
+
+.b2b-timeline-rail {
+  position: absolute;
+  left: 21px;
+  top: 46px;
+  bottom: 46px;
+  width: 3px;
+  background: #E5DDD0;
+  border-radius: 9999px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.b2b-timeline-fill {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #721513 0%, #E51D24 100%);
+  transform-origin: top center;
+  transform: scaleY(0.15);
+  transition: transform 0.22s ease-out;
+}
+
+.b2b-timeline-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.b2b-timeline-step {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  position: relative;
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 1.15rem;
+  align-items: center;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: transform 0.3s var(--ease-premium);
+}
+
+.b2b-step-node {
+  position: relative;
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: #FFFFFF;
+  border: 2.5px solid #D5CBBF;
+  color: #721513;
+  font-size: 0.84rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(114, 21, 19, 0.07);
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.3s var(--ease-premium), box-shadow 0.3s ease;
+}
+
+.b2b-step-content {
+  background: #FFFFFF;
+  border: 1.5px solid #EDE7DC;
+  border-radius: 24px;
+  padding: 1.15rem 1.4rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s var(--ease-premium);
+}
+
+.b2b-step-content h3 {
+  margin: 0 0 0.3rem;
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: #721513;
+  transition: color 0.25s ease;
+}
+
+.b2b-step-content p {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: #6E5A56;
+}
+
+.b2b-timeline-step.is-reached .b2b-step-node {
+  border-color: #721513;
+  background: #721513;
+  color: #FAF5EA;
+}
+
+.b2b-timeline-step.is-active .b2b-step-node,
+.b2b-timeline-step:hover .b2b-step-node {
+  border-color: #E51D24;
+  background: #E51D24;
+  color: #FFFFFF;
+  transform: scale(1.08);
+  box-shadow: 0 0 0 6px rgba(229, 29, 36, 0.16);
+}
+
+.b2b-timeline-step.is-active .b2b-step-content,
+.b2b-timeline-step:hover .b2b-step-content {
+  border-color: #721513;
+  box-shadow: 0 14px 28px rgba(114, 21, 19, 0.08);
+  transform: translateX(4px);
+}
+
+.b2b-timeline-step.is-active .b2b-step-content h3,
+.b2b-timeline-step:hover .b2b-step-content h3 {
   color: #E51D24;
 }
 
-/* Révélation au scroll */
+@media (max-width: 960px) {
+  .b2b-workflow-layout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  .b2b-workflow-aside {
+    position: static;
+  }
+  .section-head.section-head-left {
+    text-align: center;
+    margin: 0 auto 1.5rem;
+    max-width: 680px;
+  }
+}
+
+@media (max-width: 640px) {
+  .b2b-timeline-rail {
+    left: 17px;
+  }
+  .b2b-timeline-step {
+    grid-template-columns: 36px 1fr;
+    gap: 0.85rem;
+    padding: 0.35rem 0;
+  }
+  .b2b-step-node {
+    width: 36px;
+    height: 36px;
+    font-size: 0.76rem;
+  }
+  .b2b-step-content {
+    padding: 0.95rem 1rem;
+  }
+}
+
+/* 9. Cartes Portails avec Spotlight radial dynamique */
+.portail-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.portail-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(280px circle at var(--mx, 50%) var(--my, 50%), rgba(114, 21, 19, 0.07), transparent 65%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.portail-card:hover::before {
+  opacity: 1;
+}
+
+.portail-icon {
+  transition: transform 0.35s var(--ease-premium);
+}
+
+.portail-card:hover .portail-icon {
+  transform: scale(1.1) rotate(-4deg);
+}
+
+.portail-cta i {
+  transition: transform 0.25s var(--ease-premium);
+}
+
+.portail-card:hover .portail-cta i {
+  transform: translateX(6px);
+}
+
+/* 10. Révélation au scroll + Stagger par carte */
 .b2b-reveal {
   opacity: 0;
   transform: translateY(28px);
-  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.75s var(--ease-premium), transform 0.75s var(--ease-premium);
 }
 
 .b2b-reveal.visible {
@@ -1043,46 +1624,613 @@
   transform: translateY(0);
 }
 
-/* Micro-interactions sur les cartes & boutons */
-.offre-icon,
-.portail-icon {
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+.b2b-reveal .offre-card,
+.b2b-reveal .b2b-timeline-step,
+.b2b-reveal .portail-card {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.65s var(--ease-premium), transform 0.65s var(--ease-premium), background-color 0.35s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  transition-delay: calc(var(--stagger, 0) * 90ms);
 }
 
-.offre-card:hover .offre-icon,
-.portail-card:hover .portail-icon {
-  transform: scale(1.08) rotate(-3deg);
+.b2b-reveal.visible .offre-card,
+.b2b-reveal.visible .b2b-timeline-step,
+.b2b-reveal.visible .portail-card {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-.step-card {
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+.b2b-reveal.visible .offre-card:hover,
+.b2b-reveal.visible .b2b-timeline-step:hover,
+.b2b-reveal.visible .b2b-timeline-step.is-active,
+.b2b-reveal.visible .portail-card:hover {
+  transition-delay: 0ms;
 }
 
-.step-card:hover {
+/* 11. Footer Signature Filigrane & Bouton Haut de page */
+footer {
+  border-top: 4px solid #E51D24;
+}
+
+footer .footer-links a {
+  display: inline-block;
+  transition: transform 0.25s var(--ease-premium), color 0.2s ease;
+}
+
+footer .footer-links a:hover {
+  transform: translateX(6px);
+}
+
+.b2b-footer-signature {
+  font-size: clamp(2.8rem, 10.5vw, 8.8rem);
+  font-weight: 800;
+  letter-spacing: -0.055em;
+  line-height: 0.88;
+  text-align: center;
+  margin-top: 2rem;
+  margin-bottom: -0.5rem;
+  user-select: none;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(250, 245, 234, 0.24) 15%, rgba(250, 245, 234, 0.03) 95%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.b2b-back-top-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #FAF5EA;
+  border: 1px solid rgba(250, 245, 234, 0.25);
+  border-radius: 9999px;
+  padding: 0.42rem 0.9rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: inherit;
+  transition: background 0.2s ease, transform 0.25s var(--ease-premium), border-color 0.2s ease;
+}
+
+.b2b-back-top-btn:hover {
+  background: #E51D24;
+  border-color: #E51D24;
+  color: #FFFFFF;
+  transform: translateY(-2px);
+}
+
+/* ==========================================================
+   SECTIONS COMPLÉMENTAIRES : TRUST LOGOS, MENUS, FAQ & LÉGAL
+   ========================================================== */
+
+/* 12. Carrousel Automatique Partenaires (Compact & Élégant) */
+.b2b-trust-section {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(2rem, 3.5vw, 3rem) 0;
+  background-color: #FAF8F4;
+  background-image: url('/assets/images/kiki-brand-pattern.png');
+  background-size: 380px auto;
+  border-bottom: 1.5px solid #EDE7DC;
+}
+
+.b2b-trust-section .section-head {
+  margin-bottom: 1.25rem;
+}
+
+.b2b-trust-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(250, 248, 244, 0.91);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.b2b-trust-container {
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+  box-sizing: border-box;
+}
+
+.b2b-trust-sub {
+  display: inline-block;
+  color: #721513;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 800;
+  font-size: 0.78rem;
+  margin-bottom: 0.45rem;
+}
+
+.b2b-trust-line {
+  width: 48px;
+  height: 3px;
+  background: #E51D24;
+  margin: 0.75rem auto 0;
+  border-radius: 9999px;
+}
+
+.b2b-slider-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-top: 1.15rem;
+}
+
+.b2b-slider-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  border: 1.5px solid #EDE7DC;
+  color: #721513;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(114, 21, 19, 0.1);
+  transition: transform 0.25s var(--ease-premium), background-color 0.2s ease, color 0.2s ease;
+}
+
+.b2b-slider-btn:hover {
+  background: #721513;
+  color: #FFFFFF;
+  border-color: #721513;
+  transform: translateY(-50%) scale(1.08);
+}
+
+.b2b-slider-prev {
+  left: 6px;
+}
+
+.b2b-slider-next {
+  right: 6px;
+}
+
+.b2b-clients-slider {
+  display: flex;
+  gap: 1.15rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 0.75rem 0.5rem;
+  width: 100%;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 5%, #000 95%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, #000 5%, #000 95%, transparent 100%);
+}
+
+.b2b-clients-slider::-webkit-scrollbar {
+  display: none;
+}
+
+.b2b-logo-set {
+  display: flex;
+  gap: 1.15rem;
+  flex: 0 0 auto;
+}
+
+.b2b-partner-card {
+  flex: 0 0 auto;
+  width: 165px;
+  height: 96px;
+  background: #FFFFFF;
+  border: 1.5px solid #EDE7DC;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(114, 21, 19, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.9rem 1.25rem;
+  box-sizing: border-box;
+  transition: transform 0.3s var(--ease-premium), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.b2b-partner-card img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.35s var(--ease-premium);
+}
+
+.b2b-partner-card:hover {
   transform: translateY(-4px);
   border-color: #C5A880;
-  box-shadow: 0 12px 26px rgba(114, 21, 19, 0.06);
+  box-shadow: 0 12px 26px rgba(114, 21, 19, 0.12);
 }
 
-.portail-cta i {
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+.b2b-partner-card:hover img {
+  transform: scale(1.05);
 }
 
-.portail-card:hover .portail-cta i {
-  transform: translateX(5px);
+/* 13. Galerie Culinaire Pleine Hauteur (Vrais plats Kiki) */
+.b2b-dishes-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.15rem;
 }
 
+.b2b-dish-card {
+  position: relative;
+  height: 275px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #231513;
+  border: 1.5px solid #EDE7DC;
+  box-shadow: 0 12px 26px rgba(51, 39, 36, 0.08);
+  transition: transform 0.35s var(--ease-premium), box-shadow 0.35s ease, border-color 0.3s ease;
+}
+
+.b2b-reveal .b2b-dish-card {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.65s var(--ease-premium), transform 0.65s var(--ease-premium), box-shadow 0.35s ease, border-color 0.3s ease;
+  transition-delay: calc(var(--stagger, 0) * 90ms);
+}
+
+.b2b-reveal.visible .b2b-dish-card {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.b2b-reveal.visible .b2b-dish-card:hover {
+  transition-delay: 0ms;
+  transform: translateY(-6px);
+  border-color: #721513;
+  box-shadow: 0 18px 36px rgba(114, 21, 19, 0.16);
+}
+
+.b2b-dish-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s var(--ease-premium);
+}
+
+.b2b-dish-card:hover .b2b-dish-photo {
+  transform: scale(1.08);
+}
+
+.b2b-dish-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(28, 12, 11, 0.25) 0%,
+    rgba(28, 12, 11, 0.12) 38%,
+    rgba(28, 12, 11, 0.84) 76%,
+    rgba(22, 8, 8, 0.94) 100%
+  );
+  pointer-events: none;
+}
+
+.b2b-dish-top {
+  position: absolute;
+  top: 0.85rem;
+  left: 0.85rem;
+  right: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  z-index: 2;
+}
+
+.b2b-dish-cat {
+  background: rgba(114, 21, 19, 0.9);
+  color: #FAF5EA;
+  font-size: 0.64rem;
+  font-weight: 800;
+  padding: 0.24rem 0.62rem;
+  border-radius: 9999px;
+  letter-spacing: 0.03em;
+  backdrop-filter: blur(4px);
+}
+
+.b2b-dish-kcal {
+  background: rgba(255, 255, 255, 0.94);
+  color: #332724;
+  font-size: 0.66rem;
+  font-weight: 800;
+  padding: 0.22rem 0.55rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+}
+
+.b2b-dish-kcal i {
+  color: #E51D24;
+}
+
+.b2b-dish-overlay {
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 2;
+  transition: transform 0.35s var(--ease-premium);
+}
+
+.b2b-dish-card:hover .b2b-dish-overlay {
+  transform: translateY(-3px);
+}
+
+.b2b-dish-overlay h3 {
+  margin: 0 0 0.3rem;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  line-height: 1.25;
+}
+
+.b2b-dish-overlay p {
+  margin: 0;
+  font-size: 0.78rem;
+  color: rgba(250, 245, 234, 0.86);
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (max-width: 1024px) {
+  .b2b-dishes-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .b2b-dishes-grid {
+    grid-template-columns: 1fr;
+  }
+  .b2b-dish-card {
+    height: 235px;
+  }
+  .b2b-partner-card {
+    width: 136px;
+    height: 78px;
+    padding: 0.7rem 0.95rem;
+    border-radius: 14px;
+  }
+  .b2b-slider-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 0.8rem;
+  }
+}
+
+/* 14. Accordéon FAQ B2B (+ rotatif fluide) */
+.b2b-faq-container {
+  max-width: 860px;
+}
+
+.b2b-faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.b2b-faq-item {
+  background: #FAF8F4;
+  border: 1.5px solid #EDE7DC;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: border-color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.b2b-faq-item.is-open {
+  background: #FFFFFF;
+  border-color: #721513;
+  box-shadow: 0 12px 28px rgba(114, 21, 19, 0.06);
+}
+
+.b2b-faq-trigger {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 1.15rem 1.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+
+.b2b-faq-q {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: #332724;
+  line-height: 1.35;
+}
+
+.b2b-faq-item.is-open .b2b-faq-q {
+  color: #721513;
+}
+
+.b2b-faq-num {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #E51D24;
+  background: rgba(229, 29, 36, 0.08);
+  padding: 0.25rem 0.55rem;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+.b2b-faq-plus {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  border: 1px solid #EDE7DC;
+  color: #721513;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  transition: transform 0.32s var(--ease-premium), background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.b2b-faq-item.is-open .b2b-faq-plus {
+  transform: rotate(45deg);
+  background: #721513;
+  color: #FFFFFF;
+  border-color: #721513;
+}
+
+.b2b-faq-answer {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s var(--ease-premium);
+}
+
+.b2b-faq-item.is-open .b2b-faq-answer {
+  grid-template-rows: 1fr;
+}
+
+.b2b-faq-answer p {
+  overflow: hidden;
+  margin: 0;
+  padding: 0 1.35rem 0 3.75rem;
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: #6E5A56;
+  transition: padding-bottom 0.35s var(--ease-premium);
+}
+
+.b2b-faq-item.is-open .b2b-faq-answer p {
+  padding-bottom: 1.25rem;
+}
+
+@media (max-width: 640px) {
+  .b2b-faq-answer p {
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
+  }
+  .b2b-faq-trigger {
+    padding: 1rem 1.15rem;
+  }
+}
+
+.b2b-btn-outline-white {
+  transition: background 0.2s ease, transform 0.2s var(--ease-premium);
+}
+
+.b2b-btn-outline-white:hover {
+  background: rgba(255, 255, 255, 0.14);
+  transform: translateY(-2px);
+}
+
+/* 15. Modale Légale / Confidentialité */
+.b2b-legal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(51, 39, 36, 0.55);
+  backdrop-filter: blur(4px);
+  z-index: 99998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+}
+
+.b2b-legal-dialog {
+  background: #FFFFFF;
+  border: 1.5px solid #EDE7DC;
+  border-radius: 20px;
+  max-width: 540px;
+  width: 100%;
+  padding: 1.5rem;
+  box-shadow: 0 24px 60px rgba(51, 39, 36, 0.25);
+  animation: b2bFadeUp 0.32s var(--ease-premium) both;
+}
+
+.b2b-legal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid #EDE7DC;
+  margin-bottom: 1rem;
+}
+
+.b2b-legal-head h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #721513;
+}
+
+.b2b-legal-close {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid #EDE7DC;
+  background: #FAF8F4;
+  color: #721513;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.b2b-legal-body p {
+  margin: 0 0 0.75rem;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: #6E5A56;
+}
+
+.b2b-legal-body p:last-child {
+  margin-bottom: 0;
+}
+
+/* 16. Respect des préférences d'accessibilité */
 @media (prefers-reduced-motion: reduce) {
-  .b2b-hero-content,
+  .b2b-page-curtain,
+  .b2b-cursor-dot,
+  .b2b-cursor-ring,
+  .b2b-scroll-progress {
+    display: none !important;
+  }
+  .b2b-hero-content .b2b-pill-tag,
+  .b2b-hero-title,
+  .b2b-hero-desc,
+  .b2b-hero-cta,
+  .b2b-hero-kpis,
   .b2b-hero-visual,
   .b2b-preview-card,
   .b2b-marquee-track {
     animation: none !important;
   }
-  .b2b-reveal {
-    opacity: 1;
-    transform: none;
-    transition: none;
+  .b2b-reveal,
+  .b2b-reveal .offre-card,
+  .b2b-reveal .b2b-dish-card,
+  .b2b-reveal .b2b-timeline-step,
+  .b2b-reveal .portail-card {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
   }
 }
 

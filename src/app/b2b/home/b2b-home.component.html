@@ -1,7 +1,23 @@
 <div class="b2b-home-page">
 
+  <!-- BARRE DE PROGRESSION DE SCROLL (STYLE SEBAS) -->
+  <div class="b2b-scroll-progress" aria-hidden="true"></div>
+
+  <!-- DOUBLE RIDEAU CINÉMATIQUE D'OUVERTURE (EASE_CURTAIN) -->
+  <div class="b2b-page-curtain" aria-hidden="true">
+    <div class="b2b-curtain-layer b2b-curtain-primary"></div>
+    <div class="b2b-curtain-layer b2b-curtain-accent"></div>
+  </div>
+
+  <!-- CURSEUR INERTIEL (DESKTOP UNIQUEMENT) -->
+  <div class="b2b-cursor-dot" [class.is-hidden]="cursorMode() === 'hidden'" aria-hidden="true"></div>
+  <div class="b2b-cursor-ring"
+       [class.is-hidden]="cursorMode() === 'hidden'"
+       [class.is-pointer]="cursorMode() === 'pointer'"
+       aria-hidden="true"></div>
+
   <!-- TOPBAR CORPORATE B2B -->
-  <div class="b2b-topbar">
+  <div class="b2b-topbar" id="top">
     <div class="b2b-container b2b-topbar-inner">
       <div class="b2b-topbar-left">
         <span><i class="fa-solid fa-building"></i> Kiki Traiteur • Pôle Entreprises</span>
@@ -52,8 +68,10 @@
         <div class="b2b-nav-links-wrap">
           <a href="#top" class="b2b-nav-active-mobile" (click)="allerHaut($event)">Accueil B2B</a>
           <a href="#offres-b2b" (click)="allerVersSection('offres-b2b', $event)">Nos Offres</a>
+          <a href="#menus-b2b" (click)="allerVersSection('menus-b2b', $event)">Nos Menus</a>
           <a href="#fonctionnement-b2b" (click)="allerVersSection('fonctionnement-b2b', $event)">Fonctionnement</a>
-          <a href="#portails-b2b" (click)="allerVersSection('portails-b2b', $event)">Portails Métiers</a>
+          <a href="#portails-b2b" (click)="allerVersSection('portails-b2b', $event)">Portails</a>
+          <a href="#faq-b2b" (click)="allerVersSection('faq-b2b', $event)">FAQ</a>
         </div>
 
         <!-- Boutons pilules pleine largeur (mobile uniquement) -->
@@ -61,14 +79,14 @@
           <a href="#portails-b2b" class="b2b-mobile-pill-outline" (click)="allerVersSection('portails-b2b', $event)">
             <i class="fa-solid fa-layer-group"></i> EXPLORER LES PORTAILS
           </a>
-          <a routerLink="/b2b/login" class="b2b-mobile-pill-primary" (click)="menuMobileOuvert.set(false)">
+          <a href="/b2b/login" class="b2b-mobile-pill-primary" (click)="allerConnexion($event)">
             <i class="fa-solid fa-right-to-bracket"></i> CONNEXION ESPACE B2B
           </a>
         </div>
       </div>
 
       <div class="b2b-header-actions">
-        <a routerLink="/b2b/login" class="b2b-btn-login">
+        <a href="/b2b/login" class="b2b-btn-login" (click)="allerConnexion($event)">
           <i class="fa-solid fa-right-to-bracket"></i> Connexion B2B
         </a>
         <button type="button" class="b2b-burger" (click)="toggleMenuMobile()" aria-label="Menu">
@@ -85,7 +103,7 @@
         <span class="b2b-pill-tag">
           <i class="fa-solid fa-briefcase"></i> CANTINE DIGITALE & RESTAURATION COLLECTIVE
         </span>
-        <h1>
+        <h1 class="b2b-hero-title">
           La restauration d'entreprise <span>clé en main</span> au Sénégal
         </h1>
         <p class="b2b-hero-desc">
@@ -95,7 +113,7 @@
         </p>
 
         <div class="b2b-hero-cta">
-          <a routerLink="/b2b/login" class="b2b-btn-primary">
+          <a href="/b2b/login" class="b2b-btn-primary" (click)="allerConnexion($event)">
             <i class="fa-solid fa-unlock-keyhole"></i> Accéder à mon Espace B2B
           </a>
           <a href="#portails-b2b" class="b2b-btn-outline" (click)="allerVersSection('portails-b2b', $event)">
@@ -105,12 +123,12 @@
 
         <div class="b2b-hero-kpis">
           <div class="kpi-item">
-            <strong>5 000 FCFA</strong>
+            <strong>{{ compteurForfait() | number:'1.0-0':'fr-FR' }} FCFA</strong>
             <span>Forfait repas de base</span>
           </div>
           <div class="kpi-sep"></div>
           <div class="kpi-item">
-            <strong>0% à 100%</strong>
+            <strong>0% à {{ compteurSubvention() }}%</strong>
             <span>Subvention RH flexible</span>
           </div>
           <div class="kpi-sep"></div>
@@ -159,7 +177,7 @@
           </div>
 
           <div class="preview-footer-action">
-            <a routerLink="/b2b/login" class="preview-link">
+            <a href="/b2b/login" class="preview-link" (click)="allerConnexion($event)">
               Tester la démonstration complète <i class="fa-solid fa-arrow-right"></i>
             </a>
           </div>
@@ -168,72 +186,212 @@
     </div>
   </section>
 
-  <!-- RUBAN DÉFILANT B2B (STYLE MARQUEE KIKI TRAITEUR) -->
+  <!-- MARQUEE CINÉTIQUE (INSPIRÉ VISIONMARQUEE) -->
   <div class="b2b-marquee-bar" aria-hidden="true">
     <div class="b2b-marquee-track">
-      <span><i class="fa-solid fa-circle"></i> CUISINE &amp; SERVICE SUR PLACE</span>
-      <span><i class="fa-solid fa-circle"></i> SERVICE EN RÉFECTOIRE</span>
-      <span><i class="fa-solid fa-circle"></i> LIVRAISON EN BARQUETTES</span>
-      <span><i class="fa-solid fa-circle"></i> SUBVENTIONS RH 0% À 100%</span>
-      <span><i class="fa-solid fa-circle"></i> POINTAGE QR CODE CANTINE</span>
-      <span><i class="fa-solid fa-circle"></i> PAIEMENT WAVE INTÉGRÉ</span>
-      <span><i class="fa-solid fa-circle"></i> FACTURATION CONSOLIDÉE</span>
-      <span><i class="fa-solid fa-circle"></i> CUISINE &amp; SERVICE SUR PLACE</span>
-      <span><i class="fa-solid fa-circle"></i> SERVICE EN RÉFECTOIRE</span>
-      <span><i class="fa-solid fa-circle"></i> LIVRAISON EN BARQUETTES</span>
-      <span><i class="fa-solid fa-circle"></i> SUBVENTIONS RH 0% À 100%</span>
-      <span><i class="fa-solid fa-circle"></i> POINTAGE QR CODE CANTINE</span>
-      <span><i class="fa-solid fa-circle"></i> PAIEMENT WAVE INTÉGRÉ</span>
-      <span><i class="fa-solid fa-circle"></i> FACTURATION CONSOLIDÉE</span>
+      <span><i class="fa-solid fa-diamond"></i> CUISINE &amp; SERVICE SUR PLACE</span>
+      <span><i class="fa-solid fa-diamond"></i> SERVICE EN RÉFECTOIRE</span>
+      <span><i class="fa-solid fa-diamond"></i> LIVRAISON EN BARQUETTES</span>
+      <span><i class="fa-solid fa-diamond"></i> SUBVENTIONS RH 0% À 100%</span>
+      <span><i class="fa-solid fa-diamond"></i> POINTAGE QR CODE CANTINE</span>
+      <span><i class="fa-solid fa-diamond"></i> PAIEMENT WAVE INTÉGRÉ</span>
+      <span><i class="fa-solid fa-diamond"></i> FACTURATION CONSOLIDÉE</span>
+      <span><i class="fa-solid fa-diamond"></i> CUISINE &amp; SERVICE SUR PLACE</span>
+      <span><i class="fa-solid fa-diamond"></i> SERVICE EN RÉFECTOIRE</span>
+      <span><i class="fa-solid fa-diamond"></i> LIVRAISON EN BARQUETTES</span>
+      <span><i class="fa-solid fa-diamond"></i> SUBVENTIONS RH 0% À 100%</span>
+      <span><i class="fa-solid fa-diamond"></i> POINTAGE QR CODE CANTINE</span>
+      <span><i class="fa-solid fa-diamond"></i> PAIEMENT WAVE INTÉGRÉ</span>
+      <span><i class="fa-solid fa-diamond"></i> FACTURATION CONSOLIDÉE</span>
     </div>
   </div>
 
-  <!-- SECTION 1 : LES 3 MODES DE PRESTATION B2B -->
+  <!-- SECTION PREUVE SOCIALE : CARROUSEL AUTOMATIQUE PARTENAIRES (INSPIRÉ KIKI TRAITEUR) -->
+  <section class="b2b-trust-section" aria-label="Entreprises partenaires">
+    <div class="b2b-trust-overlay"></div>
+    <div class="b2b-trust-container">
+      <div class="section-head b2b-reveal">
+        <span class="b2b-trust-sub">ILS NOUS FONT CONFIANCE</span>
+        <h2>Des institutions prestigieuses &amp; clients de renom</h2>
+        <div class="b2b-trust-line" aria-hidden="true"><span></span></div>
+      </div>
+
+      <div class="b2b-slider-wrapper b2b-reveal"
+           (mouseenter)="pauseAutoScroll()"
+           (mouseleave)="resumeAutoScroll()">
+        <button type="button" class="b2b-slider-btn b2b-slider-prev" (click)="scrollSlider('left')" aria-label="Précédent">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        <div id="b2b-clients-slider" class="b2b-clients-slider">
+          <div id="b2b-logo-set-1" class="b2b-logo-set">
+            @for (client of clientsPartenaires; track client.nom) {
+              <div class="b2b-partner-card" [title]="client.nom">
+                <img [src]="client.logo" [alt]="client.nom" loading="lazy">
+              </div>
+            }
+          </div>
+          <div id="b2b-logo-set-2" class="b2b-logo-set" aria-hidden="true">
+            @for (client of clientsPartenaires; track client.nom) {
+              <div class="b2b-partner-card" [title]="client.nom">
+                <img [src]="client.logo" [alt]="client.nom" loading="lazy">
+              </div>
+            }
+          </div>
+          <div id="b2b-logo-set-3" class="b2b-logo-set" aria-hidden="true">
+            @for (client of clientsPartenaires; track client.nom) {
+              <div class="b2b-partner-card" [title]="client.nom">
+                <img [src]="client.logo" [alt]="client.nom" loading="lazy">
+              </div>
+            }
+          </div>
+        </div>
+
+        <button type="button" class="b2b-slider-btn b2b-slider-next" (click)="scrollSlider('right')" aria-label="Suivant">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 1 : LES 3 MODES DE PRESTATION B2B + SCEAU ROTATIF + CARTES PILIERS -->
   <section id="offres-b2b" class="b2b-section b2b-section-light">
     <div class="b2b-container">
-      <div class="section-head b2b-reveal">
-        <span class="section-tag">NOS MODES D'EXPLOITATION</span>
-        <h2>Trois solutions adaptées à vos locaux</h2>
-        <p>Chaque entreprise choisit son mode de prestation et la composition autorisée (Entrée, Plat chaud, Dessert, Boisson).</p>
+      <div class="section-head-with-seal b2b-reveal">
+        <div class="section-head">
+          <span class="section-tag">NOS MODES D'EXPLOITATION</span>
+          <h2>Trois solutions adaptées à vos locaux</h2>
+          <p>Chaque entreprise choisit son mode de prestation et la composition autorisée (Entrée, Plat chaud, Dessert, Boisson).</p>
+        </div>
+
+        <!-- SCEAU CIRCULAIRE ROTATIF AU SCROLL (STYLE VISION SECTION) -->
+        <div class="b2b-rotating-seal" aria-hidden="true">
+          <svg class="b2b-seal-svg" viewBox="0 0 140 140" width="112" height="112">
+            <defs>
+              <path id="b2bSealPath" d="M 70, 70 m -50, 0 a 50,50 0 1,1 100,0 a 50,50 0 1,1 -100,0" />
+            </defs>
+            <text fill="#721513" font-size="9.2" font-weight="800" letter-spacing="2.3">
+              <textPath href="#b2bSealPath">
+                EXCELLENCE CULINAIRE • DAKAR SÉNÉGAL • 1997 •
+              </textPath>
+            </text>
+          </svg>
+          <div class="b2b-seal-center">B2B</div>
+        </div>
       </div>
 
       <div class="offres-grid b2b-reveal">
-        @for (offre of prestationsB2B; track offre.titre) {
-          <article class="offre-card">
-            <div class="offre-icon">
-              <i [class]="offre.icone"></i>
+        @for (offre of prestationsB2B; track offre.titre; let idx = $index) {
+          <article class="offre-card" [style.--stagger]="idx">
+            <div class="offre-card-top">
+              <div class="offre-icon">
+                <i [class]="offre.icone"></i>
+              </div>
+              <span class="offre-num">{{ offre.numero }}</span>
             </div>
             <span class="offre-badge">{{ offre.badge }}</span>
             <h3>{{ offre.titre }}</h3>
             <p>{{ offre.description }}</p>
+            <span class="offre-bottom-line" aria-hidden="true"></span>
           </article>
         }
       </div>
     </div>
   </section>
 
-  <!-- SECTION 2 : FONCTIONNEMENT EN 4 ÉTAPES -->
-  <section id="fonctionnement-b2b" class="b2b-section">
+  <!-- SECTION 2 : FONCTIONNEMENT EN 4 ÉTAPES (SPLIT ASYMÉTRIQUE + TIMELINE VERTICALE) -->
+  <section id="fonctionnement-b2b" class="b2b-section b2b-section-sand b2b-workflow-section">
+    <div class="b2b-workflow-watermark" aria-hidden="true">
+      {{ etapesFlux[activeStepIndex()].numero }}
+    </div>
+
+    <div class="b2b-container b2b-workflow-inner">
+      <div class="b2b-workflow-layout">
+        <!-- Colonne gauche sticky : Titre & aperçu de l'étape active -->
+        <div class="b2b-workflow-aside b2b-reveal">
+          <div class="section-head section-head-left">
+            <span class="section-tag">ZÉRO PAPIER • ZÉRO ERREUR</span>
+            <h2>Un workflow conçu pour les RH et les salariés</h2>
+            <p>De la planification hebdomadaire des menus jusqu'au rapprochement comptable en fin de mois.</p>
+          </div>
+
+          <div class="b2b-workflow-spotlight">
+            <div class="b2b-spotlight-head">
+              <span class="b2b-spotlight-badge">Étape {{ etapesFlux[activeStepIndex()].numero }} / 04</span>
+              <div class="b2b-spotlight-pills" aria-label="Sélectionner une étape">
+                @for (etape of etapesFlux; track etape.numero; let idx = $index) {
+                  <button type="button"
+                          class="b2b-spotlight-dot"
+                          [class.is-active]="activeStepIndex() === idx"
+                          (click)="activerEtape(idx)"
+                          [attr.aria-label]="'Étape ' + etape.numero">
+                    {{ etape.numero }}
+                  </button>
+                }
+              </div>
+            </div>
+            <h3>{{ etapesFlux[activeStepIndex()].titre }}</h3>
+            <p>{{ etapesFlux[activeStepIndex()].texte }}</p>
+          </div>
+        </div>
+
+        <!-- Colonne droite : Timeline verticale connectée -->
+        <div class="b2b-workflow-timeline b2b-reveal">
+          <div class="b2b-timeline-rail" aria-hidden="true">
+            <div class="b2b-timeline-fill"></div>
+          </div>
+
+          <div class="b2b-timeline-steps">
+            @for (etape of etapesFlux; track etape.numero; let idx = $index) {
+              <button type="button"
+                      class="b2b-timeline-step"
+                      [class.is-reached]="idx <= activeStepIndex()"
+                      [class.is-active]="activeStepIndex() === idx"
+                      [style.--stagger]="idx"
+                      (mouseenter)="activerEtape(idx)"
+                      (click)="activerEtape(idx)">
+                <span class="b2b-step-node" aria-hidden="true">{{ etape.numero }}</span>
+                <div class="b2b-step-content">
+                  <h3>{{ etape.titre }}</h3>
+                  <p>{{ etape.texte }}</p>
+                </div>
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION APERÇU CULINAIRE : GALERIE PHOTO PLEINE HAUTEUR -->
+  <section id="menus-b2b" class="b2b-section b2b-section-light">
     <div class="b2b-container">
       <div class="section-head b2b-reveal">
-        <span class="section-tag">ZÉRO PAPIER • ZÉRO ERREUR</span>
-        <h2>Un workflow conçu pour les RH et les salariés</h2>
-        <p>De la planification hebdomadaire des menus jusqu'au rapprochement comptable en fin de mois.</p>
+        <span class="section-tag">CARTE B2B &amp; QUALITÉ CULINAIRE</span>
+        <h2>Des assiettes équilibrées et renouvelées chaque semaine</h2>
+        <p>Préparées chaque matin avec des produits frais pour offrir énergie, variété et plaisir gustatif à vos équipes.</p>
       </div>
 
-      <div class="steps-grid b2b-reveal">
-        @for (etape of etapesFlux; track etape.numero) {
-          <div class="step-card">
-            <div class="step-num">{{ etape.numero }}</div>
-            <h3>{{ etape.titre }}</h3>
-            <p>{{ etape.texte }}</p>
-          </div>
+      <div class="b2b-dishes-grid b2b-reveal">
+        @for (plat of apercusMenus; track plat.nom; let idx = $index) {
+          <article class="b2b-dish-card" [style.--stagger]="idx">
+            <img class="b2b-dish-photo" [src]="plat.image" [alt]="plat.nom" loading="lazy">
+            <div class="b2b-dish-scrim" aria-hidden="true"></div>
+            <div class="b2b-dish-top">
+              <span class="b2b-dish-cat">{{ plat.categorie }}</span>
+              <span class="b2b-dish-kcal"><i class="fa-solid fa-fire"></i> {{ plat.calories }}</span>
+            </div>
+            <div class="b2b-dish-overlay">
+              <h3>{{ plat.nom }}</h3>
+              <p>{{ plat.details }}</p>
+            </div>
+          </article>
         }
       </div>
     </div>
   </section>
 
-  <!-- SECTION 3 : ACCÈS DIRECT AUX 4 PORTAILS MÉTIERS -->
+  <!-- SECTION 3 : ACCÈS DIRECT AUX 4 PORTAILS MÉTIERS (SPOTLIGHT + STAGGER) -->
   <section id="portails-b2b" class="b2b-section b2b-section-sand">
     <div class="b2b-container">
       <div class="section-head b2b-reveal">
@@ -243,8 +401,8 @@
       </div>
 
       <div class="portails-grid b2b-reveal">
-        @for (p of portails; track p.role) {
-          <button type="button" class="portail-card" (click)="ouvrirPortail(p)">
+        @for (p of portails; track p.role; let idx = $index) {
+          <button type="button" class="portail-card" [style.--stagger]="idx" (click)="ouvrirPortail(p)">
             <div class="portail-top">
               <div class="portail-icon" [style.background]="p.couleur + '15'" [style.color]="p.couleur">
                 <i [class]="p.icone"></i>
@@ -265,22 +423,55 @@
     </div>
   </section>
 
-  <!-- BANNIÈRE CTA CONVENTION -->
-  <section class="b2b-cta-banner">
+  <!-- SECTION 4 : FAQ B2B ACCORDÉON DYNAMIQUE -->
+  <section id="faq-b2b" class="b2b-section b2b-section-light">
+    <div class="b2b-container b2b-faq-container">
+      <div class="section-head b2b-reveal">
+        <span class="section-tag">QUESTIONS FRÉQUENTES RH &amp; PROSPECTS</span>
+        <h2>Tout savoir sur la cantine digitale B2B</h2>
+        <p>Les réponses essentielles avant de conventionner votre entreprise avec Kiki Traiteur.</p>
+      </div>
+
+      <div class="b2b-faq-list b2b-reveal">
+        @for (item of questionsFaq; track item.question; let idx = $index) {
+          <div class="b2b-faq-item" [class.is-open]="faqOuverte() === idx">
+            <button type="button" class="b2b-faq-trigger" (click)="toggleFaq(idx)" [attr.aria-expanded]="faqOuverte() === idx">
+              <span class="b2b-faq-q">
+                <span class="b2b-faq-num">0{{ idx + 1 }}</span>
+                {{ item.question }}
+              </span>
+              <span class="b2b-faq-plus" aria-hidden="true">
+                <i class="fa-solid fa-plus"></i>
+              </span>
+            </button>
+            <div class="b2b-faq-answer">
+              <p>{{ item.reponse }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- BANNIÈRE CTA CONVENTION AVEC COMPTEUR ANIMÉ -->
+  <section class="b2b-cta-banner b2b-reveal">
     <div class="b2b-container b2b-cta-inner">
       <div>
         <h2>Vous souhaitez équiper votre entreprise ?</h2>
-        <p>Démarrez votre convention cantine Kiki Traiteur à Dakar et Diamniadio en moins de 48h.</p>
+        <p>Démarrez votre convention cantine Kiki Traiteur à Dakar et Diamniadio en moins de <strong>{{ compteurDelai() }}h</strong>.</p>
       </div>
       <div class="b2b-cta-actions">
-        <a routerLink="/b2b/login" class="b2b-btn-white">
+        <a href="/b2b/login" class="b2b-btn-white" (click)="allerConnexion($event)">
           <i class="fa-solid fa-right-to-bracket"></i> Se connecter à mon espace
+        </a>
+        <a href="tel:+221338322966" class="b2b-btn-outline-white">
+          <i class="fa-solid fa-phone"></i> Contacter le Pôle Entreprises
         </a>
       </div>
     </div>
   </section>
 
-  <!-- FOOTER IDENTIQUE AU SITE KIKI TRAITEUR -->
+  <!-- FOOTER IDENTIQUE AU SITE KIKI TRAITEUR + SIGNATURE FILIGRANE & HAUT DE PAGE -->
   <footer>
     <div class="container footer-grid">
       <div class="footer-col">
@@ -300,9 +491,11 @@
         <ul class="footer-links">
           <li><a href="#top" (click)="allerHaut($event)">Accueil B2B</a></li>
           <li><a href="#offres-b2b" (click)="allerVersSection('offres-b2b', $event)">Nos Offres</a></li>
+          <li><a href="#menus-b2b" (click)="allerVersSection('menus-b2b', $event)">Nos Menus</a></li>
           <li><a href="#fonctionnement-b2b" (click)="allerVersSection('fonctionnement-b2b', $event)">Fonctionnement</a></li>
           <li><a href="#portails-b2b" (click)="allerVersSection('portails-b2b', $event)">Portails Métiers</a></li>
-          <li><a routerLink="/b2b/login">Connexion Espace B2B</a></li>
+          <li><a href="#faq-b2b" (click)="allerVersSection('faq-b2b', $event)">FAQ</a></li>
+          <li><a href="/b2b/login" (click)="allerConnexion($event)">Connexion Espace B2B</a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -328,14 +521,48 @@
         </ul>
       </div>
     </div>
+
+    <!-- SIGNATURE GÉANTE EN DÉGRADÉ (INSPIRÉ FOOTER SEBAS) -->
+    <div class="container b2b-footer-signature" aria-hidden="true">KIKI TRAITEUR</div>
+
     <div class="container footer-bottom">
       <p>&copy; 2026 Kiki Traiteur. Tous Droits Réservés.</p>
       <div class="footer-legal-links">
-        <a routerLink="/mentions-legales">Mentions Légales</a>
-        <a routerLink="/politique-confidentialite">Politique de Confidentialité</a>
+        <a href="#mentions-legales" (click)="ouvrirLegal('mentions', $event)">Mentions Légales</a>
+        <a href="#confidentialite" (click)="ouvrirLegal('confidentialite', $event)">Politique de Confidentialité</a>
+        <button type="button" class="b2b-back-top-btn" (click)="allerHaut($event)">
+          Haut de page <i class="fa-solid fa-arrow-up"></i>
+        </button>
       </div>
     </div>
   </footer>
 
-</div>
+  <!-- MODALE LÉGALE RAPIDE (MENTIONS & CONFIDENTIALITÉ) -->
+  @if (legalModal()) {
+    <div class="b2b-legal-backdrop" (click)="legalModal.set(null)">
+      <div class="b2b-legal-dialog" (click)="$event.stopPropagation()">
+        <div class="b2b-legal-head">
+          <h3>
+            {{ legalModal() === 'mentions' ? 'Mentions Légales — Kiki Traiteur B2B' : 'Politique de Confidentialité B2B' }}
+          </h3>
+          <button type="button" class="b2b-legal-close" (click)="legalModal.set(null)" aria-label="Fermer">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        @if (legalModal() === 'mentions') {
+          <div class="b2b-legal-body">
+            <p><strong>Éditeur :</strong> Kiki Traiteur Sénégal — Pôle Restauration Collective &amp; Entreprises.</p>
+            <p><strong>Siège &amp; Cuisine Centrale :</strong> Hann Maristes, Dakar, Sénégal.</p>
+            <p><strong>Contact Entreprises :</strong> +221 33 832 29 66 • entreprises&#64;kikitraiteursenegal.net</p>
+          </div>
+        } @else {
+          <div class="b2b-legal-body">
+            <p>Les données des entreprises clientes et collaborateurs (matricule, site, historique des commandes, pointages QR Code et subventions RH) sont strictement traitées pour l'exécution du service de cantine digitale.</p>
+            <p>Chaque entreprise dispose d'un espace étanche et les relevés mensuels ne sont accessibles qu'aux responsables RH habilités et à la direction Kiki Traiteur.</p>
+          </div>
+        }
+      </div>
+    </div>
+  }
 
+</div>

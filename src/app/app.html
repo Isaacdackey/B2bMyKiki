@@ -1,1 +1,12 @@
 <router-outlet></router-outlet>
+
+<!-- RIDEAU CINÉMATIQUE PAGE-TO-PAGE (ROUGE & BORDEAUX) -->
+@if (b2b.curtainPhase() !== 'idle') {
+  <div class="b2b-global-curtain"
+       [class.is-covering]="b2b.curtainPhase() === 'covering'"
+       [class.is-revealing]="b2b.curtainPhase() === 'revealing'"
+       aria-hidden="true">
+    <div class="b2b-gc-layer b2b-gc-bordeaux"></div>
+    <div class="b2b-gc-layer b2b-gc-red"></div>
+  </div>
+}

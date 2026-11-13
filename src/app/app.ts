@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { B2bStateService } from './b2b/shared/b2b-state.service';
 
 @Component({
   selector: 'app-root',
@@ -12,6 +13,7 @@ import { filter } from 'rxjs/operators';
 })
 export class App implements OnInit {
   readonly title = 'Kiki Traiteur | B2B Restauration Entreprise';
+  b2b = inject(B2bStateService);
 
   constructor(private router: Router) {}
 

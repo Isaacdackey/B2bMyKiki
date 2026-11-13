@@ -1,1 +1,62 @@
 /* Global stylesheet replaced by public/assets/css/style.css and admin.css */
+
+.b2b-global-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  pointer-events: none;
+}
+
+.b2b-gc-layer {
+  position: fixed;
+  inset: 0;
+  will-change: transform;
+}
+
+.b2b-gc-bordeaux {
+  background: #721513;
+}
+
+.b2b-gc-red {
+  background: #E51D24;
+}
+
+/* Phase 1 : Le double rideau monte du bas pour recouvrir l'écran */
+.b2b-global-curtain.is-covering .b2b-gc-bordeaux {
+  transform-origin: bottom center;
+  animation: b2bGlobalCover 0.42s cubic-bezier(0.76, 0, 0.24, 1) 0s forwards;
+}
+
+.b2b-global-curtain.is-covering .b2b-gc-red {
+  transform-origin: bottom center;
+  animation: b2bGlobalCover 0.42s cubic-bezier(0.76, 0, 0.24, 1) 0.08s both;
+}
+
+/* Phase 2 : Le double rideau se lève vers le haut pour révéler la page Connexion */
+.b2b-global-curtain.is-revealing .b2b-gc-red {
+  transform-origin: top center;
+  animation: b2bGlobalReveal 0.48s cubic-bezier(0.76, 0, 0.24, 1) 0s both;
+}
+
+.b2b-global-curtain.is-revealing .b2b-gc-bordeaux {
+  transform-origin: top center;
+  animation: b2bGlobalReveal 0.52s cubic-bezier(0.76, 0, 0.24, 1) 0.1s both;
+}
+
+@keyframes b2bGlobalCover {
+  0% {
+    transform: scaleY(0);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes b2bGlobalReveal {
+  0% {
+    transform: scaleY(1);
+  }
+  100% {
+    transform: scaleY(0);
+  }
+}
