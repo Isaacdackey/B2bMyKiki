@@ -1,0 +1,261 @@
+<div class="b2b-home-page">
+
+  <!-- TOPBAR CORPORATE B2B -->
+  <div class="b2b-topbar">
+    <div class="b2b-container b2b-topbar-inner">
+      <div class="b2b-topbar-left">
+        <span><i class="fa-solid fa-building"></i> Kiki Traiteur • Pôle Restauration d'Entreprise</span>
+        <span class="sep">•</span>
+        <span><i class="fa-solid fa-phone"></i> +221 33 832 29 66</span>
+        <span class="sep hidden-sm">•</span>
+        <span class="hidden-sm"><i class="fa-solid fa-envelope"></i> entreprises&#64;kikitraiteursenegal.net</span>
+      </div>
+      <div class="b2b-topbar-right">
+        <a routerLink="/" class="b2b-back-b2c">
+          <i class="fa-solid fa-arrow-left"></i> Site Vitrine Grand Public (B2C)
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVBAR B2B DÉDIÉE -->
+  <header class="b2b-header">
+    <div class="b2b-container b2b-header-inner">
+      <a routerLink="/b2b" class="b2b-brand">
+        <img src="assets/images/logo.png"
+             alt="Kiki Traiteur B2B"
+             onerror="this.src='assets/images/KIKI TRAITEUR Logo Picto Rouge bordeau.png'">
+        <div class="b2b-brand-text">
+          <span class="b2b-brand-name">Kiki Traiteur</span>
+          <span class="b2b-brand-badge">B2B PRO</span>
+        </div>
+      </a>
+
+      <nav class="b2b-nav" [class.open]="menuMobileOuvert()">
+        <a href="#offres-b2b" (click)="menuMobileOuvert.set(false)">Nos Offres</a>
+        <a href="#fonctionnement-b2b" (click)="menuMobileOuvert.set(false)">Fonctionnement</a>
+        <a href="#portails-b2b" (click)="menuMobileOuvert.set(false)">Portails Métiers</a>
+        <a routerLink="/devis" [queryParams]="{ prestation: 'corporate' }" (click)="menuMobileOuvert.set(false)">Demander un Devis</a>
+      </nav>
+
+      <div class="b2b-header-actions">
+        <a routerLink="/b2b/login" class="b2b-btn-login">
+          <i class="fa-solid fa-right-to-bracket"></i> Connexion B2B
+        </a>
+        <button type="button" class="b2b-burger" (click)="toggleMenuMobile()" aria-label="Menu">
+          <i class="fa-solid" [class.fa-bars]="!menuMobileOuvert()" [class.fa-xmark]="menuMobileOuvert()"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO SECTION B2B -->
+  <section class="b2b-hero">
+    <div class="b2b-container b2b-hero-grid">
+      <div class="b2b-hero-content">
+        <span class="b2b-pill-tag">
+          <i class="fa-solid fa-briefcase"></i> CANTINE DIGITALE & RESTAURATION COLLECTIVE
+        </span>
+        <h1>
+          La restauration d'entreprise <span>clé en main</span> au Sénégal
+        </h1>
+        <p class="b2b-hero-desc">
+          Offrez à vos collaborateurs des repas équilibrés chaque jour sans gestion administrative lourde.
+          Kiki Traiteur déploie votre cantine digitale : commandes hebdomadaires, subventions RH paramétrables,
+          pointage par QR Code et facturation mensuelle consolidée.
+        </p>
+
+        <div class="b2b-hero-cta">
+          <a routerLink="/b2b/login" class="b2b-btn-primary">
+            <i class="fa-solid fa-unlock-keyhole"></i> Accéder à mon Espace B2B
+          </a>
+          <a routerLink="/devis" [queryParams]="{ prestation: 'corporate' }" class="b2b-btn-outline">
+            <i class="fa-solid fa-file-signature"></i> Conventionner mon Entreprise
+          </a>
+        </div>
+
+        <div class="b2b-hero-kpis">
+          <div class="kpi-item">
+            <strong>5 000 FCFA</strong>
+            <span>Forfait repas de base</span>
+          </div>
+          <div class="kpi-sep"></div>
+          <div class="kpi-item">
+            <strong>0% à 100%</strong>
+            <span>Subvention RH flexible</span>
+          </div>
+          <div class="kpi-sep"></div>
+          <div class="kpi-item">
+            <strong>QR Cantine</strong>
+            <span>Traçabilité en temps réel</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- VISUEL DASHBOARD / CANTINE EN DIRECT -->
+      <div class="b2b-hero-visual">
+        <div class="b2b-preview-card">
+          <div class="preview-card-top">
+            <span class="preview-dot"></span>
+            <span>PILOTAGE SITE EN DIRECT • PLATEAU, DAKAR</span>
+          </div>
+
+          <div class="preview-site-header">
+            <div>
+              <small>ENTREPRISE CONVENTIONNÉE</small>
+              <strong>{{ b2b.currentEntreprise().nom }}</strong>
+            </div>
+            <span class="preview-status-ok"><i class="fa-solid fa-circle-check"></i> Actif</span>
+          </div>
+
+          <div class="preview-metrics">
+            <div class="metric-box">
+              <span class="metric-label">Formule du jour</span>
+              <span class="metric-val">Entrée + Plat + Dessert</span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-label">Cut-off commande</span>
+              <span class="metric-val">18:00 (J-1)</span>
+            </div>
+          </div>
+
+          <div class="preview-flow-bars">
+            <div class="flow-row">
+              <span><i class="fa-solid fa-qrcode"></i> Repas scannés sur place</span>
+              <strong>En temps réel</strong>
+            </div>
+            <div class="flow-row">
+              <span><i class="fa-solid fa-percent"></i> Prise en charge RH</span>
+              <strong>Automatisée</strong>
+            </div>
+            <div class="flow-row">
+              <span><i class="fa-solid fa-wallet"></i> Employés autonomes</span>
+              <strong>Paiement Wave intégré</strong>
+            </div>
+          </div>
+
+          <div class="preview-footer-action">
+            <a routerLink="/b2b/login" class="preview-link">
+              Tester la démonstration complète <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 1 : LES 3 MODES DE PRESTATION B2B -->
+  <section id="offres-b2b" class="b2b-section b2b-section-light">
+    <div class="b2b-container">
+      <div class="section-head">
+        <span class="section-tag">NOS MODES D'EXPLOITATION</span>
+        <h2>Trois solutions adaptées à vos locaux</h2>
+        <p>Chaque entreprise choisit son mode de prestation et la composition autorisée (Entrée, Plat chaud, Dessert, Boisson).</p>
+      </div>
+
+      <div class="offres-grid">
+        @for (offre of prestationsB2B; track offre.titre) {
+          <article class="offre-card">
+            <div class="offre-icon">
+              <i [class]="offre.icone"></i>
+            </div>
+            <span class="offre-badge">{{ offre.badge }}</span>
+            <h3>{{ offre.titre }}</h3>
+            <p>{{ offre.description }}</p>
+          </article>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2 : FONCTIONNEMENT EN 4 ÉTAPES -->
+  <section id="fonctionnement-b2b" class="b2b-section">
+    <div class="b2b-container">
+      <div class="section-head">
+        <span class="section-tag">ZÉRO PAPIER • ZÉRO ERREUR</span>
+        <h2>Un workflow conçu pour les RH et les salariés</h2>
+        <p>De la planification hebdomadaire des menus jusqu'au rapprochement comptable en fin de mois.</p>
+      </div>
+
+      <div class="steps-grid">
+        @for (etape of etapesFlux; track etape.numero) {
+          <div class="step-card">
+            <div class="step-num">{{ etape.numero }}</div>
+            <h3>{{ etape.titre }}</h3>
+            <p>{{ etape.texte }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3 : ACCÈS DIRECT AUX 4 PORTAILS MÉTIERS -->
+  <section id="portails-b2b" class="b2b-section b2b-section-sand">
+    <div class="b2b-container">
+      <div class="section-head">
+        <span class="section-tag">ESPACES ÉTANCHES PAR RÔLE</span>
+        <h2>Accédez directement à votre portail</h2>
+        <p>Chaque acteur dispose d'une interface dédiée. Sélectionnez un profil pour ouvrir son espace.</p>
+      </div>
+
+      <div class="portails-grid">
+        @for (p of portails; track p.role) {
+          <button type="button" class="portail-card" (click)="ouvrirPortail(p)">
+            <div class="portail-top">
+              <div class="portail-icon" [style.background]="p.couleur + '15'" [style.color]="p.couleur">
+                <i [class]="p.icone"></i>
+              </div>
+              <span class="portail-badge" [style.color]="p.couleur" [style.background]="p.couleur + '12'">
+                {{ p.badge }}
+              </span>
+            </div>
+            <h3>{{ p.titre }}</h3>
+            <small class="portail-sub">{{ p.sousTitre }}</small>
+            <p>{{ p.description }}</p>
+            <span class="portail-cta" [style.color]="p.couleur">
+              Ouvrir le portail <i class="fa-solid fa-arrow-right"></i>
+            </span>
+          </button>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- BANNIÈRE CTA CONVENTION -->
+  <section class="b2b-cta-banner">
+    <div class="b2b-container b2b-cta-inner">
+      <div>
+        <h2>Vous souhaitez équiper votre entreprise ?</h2>
+        <p>Démarrez votre convention cantine Kiki Traiteur à Dakar et Diamniadio en moins de 48h.</p>
+      </div>
+      <div class="b2b-cta-actions">
+        <a routerLink="/devis" [queryParams]="{ prestation: 'corporate' }" class="b2b-btn-white">
+          <i class="fa-solid fa-paper-plane"></i> Demander une convention
+        </a>
+        <a routerLink="/b2b/login" class="b2b-btn-outline-white">
+          <i class="fa-solid fa-right-to-bracket"></i> Se connecter
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER B2B DÉDIÉ -->
+  <footer class="b2b-footer">
+    <div class="b2b-container b2b-footer-inner">
+      <div class="footer-brand">
+        <strong>Kiki Traiteur • B2B Pro</strong>
+        <span>Restauration d'Entreprise & Cantine Digitale • Depuis 1997</span>
+      </div>
+      <div class="footer-links">
+        <a routerLink="/b2b/login">Connexion Portails</a>
+        <a routerLink="/devis" [queryParams]="{ prestation: 'corporate' }">Devis Entreprise</a>
+        <a routerLink="/">Site Grand Public (B2C)</a>
+      </div>
+      <div class="footer-copy">
+        © 2026 Kiki Traiteur Sénégal • Hann Maristes, Dakar
+      </div>
+    </div>
+  </footer>
+
+</div>
+
