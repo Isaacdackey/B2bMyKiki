@@ -1374,8 +1374,6 @@
 }
 
 .b2b-spotlight-dot {
-  appearance: none;
-  -webkit-appearance: none;
   border: 1.5px solid #EDE7DC;
   background: #FAF8F4;
   color: #6E5A56;
@@ -1385,20 +1383,14 @@
   line-height: 1;
   width: 34px;
   height: 34px;
+  min-height: 0;
   padding: 0;
   flex-shrink: 0;
   border-radius: 9999px;
-  cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.b2b-spotlight-dot:hover {
-  border-color: #721513;
-  color: #721513;
-  transform: translateY(-1px);
 }
 
 .b2b-spotlight-dot.is-active {
@@ -1455,11 +1447,8 @@
 }
 
 .b2b-timeline-step {
-  appearance: none;
-  -webkit-appearance: none;
   width: 100%;
   text-align: left;
-  font-family: inherit;
   position: relative;
   display: grid;
   grid-template-columns: 44px 1fr;
@@ -1469,7 +1458,6 @@
   background: transparent;
   border: 0;
   border-radius: 24px;
-  cursor: pointer;
   transition: transform 0.3s var(--ease-premium);
 }
 
@@ -1521,8 +1509,7 @@
   color: #FAF5EA;
 }
 
-.b2b-timeline-step.is-active .b2b-step-node,
-.b2b-timeline-step:hover .b2b-step-node {
+.b2b-timeline-step.is-active .b2b-step-node {
   border-color: #E51D24;
   background: #E51D24;
   color: #FFFFFF;
@@ -1530,15 +1517,13 @@
   box-shadow: 0 0 0 6px rgba(229, 29, 36, 0.16);
 }
 
-.b2b-timeline-step.is-active .b2b-step-content,
-.b2b-timeline-step:hover .b2b-step-content {
+.b2b-timeline-step.is-active .b2b-step-content {
   border-color: #721513;
   box-shadow: 0 14px 28px rgba(114, 21, 19, 0.08);
   transform: translateX(4px);
 }
 
-.b2b-timeline-step.is-active .b2b-step-content h3,
-.b2b-timeline-step:hover .b2b-step-content h3 {
+.b2b-timeline-step.is-active .b2b-step-content h3 {
   color: #E51D24;
 }
 
@@ -1641,7 +1626,6 @@
 }
 
 .b2b-reveal.visible .offre-card:hover,
-.b2b-reveal.visible .b2b-timeline-step:hover,
 .b2b-reveal.visible .b2b-timeline-step.is-active,
 .b2b-reveal.visible .portail-card:hover {
   transition-delay: 0ms;
@@ -1768,6 +1752,8 @@ footer .footer-links a:hover {
   z-index: 10;
   width: 40px;
   height: 40px;
+  min-height: 0;
+  padding: 0;
   border-radius: 50%;
   background: #FFFFFF;
   border: 1.5px solid #EDE7DC;

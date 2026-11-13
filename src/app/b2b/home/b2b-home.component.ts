@@ -341,7 +341,7 @@ export class B2bHomeComponent implements AfterViewInit, OnDestroy {
             const pct = Math.min(Math.max(raw, 0.15), 1);
             timelineFill.style.transform = `scaleY(${pct})`;
 
-            const stepIdx = pct < 0.34 ? 0 : pct < 0.58 ? 1 : pct < 0.82 ? 2 : 3;
+            const stepIdx = pct < 0.33 ? 0 : pct < 0.56 ? 1 : pct < 0.78 ? 2 : 3;
             if (stepIdx !== this.activeStepIndex()) {
               this.ngZone.run(() => this.activeStepIndex.set(stepIdx));
             }
@@ -452,10 +452,6 @@ export class B2bHomeComponent implements AfterViewInit, OnDestroy {
         this.cursorMode.set(mode);
       });
     }
-  }
-
-  activerEtape(index: number): void {
-    this.activeStepIndex.set(index);
   }
 
   toggleFaq(index: number): void {

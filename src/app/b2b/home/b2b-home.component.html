@@ -318,15 +318,12 @@
           <div class="b2b-workflow-spotlight">
             <div class="b2b-spotlight-head">
               <span class="b2b-spotlight-badge">Étape {{ etapesFlux[activeStepIndex()].numero }} / 04</span>
-              <div class="b2b-spotlight-pills" aria-label="Sélectionner une étape">
+              <div class="b2b-spotlight-pills" aria-hidden="true">
                 @for (etape of etapesFlux; track etape.numero; let idx = $index) {
-                  <button type="button"
-                          class="b2b-spotlight-dot"
-                          [class.is-active]="activeStepIndex() === idx"
-                          (click)="activerEtape(idx)"
-                          [attr.aria-label]="'Étape ' + etape.numero">
+                  <span class="b2b-spotlight-dot"
+                        [class.is-active]="activeStepIndex() === idx">
                     {{ etape.numero }}
-                  </button>
+                  </span>
                 }
               </div>
             </div>
@@ -335,7 +332,7 @@
           </div>
         </div>
 
-        <!-- Colonne droite : Timeline verticale connectée -->
+        <!-- Colonne droite : Timeline verticale connectée au scroll -->
         <div class="b2b-workflow-timeline b2b-reveal">
           <div class="b2b-timeline-rail" aria-hidden="true">
             <div class="b2b-timeline-fill"></div>
@@ -343,19 +340,16 @@
 
           <div class="b2b-timeline-steps">
             @for (etape of etapesFlux; track etape.numero; let idx = $index) {
-              <button type="button"
-                      class="b2b-timeline-step"
-                      [class.is-reached]="idx <= activeStepIndex()"
-                      [class.is-active]="activeStepIndex() === idx"
-                      [style.--stagger]="idx"
-                      (mouseenter)="activerEtape(idx)"
-                      (click)="activerEtape(idx)">
+              <article class="b2b-timeline-step"
+                       [class.is-reached]="idx <= activeStepIndex()"
+                       [class.is-active]="activeStepIndex() === idx"
+                       [style.--stagger]="idx">
                 <span class="b2b-step-node" aria-hidden="true">{{ etape.numero }}</span>
                 <div class="b2b-step-content">
                   <h3>{{ etape.titre }}</h3>
                   <p>{{ etape.texte }}</p>
                 </div>
-              </button>
+              </article>
             }
           </div>
         </div>
