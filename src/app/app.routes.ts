@@ -71,7 +71,16 @@ export const routes: Routes = [
   { path: 'admin', redirectTo: 'gestionnaire', pathMatch: 'full' },
 
   // =============================================
-  // SITE PUBLIC VITRINE (AVEC TOPBAR, HEADER, MENU BURGER ET FOOTER)
+  // =============================================
+  // PAGE D'ACCUEIL PRINCIPALE B2B (PAR DÉFAUT SUR /)
+  // =============================================
+  {
+    path: '',
+    pathMatch: 'full',
+    loadComponent: () => import('./b2b/home/b2b-home.component').then(m => m.B2bHomeComponent)
+  },
+
+  // SITE PUBLIC VITRINE (AUTRES PAGES : /prestations, /devis, /contact...)
   // =============================================
   {
     path: '',
