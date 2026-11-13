@@ -32,9 +32,39 @@
       </a>
 
       <div class="b2b-nav" role="navigation" [class.open]="menuMobileOuvert()">
-        <a href="#offres-b2b" (click)="menuMobileOuvert.set(false)">Nos Offres</a>
-        <a href="#fonctionnement-b2b" (click)="menuMobileOuvert.set(false)">Fonctionnement</a>
-        <a href="#portails-b2b" (click)="menuMobileOuvert.set(false)">Portails Métiers</a>
+        <!-- En-tête du panneau mobile plein écran -->
+        <div class="b2b-mobile-menu-header">
+          <a routerLink="/b2b" class="b2b-brand" (click)="menuMobileOuvert.set(false)">
+            <img src="assets/images/logo.png"
+                 alt="Kiki Traiteur B2B"
+                 onerror="this.src='assets/images/KIKI TRAITEUR Logo Picto Rouge bordeau.png'">
+            <div class="b2b-brand-text">
+              <span class="b2b-brand-name">Kiki Traiteur</span>
+              <span class="b2b-brand-badge">B2B PRO</span>
+            </div>
+          </a>
+          <button type="button" class="b2b-mobile-close" (click)="menuMobileOuvert.set(false)" aria-label="Fermer le menu">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Liens centrés -->
+        <div class="b2b-nav-links-wrap">
+          <a routerLink="/b2b" class="b2b-nav-active-mobile" (click)="menuMobileOuvert.set(false)">Accueil B2B</a>
+          <a href="#offres-b2b" (click)="menuMobileOuvert.set(false)">Nos Offres</a>
+          <a href="#fonctionnement-b2b" (click)="menuMobileOuvert.set(false)">Fonctionnement</a>
+          <a href="#portails-b2b" (click)="menuMobileOuvert.set(false)">Portails Métiers</a>
+        </div>
+
+        <!-- Boutons pilules pleine largeur (mobile uniquement) -->
+        <div class="b2b-mobile-menu-actions">
+          <a href="#portails-b2b" class="b2b-mobile-pill-outline" (click)="menuMobileOuvert.set(false)">
+            <i class="fa-solid fa-layer-group"></i> EXPLORER LES PORTAILS
+          </a>
+          <a routerLink="/b2b/login" class="b2b-mobile-pill-primary" (click)="menuMobileOuvert.set(false)">
+            <i class="fa-solid fa-right-to-bracket"></i> CONNEXION ESPACE B2B
+          </a>
+        </div>
       </div>
 
       <div class="b2b-header-actions">
