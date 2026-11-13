@@ -769,6 +769,9 @@
     padding: 0.5rem 0.9rem;
     font-size: 0.8rem;
   }
+  .b2b-hero-cta {
+    justify-content: center;
+  }
 }
 
 @media (max-width: 640px) {
