@@ -607,7 +607,7 @@
 /* ==========================================================
    BREAKPOINT RESPONSIVE UNIFIÉ MOBILE-FIRST (< 1024px)
    ========================================================== */
-@media (max-width: 1023px) {
+@media (max-width: 767px) {
   .desktop-only {
     display: none !important;
   }

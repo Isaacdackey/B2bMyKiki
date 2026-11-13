@@ -171,7 +171,7 @@
 }
 
 .b2b-burger {
-  display: none;
+  display: none !important;
   background: #FAF5EA;
   border: 1.5px solid #EDE7DC;
   color: #721513;
@@ -748,8 +748,20 @@
   .hidden-sm {
     display: none;
   }
+  .offres-grid,
+  .steps-grid,
+  .portails-grid {
+    grid-template-columns: 1fr;
+  }
+  .b2b-btn-login {
+    padding: 0.5rem 0.9rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 640px) {
   .b2b-burger {
-    display: inline-flex;
+    display: inline-flex !important;
     align-items: center;
     justify-content: center;
   }
@@ -768,15 +780,6 @@
   }
   .b2b-nav.open {
     display: flex;
-  }
-  .offres-grid,
-  .steps-grid,
-  .portails-grid {
-    grid-template-columns: 1fr;
-  }
-  .b2b-btn-login {
-    padding: 0.5rem 0.9rem;
-    font-size: 0.8rem;
   }
 }
 
