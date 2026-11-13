@@ -35,7 +35,6 @@
         <a href="#offres-b2b" (click)="menuMobileOuvert.set(false)">Nos Offres</a>
         <a href="#fonctionnement-b2b" (click)="menuMobileOuvert.set(false)">Fonctionnement</a>
         <a href="#portails-b2b" (click)="menuMobileOuvert.set(false)">Portails Métiers</a>
-        <a routerLink="/devis" [queryParams]="{ prestation: 'corporate' }" (click)="menuMobileOuvert.set(false)">Demander un Devis</a>
       </nav>
 
       <div class="b2b-header-actions">
@@ -69,8 +68,8 @@
           <a routerLink="/b2b/login" class="b2b-btn-primary">
             <i class="fa-solid fa-unlock-keyhole"></i> Accéder à mon Espace B2B
           </a>
-          <a routerLink="/devis" [queryParams]="{ prestation: 'corporate' }" class="b2b-btn-outline">
-            <i class="fa-solid fa-file-signature"></i> Conventionner mon Entreprise
+          <a href="#portails-b2b" class="b2b-btn-outline">
+            <i class="fa-solid fa-layer-group"></i> Explorer les Portails
           </a>
         </div>
 
@@ -224,11 +223,8 @@
         <p>Démarrez votre convention cantine Kiki Traiteur à Dakar et Diamniadio en moins de 48h.</p>
       </div>
       <div class="b2b-cta-actions">
-        <a routerLink="/devis" [queryParams]="{ prestation: 'corporate' }" class="b2b-btn-white">
-          <i class="fa-solid fa-paper-plane"></i> Demander une convention
-        </a>
-        <a routerLink="/b2b/login" class="b2b-btn-outline-white">
-          <i class="fa-solid fa-right-to-bracket"></i> Se connecter
+        <a routerLink="/b2b/login" class="b2b-btn-white">
+          <i class="fa-solid fa-right-to-bracket"></i> Se connecter à mon espace
         </a>
       </div>
     </div>
