@@ -1,9 +1,0 @@
-<div class="toast-container" *ngIf="toastService.toasts().length > 0" aria-live="polite" aria-atomic="true">
-      <div *ngFor="let toast of toastService.toasts()"
-           class="toast-msg"
-           [class.error]="toast.isError"
-           [class.show]="toast.visible"
-           role="status">
-        <span>{{ toast.message }}</span>
-      </div>
-    </div>
