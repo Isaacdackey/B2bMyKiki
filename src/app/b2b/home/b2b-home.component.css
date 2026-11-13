@@ -467,6 +467,7 @@
 /* SECTIONS COMMUNES */
 .b2b-section {
   padding: clamp(2.75rem, 5vw, 4.25rem) 0;
+  scroll-margin-top: 80px;
 }
 
 .b2b-section-light {

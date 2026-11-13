@@ -50,15 +50,15 @@
 
         <!-- Liens centrés -->
         <div class="b2b-nav-links-wrap">
-          <a routerLink="/b2b" class="b2b-nav-active-mobile" (click)="menuMobileOuvert.set(false)">Accueil B2B</a>
-          <a href="#offres-b2b" (click)="menuMobileOuvert.set(false)">Nos Offres</a>
-          <a href="#fonctionnement-b2b" (click)="menuMobileOuvert.set(false)">Fonctionnement</a>
-          <a href="#portails-b2b" (click)="menuMobileOuvert.set(false)">Portails Métiers</a>
+          <a href="#top" class="b2b-nav-active-mobile" (click)="allerHaut($event)">Accueil B2B</a>
+          <a href="#offres-b2b" (click)="allerVersSection('offres-b2b', $event)">Nos Offres</a>
+          <a href="#fonctionnement-b2b" (click)="allerVersSection('fonctionnement-b2b', $event)">Fonctionnement</a>
+          <a href="#portails-b2b" (click)="allerVersSection('portails-b2b', $event)">Portails Métiers</a>
         </div>
 
         <!-- Boutons pilules pleine largeur (mobile uniquement) -->
         <div class="b2b-mobile-menu-actions">
-          <a href="#portails-b2b" class="b2b-mobile-pill-outline" (click)="menuMobileOuvert.set(false)">
+          <a href="#portails-b2b" class="b2b-mobile-pill-outline" (click)="allerVersSection('portails-b2b', $event)">
             <i class="fa-solid fa-layer-group"></i> EXPLORER LES PORTAILS
           </a>
           <a routerLink="/b2b/login" class="b2b-mobile-pill-primary" (click)="menuMobileOuvert.set(false)">
@@ -98,7 +98,7 @@
           <a routerLink="/b2b/login" class="b2b-btn-primary">
             <i class="fa-solid fa-unlock-keyhole"></i> Accéder à mon Espace B2B
           </a>
-          <a href="#portails-b2b" class="b2b-btn-outline">
+          <a href="#portails-b2b" class="b2b-btn-outline" (click)="allerVersSection('portails-b2b', $event)">
             <i class="fa-solid fa-layer-group"></i> Explorer les Portails
           </a>
         </div>
@@ -276,22 +276,22 @@
         </div>
       </div>
       <div class="footer-col">
-        <h4>Navigation</h4>
+        <h4>Navigation B2B</h4>
         <ul class="footer-links">
-          <li><a routerLink="/">Accueil</a></li>
-          <li><a routerLink="/a-propos">À propos</a></li>
-          <li><a routerLink="/prestations">Prestations</a></li>
-          <li><a routerLink="/realisations">Réalisations</a></li>
-          <li><a routerLink="/contact">Contact</a></li>
+          <li><a href="#top" (click)="allerHaut($event)">Accueil B2B</a></li>
+          <li><a href="#offres-b2b" (click)="allerVersSection('offres-b2b', $event)">Nos Offres</a></li>
+          <li><a href="#fonctionnement-b2b" (click)="allerVersSection('fonctionnement-b2b', $event)">Fonctionnement</a></li>
+          <li><a href="#portails-b2b" (click)="allerVersSection('portails-b2b', $event)">Portails Métiers</a></li>
+          <li><a routerLink="/b2b/login">Connexion Espace B2B</a></li>
         </ul>
       </div>
       <div class="footer-col">
-        <h4>Services</h4>
+        <h4>Portails &amp; Solutions</h4>
         <ul class="footer-links">
-          <li><a routerLink="/prestations" [queryParams]="{cat: 'corporate'}">Restauration d'Entreprise</a></li>
-          <li><a routerLink="/prestations" [queryParams]="{cat: 'events'}">Catering Événementiel</a></li>
-          <li><a routerLink="/prestations" [queryParams]="{cat: 'diva'}">Salle La Diva</a></li>
-          <li><a routerLink="/prestations" [queryParams]="{cat: 'decoration'}">Décoration de tables</a></li>
+          <li><a href="#" (click)="ouvrirPortailParRole('SALARIE_CONVENTIONNE', $event)">Espace Collaborateur</a></li>
+          <li><a href="#" (click)="ouvrirPortailParRole('RESPONSABLE_ENTREPRISE', $event)">Portail RH &amp; Entreprise</a></li>
+          <li><a href="#" (click)="ouvrirPortailParRole('RESPONSABLE_SITE_KIKI', $event)">Responsable de Site</a></li>
+          <li><a href="#" (click)="ouvrirPortailParRole('SUPER_ADMIN', $event)">Super Admin Kiki</a></li>
         </ul>
       </div>
       <div class="footer-col">

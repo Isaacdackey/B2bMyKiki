@@ -129,6 +129,33 @@ export class B2bHomeComponent {
     this.menuMobileOuvert.update(v => !v);
   }
 
+  allerHaut(event?: Event) {
+    if (event) event.preventDefault();
+    this.menuMobileOuvert.set(false);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  allerVersSection(sectionId: string, event?: Event) {
+    if (event) event.preventDefault();
+    this.menuMobileOuvert.set(false);
+    if (typeof document !== 'undefined') {
+      const el = document.getElementById(sectionId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  }
+
+  ouvrirPortailParRole(role: UserRoleB2B, event?: Event) {
+    if (event) event.preventDefault();
+    const portail = this.portails.find(p => p.role === role);
+    if (portail) {
+      this.ouvrirPortail(portail);
+    }
+  }
+
   ouvrirPortail(p: PortailCarte) {
     if (p.role === 'SUPER_ADMIN') {
       this.b2b.superAdminActiveSection.set('DASHBOARD');
