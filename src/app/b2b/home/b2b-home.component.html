@@ -31,11 +31,11 @@
         </div>
       </a>
 
-      <nav class="b2b-nav" [class.open]="menuMobileOuvert()">
+      <div class="b2b-nav" role="navigation" [class.open]="menuMobileOuvert()">
         <a href="#offres-b2b" (click)="menuMobileOuvert.set(false)">Nos Offres</a>
         <a href="#fonctionnement-b2b" (click)="menuMobileOuvert.set(false)">Fonctionnement</a>
         <a href="#portails-b2b" (click)="menuMobileOuvert.set(false)">Portails Métiers</a>
-      </nav>
+      </div>
 
       <div class="b2b-header-actions">
         <a routerLink="/b2b/login" class="b2b-btn-login">
