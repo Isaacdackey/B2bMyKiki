@@ -942,3 +942,144 @@
   }
 }
 
+/* ==========================================================
+   MOTION DESIGN INSPIRÉ DE KIKI TRAITEUR
+   ========================================================== */
+@keyframes b2bFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes b2bFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes b2bMarquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.b2b-hero-content {
+  animation: b2bFadeUp 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.b2b-hero-visual {
+  animation: b2bFadeUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.14s both;
+}
+
+.b2b-preview-card {
+  animation: b2bFloat 5.5s ease-in-out infinite;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.b2b-preview-card:hover {
+  animation-play-state: paused;
+  box-shadow: 0 26px 55px rgba(114, 21, 19, 0.12);
+}
+
+/* Ruban défilant bordeaux style Kiki Traiteur */
+.b2b-marquee-bar {
+  background: #721513;
+  color: #FAF5EA;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 0.85rem 0;
+  border-top: 1px solid rgba(230, 218, 186, 0.2);
+  border-bottom: 1px solid rgba(230, 218, 186, 0.2);
+}
+
+.b2b-marquee-track {
+  display: inline-flex;
+  align-items: center;
+  gap: 2.75rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  animation: b2bMarquee 28s linear infinite;
+}
+
+.b2b-marquee-bar:hover .b2b-marquee-track {
+  animation-play-state: paused;
+}
+
+.b2b-marquee-track span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.b2b-marquee-track i {
+  font-size: 0.38rem;
+  color: #E51D24;
+}
+
+/* Révélation au scroll */
+.b2b-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.b2b-reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Micro-interactions sur les cartes & boutons */
+.offre-icon,
+.portail-icon {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.offre-card:hover .offre-icon,
+.portail-card:hover .portail-icon {
+  transform: scale(1.08) rotate(-3deg);
+}
+
+.step-card {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.step-card:hover {
+  transform: translateY(-4px);
+  border-color: #C5A880;
+  box-shadow: 0 12px 26px rgba(114, 21, 19, 0.06);
+}
+
+.portail-cta i {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.portail-card:hover .portail-cta i {
+  transform: translateX(5px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .b2b-hero-content,
+  .b2b-hero-visual,
+  .b2b-preview-card,
+  .b2b-marquee-track {
+    animation: none !important;
+  }
+  .b2b-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+

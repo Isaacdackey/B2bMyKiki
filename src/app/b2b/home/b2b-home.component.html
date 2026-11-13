@@ -168,16 +168,36 @@
     </div>
   </section>
 
+  <!-- RUBAN DÉFILANT B2B (STYLE MARQUEE KIKI TRAITEUR) -->
+  <div class="b2b-marquee-bar" aria-hidden="true">
+    <div class="b2b-marquee-track">
+      <span><i class="fa-solid fa-circle"></i> CUISINE &amp; SERVICE SUR PLACE</span>
+      <span><i class="fa-solid fa-circle"></i> SERVICE EN RÉFECTOIRE</span>
+      <span><i class="fa-solid fa-circle"></i> LIVRAISON EN BARQUETTES</span>
+      <span><i class="fa-solid fa-circle"></i> SUBVENTIONS RH 0% À 100%</span>
+      <span><i class="fa-solid fa-circle"></i> POINTAGE QR CODE CANTINE</span>
+      <span><i class="fa-solid fa-circle"></i> PAIEMENT WAVE INTÉGRÉ</span>
+      <span><i class="fa-solid fa-circle"></i> FACTURATION CONSOLIDÉE</span>
+      <span><i class="fa-solid fa-circle"></i> CUISINE &amp; SERVICE SUR PLACE</span>
+      <span><i class="fa-solid fa-circle"></i> SERVICE EN RÉFECTOIRE</span>
+      <span><i class="fa-solid fa-circle"></i> LIVRAISON EN BARQUETTES</span>
+      <span><i class="fa-solid fa-circle"></i> SUBVENTIONS RH 0% À 100%</span>
+      <span><i class="fa-solid fa-circle"></i> POINTAGE QR CODE CANTINE</span>
+      <span><i class="fa-solid fa-circle"></i> PAIEMENT WAVE INTÉGRÉ</span>
+      <span><i class="fa-solid fa-circle"></i> FACTURATION CONSOLIDÉE</span>
+    </div>
+  </div>
+
   <!-- SECTION 1 : LES 3 MODES DE PRESTATION B2B -->
   <section id="offres-b2b" class="b2b-section b2b-section-light">
     <div class="b2b-container">
-      <div class="section-head">
+      <div class="section-head b2b-reveal">
         <span class="section-tag">NOS MODES D'EXPLOITATION</span>
         <h2>Trois solutions adaptées à vos locaux</h2>
         <p>Chaque entreprise choisit son mode de prestation et la composition autorisée (Entrée, Plat chaud, Dessert, Boisson).</p>
       </div>
 
-      <div class="offres-grid">
+      <div class="offres-grid b2b-reveal">
         @for (offre of prestationsB2B; track offre.titre) {
           <article class="offre-card">
             <div class="offre-icon">
@@ -195,13 +215,13 @@
   <!-- SECTION 2 : FONCTIONNEMENT EN 4 ÉTAPES -->
   <section id="fonctionnement-b2b" class="b2b-section">
     <div class="b2b-container">
-      <div class="section-head">
+      <div class="section-head b2b-reveal">
         <span class="section-tag">ZÉRO PAPIER • ZÉRO ERREUR</span>
         <h2>Un workflow conçu pour les RH et les salariés</h2>
         <p>De la planification hebdomadaire des menus jusqu'au rapprochement comptable en fin de mois.</p>
       </div>
 
-      <div class="steps-grid">
+      <div class="steps-grid b2b-reveal">
         @for (etape of etapesFlux; track etape.numero) {
           <div class="step-card">
             <div class="step-num">{{ etape.numero }}</div>
@@ -216,13 +236,13 @@
   <!-- SECTION 3 : ACCÈS DIRECT AUX 4 PORTAILS MÉTIERS -->
   <section id="portails-b2b" class="b2b-section b2b-section-sand">
     <div class="b2b-container">
-      <div class="section-head">
+      <div class="section-head b2b-reveal">
         <span class="section-tag">ESPACES ÉTANCHES PAR RÔLE</span>
         <h2>Accédez directement à votre portail</h2>
         <p>Chaque acteur dispose d'une interface dédiée. Sélectionnez un profil pour ouvrir son espace.</p>
       </div>
 
-      <div class="portails-grid">
+      <div class="portails-grid b2b-reveal">
         @for (p of portails; track p.role) {
           <button type="button" class="portail-card" (click)="ouvrirPortail(p)">
             <div class="portail-top">

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { B2bStateService } from '../shared/b2b-state.service';
@@ -24,9 +24,11 @@ interface PortailCarte {
   templateUrl: './b2b-home.component.html',
   styleUrls: ['./b2b-home.component.css']
 })
-export class B2bHomeComponent {
+export class B2bHomeComponent implements AfterViewInit, OnDestroy {
   b2b = inject(B2bStateService);
   private router = inject(Router);
+  private el = inject(ElementRef);
+  private observer?: IntersectionObserver;
 
   menuMobileOuvert = signal(false);
 
@@ -124,6 +126,31 @@ export class B2bHomeComponent {
       entiteDemo: 'Kiki Traiteur Siège'
     }
   ];
+
+  ngAfterViewInit(): void {
+    if (typeof window === 'undefined') return;
+    const targets = this.el.nativeElement.querySelectorAll('.b2b-reveal');
+    if (!('IntersectionObserver' in window)) {
+      targets.forEach((t: Element) => t.classList.add('visible'));
+      return;
+    }
+    this.observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            this.observer?.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+    targets.forEach((t: Element) => this.observer?.observe(t));
+  }
+
+  ngOnDestroy(): void {
+    this.observer?.disconnect();
+  }
 
   toggleMenuMobile() {
     this.menuMobileOuvert.update(v => !v);
