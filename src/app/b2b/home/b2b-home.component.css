@@ -145,15 +145,35 @@
 }
 
 .b2b-nav-links-wrap a {
+  position: relative;
   color: #332724;
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 700;
-  transition: color 0.2s;
+  padding: 0.25rem 0;
+  transition: color 0.2s ease;
+}
+
+.b2b-nav-links-wrap a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: #E51D24;
+  border-radius: 9999px;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .b2b-nav-links-wrap a:hover {
   color: #721513;
+}
+
+.b2b-nav-links-wrap a:hover::after {
+  transform: scaleX(1);
 }
 
 .b2b-header-actions {
