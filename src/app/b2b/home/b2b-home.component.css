@@ -640,12 +640,15 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.75rem;
+  width: 100%;
   margin-bottom: 1rem;
 }
 
 .portail-icon {
   width: 44px;
   height: 44px;
+  flex-shrink: 0;
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -1006,51 +1009,6 @@
   }
   100% {
     transform: scaleY(0);
-  }
-}
-
-/* 3. Curseur inertiel contextuel (Desktop pointer fine) */
-.b2b-cursor-dot,
-.b2b-cursor-ring {
-  position: fixed;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  z-index: 99999;
-  transition: opacity 0.2s ease, width 0.28s var(--ease-premium), height 0.28s var(--ease-premium), background-color 0.25s ease, border-color 0.25s ease;
-  will-change: transform;
-}
-
-.b2b-cursor-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #E51D24;
-}
-
-.b2b-cursor-ring {
-  width: 38px;
-  height: 38px;
-  border-radius: 9999px;
-  border: 1.5px solid rgba(114, 21, 19, 0.45);
-}
-
-.b2b-cursor-ring.is-pointer {
-  width: 18px;
-  height: 18px;
-  border-color: #E51D24;
-  background: rgba(229, 29, 36, 0.12);
-}
-
-.b2b-cursor-dot.is-hidden,
-.b2b-cursor-ring.is-hidden {
-  opacity: 0;
-}
-
-@media (hover: none), (pointer: coarse), (max-width: 1024px) {
-  .b2b-cursor-dot,
-  .b2b-cursor-ring {
-    display: none !important;
   }
 }
 
@@ -1631,7 +1589,7 @@
   transition-delay: 0ms;
 }
 
-/* 11. Footer Signature Filigrane & Bouton Haut de page */
+/* 11. Footer & Bouton Haut de page */
 footer {
   border-top: 4px solid #E51D24;
 }
@@ -1645,20 +1603,8 @@ footer .footer-links a:hover {
   transform: translateX(6px);
 }
 
-.b2b-footer-signature {
-  font-size: clamp(2.8rem, 10.5vw, 8.8rem);
-  font-weight: 800;
-  letter-spacing: -0.055em;
-  line-height: 0.88;
-  text-align: center;
-  margin-top: 2rem;
-  margin-bottom: -0.5rem;
-  user-select: none;
-  pointer-events: none;
-  background: linear-gradient(180deg, rgba(250, 245, 234, 0.24) 15%, rgba(250, 245, 234, 0.03) 95%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+.footer-bottom {
+  border-top: none;
 }
 
 .b2b-back-top-btn {
@@ -2194,8 +2140,6 @@ footer .footer-links a:hover {
 /* 16. Respect des préférences d'accessibilité */
 @media (prefers-reduced-motion: reduce) {
   .b2b-page-curtain,
-  .b2b-cursor-dot,
-  .b2b-cursor-ring,
   .b2b-scroll-progress {
     display: none !important;
   }

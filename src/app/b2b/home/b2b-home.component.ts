@@ -32,7 +32,6 @@ export class B2bHomeComponent implements AfterViewInit, OnDestroy {
 
   private revealObserver?: IntersectionObserver;
   private counterObserver?: IntersectionObserver;
-  private rafId?: number;
   private autoScrollInterval?: ReturnType<typeof setInterval>;
   private cleanupListeners: Array<() => void> = [];
 
@@ -41,7 +40,6 @@ export class B2bHomeComponent implements AfterViewInit, OnDestroy {
   compteurSubvention = signal(0);
   compteurForfait = signal(0);
   compteurDelai = signal(0);
-  cursorMode = signal<'default' | 'pointer' | 'hidden'>('hidden');
   faqOuverte = signal<number | null>(0);
   legalModal = signal<'mentions' | 'confidentialite' | null>(null);
 
@@ -228,9 +226,6 @@ export class B2bHomeComponent implements AfterViewInit, OnDestroy {
     this.revealObserver?.disconnect();
     this.counterObserver?.disconnect();
     this.pauseAutoScroll();
-    if (this.rafId) {
-      cancelAnimationFrame(this.rafId);
-    }
     this.cleanupListeners.forEach(fn => fn());
   }
 
@@ -360,31 +355,9 @@ export class B2bHomeComponent implements AfterViewInit, OnDestroy {
     if (!isDesktopFinePointer) return;
 
     const rootEl = this.el.nativeElement;
-    const dot = rootEl.querySelector('.b2b-cursor-dot') as HTMLElement | null;
-    const ring = rootEl.querySelector('.b2b-cursor-ring') as HTMLElement | null;
-    if (!dot || !ring) return;
 
     this.ngZone.runOutsideAngular(() => {
-      let targetX = -100;
-      let targetY = -100;
-      let ringX = -100;
-      let ringY = -100;
-      let started = false;
-
       const onMouseMove = (e: MouseEvent) => {
-        targetX = e.clientX;
-        targetY = e.clientY;
-        dot.style.transform = `translate3d(${targetX}px, ${targetY}px, 0) translate(-50%, -50%)`;
-
-        if (!started) {
-          started = true;
-          ringX = targetX;
-          ringY = targetY;
-          this.ngZone.run(() => {
-            if (this.cursorMode() === 'hidden') this.cursorMode.set('default');
-          });
-        }
-
         // Spotlight sur cartes portails
         const target = e.target as HTMLElement | null;
         const portailCard = target?.closest('.portail-card') as HTMLElement | null;
@@ -393,17 +366,6 @@ export class B2bHomeComponent implements AfterViewInit, OnDestroy {
           portailCard.style.setProperty('--mx', `${e.clientX - rect.left}px`);
           portailCard.style.setProperty('--my', `${e.clientY - rect.top}px`);
         }
-
-        // Détection contextuelle du curseur
-        if (target?.closest('a, button')) {
-          this.setCursorState('pointer');
-        } else {
-          this.setCursorState('default');
-        }
-      };
-
-      const onMouseLeaveWindow = () => {
-        this.setCursorState('hidden');
       };
 
       // Effet magnétique sur boutons principaux
@@ -428,30 +390,12 @@ export class B2bHomeComponent implements AfterViewInit, OnDestroy {
         });
       });
 
-      const loop = () => {
-        ringX += (targetX - ringX) * 0.16;
-        ringY += (targetY - ringY) * 0.16;
-        ring.style.transform = `translate3d(${ringX.toFixed(2)}px, ${ringY.toFixed(2)}px, 0) translate(-50%, -50%)`;
-        this.rafId = requestAnimationFrame(loop);
-      };
-      this.rafId = requestAnimationFrame(loop);
-
       window.addEventListener('mousemove', onMouseMove, { passive: true });
-      document.addEventListener('mouseleave', onMouseLeaveWindow);
 
       this.cleanupListeners.push(() => {
         window.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseleave', onMouseLeaveWindow);
       });
     });
-  }
-
-  private setCursorState(mode: 'default' | 'pointer' | 'hidden'): void {
-    if (this.cursorMode() !== mode) {
-      this.ngZone.run(() => {
-        this.cursorMode.set(mode);
-      });
-    }
   }
 
   toggleFaq(index: number): void {
