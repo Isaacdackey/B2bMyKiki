@@ -67,6 +67,27 @@
 html {
   scroll-behavior: smooth;
   box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: #E51D24 #FAF8F4;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FAF8F4;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #E51D24;
+  border-radius: 9999px;
+  border: 2px solid #FAF8F4;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #721513;
 }
 
 *, *::before, *::after {
