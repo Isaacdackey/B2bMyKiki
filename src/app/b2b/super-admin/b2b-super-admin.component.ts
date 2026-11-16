@@ -876,6 +876,74 @@ export class B2bSuperAdminComponent {
 
   // PROGRAMMATION GLOBALE & DÉPLOIEMENT VERS TOUTES LES ENTREPRISES
   jourPlanningGlobalActif = signal<'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche'>('Lundi');
+  modeVuePlanning = signal<'semaine' | 'calendrier'>('semaine');
+  moisCalendrierActif = signal<Date>(new Date());
+  dateCalendrierSelectionnee = signal<string>(new Date().toISOString().slice(0, 10));
+
+  private readonly joursSemaineNoms: Array<'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche'> = [
+    'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'
+  ];
+
+  moisCalendrierLabel = computed(() => {
+    const d = this.moisCalendrierActif();
+    return d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+  });
+
+  joursCalendrierMois = computed(() => {
+    const ref = this.moisCalendrierActif();
+    const year = ref.getFullYear();
+    const month = ref.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const startOffset = (firstDay.getDay() + 6) % 7; // Lundi = 0 ... Dimanche = 6
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const todayIso = new Date().toISOString().slice(0, 10);
+    const menus = this.b2b.menusPlanifiesEntreprises();
+
+    const cells: Array<{
+      dateNum: number;
+      dateIso: string;
+      inMonth: boolean;
+      isToday: boolean;
+      jourNom: 'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche';
+      nbMets: number;
+    }> = [];
+
+    const totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
+    for (let i = 0; i < totalCells; i++) {
+      const cellDate = new Date(year, month, 1 - startOffset + i);
+      const iso = `${cellDate.getFullYear()}-${String(cellDate.getMonth() + 1).padStart(2, '0')}-${String(cellDate.getDate()).padStart(2, '0')}`;
+      const dayIdx = (cellDate.getDay() + 6) % 7;
+      const jourNom = this.joursSemaineNoms[dayIdx];
+      const nbMets = menus.find(m => (m.entrepriseId === 'ent-001' || m.entrepriseId === 'GLOBAL') && m.jourNom === jourNom)?.lignes?.length || 0;
+      cells.push({
+        dateNum: cellDate.getDate(),
+        dateIso: iso,
+        inMonth: cellDate.getMonth() === month,
+        isToday: iso === todayIso,
+        jourNom,
+        nbMets
+      });
+    }
+    return cells;
+  });
+
+  changerMoisCalendrier(delta: number): void {
+    const cur = this.moisCalendrierActif();
+    this.moisCalendrierActif.set(new Date(cur.getFullYear(), cur.getMonth() + delta, 1));
+  }
+
+  selectionnerDateCalendrier(cell: {
+    dateIso: string;
+    inMonth: boolean;
+    jourNom: 'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche';
+  }): void {
+    this.dateCalendrierSelectionnee.set(cell.dateIso);
+    this.jourPlanningGlobalActif.set(cell.jourNom);
+    if (!cell.inMonth) {
+      const [y, m] = cell.dateIso.split('-').map(Number);
+      this.moisCalendrierActif.set(new Date(y, m - 1, 1));
+    }
+  }
   modalAjouterPlatAuJourGlobal = signal<boolean>(false);
   categoriePlatAAjouter = signal<'ENTREE' | 'PLAT' | 'DESSERT' | 'BOISSON'>('PLAT');
 

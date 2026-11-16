@@ -234,7 +234,7 @@
               <i class="fa-solid fa-list-check"></i> File des commandes du jour (Distribution Réfectoire)
             </span>
             <span style="font-size: 0.75rem; color: #6E5A56;">
-              Règle : l'employé scanne le QR code cantine $\rightarrow$ Statut passe à « Scanné » $\rightarrow$ Vous pouvez cliquer sur « Marquer Livré ».
+              Règle : l'employé scanne le QR code cantine → Statut passe à « Scanné » → Vous pouvez cliquer sur « Marquer Livré ».
             </span>
           </div>
 
@@ -287,7 +287,7 @@
                       <button 
                         type="button" 
                         (click)="simulerScanEmploye(cmd.id)"
-                        style="background: #EFF6FF; color: #1D4ED8; border: 1.5px solid #93C5FD; border-radius: 8px; padding: 0.45rem 0.85rem; font-size: 0.78rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; margin: 0 auto;">
+                        style="min-height: 0; background: #EFF6FF; color: #1D4ED8; border: 1.5px solid #93C5FD; border-radius: 8px; padding: 0.36rem 0.75rem; font-size: 0.74rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap; margin: 0 auto;">
                         <i class="fa-solid fa-qrcode"></i> Valider Scan
                       </button>
                     } @else if (cmd.statut === 'SCANNE') {
@@ -295,7 +295,7 @@
                       <button 
                         type="button" 
                         (click)="marquerLivre(cmd.id)"
-                        style="background: #606C38; color: #FFFFFF; border: none; border-radius: 8px; padding: 0.45rem 0.95rem; font-size: 0.78rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 2px 8px rgba(96, 108, 56, 0.3); margin: 0 auto;">
+                        style="min-height: 0; background: #606C38; color: #FFFFFF; border: none; border-radius: 8px; padding: 0.38rem 0.85rem; font-size: 0.74rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap; box-shadow: 0 2px 8px rgba(96, 108, 56, 0.25); margin: 0 auto;">
                         <i class="fa-solid fa-check"></i> Marquer Livré
                       </button>
                     } @else {
@@ -424,11 +424,11 @@
                   </td>
                   <td style="padding: 0.85rem 1.25rem; text-align: center;">
                     @if (rec.statut === 'DEBLOQUE') {
-                      <span style="background: rgba(96, 108, 56, 0.15); color: #606C38; font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #606C38; display: inline-flex; align-items: center; gap: 0.35rem;">
+                      <span style="background: rgba(96, 108, 56, 0.15); color: #606C38; font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #606C38; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
                         <i class="fa-solid fa-lock-open"></i> Débloqué ({{ rec.debloqueAt || '10:45' }})
                       </span>
                     } @else {
-                      <span style="background: #FEE2E2; color: #DC2626; font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #FCA5A5; display: inline-flex; align-items: center; gap: 0.35rem;">
+                      <span style="background: #FEE2E2; color: #DC2626; font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #FCA5A5; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
                         <i class="fa-solid fa-triangle-exclamation"></i> En attente
                       </span>
                     }

@@ -1274,12 +1274,37 @@ export class B2bStateService {
   }
 
   toggleStatutEmploye(empId: string) {
+    let updatedEmp: EmployeB2B | null = null;
     this.listeEmployes.update(list => list.map(emp => {
       if (emp.id === empId) {
-        return { ...emp, actif: !emp.actif };
+        const nextActif = !emp.actif;
+        if (!nextActif) {
+          const prevTaux = emp.tauxSubvention ?? 100;
+          updatedEmp = {
+            ...emp,
+            actif: false,
+            tauxSubvention: 0,
+            type: 'AUTONOME',
+            tauxSubventionPrecedent: prevTaux
+          } as EmployeB2B;
+        } else {
+          const savedTaux = (emp as EmployeB2B & { tauxSubventionPrecedent?: number }).tauxSubventionPrecedent;
+          const restoredTaux = savedTaux !== undefined ? savedTaux : (emp.tauxSubvention > 0 ? emp.tauxSubvention : 100);
+          updatedEmp = {
+            ...emp,
+            actif: true,
+            tauxSubvention: restoredTaux,
+            type: restoredTaux === 0 ? 'AUTONOME' : 'SUBVENTIONNE'
+          };
+        }
+        return updatedEmp;
       }
       return emp;
     }));
+
+    if (updatedEmp && this.currentEmploye().id === empId) {
+      this.currentEmploye.set(updatedEmp);
+    }
   }
 
   // ACTIONS EMPLOYÉ

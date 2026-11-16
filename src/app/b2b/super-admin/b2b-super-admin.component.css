@@ -1391,7 +1391,8 @@
   background: #EDE7DC;
 }
 
-.sa-modal-overlay {
+.sa-modal-overlay,
+.sa-modal-backdrop {
   position: fixed;
   inset: 0;
   background: rgba(51, 39, 36, 0.65);

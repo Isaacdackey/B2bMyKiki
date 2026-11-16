@@ -184,6 +184,9 @@ export class B2bLoginComponent {
 
     setTimeout(() => {
       this.loading.set(false);
+      if (p.role === 'RESPONSABLE_ENTREPRISE') {
+        this.b2b.rhActiveSection.set('STATISTIQUES');
+      }
       this.router.navigateByUrl(p.destinationUrl);
       if (typeof window !== 'undefined') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
