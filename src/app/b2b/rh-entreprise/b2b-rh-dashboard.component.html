@@ -498,10 +498,10 @@
             </thead>
             <tbody>
               @for (l of lignesFacturationFiltrees(); track l.date) {
-                <tr>
+                <tr (click)="facturationJourSelectionne.set(l)" style="cursor: pointer;" title="Cliquer pour voir le détail nominatif de la journée">
                   <td data-label="Date">
                     <div style="font-weight: 800; color: #332724;">{{ l.dateAffichee }}</div>
-                    <div style="font-size: 0.72rem; color: #6E5A56;">{{ l.date }}</div>
+                    <div style="font-size: 0.72rem; color: #6E5A56;">{{ l.date }} · <span style="color: #721513; font-weight: 700;">Voir détail →</span></div>
                   </td>
                   <td data-label="Plats livrés" style="font-weight: 800; color: #721513; font-size: 1rem;">
                     {{ l.nbPlatsLivres }} <span style="font-size: 0.78rem; font-weight: 600; color: #6E5A56;">repas</span>
@@ -549,6 +549,66 @@
             </tfoot>
           </table>
         </div>
+
+        <!-- MODALE DÉTAIL NOMINATIF D'UNE JOURNÉE DE FACTURATION -->
+        @if (facturationJourSelectionne(); as jour) {
+          <div style="position: fixed; inset: 0; background: rgba(51, 39, 36, 0.65); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1.25rem;"
+               (click)="facturationJourSelectionne.set(null)">
+            <div style="background: #FFFFFF; border-radius: 20px; max-width: 720px; width: 100%; max-height: 88dvh; overflow-y: auto; padding: 1.5rem; box-shadow: 0 20px 45px rgba(0, 0, 0, 0.2); border: 1.5px solid #EDE7DC;"
+                 (click)="$event.stopPropagation()">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div>
+                  <span style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">Détail journalier</span>
+                  <h3 style="margin: 0.15rem 0 0; font-size: 1.2rem; color: #721513; font-weight: 900;">
+                    {{ jour.dateAffichee }} ({{ jour.date }})
+                  </h3>
+                </div>
+                <button type="button" (click)="facturationJourSelectionne.set(null)" style="background: none; border: none; font-size: 1.2rem; color: #6E5A56; cursor: pointer; min-height: 0; padding: 0.25rem;">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+
+              <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                <span style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 10px; padding: 0.45rem 0.75rem; font-size: 0.78rem; font-weight: 800; color: #721513;">
+                  {{ jour.nbPlatsLivres }} repas livrés
+                </span>
+                <span style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 10px; padding: 0.45rem 0.75rem; font-size: 0.78rem; font-weight: 800; color: #332724;">
+                  Total : {{ (jour.montantTotal | number) }} FCFA
+                </span>
+                <span style="background: rgba(229, 29, 36, 0.08); border: 1px solid rgba(229, 29, 36, 0.2); border-radius: 10px; padding: 0.45rem 0.75rem; font-size: 0.78rem; font-weight: 800; color: #E51D24;">
+                  Part entreprise : {{ (jour.montantPartEntreprise | number) }} FCFA
+                </span>
+              </div>
+
+              @if (detailsCommandesJourSelectionne().length === 0) {
+                <div style="background: #FAF8F4; border: 1.5px dashed #EDE7DC; border-radius: 12px; padding: 1.5rem; text-align: center; color: #6E5A56; font-size: 0.85rem;">
+                  Aucun détail nominatif enregistré pour cette journée dans les données de démonstration.
+                </div>
+              } @else {
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
+                  <thead>
+                    <tr style="background: #FAF8F4; border-bottom: 1.5px solid #EDE7DC; text-align: left;">
+                      <th style="padding: 0.6rem;">Collaborateur</th>
+                      <th style="padding: 0.6rem;">Plat</th>
+                      <th style="padding: 0.6rem;">Taux (date T)</th>
+                      <th style="padding: 0.6rem;">Part Entreprise</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (c of detailsCommandesJourSelectionne(); track c.id) {
+                      <tr style="border-bottom: 1px solid #EDE7DC;">
+                        <td style="padding: 0.6rem;"><strong>{{ c.employeNom }}</strong><br><small style="color: #6E5A56;">{{ c.matricule }}</small></td>
+                        <td style="padding: 0.6rem; color: #332724;">{{ c.platNom }}</td>
+                        <td style="padding: 0.6rem; font-weight: 800; color: #606C38;">{{ c.tauxApplique }}%</td>
+                        <td style="padding: 0.6rem; font-weight: 800; color: #721513;">{{ (c.partEntreprise | number) }} FCFA</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              }
+            </div>
+          </div>
+        }
 
       </div>
     }

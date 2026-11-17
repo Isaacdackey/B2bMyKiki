@@ -234,7 +234,7 @@
               <i class="fa-solid fa-list-check"></i> File des commandes du jour (Distribution Réfectoire)
             </span>
             <span style="font-size: 0.75rem; color: #6E5A56;">
-              Règle : l'employé scanne le QR code cantine → Statut passe à « Scanné » → Vous pouvez cliquer sur « Marquer Livré ».
+              Règle : l'employé scanne le QR code cantine → Statut passe à « À livrer » → Vous pouvez cliquer sur « Marquer Livré ».
             </span>
           </div>
 
@@ -283,13 +283,9 @@
                   </td>
                   <td style="padding: 0.85rem 1.25rem; text-align: center;">
                     @if (cmd.statut === 'EN_COURS') {
-                      <!-- Simulation du scan employé si l'employé n'a pas son smartphone ou pour test -->
-                      <button 
-                        type="button" 
-                        (click)="simulerScanEmploye(cmd.id)"
-                        style="min-height: 0; background: #EFF6FF; color: #1D4ED8; border: 1.5px solid #93C5FD; border-radius: 8px; padding: 0.36rem 0.75rem; font-size: 0.74rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap; margin: 0 auto;">
-                        <i class="fa-solid fa-qrcode"></i> Valider Scan
-                      </button>
+                      <span style="background: rgba(51, 39, 36, 0.07); color: #6E5A56; border: 1px solid #EDE7DC; border-radius: 9999px; padding: 0.3rem 0.72rem; font-size: 0.72rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap; margin: 0 auto;">
+                        <i class="fa-solid fa-clock"></i> En attente de scan
+                      </span>
                     } @else if (cmd.statut === 'SCANNE') {
                       <!-- Bouton autorisant le Responsable à marquer livré -->
                       <button 

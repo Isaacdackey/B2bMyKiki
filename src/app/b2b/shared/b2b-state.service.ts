@@ -1142,6 +1142,10 @@ export class B2bStateService {
     { id: 'p2', nom: 'Capitaine Braisé & Riz Parfumé au Jasmin', description: 'Filet de poisson frais braisé au feu de bois, sauce moutarde oignon & piment', categorie: 'PLAT', prixUnitaire: 3200, image: '/assets/images/plats/p2.jpg', calories: 580, disponible: true },
     { id: 'p3', nom: 'Plat Équilibré : Pavé de Bœuf aux Herbes & Légumes Vapeur', description: 'Bœuf tendre du boucher, purée de patates douces et haricots persillés', categorie: 'PLAT', prixUnitaire: 3000, image: '/assets/images/plats/p3.jpg', calories: 520, disponible: true },
     { id: 'p4', nom: 'Thiéboudienne Penda Mbaye Royal (Riz Rouge)', description: 'Riz rouge traditionnel sénégalais mijoté aux légumes du terroir et poisson noble', categorie: 'PLAT', prixUnitaire: 2600, image: '/assets/images/plats/p4.jpg', calories: 610, disponible: true },
+    { id: 'g1', nom: 'Riz Parfumé au Jasmin', description: 'Riz blanc cuit à la vapeur, parfumé et léger', categorie: 'GARNITURE', prixUnitaire: 600, image: '/assets/images/plats/p1.jpg', calories: 220, disponible: true },
+    { id: 'g2', nom: 'Pommes de Terre Sautées aux Herbes', description: 'Pommes de terre dorées à l\'ail, persil frais et beurre doux', categorie: 'GARNITURE', prixUnitaire: 800, image: '/assets/images/plats/p3.jpg', calories: 260, disponible: true },
+    { id: 'g3', nom: 'Attiéké Frais de Saison', description: 'Semoule de manioc traditionnelle légère et parfumée', categorie: 'GARNITURE', prixUnitaire: 700, image: '/assets/images/plats/p2.jpg', calories: 240, disponible: true },
+    { id: 'g4', nom: 'Poêlée de Légumes Croquants', description: 'Carottes, haricots verts, courgettes sautées à l\'huile d\'olive', categorie: 'GARNITURE', prixUnitaire: 700, image: '/assets/images/plats/e1.jpg', calories: 140, disponible: true },
     { id: 'd1', nom: 'Coupe de Fruits Exotiques Frais', description: 'Mangue kent, ananas pain de sucre, papaye arrosée de citron vert', categorie: 'DESSERT', prixUnitaire: 800, image: '/assets/images/plats/d1.jpg', calories: 120, disponible: true },
     { id: 'd2', nom: 'Fondant au Chocolat Noir Intense & Cœur Coulant', description: 'Cacao noir pur d\'Afrique, crème anglaise vanillée', categorie: 'DESSERT', prixUnitaire: 1000, image: '/assets/images/plats/d2.jpg', calories: 340, disponible: true },
     { id: 'd3', nom: 'Yaourt Onctueux Fait Maison au Miel', description: 'Lait entier local et miel de fleurs de savane', categorie: 'DESSERT', prixUnitaire: 800, image: '/assets/images/plats/d3.jpg', calories: 160, disponible: true },
@@ -1317,6 +1321,7 @@ export class B2bStateService {
     switch (plat.categorie) {
       case 'ENTREE': sel.entree = plat; break;
       case 'PLAT': sel.plat = plat; break;
+      case 'GARNITURE': sel.garniture = plat; break;
       case 'DESSERT': sel.dessert = plat; break;
       case 'BOISSON': sel.boisson = plat; break;
     }
@@ -1328,6 +1333,7 @@ export class B2bStateService {
     switch (plat.categorie) {
       case 'ENTREE': if (sel.entree?.id === plat.id) sel.entree = undefined; break;
       case 'PLAT': if (sel.plat?.id === plat.id) sel.plat = undefined; break;
+      case 'GARNITURE': if (sel.garniture?.id === plat.id) sel.garniture = undefined; break;
       case 'DESSERT': if (sel.dessert?.id === plat.id) sel.dessert = undefined; break;
       case 'BOISSON': if (sel.boisson?.id === plat.id) sel.boisson = undefined; break;
     }

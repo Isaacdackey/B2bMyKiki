@@ -382,41 +382,6 @@
             </div>
           </div>
 
-          <!-- GRAPHE 4 : TOP PRODUITS (CLASSEMENT PAR QUANTITÉ VENDUE AVEC SURVOL DYNAMIQUE) -->
-          <div class="sa-chart-card">
-            <div class="sa-chart-header">
-              <div>
-                <h3 class="sa-chart-title">Top produits</h3>
-                <p class="sa-chart-subtitle">Spécialités les plus commandées par quantité vendue</p>
-              </div>
-              <div class="sa-chart-badge-icon gold">
-                <i class="fa-solid fa-trophy"></i>
-              </div>
-            </div>
-
-            <div class="sa-top-products-list" (mouseleave)="hoveredTopProdIndex.set(null)">
-              @for (prod of statsDashboard().topProduits; track prod.rang; let idx = $index) {
-                <div class="sa-top-prod-item"
-                     [class.is-hovered]="hoveredTopProdIndex() === idx"
-                     (mouseenter)="hoveredTopProdIndex.set(idx)">
-                  <div class="sa-top-prod-rank" [class.top3]="prod.rang <= 3">{{ prod.rang }}</div>
-                  <div class="sa-top-prod-body">
-                    <div class="sa-top-prod-head">
-                      <span class="sa-top-prod-name">{{ prod.nom }}</span>
-                      <div class="sa-top-prod-nums">
-                        <strong class="sa-top-prod-qty">{{ prod.qte }}</strong>
-                        <span class="sa-top-prod-ca">{{ (prod.ca | number) }} FCFA</span>
-                      </div>
-                    </div>
-                    <div class="sa-top-prod-track">
-                      <div class="sa-top-prod-fill" [style.width.%]="prod.pct"></div>
-                    </div>
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
-
         </div>
 
         <!-- LIGNE 3 : SYNTHÈSE RÉSEAU & DERNIÈRES COMMANDES EN TEMPS RÉEL -->
@@ -464,49 +429,6 @@
                   Planning <i class="fa-solid fa-arrow-right"></i>
                 </button>
               </div>
-            </div>
-          </div>
-
-          <!-- CARTE DROITE : DERNIÈRES COMMANDES (8 PLUS RÉCENTES) -->
-          <div class="sa-chart-card">
-            <div class="sa-chart-header">
-              <div>
-                <h3 class="sa-chart-title">Dernières commandes</h3>
-                <p class="sa-chart-subtitle">8 plus récentes sur l'ensemble des entreprises</p>
-              </div>
-              <div class="sa-chart-badge-icon green">
-                <i class="fa-solid fa-list-ul"></i>
-              </div>
-            </div>
-
-            <div class="sa-recent-orders-list">
-              @for (cmd of dernieresCommandesDashboard(); track cmd.code) {
-                <div class="sa-recent-order-row">
-                  <div class="sa-recent-order-left">
-                    <div class="sa-recent-order-code">
-                      <strong>{{ cmd.code }}</strong>
-                      <span class="sa-recent-order-slot">{{ cmd.creneau }}</span>
-                    </div>
-                    <div class="sa-recent-order-emp">
-                      <span class="sa-recent-order-name">{{ cmd.employe }}</span>
-                      <span class="sa-recent-order-time">{{ cmd.entreprise }} · {{ cmd.dateHeure }}</span>
-                    </div>
-                  </div>
-
-                  <div class="sa-recent-order-right">
-                    <span class="sa-order-status-pill"
-                          [class.paid]="cmd.statut === 'Livré'"
-                          [class.scanned]="cmd.statut === 'Scanné'"
-                          [class.pending]="cmd.statut === 'En cours'">
-                      {{ cmd.statut }}
-                    </span>
-                    <div class="sa-recent-order-price">
-                      <strong>{{ (cmd.montant | number) }} FCFA</strong>
-                      <i class="fa-solid fa-circle-check" style="color: #10B981; font-size: 0.78rem;"></i>
-                    </div>
-                  </div>
-                </div>
-              }
             </div>
           </div>
 
@@ -1959,98 +1881,6 @@
                   </button>
                 </div>
               }
-            </div>
-          }
-        </div>
-
-        <!-- SECTION SUPERVISION PAR SITE (POUR CONTRÔLE DÉTAILLÉ) -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
-          <div>
-            <h3 style="margin: 0; font-size: 1.2rem; color: #721513; font-weight: 800;">
-              Vue par Site Déployé & Contrôle Opérationnel
-            </h3>
-            <p style="margin: 0.2rem 0 0; font-size: 0.8rem; color: #6E5A56;">
-              Consultez les menus programmés site par site pour vérifier le dispatching et les portions.
-            </p>
-          </div>
-
-          <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 12px; padding: 0.35rem 0.75rem;">
-            <span style="font-size: 0.75rem; font-weight: 800; color: #721513; display: inline-flex; align-items: center; gap: 0.35rem;">
-              <i class="fa-solid fa-location-dot"></i> Filtrer par Site :
-            </span>
-            <select 
-              [ngModel]="filtreSitePlanning()"
-              (ngModelChange)="filtreSitePlanning.set($event)"
-              style="background: transparent; border: none; font-size: 0.82rem; font-weight: 700; color: #332724; cursor: pointer; outline: none;">
-              <option value="TOUS">Tous les sites (Vue consolidée)</option>
-              @for (s of tousLesSites(); track s.id) {
-                <option [value]="s.id">{{ s.entrepriseNom }} • {{ s.nom }}</option>
-              }
-            </select>
-          </div>
-        </div>
-
-        <!-- GRILLE DES MENUS PLANIFIÉS PAR SITE -->
-        <div class="sa-planning-grid">
-          @for (item of planningFiltreParSite(); track item.id) {
-            <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.25rem; box-shadow: 0 4px 18px rgba(114, 21, 19, 0.04); display: flex; flex-direction: column; justify-content: space-between;">
-              <div>
-                <!-- En-tête jour & badge site -->
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
-                  <strong style="color: #721513; font-size: 1rem;">{{ item.jour }}</strong>
-                  <span style="font-size: 0.75rem; color: #6E5A56; background: #FAF8F4; border: 1px solid #EDE7DC; padding: 0.2rem 0.5rem; border-radius: 6px;">{{ item.date }}</span>
-                </div>
-
-                <!-- Site Cible -->
-                <div style="margin-bottom: 0.75rem;">
-                  <span [style.background]="item.siteId === 'TOUS' ? 'rgba(96, 108, 56, 0.12)' : 'rgba(114, 21, 19, 0.08)'"
-                        [style.color]="item.siteId === 'TOUS' ? '#606C38' : '#721513'"
-                        style="font-size: 0.72rem; font-weight: 800; padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.35rem;">
-                    <i class="fa-solid" [class.fa-globe]="item.siteId === 'TOUS'" [class.fa-location-dot]="item.siteId !== 'TOUS'"></i>
-                    {{ item.siteNom }} {{ item.entrepriseNom ? '(' + item.entrepriseNom + ')' : '' }}
-                  </span>
-                </div>
-
-                <div style="font-size: 0.72rem; color: #C05621; font-weight: 800; text-transform: uppercase;">{{ item.theme }}</div>
-                
-                <div style="font-size: 0.95rem; font-weight: 800; color: #332724; margin: 0.45rem 0 0.85rem; line-height: 1.4; display: flex; align-items: flex-start; gap: 0.5rem;">
-                  <i class="fa-solid fa-bowl-food" style="color: #721513; margin-top: 0.2rem; flex-shrink: 0;"></i>
-                  <span>{{ item.platVedette }}</span>
-                </div>
-
-                <!-- Menu complet 4 composantes si renseigné -->
-                <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 10px; padding: 0.65rem 0.85rem; margin-bottom: 0.85rem; font-size: 0.75rem; color: #6E5A56; line-height: 1.6;">
-                  @if (item.entreeProposee) {
-                    <div><i class="fa-solid fa-leaf" style="color: #606C38; width: 14px;"></i> Entrée : <strong>{{ item.entreeProposee }}</strong></div>
-                  }
-                  @if (item.dessertPropose) {
-                    <div><i class="fa-solid fa-cake-candles" style="color: #C05621; width: 14px;"></i> Dessert : <strong>{{ item.dessertPropose }}</strong></div>
-                  }
-                  @if (item.boissonProposee) {
-                    <div><i class="fa-solid fa-wine-glass" style="color: #332724; width: 14px;"></i> Boisson : <strong>{{ item.boissonProposee }}</strong></div>
-                  }
-                </div>
-                
-                <div style="font-size: 0.78rem; color: #6E5A56; line-height: 1.6;">
-                  <div><i class="fa-solid fa-box" style="color: #E51D24;"></i> Portions prévues : <strong>{{ item.totalPrevu }} repas</strong></div>
-                </div>
-              </div>
-
-              <div style="padding-top: 0.85rem; margin-top: 1rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: nowrap;">
-                <span [style.background]="item.statut === 'EN_PRODUCTION' ? 'rgba(229, 29, 36, 0.12)' : item.statut === 'VALIDE' ? 'rgba(96, 108, 56, 0.12)' : 'rgba(51, 39, 36, 0.08)'"
-                      [style.color]="item.statut === 'EN_PRODUCTION' ? '#E51D24' : item.statut === 'VALIDE' ? '#606C38' : '#6E5A56'"
-                      style="font-size: 0.68rem; font-weight: 800; padding: 0.3rem 0.65rem; border-radius: 9999px; white-space: nowrap; display: inline-flex; align-items: center;">
-                  {{ item.statut === 'EN_PRODUCTION' ? 'EN PRODUCTION' : item.statut === 'VALIDE' ? 'VALIDÉ' : item.statut === 'PROGRAMME' ? 'PROGRAMMÉ' : 'CLÔTURÉ' }}
-                </span>
-                <div style="display: flex; gap: 0.4rem; flex-shrink: 0;">
-                  <button (click)="ouvrirModalEditPlanningGlobal(item)" class="sa-btn-action" style="width: 36px; height: 36px; min-height: 0; padding: 0; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center;" title="Modifier le menu">
-                    <i class="fa-regular fa-pen-to-square"></i>
-                  </button>
-                  <button (click)="supprimerMenuPlanning(item.id)" class="sa-btn-action" style="color: #E51D24; width: 36px; height: 36px; min-height: 0; padding: 0; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center;" title="Supprimer ce menu">
-                    <i class="fa-solid fa-trash-can"></i>
-                  </button>
-                </div>
-              </div>
             </div>
           }
         </div>

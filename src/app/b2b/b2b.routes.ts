@@ -3,7 +3,8 @@ import { Routes } from '@angular/router';
 export const B2B_ROUTES: Routes = [
   {
     path: '',
-    loadComponent: () => import('./home/b2b-home.component').then(m => m.B2bHomeComponent)
+    redirectTo: 'login',
+    pathMatch: 'full'
   },
   {
     path: 'login',

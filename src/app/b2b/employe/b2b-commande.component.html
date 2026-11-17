@@ -200,8 +200,9 @@
                     <span class="dish-tag">
                       @if (plat.categorie === 'ENTREE') { {{ b2b.modeProfil() === 'SUBVENTIONNE' ? '1. Entrée' : 'Entrée' }} }
                       @else if (plat.categorie === 'PLAT') { {{ b2b.modeProfil() === 'SUBVENTIONNE' ? '2. Plat Chaud' : 'Plat Chaud' }} }
-                      @else if (plat.categorie === 'DESSERT') { {{ b2b.modeProfil() === 'SUBVENTIONNE' ? '3. Dessert' : 'Dessert' }} }
-                      @else { {{ b2b.modeProfil() === 'SUBVENTIONNE' ? '4. Boisson' : 'Boisson' }} }
+                      @else if (plat.categorie === 'GARNITURE') { {{ b2b.modeProfil() === 'SUBVENTIONNE' ? '3. Garniture' : 'Garniture' }} }
+                      @else if (plat.categorie === 'DESSERT') { {{ b2b.modeProfil() === 'SUBVENTIONNE' ? '4. Dessert' : 'Dessert' }} }
+                      @else { {{ b2b.modeProfil() === 'SUBVENTIONNE' ? '5. Boisson' : 'Boisson' }} }
                     </span>
                   </div>
 
@@ -234,13 +235,9 @@
 
                   <div class="dish-footer-row">
                     <div class="dish-price-box">
-                      @if (b2b.modeProfil() === 'SUBVENTIONNE' && b2b.currentEmploye().tauxSubvention === 100) {
-                        <span class="price-amount" style="color: #606C38; font-size: 0.92rem;">
-                          <i class="fa-solid fa-circle-check"></i> Inclus Formule (0 F)
-                        </span>
-                      } @else if (b2b.modeProfil() === 'SUBVENTIONNE') {
-                        <span class="price-amount" style="color: #721513; font-size: 0.92rem;">
-                          Part salariale : {{ plat.prixUnitaire * (1 - (b2b.currentEmploye().tauxSubvention / 100)) | number }} F
+                      @if (b2b.modeProfil() === 'SUBVENTIONNE') {
+                        <span class="price-amount" style="color: #606C38; font-size: 0.88rem;">
+                          <i class="fa-solid fa-circle-check"></i> Inclus dans votre formule
                         </span>
                       } @else {
                         <span class="price-amount">{{ plat.prixUnitaire }} FCFA</span>
@@ -521,26 +518,63 @@
           </div>
         </div>
 
-        <div style="background: #FFFFFF; border: 2px solid #EDE7DC; border-radius: 18px; padding: 1.25rem; margin: 0 auto 1.25rem; max-width: 260px; box-shadow: 0 8px 25px rgba(114, 21, 19, 0.08);">
-          <div style="display: flex; justify-content: center; align-items: center; margin: 0 auto; background: #FAF8F4; padding: 0.65rem; border-radius: 12px; border: 1px solid #EDE7DC;">
-            <svg viewBox="0 0 25 25" width="160" height="160" shape-rendering="crispEdges">
-              <rect width="25" height="25" fill="#FAF8F4"/>
-              @for (row of qrMatrix(); track $index; let r = $index) {
-                @for (cell of row; track $index; let c = $index) {
-                  @if (cell) {
-                    <rect [attr.x]="c" [attr.y]="r" width="1" height="1" fill="#721513"/>
+        <!-- Switch Double Option QR Code (Montrer ou Scanner) -->
+        <div style="display: inline-flex; background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 9999px; padding: 0.2rem; gap: 0.2rem; margin-bottom: 1rem;">
+          <button type="button"
+                  (click)="qrMode.set('MONTRER')"
+                  style="min-height: 0; border: 0; border-radius: 9999px; padding: 0.4rem 0.9rem; font-size: 0.74rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.45rem;"
+                  [style.background]="qrMode() === 'MONTRER' ? '#721513' : 'transparent'"
+                  [style.color]="qrMode() === 'MONTRER' ? '#FFFFFF' : '#6E5A56'">
+            <i class="fa-solid fa-qrcode"></i> Montrer mon QR
+          </button>
+          <button type="button"
+                  (click)="qrMode.set('SCANNER'); scanCantineValide.set(false)"
+                  style="min-height: 0; border: 0; border-radius: 9999px; padding: 0.4rem 0.9rem; font-size: 0.74rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.45rem;"
+                  [style.background]="qrMode() === 'SCANNER' ? '#721513' : 'transparent'"
+                  [style.color]="qrMode() === 'SCANNER' ? '#FFFFFF' : '#6E5A56'">
+            <i class="fa-solid fa-camera"></i> Scanner QR Cantine
+          </button>
+        </div>
+
+        @if (qrMode() === 'MONTRER') {
+          <div style="background: #FFFFFF; border: 2px solid #EDE7DC; border-radius: 18px; padding: 1.25rem; margin: 0 auto 1.25rem; max-width: 260px; box-shadow: 0 8px 25px rgba(114, 21, 19, 0.08);">
+            <div style="display: flex; justify-content: center; align-items: center; margin: 0 auto; background: #FAF8F4; padding: 0.65rem; border-radius: 12px; border: 1px solid #EDE7DC;">
+              <svg viewBox="0 0 25 25" width="160" height="160" shape-rendering="crispEdges">
+                <rect width="25" height="25" fill="#FAF8F4"/>
+                @for (row of qrMatrix(); track $index; let r = $index) {
+                  @for (cell of row; track $index; let c = $index) {
+                    @if (cell) {
+                      <rect [attr.x]="c" [attr.y]="r" width="1" height="1" fill="#721513"/>
+                    }
                   }
                 }
-              }
-            </svg>
-          </div>
+              </svg>
+            </div>
 
-          <div style="margin-top: 0.75rem;">
-            <span style="font-family: monospace; font-size: 0.85rem; font-weight: 800; color: #721513; background: #FAF5EA; padding: 0.25rem 0.65rem; border-radius: 6px; border: 1px solid #E2D5BE;">
-              {{ derniereCommande()?.qrCode }}
-            </span>
+            <div style="margin-top: 0.75rem;">
+              <span style="font-family: monospace; font-size: 0.85rem; font-weight: 800; color: #721513; background: #FAF5EA; padding: 0.25rem 0.65rem; border-radius: 6px; border: 1px solid #E2D5BE;">
+                {{ derniereCommande()?.qrCode }}
+              </span>
+            </div>
           </div>
-        </div>
+        } @else {
+          <div style="background: #FAF8F4; border: 1.5px dashed #C5A880; border-radius: 16px; padding: 1.25rem; margin-bottom: 1.25rem;">
+            @if (!scanCantineValide()) {
+              <div style="font-size: 2rem; color: #721513; margin-bottom: 0.5rem;"><i class="fa-solid fa-camera"></i></div>
+              <p style="font-size: 0.82rem; color: #6E5A56; margin: 0 0 0.85rem;">
+                Scannez le QR Code du jour affiché à l'entrée du réfectoire pour passer votre plateau à « À livrer ».
+              </p>
+              <button type="button" (click)="validerScanCantine()"
+                      style="min-height: 0; padding: 0.55rem 1.15rem; border-radius: 9999px; background: #606C38; color: #FFFFFF; border: none; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.45rem;">
+                <i class="fa-solid fa-qrcode"></i> Simuler le scan du QR Cantine
+              </button>
+            } @else {
+              <div style="font-size: 2rem; color: #606C38; margin-bottom: 0.4rem;"><i class="fa-solid fa-circle-check"></i></div>
+              <strong style="color: #606C38; font-size: 0.92rem;">QR Cantine scanné !</strong>
+              <p style="font-size: 0.78rem; color: #6E5A56; margin: 0.3rem 0 0;">Votre commande est passée à « À livrer » au comptoir.</p>
+            }
+          </div>
+        }
 
         <button 
           (click)="fermerQrCodeModal()"
@@ -549,6 +583,18 @@
         </button>
 
       </div>
+    </div>
+  }
+
+  <!-- MESSAGE FLASH GARNITURE APRÈS SÉLECTION D'UN PLAT CHAUD -->
+  @if (flashGarnitureMessage(); as msg) {
+    <div style="position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); z-index: 1200; background: #721513; color: #FAF5EA; padding: 0.85rem 1.35rem; border-radius: 9999px; box-shadow: 0 18px 40px rgba(114, 21, 19, 0.4); display: flex; align-items: center; gap: 0.85rem; font-size: 0.86rem; font-weight: 700; max-width: 92vw;">
+      <span><i class="fa-solid fa-bowl-rice" style="color: #E6DABA; margin-right: 0.4rem;"></i> {{ msg }}</span>
+      <button type="button"
+              (click)="selectCategory('GARNITURE'); flashGarnitureMessage.set(null)"
+              style="min-height: 0; background: #E51D24; color: #FFFFFF; border: none; border-radius: 9999px; padding: 0.35rem 0.8rem; font-size: 0.75rem; font-weight: 800; cursor: pointer; white-space: nowrap;">
+        Choisir →
+      </button>
     </div>
   }
 

@@ -16,6 +16,21 @@ import { PlatB2B } from '../shared/b2b.models';
 export class B2bCommandeComponent {
   b2b = inject(B2bStateService);
 
+  qrMode = signal<'MONTRER' | 'SCANNER'>('MONTRER');
+  scanCantineValide = signal(false);
+  flashGarnitureMessage = signal<string | null>(null);
+  private flashGarnitureTimer?: ReturnType<typeof setTimeout>;
+  garnituresDisponibles = ['Riz parfumé', 'Pommes sautées', 'Attiéké', 'Légumes sautés'];
+  garnitureParPlat = signal<Record<string, string>>({});
+
+  selectionnerGarniture(platId: string, garniture: string) {
+    this.garnitureParPlat.update(map => ({ ...map, [platId]: garniture }));
+  }
+
+  validerScanCantine() {
+    this.scanCantineValide.set(true);
+  }
+
   // SÉLECTION DU JOUR POUR COMMANDER TOUTE LA SEMAINE (Lundi à Dimanche)
   joursSemaine = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'] as const;
   jourSelectionne = signal<'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche'>('Jeudi');
@@ -120,6 +135,12 @@ export class B2bCommandeComponent {
           disponible: l.disponible !== false
         };
       });
+      if (!listeBase.some(p => p.categorie === 'GARNITURE')) {
+        listeBase = [
+          ...listeBase,
+          ...this.b2b.catalogueJour().filter(p => !p.isArchive && p.categorie === 'GARNITURE')
+        ];
+      }
     } else {
       // Fallback catalogue complet
       listeBase = this.b2b.catalogueJour().filter(p => !p.isArchive);
@@ -192,8 +213,9 @@ export class B2bCommandeComponent {
       { id: 'all', name: 'Tous', icon: 'fa-globe' },
       { id: 'ENTREE', name: isSub ? '1. Entrée' : 'Entrées', icon: 'fa-cookie-bite' },
       { id: 'PLAT', name: isSub ? '2. Plat Chaud' : 'Plats Chauds', icon: 'fa-utensils' },
-      { id: 'DESSERT', name: isSub ? '3. Dessert' : 'Desserts', icon: 'fa-cake-candles' },
-      { id: 'BOISSON', name: isSub ? '4. Boisson' : 'Boissons', icon: 'fa-wine-glass-alt' }
+      { id: 'GARNITURE', name: isSub ? '3. Garniture' : 'Garnitures', icon: 'fa-bowl-rice' },
+      { id: 'DESSERT', name: isSub ? '4. Dessert' : 'Desserts', icon: 'fa-cake-candles' },
+      { id: 'BOISSON', name: isSub ? '5. Boisson' : 'Boissons', icon: 'fa-wine-glass-alt' }
     ];
   });
 
@@ -296,6 +318,12 @@ export class B2bCommandeComponent {
     } else {
       this.b2b.ajouterAuPanierAutonome(plat);
     }
+
+    if (plat.categorie === 'PLAT') {
+      this.flashGarnitureMessage.set('Plat chaud sélectionné ! Choisissez maintenant votre garniture.');
+      if (this.flashGarnitureTimer) clearTimeout(this.flashGarnitureTimer);
+      this.flashGarnitureTimer = setTimeout(() => this.flashGarnitureMessage.set(null), 4000);
+    }
   }
 
   isPlatActiveDansMode(plat: PlatB2B): boolean {
@@ -310,6 +338,7 @@ export class B2bCommandeComponent {
     const s = this.b2b.selection();
     if (plat.categorie === 'ENTREE') return s.entree?.id === plat.id;
     if (plat.categorie === 'PLAT') return s.plat?.id === plat.id;
+    if (plat.categorie === 'GARNITURE') return s.garniture?.id === plat.id;
     if (plat.categorie === 'DESSERT') return s.dessert?.id === plat.id;
     if (plat.categorie === 'BOISSON') return s.boisson?.id === plat.id;
     return false;

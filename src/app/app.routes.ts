@@ -1,10 +1,11 @@
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
-  // Redirections directes racine vers l'espace B2B
+  // Redirections directes racine vers la connexion B2B
   {
     path: '',
-    loadComponent: () => import('./b2b/home/b2b-home.component').then(m => m.B2bHomeComponent)
+    redirectTo: 'b2b/login',
+    pathMatch: 'full'
   },
   {
     path: 'login',
@@ -43,10 +44,10 @@ export const routes: Routes = [
     loadChildren: () => import('./b2b/b2b.routes').then(m => m.B2B_ROUTES)
   },
 
-  // Wildcard redirection vers l'accueil B2B
+  // Wildcard redirection vers la connexion B2B
   {
     path: '**',
-    redirectTo: '',
+    redirectTo: 'b2b/login',
     pathMatch: 'full'
   }
 ];

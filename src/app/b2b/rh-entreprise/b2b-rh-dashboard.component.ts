@@ -171,8 +171,33 @@ export class B2bRhDashboardComponent {
     }
   }
 
+  facturationJourSelectionne = signal<{ date: string; dateAffichee: string; nbPlatsLivres: number; montantTotal: number; montantPartEntreprise: number } | null>(null);
+
+  detailsCommandesJourSelectionne = computed(() => {
+    const jour = this.facturationJourSelectionne();
+    if (!jour) return [];
+    return this.b2b.historiqueCommandes()
+      .filter(c => c.date === jour.date)
+      .map(c => ({
+        ...c,
+        tauxApplique: c.tauxSubventionApplique ?? Math.round((c.partEntreprise / (c.prixTotal || 1)) * 100)
+      }));
+  });
+
   exporterExcelFacturation() {
-    alert('Export Excel généré avec succès ! Le fichier "Facturation_Kiki_Traiteur.xlsx" a été téléchargé.');
+    const lignes = this.lignesFacturationFiltrees();
+    const header = 'Date;Libellé;Plats livrés;Montant Total (FCFA);Part Entreprise (FCFA);Statut';
+    const rows = lignes.map(l =>
+      `${l.date};"${l.dateAffichee}";${l.nbPlatsLivres};${l.montantTotal};${l.montantPartEntreprise};${l.statut}`
+    );
+    const csvContent = '\uFEFF' + [header, ...rows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Facturation_Kiki_Traiteur_${this.factureDateDebut()}_au_${this.factureDateFin()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   surChangementDateManuel() {

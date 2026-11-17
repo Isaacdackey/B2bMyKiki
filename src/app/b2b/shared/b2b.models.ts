@@ -77,7 +77,7 @@ export interface PlatB2B {
   id: string;
   nom: string;
   description: string;
-  categorie: 'ENTREE' | 'PLAT' | 'DESSERT' | 'BOISSON';
+  categorie: 'ENTREE' | 'PLAT' | 'GARNITURE' | 'DESSERT' | 'BOISSON';
   prixUnitaire: number;
   image: string;
   allergene?: string;
@@ -102,6 +102,7 @@ export interface FormuleRegle {
 export interface SelectionRepas {
   entree?: PlatB2B;
   plat?: PlatB2B;
+  garniture?: PlatB2B;
   dessert?: PlatB2B;
   boisson?: PlatB2B;
   supplements: PlatB2B[];
@@ -138,7 +139,7 @@ export interface CommandeEntrepriseSite {
   entrepriseNom: string;
   matricule: string;
   employeNom: string;
-  categorie: 'ENTREE' | 'PLAT' | 'DESSERT' | 'BOISSON';
+  categorie: 'ENTREE' | 'PLAT' | 'GARNITURE' | 'DESSERT' | 'BOISSON';
   platNom: string;
   date: string; // YYYY-MM-DD
   heure: string; // HH:mm
@@ -208,6 +209,7 @@ export interface CommandeHistoriqueB2B {
   prixTotal: number;
   partEntreprise: number;
   partEmploye: number;
+  tauxSubventionApplique?: number;
   statut: 'LIVRE' | 'VALIDE' | 'EN_PREPARATION';
 }
 
