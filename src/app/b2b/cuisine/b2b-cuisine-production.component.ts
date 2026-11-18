@@ -137,6 +137,35 @@ export class B2bCuisineProductionComponent {
     return this.facturationJournaliere().reduce((sum: number, l: FacturationLigneJournaliere) => sum + (l.nbPlatsLivres || 0), 0);
   });
 
+  facturationJourSelectionne = signal<FacturationLigneJournaliere | null>(null);
+
+  detailsCommandesJourSelectionne = computed(() => {
+    const jour = this.facturationJourSelectionne();
+    if (!jour) return [];
+    return this.b2b.historiqueCommandes()
+      .filter(c => c.date === jour.date)
+      .map(c => ({
+        ...c,
+        tauxApplique: c.tauxSubventionApplique ?? Math.round((c.partEntreprise / (c.prixTotal || 1)) * 100)
+      }));
+  });
+
+  exporterExcelFacturationSite() {
+    const lignes = this.facturationJournaliere();
+    const header = 'Date;Libellé;Plats livrés;Montant Total (FCFA);Part Entreprise (FCFA);Statut';
+    const rows = lignes.map(l =>
+      `${l.date};"${l.dateAffichee}";${l.nbPlatsLivres};${l.montantTotal};${l.montantPartEntreprise};${l.statut}`
+    );
+    const csvContent = '\uFEFF' + [header, ...rows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Facturation_Site_Kiki_Traiteur.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   // MODAL AJOUT PLAT AU MENU
   showModalAjoutPlat = signal<boolean>(false);
   platSelectionnePourAjout = signal<string>('');

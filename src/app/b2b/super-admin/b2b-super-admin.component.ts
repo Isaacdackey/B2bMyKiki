@@ -876,6 +876,18 @@ export class B2bSuperAdminComponent {
 
   // PROGRAMMATION GLOBALE & DÉPLOIEMENT VERS TOUTES LES ENTREPRISES
   jourPlanningGlobalActif = signal<'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche'>('Lundi');
+  facturationJourSelectionne = signal<{ date: string; dateAffichee: string; nbPlatsLivres: number; montantTotal: number; montantPartEntreprise: number } | null>(null);
+
+  detailsCommandesJourSelectionne = computed(() => {
+    const jour = this.facturationJourSelectionne();
+    if (!jour) return [];
+    return this.b2b.historiqueCommandes()
+      .filter(c => c.date === jour.date)
+      .map(c => ({
+        ...c,
+        tauxApplique: c.tauxSubventionApplique ?? Math.round((c.partEntreprise / (c.prixTotal || 1)) * 100)
+      }));
+  });
   modeVuePlanning = signal<'semaine' | 'calendrier'>('semaine');
   moisCalendrierActif = signal<Date>(new Date());
   dateCalendrierSelectionnee = signal<string>(new Date().toISOString().slice(0, 10));

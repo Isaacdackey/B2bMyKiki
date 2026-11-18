@@ -1163,10 +1163,13 @@
                     </thead>
                     <tbody>
                       @for (ligne of lignesFacturationFiltrees(); track ligne.date) {
-                        <tr style="border-bottom: 1px solid #F0EAE1;">
+                        <tr (click)="facturationJourSelectionne.set(ligne)" style="border-bottom: 1px solid #F0EAE1; cursor: pointer;" title="Cliquer pour voir le détail nominatif">
                           <td style="padding: 0.85rem 1rem; font-weight: 800; color: #332724;">
-                            <i class="fa-regular fa-calendar" style="color: #721513; margin-right: 0.35rem;"></i>
-                            {{ ligne.dateAffichee }}
+                            <div>
+                              <i class="fa-regular fa-calendar" style="color: #721513; margin-right: 0.35rem;"></i>
+                              {{ ligne.dateAffichee }}
+                            </div>
+                            <div style="font-size: 0.7rem; color: #721513; font-weight: 700; margin-top: 0.15rem;">Voir détail →</div>
                           </td>
                           <td style="padding: 0.85rem 1rem; text-align: center; font-weight: 800; color: #721513;">
                             {{ ligne.nbPlatsLivres }} plats
@@ -2787,6 +2790,52 @@
             <i class="fa-solid fa-clone"></i> Dupliquer vers ce jour
           </button>
         </div>
+      </div>
+    </div>
+  }
+
+  <!-- MODALE DÉTAIL NOMINATIF D'UNE JOURNÉE DE FACTURATION -->
+  @if (facturationJourSelectionne(); as jour) {
+    <div class="sa-modal-backdrop" (click)="facturationJourSelectionne.set(null)">
+      <div class="sa-modal-card" (click)="$event.stopPropagation()" style="max-width: 720px; padding: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <div>
+            <span style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">Détail journalier</span>
+            <h3 style="margin: 0.15rem 0 0; font-size: 1.2rem; color: #721513; font-weight: 900;">
+              {{ jour.dateAffichee }} ({{ jour.date }})
+            </h3>
+          </div>
+          <button type="button" (click)="facturationJourSelectionne.set(null)" style="background: none; border: none; font-size: 1.2rem; color: #6E5A56; cursor: pointer; min-height: 0; padding: 0.25rem;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        @if (detailsCommandesJourSelectionne().length === 0) {
+          <div style="background: #FAF8F4; border: 1.5px dashed #EDE7DC; border-radius: 12px; padding: 1.5rem; text-align: center; color: #6E5A56; font-size: 0.85rem;">
+            Aucun détail nominatif enregistré pour cette journée dans les données de démonstration.
+          </div>
+        } @else {
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
+            <thead>
+              <tr style="background: #FAF8F4; border-bottom: 1.5px solid #EDE7DC; text-align: left;">
+                <th style="padding: 0.6rem;">Collaborateur</th>
+                <th style="padding: 0.6rem;">Plat</th>
+                <th style="padding: 0.6rem;">Taux (date T)</th>
+                <th style="padding: 0.6rem;">Part Entreprise</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (c of detailsCommandesJourSelectionne(); track c.id) {
+                <tr style="border-bottom: 1px solid #EDE7DC;">
+                  <td style="padding: 0.6rem;"><strong>{{ c.employeNom }}</strong><br><small style="color: #6E5A56;">{{ c.matricule }}</small></td>
+                  <td style="padding: 0.6rem; color: #332724;">{{ c.platNom }}</td>
+                  <td style="padding: 0.6rem; font-weight: 800; color: #606C38;">{{ c.tauxApplique }}%</td>
+                  <td style="padding: 0.6rem; font-weight: 800; color: #721513;">{{ (c.partEntreprise | number) }} FCFA</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
       </div>
     </div>
   }
