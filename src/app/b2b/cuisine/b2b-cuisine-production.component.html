@@ -815,19 +815,19 @@
             style="width: 100%; padding: 0.65rem; border: 1.5px solid #CBD5E1; border-radius: 8px; font-size: 0.88rem; font-weight: 800;">
         </div>
 
-        <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+        <div style="display: flex; justify-content: flex-end; align-items: stretch; gap: 0.75rem;">
           <button 
             type="button" 
             (click)="fermerModalAjoutPlat()"
-            style="padding: 0.65rem 1.25rem; border: 1.5px solid #EDE7DC; background: #FAF8F4; border-radius: 10px; font-weight: 800; color: #6E5A56; cursor: pointer;">
+            style="height: 42px; min-height: 42px; max-height: 42px; padding: 0 1.2rem; border: 1.5px solid #EDE7DC; background: #FAF8F4; border-radius: 9999px; font-weight: 800; font-size: 0.82rem; color: #6E5A56; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; box-sizing: border-box;">
             Annuler
           </button>
           <button 
             type="button" 
             [disabled]="!platSelectionnePourAjout()"
             (click)="confirmerAjoutPlat()"
-            style="padding: 0.65rem 1.5rem; border: none; background: #721513; color: #FFFFFF; border-radius: 10px; font-weight: 800; cursor: pointer;">
-            Ajouter au menu
+            style="height: 42px; min-height: 42px; max-height: 42px; padding: 0 1.4rem; border: 1.5px solid #721513; background: #721513; color: #FFFFFF; border-radius: 9999px; font-weight: 800; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; white-space: nowrap; box-sizing: border-box;">
+            <i class="fa-solid fa-check"></i> Ajouter au menu
           </button>
         </div>
       </div>

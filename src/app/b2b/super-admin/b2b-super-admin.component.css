@@ -1354,36 +1354,49 @@
 .sa-btn-primary {
   background: #721513;
   color: #FFFFFF;
-  border: none;
-  padding: 0.65rem 1.25rem;
+  border: 1.5px solid #721513;
+  height: 40px;
+  min-height: 40px !important;
+  max-height: 40px;
+  padding: 0 1.2rem;
   border-radius: 9999px;
   font-weight: 800;
   font-size: 0.82rem;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
+  gap: 0.45rem;
+  white-space: nowrap;
+  box-sizing: border-box;
   box-shadow: 0 4px 14px rgba(114, 21, 19, 0.2);
   transition: all 0.2s;
 }
 
 .sa-btn-primary:hover {
   background: #5A0F0E;
+  border-color: #5A0F0E;
   transform: translateY(-1px);
 }
 
 .sa-btn-action {
   background: #FAF8F4;
-  border: 1px solid #EDE7DC;
+  border: 1.5px solid #EDE7DC;
   color: #721513;
-  padding: 0.4rem 0.75rem;
-  border-radius: 8px;
-  font-size: 0.75rem;
+  height: 40px;
+  min-height: 40px !important;
+  max-height: 40px;
+  padding: 0 1rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
   font-weight: 700;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  justify-content: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+  box-sizing: border-box;
   transition: all 0.2s;
 }
 

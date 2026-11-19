@@ -763,13 +763,13 @@
                               <select 
                                 [value]="emp.tauxSubvention" 
                                 (change)="b2b.setTauxSubventionEmploye(emp.id, +$any($event.target).value)"
-                                style="height: 32px; padding: 0 0.5rem; font-size: 0.8rem; font-weight: 800; border-radius: 6px; border: 1.5px solid #EDE7DC; background: #FFFFFF; min-width: 175px;"
+                                style="height: 32px; padding: 0 0.5rem; font-size: 0.8rem; font-weight: 800; border-radius: 6px; border: 1.5px solid #EDE7DC; background: #FFFFFF; min-width: 85px;"
                                 [style.color]="emp.tauxSubvention === 100 ? '#606C38' : (emp.tauxSubvention === 0 ? '#6E5A56' : '#C05621')">
-                                <option [value]="100" [selected]="emp.tauxSubvention === 100">100% (Prise en charge intégrale)</option>
-                                <option [value]="70" [selected]="emp.tauxSubvention === 70">70% subventionné</option>
-                                <option [value]="50" [selected]="emp.tauxSubvention === 50">50% subventionné</option>
-                                <option [value]="25" [selected]="emp.tauxSubvention === 25">25% subventionné</option>
-                                <option [value]="0" [selected]="emp.tauxSubvention === 0">0% (Frais perso. / Autonome)</option>
+                                <option [value]="100" [selected]="emp.tauxSubvention === 100">100%</option>
+                                <option [value]="70" [selected]="emp.tauxSubvention === 70">70%</option>
+                                <option [value]="50" [selected]="emp.tauxSubvention === 50">50%</option>
+                                <option [value]="25" [selected]="emp.tauxSubvention === 25">25%</option>
+                                <option [value]="0" [selected]="emp.tauxSubvention === 0">0%</option>
                               </select>
                             </td>
                             <td style="padding: 0.75rem 1rem; text-align: center;">
@@ -2083,11 +2083,11 @@
         </div>
 
         <!-- Boutons d'action en bas fixes (sans bordure) -->
-        <div style="display: flex; gap: 0.75rem; margin-top: 0.75rem; padding-top: 0.25rem; flex-shrink: 0;">
-          <button (click)="showModalEntreprise.set(false)" style="flex: 1; padding: 0.6rem; background: #FAF8F4; color: #6E5A56; border: 1.5px solid #EDE7DC; border-radius: 9999px; font-size: 0.82rem; font-weight: 700; cursor: pointer;">
+        <div style="display: flex; gap: 0.75rem; margin-top: 0.75rem; padding-top: 0.25rem; flex-shrink: 0; align-items: stretch;">
+          <button (click)="showModalEntreprise.set(false)" class="sa-btn-action" style="flex: 1; height: 42px; min-height: 42px; max-height: 42px; color: #6E5A56;">
             Annuler
           </button>
-          <button (click)="enregistrerEntreprise()" class="sa-btn-primary" style="flex: 1.5; justify-content: center; padding: 0.6rem; font-size: 0.82rem;">
+          <button (click)="enregistrerEntreprise()" class="sa-btn-primary" style="flex: 1.4; height: 42px; min-height: 42px; max-height: 42px; justify-content: center;">
             <i class="fa-solid fa-check"></i> Enregistrer l'Entreprise
           </button>
         </div>
@@ -2253,11 +2253,11 @@
           </div>
         </div>
 
-        <div style="display: flex; gap: 1rem; margin-top: 1.75rem;">
-          <button (click)="showModalSite.set(false)" style="flex: 1; padding: 0.85rem; background: #FAF8F4; color: #6E5A56; border: 1.5px solid #EDE7DC; border-radius: 9999px; font-weight: 700; cursor: pointer;">
+        <div style="display: flex; gap: 0.75rem; margin-top: 1.75rem; align-items: stretch;">
+          <button (click)="showModalSite.set(false)" class="sa-btn-action" style="flex: 1; height: 44px; min-height: 44px; max-height: 44px; color: #6E5A56;">
             Annuler
           </button>
-          <button (click)="enregistrerSite()" class="sa-btn-primary" style="flex: 1.5; justify-content: center;">
+          <button (click)="enregistrerSite()" class="sa-btn-primary" style="flex: 1.4; height: 44px; min-height: 44px; max-height: 44px; justify-content: center;">
             <i class="fa-solid fa-check"></i> Enregistrer
           </button>
         </div>
@@ -2359,11 +2359,11 @@
           </div>
         </div>
 
-        <div style="display: flex; gap: 1rem; margin-top: 1.75rem;">
-          <button (click)="showModalPlat.set(false)" style="flex: 1; padding: 0.85rem; background: #FAF8F4; color: #6E5A56; border: 1.5px solid #EDE7DC; border-radius: 9999px; font-weight: 700; cursor: pointer;">
+        <div style="display: flex; gap: 0.75rem; margin-top: 1.75rem; align-items: stretch;">
+          <button (click)="showModalPlat.set(false)" class="sa-btn-action" style="flex: 1; height: 44px; min-height: 44px; max-height: 44px; color: #6E5A56;">
             Annuler
           </button>
-          <button (click)="enregistrerPlat()" class="sa-btn-primary" style="flex: 1.5; justify-content: center;">
+          <button (click)="enregistrerPlat()" class="sa-btn-primary" style="flex: 1.4; height: 44px; min-height: 44px; max-height: 44px; justify-content: center;">
             <i class="fa-solid fa-check"></i> Enregistrer le Plat
           </button>
         </div>
@@ -2483,11 +2483,11 @@
           </div>
         </div>
 
-        <div style="display: flex; gap: 1rem; margin-top: 1.75rem;">
-          <button (click)="showModalPlanning.set(false)" style="flex: 1; padding: 0.85rem; background: #FAF8F4; color: #6E5A56; border: 1.5px solid #EDE7DC; border-radius: 9999px; font-weight: 700; cursor: pointer;">
+        <div style="display: flex; gap: 0.75rem; margin-top: 1.75rem; align-items: stretch;">
+          <button (click)="showModalPlanning.set(false)" class="sa-btn-action" style="flex: 1; height: 44px; min-height: 44px; max-height: 44px; color: #6E5A56;">
             Annuler
           </button>
-          <button (click)="enregistrerPlanningGlobal()" class="sa-btn-primary" style="flex: 1.5; justify-content: center;">
+          <button (click)="enregistrerPlanningGlobal()" class="sa-btn-primary" style="flex: 1.4; height: 44px; min-height: 44px; max-height: 44px; justify-content: center;">
             <i class="fa-solid fa-check"></i> Enregistrer le Menu
           </button>
         </div>

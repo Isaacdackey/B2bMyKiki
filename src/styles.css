@@ -321,9 +321,6 @@ div.password-field.input-with-icon input:not([type="checkbox"]):not([type="radio
 }
 
 /* Espacement global automatique uniquement quand l'icône est suivie d'un élément de texte (et JAMAIS pour une icône seule) */
-button i[class*="fa-"]:not(.input-icon):not(:only-child),
-a i[class*="fa-"]:not(.input-icon):not(:only-child),
-span i[class*="fa-"]:not(.input-icon):not(:only-child),
 h1 i[class*="fa-"]:not(:only-child),
 h2 i[class*="fa-"]:not(:only-child),
 h3 i[class*="fa-"]:not(:only-child),
@@ -332,9 +329,62 @@ h5 i[class*="fa-"]:not(:only-child),
 h6 i[class*="fa-"]:not(:only-child),
 label i[class*="fa-"]:not(:only-child),
 p i[class*="fa-"]:not(:only-child),
-div.badge i[class*="fa-"]:not(:only-child),
-.btn i[class*="fa-"]:not(:only-child) {
+div.badge i[class*="fa-"]:not(:only-child) {
   margin-right: 0.45rem;
+}
+
+/* Harmonisation globale des boutons et de leurs icônes */
+button,
+a.btn,
+.btn {
+  gap: 0.45rem;
+}
+
+button i[class*="fa-"]:not(.input-icon),
+a i[class*="fa-"]:not(.input-icon),
+.btn i[class*="fa-"]:not(.input-icon) {
+  margin-right: 0 !important;
+  font-size: 0.92em;
+  line-height: 1;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+span i[class*="fa-"]:not(.input-icon):not(:only-child) {
+  margin-right: 0.35rem;
+  font-size: 0.92em;
+  line-height: 1;
+}
+
+/* Si le parent span/h1/h2/h3/label utilise déjà display:flex ou inline-flex avec gap, supprimer le margin-right redondant */
+span[style*="flex"] > i[class*="fa-"],
+h1[style*="flex"] > i[class*="fa-"],
+h2[style*="flex"] > i[class*="fa-"],
+h3[style*="flex"] > i[class*="fa-"],
+h4[style*="flex"] > i[class*="fa-"],
+label[style*="flex"] > i[class*="fa-"],
+div[style*="flex"] > i[class*="fa-"] {
+  margin-right: 0 !important;
+}
+
+/* Harmonisation des boutons d'icône seule (fermeture modale, suppression ligne, etc.) */
+.btn-del-row,
+.sa-modal-close-btn {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  aspect-ratio: 1 / 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  font-size: 0.95rem !important;
 }
 
 /* Centrage parfait et forme 100% arrondie (cercle) pour les boîtes d'icônes explicites du projet */
