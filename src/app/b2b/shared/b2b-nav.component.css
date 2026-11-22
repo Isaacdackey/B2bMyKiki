@@ -605,9 +605,9 @@
 }
 
 /* ==========================================================
-   BREAKPOINT RESPONSIVE UNIFIÉ MOBILE-FIRST (< 1024px)
+   BREAKPOINT RESPONSIVE UNIFIÉ MOBILE & TABLETTE (< 1024px)
    ========================================================== */
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
   .desktop-only {
     display: none !important;
   }

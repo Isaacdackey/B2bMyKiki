@@ -1191,3 +1191,43 @@ body:has(.fidelite-modal-overlay) .mykiki-main-content,
   -webkit-overflow-scrolling: touch;
 }
 
+/* ============================================================
+   HARMONISATION RESPONSIVE B2B (GRILLES INLINE, CALENDRIER 7J & MODALES)
+   ============================================================ */
+@media (max-width: 768px) {
+  /* Les grilles inline 2 ou 3 colonnes des fiches et formulaires B2B s'empilent proprement sur mobile */
+  .super-admin-wrapper div[style*="grid-template-columns: 2fr 1fr"],
+  .super-admin-wrapper div[style*="grid-template-columns: 1fr 1fr"],
+  .super-admin-wrapper div[style*="grid-template-columns: 1.2fr 1fr 1fr"],
+  .super-admin-wrapper div[style*="grid-template-columns: 1fr 1.5fr"],
+  .super-admin-wrapper div[style*="grid-template-columns: 1.4fr 1fr"],
+  .super-admin-wrapper div[style*="grid-template-columns: 1fr 1.3fr"],
+  .super-admin-wrapper div[style*="grid-template-columns: repeat(3, 1fr)"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Les barres de sélection des 7 jours (Lundi..Dimanche) défilent horizontalement sur mobile sans casser la grille mensuelle */
+  .super-admin-wrapper div[style*="grid-template-columns: repeat(7, 1fr); gap: 0.5rem"] {
+    display: flex !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding-bottom: 0.35rem !important;
+  }
+
+  .super-admin-wrapper div[style*="grid-template-columns: repeat(7, 1fr); gap: 0.5rem"] > button {
+    flex: 1 0 92px !important;
+  }
+}
+
+@media (max-width: 440px) {
+  .modal-actions-row {
+    flex-direction: column !important;
+  }
+
+  .modal-actions-row > button {
+    width: 100% !important;
+    flex: none !important;
+  }
+}
+
+

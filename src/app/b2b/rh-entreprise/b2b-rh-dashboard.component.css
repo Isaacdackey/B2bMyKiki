@@ -301,3 +301,9 @@
     grid-template-columns: 1fr !important;
   }
 }
+
+@media (max-width: 640px) {
+  .rh-form-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+}

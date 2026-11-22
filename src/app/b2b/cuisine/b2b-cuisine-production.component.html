@@ -9,32 +9,32 @@
     <!-- ============================================================== -->
     <!-- EN-TÊTE OFFICIEL RESPONSABLE DE SITE KIKI                      -->
     <!-- ============================================================== -->
-    <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1rem 1.35rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; box-shadow: 0 4px 18px rgba(114, 21, 19, 0.05);">
-      <div>
-        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-          <span style="font-size: 0.72rem; color: #721513; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; background: #FAF5EA; padding: 0.2rem 0.65rem; border-radius: 9999px; border: 1px solid #E2D5BE; display: inline-flex; align-items: center; gap: 0.4rem;">
-            <i class="fa-solid fa-store"></i> RESPONSABLE DE SITE KIKI • EXPLOITATION & CANTINE
+    <div class="cuisine-hero-card">
+      <div style="min-width: 0; flex: 1 1 320px;">
+        <div class="cuisine-hero-badges">
+          <span style="font-size: 0.7rem; color: #721513; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; background: #FAF5EA; padding: 0.22rem 0.65rem; border-radius: 9999px; border: 1px solid #E2D5BE; display: inline-flex; align-items: center; gap: 0.35rem; max-width: 100%;">
+            <i class="fa-solid fa-store"></i> <span>RESPONSABLE DE SITE KIKI • EXPLOITATION</span>
           </span>
-          <span style="font-size: 0.72rem; color: #606C38; font-weight: 700; background: rgba(96, 108, 56, 0.1); padding: 0.2rem 0.65rem; border-radius: 9999px;">
-            <i class="fa-solid fa-shield-check"></i> Site : {{ entreprise().sites[0]?.nom || 'Siège Plateau' }}
+          <span style="font-size: 0.72rem; color: #606C38; font-weight: 700; background: rgba(96, 108, 56, 0.1); padding: 0.22rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.35rem;">
+            <i class="fa-solid fa-shield-check"></i> <span>Site : {{ entreprise().sites[0]?.nom || 'Siège Plateau' }}</span>
           </span>
         </div>
 
-        <h1 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.35rem; color: #721513; font-weight: 900;">
+        <h1 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: clamp(1.1rem, 2.5vw, 1.35rem); color: #721513; font-weight: 900; line-height: 1.3;">
           Gestion d'Exploitation Cantine • {{ entreprise().nom }}
         </h1>
-        <p style="margin: 0.2rem 0 0; font-size: 0.8rem; color: #6E5A56;">
+        <p style="margin: 0.25rem 0 0; font-size: 0.78rem; color: #6E5A56; line-height: 1.45;">
           Convention {{ entreprise().montantPriseEnChargeRepas | number }} FCFA/repas • Prestation : {{ getLibellePrestation(entreprise().typePrestation) }} • Cut-Off : {{ getLibelleCutOff(entreprise()) }}
         </p>
       </div>
 
       <!-- BOUTONS D'ACTIONS RAPIDES : PROJETER QR CODE & RECLAMATIONS -->
-      <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
+      <div class="cuisine-hero-actions">
         <button 
           type="button"
           (click)="setTab('PROJECTION_QR')"
           style="background: #E51D24; color: #FFFFFF; border: none; border-radius: 10px; padding: 0.55rem 1rem; font-weight: 800; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.45rem; cursor: pointer; box-shadow: 0 4px 14px rgba(229, 29, 36, 0.25);">
-          <i class="fa-solid fa-qrcode" style="font-size: 0.95rem;"></i> Projeter QR Code Cantine
+          <i class="fa-solid fa-qrcode"></i> Projeter QR Code Cantine
         </button>
 
         <button 
@@ -50,6 +50,31 @@
         </button>
       </div>
     </div>
+
+    <!-- BARRE D'ONGLETS SCROLLABLE (NAVIGATION RAPIDE MOBILE / TABLETTE / DESKTOP) -->
+    <nav class="cuisine-tabs-bar" aria-label="Onglets Exploitation Cuisine">
+      <button type="button" class="cuisine-tab-pill" [class.active]="activeTab() === 'MENU'" (click)="setTab('MENU')">
+        <i class="fa-solid fa-calendar-days"></i> Menu &amp; Quantités
+      </button>
+      <button type="button" class="cuisine-tab-pill" [class.active]="activeTab() === 'COMMANDES'" (click)="setTab('COMMANDES')">
+        <i class="fa-solid fa-receipt"></i> Commandes ({{ commandesSite().length }})
+      </button>
+      <button type="button" class="cuisine-tab-pill" [class.active]="activeTab() === 'PROJECTION_QR'" (click)="setTab('PROJECTION_QR')">
+        <i class="fa-solid fa-qrcode"></i> QR Cantine
+      </button>
+      <button type="button" class="cuisine-tab-pill" [class.active]="activeTab() === 'RECLAMATIONS'" (click)="setTab('RECLAMATIONS')">
+        <i class="fa-solid fa-triangle-exclamation"></i> Réclamations ({{ reclamationsEnAttenteCount() }})
+      </button>
+      <button type="button" class="cuisine-tab-pill" [class.active]="activeTab() === 'UTILISATEURS'" (click)="setTab('UTILISATEURS')">
+        <i class="fa-solid fa-users-gear"></i> Utilisateurs ({{ employesSite().length }})
+      </button>
+      <button type="button" class="cuisine-tab-pill" [class.active]="activeTab() === 'FACTURATION'" (click)="setTab('FACTURATION')">
+        <i class="fa-solid fa-file-invoice-dollar"></i> Facturation
+      </button>
+      <button type="button" class="cuisine-tab-pill" [class.active]="activeTab() === 'INFOS'" (click)="setTab('INFOS')">
+        <i class="fa-solid fa-circle-info"></i> Infos Contrat
+      </button>
+    </nav>
 
     <!-- ============================================================== -->
     <!-- ONGLET 1 : MENU PLANIFIÉ & SAISIE DES QUANTITÉS                -->
@@ -79,22 +104,22 @@
 
         @if (menuJourActif(); as mActif) {
           <!-- BANDEAU INFO CONFORMITÉ DU JOUR -->
-          <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-            <div>
-              <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <h3 style="margin: 0; font-size: 1.25rem; color: #721513; font-weight: 900;">
+          <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.15rem 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div style="min-width: 0; flex: 1 1 280px;">
+              <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                <h3 style="margin: 0; font-size: 1.15rem; color: #721513; font-weight: 900;">
                   {{ mActif.jourNom }} • {{ mActif.theme || 'Service Quotidien' }}
                 </h3>
                 @if (mActif.statutConformite === 'CONFORME') {
-                  <span style="background: rgba(96, 108, 56, 0.15); color: #606C38; font-size: 0.75rem; font-weight: 800; padding: 0.2rem 0.65rem; border-radius: 9999px; border: 1px solid #606C38;">
+                  <span style="background: rgba(96, 108, 56, 0.15); color: #606C38; font-size: 0.72rem; font-weight: 800; padding: 0.2rem 0.65rem; border-radius: 9999px; border: 1px solid #606C38;">
                     <i class="fa-solid fa-check"></i> Conforme aux effectifs ({{ employesSubventionnesCount() }} repas)
                   </span>
                 } @else if (mActif.statutConformite === 'NON_CONFORME') {
-                  <span style="background: #FEE2E2; color: #DC2626; font-size: 0.75rem; font-weight: 800; padding: 0.2rem 0.65rem; border-radius: 9999px; border: 1px solid #DC2626;">
+                  <span style="background: #FEE2E2; color: #DC2626; font-size: 0.72rem; font-weight: 800; padding: 0.2rem 0.65rem; border-radius: 9999px; border: 1px solid #DC2626;">
                     <i class="fa-solid fa-triangle-exclamation"></i> Quantités insuffisantes (< {{ employesSubventionnesCount() }})
                   </span>
                 } @else {
-                  <span style="background: #FEF3C7; color: #D97706; font-size: 0.75rem; font-weight: 800; padding: 0.2rem 0.65rem; border-radius: 9999px; border: 1px solid #FCD34D;">
+                  <span style="background: #FEF3C7; color: #D97706; font-size: 0.72rem; font-weight: 800; padding: 0.2rem 0.65rem; border-radius: 9999px; border: 1px solid #FCD34D;">
                     <i class="fa-regular fa-clock"></i> Non saisi (Non visible par les salariés)
                   </span>
                 }
@@ -113,66 +138,68 @@
           </div>
 
           <!-- TABLEAU DES PLATS PLANIFIÉS AVEC SAISIE DES QUANTITÉS -->
-          <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
-            <div style="padding: 1rem 1.25rem; background: #FAF8F4; border-bottom: 1px solid #EDE7DC; font-weight: 800; font-size: 0.85rem; color: #721513; display: flex; justify-content: space-between; align-items: center;">
-              <span><i class="fa-solid fa-list-check"></i> Plats & Quantités au programme de {{ mActif.jourNom }}</span>
+          <div class="cuisine-table-card">
+            <div class="cuisine-table-header" style="font-weight: 800; font-size: 0.85rem; color: #721513;">
+              <span><i class="fa-solid fa-list-check"></i> Plats &amp; Quantités au programme de {{ mActif.jourNom }}</span>
               <span style="font-size: 0.78rem; color: #6E5A56; font-weight: 600;">{{ mActif.lignes.length }} plat(s) au menu</span>
             </div>
 
-            <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
-              <thead>
-                <tr style="background: #FAF8F4; color: #6E5A56; font-size: 0.72rem; text-transform: uppercase; font-weight: 800; border-bottom: 1.5px solid #EDE7DC;">
-                  <th style="padding: 0.85rem 1.25rem;">Catégorie</th>
-                  <th style="padding: 0.85rem 1.25rem;">Plat</th>
-                  <th style="padding: 0.85rem 1.25rem; text-align: center;">Quantité Prévue (Portions)</th>
-                  <th style="padding: 0.85rem 1.25rem; text-align: center;">Déjà Commandé</th>
-                  <th style="padding: 0.85rem 1.25rem; text-align: center;">Reste Disponible</th>
-                  <th style="padding: 0.85rem 1.25rem; text-align: center;">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (ligne of mActif.lignes; track ligne.id) {
-                  @let stock = b2b.getStockInfoPlat(ligne.platId, mActif.jourNom);
-                  <tr style="border-bottom: 1px solid #F0EAE1;">
-                    <td style="padding: 0.85rem 1.25rem;">
-                      <span [style.background]="ligne.categorie === 'PLAT' ? '#FEE2E2' : ligne.categorie === 'ENTREE' ? '#ECFDF5' : ligne.categorie === 'DESSERT' ? '#FEF3C7' : '#EFF6FF'"
-                            [style.color]="ligne.categorie === 'PLAT' ? '#991B1B' : ligne.categorie === 'ENTREE' ? '#065F46' : ligne.categorie === 'DESSERT' ? '#92400E' : '#1E40AF'"
-                            style="padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; display: inline-block;">
-                        {{ ligne.categorie }}
-                      </span>
-                    </td>
-                    <td style="padding: 0.85rem 1.25rem;">
-                      <strong style="color: #332724; font-size: 0.9rem;">{{ ligne.nomPlat }}</strong>
-                    </td>
-                    <td style="padding: 0.85rem 1.25rem; text-align: center;">
-                      <input 
-                        type="number" 
-                        min="0"
-                        [ngModel]="ligne.quantitePrevue"
-                        (ngModelChange)="onQuantiteChange(ligne.id, $event)"
-                        style="width: 80px; text-align: center; padding: 0.45rem; border: 1.5px solid #CBD5E1; border-radius: 8px; font-weight: 800; font-size: 0.95rem; color: #721513; background: #FAF5EA;">
-                    </td>
-                    <td style="padding: 0.85rem 1.25rem; text-align: center; font-weight: 700; color: #6E5A56;">
-                      {{ stock.dejaCommande }}
-                    </td>
-                    <td style="padding: 0.85rem 1.25rem; text-align: center;">
-                      <span [style.color]="stock.resteDisponible > 5 ? '#606C38' : '#DC2626'" style="font-weight: 900; font-size: 0.95rem;">
-                        {{ stock.resteDisponible }}
-                      </span>
-                    </td>
-                    <td style="padding: 0.85rem 1.25rem; text-align: center;">
-                      <button 
-                        type="button" 
-                        (click)="supprimerLigneMenu(ligne.id)"
-                        style="background: none; border: none; color: #DC2626; cursor: pointer; padding: 0.4rem; font-size: 1rem; display: inline-flex; align-items: center; justify-content: center; margin: 0 auto;"
-                        title="Retirer ce plat du programme">
-                        <i class="fa-regular fa-trash-can"></i>
-                      </button>
-                    </td>
+            <div class="cuisine-table-wrap">
+              <table class="cuisine-table">
+                <thead>
+                  <tr>
+                    <th>Catégorie</th>
+                    <th>Plat</th>
+                    <th style="text-align: center;">Quantité Prévue (Portions)</th>
+                    <th style="text-align: center;">Déjà Commandé</th>
+                    <th style="text-align: center;">Reste Disponible</th>
+                    <th style="text-align: center;">Action</th>
                   </tr>
-                }
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  @for (ligne of mActif.lignes; track ligne.id) {
+                    @let stock = b2b.getStockInfoPlat(ligne.platId, mActif.jourNom);
+                    <tr>
+                      <td data-label="Catégorie">
+                        <span [style.background]="ligne.categorie === 'PLAT' ? '#FEE2E2' : ligne.categorie === 'ENTREE' ? '#ECFDF5' : ligne.categorie === 'DESSERT' ? '#FEF3C7' : '#EFF6FF'"
+                              [style.color]="ligne.categorie === 'PLAT' ? '#991B1B' : ligne.categorie === 'ENTREE' ? '#065F46' : ligne.categorie === 'DESSERT' ? '#92400E' : '#1E40AF'"
+                              style="padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; display: inline-block;">
+                          {{ ligne.categorie }}
+                        </span>
+                      </td>
+                      <td data-label="Plat">
+                        <strong style="color: #332724; font-size: 0.9rem;">{{ ligne.nomPlat }}</strong>
+                      </td>
+                      <td data-label="Quantité Prévue" style="text-align: center;">
+                        <input 
+                          type="number" 
+                          min="0"
+                          [ngModel]="ligne.quantitePrevue"
+                          (ngModelChange)="onQuantiteChange(ligne.id, $event)"
+                          style="width: 80px; text-align: center; padding: 0.45rem; border: 1.5px solid #CBD5E1; border-radius: 8px; font-weight: 800; font-size: 0.95rem; color: #721513; background: #FAF5EA;">
+                      </td>
+                      <td data-label="Déjà Commandé" style="text-align: center; font-weight: 700; color: #6E5A56;">
+                        {{ stock.dejaCommande }}
+                      </td>
+                      <td data-label="Reste Disponible" style="text-align: center;">
+                        <span [style.color]="stock.resteDisponible > 5 ? '#606C38' : '#DC2626'" style="font-weight: 900; font-size: 0.95rem;">
+                          {{ stock.resteDisponible }}
+                        </span>
+                      </td>
+                      <td data-label="Action" style="text-align: center;">
+                        <button 
+                          type="button" 
+                          (click)="supprimerLigneMenu(ligne.id)"
+                          style="background: none; border: none; color: #DC2626; cursor: pointer; padding: 0.4rem; font-size: 1rem; display: inline-flex; align-items: center; justify-content: center;"
+                          title="Retirer ce plat du programme">
+                          <i class="fa-regular fa-trash-can"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
           </div>
         }
       </div>
@@ -228,8 +255,8 @@
         </div>
 
         <!-- TABLEAU DES COMMANDES DU JOUR AVEC PROCESSUS STRICT DE SCAN & LIVRAISON -->
-        <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
-          <div style="padding: 1rem 1.25rem; background: #FAF8F4; border-bottom: 1px solid #EDE7DC; display: flex; justify-content: space-between; align-items: center;">
+        <div class="cuisine-table-card">
+          <div class="cuisine-table-header">
             <span style="font-weight: 800; font-size: 0.88rem; color: #721513;">
               <i class="fa-solid fa-list-check"></i> File des commandes du jour (Distribution Réfectoire)
             </span>
@@ -238,72 +265,74 @@
             </span>
           </div>
 
-          <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
-            <thead>
-              <tr style="background: #FAF8F4; color: #6E5A56; font-size: 0.72rem; text-transform: uppercase; font-weight: 800; border-bottom: 1.5px solid #EDE7DC;">
-                <th style="padding: 0.85rem 1.25rem;">Heure</th>
-                <th style="padding: 0.85rem 1.25rem;">Matricule</th>
-                <th style="padding: 0.85rem 1.25rem;">Salarié</th>
-                <th style="padding: 0.85rem 1.25rem;">Plat Commandé</th>
-                <th style="padding: 0.85rem 1.25rem; text-align: center;">Statut</th>
-                <th style="padding: 0.85rem 1.25rem; text-align: center;">Action Responsable</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (cmd of commandesSite(); track cmd.id) {
-                <tr style="border-bottom: 1px solid #F0EAE1;">
-                  <td style="padding: 0.85rem 1.25rem; font-weight: 700; color: #6E5A56;">
-                    {{ cmd.heure }}
-                  </td>
-                  <td style="padding: 0.85rem 1.25rem;">
-                    <span style="font-family: monospace; font-size: 0.78rem; font-weight: 800; color: #721513; background: #FAF5EA; padding: 0.2rem 0.5rem; border-radius: 6px;">
-                      {{ cmd.matricule }}
-                    </span>
-                  </td>
-                  <td style="padding: 0.85rem 1.25rem;">
-                    <strong style="color: #332724;">{{ cmd.employeNom }}</strong>
-                  </td>
-                  <td style="padding: 0.85rem 1.25rem; color: #332724;">
-                    {{ cmd.platNom }}
-                  </td>
-                  <td style="padding: 0.85rem 1.25rem; text-align: center;">
-                    @if (cmd.statut === 'LIVRE') {
-                      <span style="background: rgba(96, 108, 56, 0.15); color: #606C38; font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #606C38; display: inline-flex; align-items: center; gap: 0.35rem;">
-                        <i class="fa-solid fa-check-double"></i> Livré ({{ cmd.livreAt || '12h14' }})
-                      </span>
-                    } @else if (cmd.statut === 'SCANNE') {
-                      <span style="background: #DBEAFE; color: #1D4ED8; font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #93C5FD; display: inline-flex; align-items: center; gap: 0.35rem;">
-                        <i class="fa-solid fa-qrcode"></i> Scanné ({{ cmd.scanneAt || '12h20' }})
-                      </span>
-                    } @else {
-                      <span style="background: #FEF3C7; color: #B45309; font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #FCD34D; display: inline-flex; align-items: center; gap: 0.35rem;">
-                        <i class="fa-regular fa-clock"></i> En cours
-                      </span>
-                    }
-                  </td>
-                  <td style="padding: 0.85rem 1.25rem; text-align: center;">
-                    @if (cmd.statut === 'EN_COURS') {
-                      <span style="background: rgba(51, 39, 36, 0.07); color: #6E5A56; border: 1px solid #EDE7DC; border-radius: 9999px; padding: 0.3rem 0.72rem; font-size: 0.72rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap; margin: 0 auto;">
-                        <i class="fa-solid fa-clock"></i> En attente de scan
-                      </span>
-                    } @else if (cmd.statut === 'SCANNE') {
-                      <!-- Bouton autorisant le Responsable à marquer livré -->
-                      <button 
-                        type="button" 
-                        (click)="marquerLivre(cmd.id)"
-                        style="min-height: 0; background: #606C38; color: #FFFFFF; border: none; border-radius: 8px; padding: 0.38rem 0.85rem; font-size: 0.74rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap; box-shadow: 0 2px 8px rgba(96, 108, 56, 0.25); margin: 0 auto;">
-                        <i class="fa-solid fa-check"></i> Marquer Livré
-                      </button>
-                    } @else {
-                      <span style="font-size: 0.78rem; color: #606C38; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem; margin: 0 auto;">
-                        <i class="fa-solid fa-circle-check"></i> Remis
-                      </span>
-                    }
-                  </td>
+          <div class="cuisine-table-wrap">
+            <table class="cuisine-table">
+              <thead>
+                <tr>
+                  <th>Heure</th>
+                  <th>Matricule</th>
+                  <th>Salarié</th>
+                  <th>Plat Commandé</th>
+                  <th style="text-align: center;">Statut</th>
+                  <th style="text-align: center;">Action Responsable</th>
                 </tr>
-              }
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                @for (cmd of commandesSite(); track cmd.id) {
+                  <tr>
+                    <td data-label="Heure" style="font-weight: 700; color: #6E5A56;">
+                      {{ cmd.heure }}
+                    </td>
+                    <td data-label="Matricule">
+                      <span style="font-family: monospace; font-size: 0.78rem; font-weight: 800; color: #721513; background: #FAF5EA; padding: 0.2rem 0.5rem; border-radius: 6px;">
+                        {{ cmd.matricule }}
+                      </span>
+                    </td>
+                    <td data-label="Salarié">
+                      <strong style="color: #332724;">{{ cmd.employeNom }}</strong>
+                    </td>
+                    <td data-label="Plat Commandé" style="color: #332724;">
+                      {{ cmd.platNom }}
+                    </td>
+                    <td data-label="Statut" style="text-align: center;">
+                      @if (cmd.statut === 'LIVRE') {
+                        <span style="background: rgba(96, 108, 56, 0.15); color: #606C38; font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #606C38; display: inline-flex; align-items: center; gap: 0.35rem;">
+                          <i class="fa-solid fa-check-double"></i> Livré ({{ cmd.livreAt || '12h14' }})
+                        </span>
+                      } @else if (cmd.statut === 'SCANNE') {
+                        <span style="background: #DBEAFE; color: #1D4ED8; font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #93C5FD; display: inline-flex; align-items: center; gap: 0.35rem;">
+                          <i class="fa-solid fa-qrcode"></i> Scanné ({{ cmd.scanneAt || '12h20' }})
+                        </span>
+                      } @else {
+                        <span style="background: #FEF3C7; color: #B45309; font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #FCD34D; display: inline-flex; align-items: center; gap: 0.35rem;">
+                          <i class="fa-regular fa-clock"></i> En cours
+                        </span>
+                      }
+                    </td>
+                    <td data-label="Action Responsable" style="text-align: center;">
+                      @if (cmd.statut === 'EN_COURS') {
+                        <span style="background: rgba(51, 39, 36, 0.07); color: #6E5A56; border: 1px solid #EDE7DC; border-radius: 9999px; padding: 0.3rem 0.72rem; font-size: 0.72rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
+                          <i class="fa-solid fa-clock"></i> En attente de scan
+                        </span>
+                      } @else if (cmd.statut === 'SCANNE') {
+                        <!-- Bouton autorisant le Responsable à marquer livré -->
+                        <button 
+                          type="button" 
+                          (click)="marquerLivre(cmd.id)"
+                          style="min-height: 0; background: #606C38; color: #FFFFFF; border: none; border-radius: 8px; padding: 0.38rem 0.85rem; font-size: 0.74rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap; box-shadow: 0 2px 8px rgba(96, 108, 56, 0.25);">
+                          <i class="fa-solid fa-check"></i> Marquer Livré
+                        </button>
+                      } @else {
+                        <span style="font-size: 0.78rem; color: #606C38; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;">
+                          <i class="fa-solid fa-circle-check"></i> Remis
+                        </span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <!-- MODALE DÉTAIL NOMINATIF D'UNE JOURNÉE DE FACTURATION -->
@@ -329,26 +358,28 @@
                   Aucun détail nominatif enregistré pour cette journée dans les données de démonstration.
                 </div>
               } @else {
-                <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
-                  <thead>
-                    <tr style="background: #FAF8F4; border-bottom: 1.5px solid #EDE7DC; text-align: left;">
-                      <th style="padding: 0.6rem;">Collaborateur</th>
-                      <th style="padding: 0.6rem;">Plat</th>
-                      <th style="padding: 0.6rem;">Taux (date T)</th>
-                      <th style="padding: 0.6rem;">Part Entreprise</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @for (c of detailsCommandesJourSelectionne(); track c.id) {
-                      <tr style="border-bottom: 1px solid #EDE7DC;">
-                        <td style="padding: 0.6rem;"><strong>{{ c.employeNom }}</strong><br><small style="color: #6E5A56;">{{ c.matricule }}</small></td>
-                        <td style="padding: 0.6rem; color: #332724;">{{ c.platNom }}</td>
-                        <td style="padding: 0.6rem; font-weight: 800; color: #606C38;">{{ c.tauxApplique }}%</td>
-                        <td style="padding: 0.6rem; font-weight: 800; color: #721513;">{{ (c.partEntreprise | number) }} FCFA</td>
+                <div class="cuisine-table-wrap">
+                  <table class="cuisine-table" style="min-width: 100%; font-size: 0.82rem;">
+                    <thead>
+                      <tr>
+                        <th>Collaborateur</th>
+                        <th>Plat</th>
+                        <th>Taux (date T)</th>
+                        <th>Part Entreprise</th>
                       </tr>
-                    }
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      @for (c of detailsCommandesJourSelectionne(); track c.id) {
+                        <tr>
+                          <td data-label="Collaborateur"><div><strong>{{ c.employeNom }}</strong><br><small style="color: #6E5A56;">{{ c.matricule }}</small></div></td>
+                          <td data-label="Plat" style="color: #332724;">{{ c.platNom }}</td>
+                          <td data-label="Taux (date T)" style="font-weight: 800; color: #606C38;">{{ c.tauxApplique }}%</td>
+                          <td data-label="Part Entreprise" style="font-weight: 800; color: #721513;">{{ (c.partEntreprise | number) }} FCFA</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
               }
             </div>
           </div>
@@ -433,68 +464,70 @@
           </span>
         </div>
 
-        <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
-          <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
-            <thead>
-              <tr style="background: #FAF8F4; color: #6E5A56; font-size: 0.72rem; text-transform: uppercase; font-weight: 800; border-bottom: 1.5px solid #EDE7DC;">
-                <th style="padding: 0.85rem 1.25rem;">Date & Heure</th>
-                <th style="padding: 0.85rem 1.25rem;">Matricule</th>
-                <th style="padding: 0.85rem 1.25rem;">Salarié</th>
-                <th style="padding: 0.85rem 1.25rem;">Département</th>
-                <th style="padding: 0.85rem 1.25rem;">Motif du retard</th>
-                <th style="padding: 0.85rem 1.25rem; text-align: center;">Statut</th>
-                <th style="padding: 0.85rem 1.25rem; text-align: center;">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (rec of reclamations(); track rec.id) {
-                <tr style="border-bottom: 1px solid #F0EAE1;">
-                  <td style="padding: 0.85rem 1.25rem; font-weight: 700; color: #6E5A56;">
-                    {{ rec.date }} • {{ rec.heureDemande }}
-                  </td>
-                  <td style="padding: 0.85rem 1.25rem; white-space: nowrap;">
-                    <span style="font-family: monospace; font-size: 0.78rem; font-weight: 800; color: #721513; background: #FAF5EA; padding: 0.2rem 0.5rem; border-radius: 6px; white-space: nowrap; display: inline-block;">
-                      {{ rec.matricule }}
-                    </span>
-                  </td>
-                  <td style="padding: 0.85rem 1.25rem;">
-                    <strong style="color: #332724;">{{ rec.employeNom }}</strong>
-                  </td>
-                  <td style="padding: 0.85rem 1.25rem; color: #6E5A56;">
-                    {{ rec.departement }}
-                  </td>
-                  <td style="padding: 0.85rem 1.25rem; color: #332724; max-width: 280px;">
-                    "{{ rec.motif }}"
-                  </td>
-                  <td style="padding: 0.85rem 1.25rem; text-align: center;">
-                    @if (rec.statut === 'DEBLOQUE') {
-                      <span style="background: rgba(96, 108, 56, 0.15); color: #606C38; font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #606C38; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
-                        <i class="fa-solid fa-lock-open"></i> Débloqué ({{ rec.debloqueAt || '10:45' }})
-                      </span>
-                    } @else {
-                      <span style="background: #FEE2E2; color: #DC2626; font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #FCA5A5; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
-                        <i class="fa-solid fa-triangle-exclamation"></i> En attente
-                      </span>
-                    }
-                  </td>
-                  <td style="padding: 0.85rem 1.25rem; text-align: center;">
-                    @if (rec.statut === 'EN_ATTENTE') {
-                      <button 
-                        type="button" 
-                        (click)="debloquerEmploye(rec.id)"
-                        style="background: #606C38; color: #FFFFFF; border: none; border-radius: 6px; padding: 0.35rem 0.75rem; font-size: 0.74rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; box-shadow: 0 2px 6px rgba(96, 108, 56, 0.25); white-space: nowrap; margin: 0 auto;">
-                        <i class="fa-solid fa-lock-open" style="font-size: 0.75rem;"></i> Débloquer pour aujourd'hui
-                      </button>
-                    } @else {
-                      <span style="font-size: 0.75rem; color: #606C38; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem; margin: 0 auto;">
-                        <i class="fa-solid fa-check"></i> Autorisé à commander
-                      </span>
-                    }
-                  </td>
+        <div class="cuisine-table-card">
+          <div class="cuisine-table-wrap">
+            <table class="cuisine-table">
+              <thead>
+                <tr>
+                  <th>Date &amp; Heure</th>
+                  <th>Matricule</th>
+                  <th>Salarié</th>
+                  <th>Département</th>
+                  <th>Motif du retard</th>
+                  <th style="text-align: center;">Statut</th>
+                  <th style="text-align: center;">Action</th>
                 </tr>
-              }
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                @for (rec of reclamations(); track rec.id) {
+                  <tr>
+                    <td data-label="Date &amp; Heure" style="font-weight: 700; color: #6E5A56;">
+                      {{ rec.date }} • {{ rec.heureDemande }}
+                    </td>
+                    <td data-label="Matricule" style="white-space: nowrap;">
+                      <span style="font-family: monospace; font-size: 0.78rem; font-weight: 800; color: #721513; background: #FAF5EA; padding: 0.2rem 0.5rem; border-radius: 6px; white-space: nowrap; display: inline-block;">
+                        {{ rec.matricule }}
+                      </span>
+                    </td>
+                    <td data-label="Salarié">
+                      <strong style="color: #332724;">{{ rec.employeNom }}</strong>
+                    </td>
+                    <td data-label="Département" style="color: #6E5A56;">
+                      {{ rec.departement }}
+                    </td>
+                    <td data-label="Motif du retard" style="color: #332724; max-width: 280px;">
+                      "{{ rec.motif }}"
+                    </td>
+                    <td data-label="Statut" style="text-align: center;">
+                      @if (rec.statut === 'DEBLOQUE') {
+                        <span style="background: rgba(96, 108, 56, 0.15); color: #606C38; font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #606C38; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
+                          <i class="fa-solid fa-lock-open"></i> Débloqué ({{ rec.debloqueAt || '10:45' }})
+                        </span>
+                      } @else {
+                        <span style="background: #FEE2E2; color: #DC2626; font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.75rem; border-radius: 9999px; border: 1px solid #FCA5A5; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
+                          <i class="fa-solid fa-triangle-exclamation"></i> En attente
+                        </span>
+                      }
+                    </td>
+                    <td data-label="Action" style="text-align: center;">
+                      @if (rec.statut === 'EN_ATTENTE') {
+                        <button 
+                          type="button" 
+                          (click)="debloquerEmploye(rec.id)"
+                          style="min-height: 0; background: #606C38; color: #FFFFFF; border: none; border-radius: 6px; padding: 0.35rem 0.75rem; font-size: 0.74rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; box-shadow: 0 2px 6px rgba(96, 108, 56, 0.25); white-space: nowrap;">
+                          <i class="fa-solid fa-lock-open" style="font-size: 0.75rem;"></i> Débloquer pour aujourd'hui
+                        </button>
+                      } @else {
+                        <span style="font-size: 0.75rem; color: #606C38; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;">
+                          <i class="fa-solid fa-check"></i> Autorisé à commander
+                        </span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <!-- MODALE DÉTAIL NOMINATIF D'UNE JOURNÉE DE FACTURATION -->
@@ -520,26 +553,28 @@
                   Aucun détail nominatif enregistré pour cette journée dans les données de démonstration.
                 </div>
               } @else {
-                <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
-                  <thead>
-                    <tr style="background: #FAF8F4; border-bottom: 1.5px solid #EDE7DC; text-align: left;">
-                      <th style="padding: 0.6rem;">Collaborateur</th>
-                      <th style="padding: 0.6rem;">Plat</th>
-                      <th style="padding: 0.6rem;">Taux (date T)</th>
-                      <th style="padding: 0.6rem;">Part Entreprise</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @for (c of detailsCommandesJourSelectionne(); track c.id) {
-                      <tr style="border-bottom: 1px solid #EDE7DC;">
-                        <td style="padding: 0.6rem;"><strong>{{ c.employeNom }}</strong><br><small style="color: #6E5A56;">{{ c.matricule }}</small></td>
-                        <td style="padding: 0.6rem; color: #332724;">{{ c.platNom }}</td>
-                        <td style="padding: 0.6rem; font-weight: 800; color: #606C38;">{{ c.tauxApplique }}%</td>
-                        <td style="padding: 0.6rem; font-weight: 800; color: #721513;">{{ (c.partEntreprise | number) }} FCFA</td>
+                <div class="cuisine-table-wrap">
+                  <table class="cuisine-table" style="min-width: 100%; font-size: 0.82rem;">
+                    <thead>
+                      <tr>
+                        <th>Collaborateur</th>
+                        <th>Plat</th>
+                        <th>Taux (date T)</th>
+                        <th>Part Entreprise</th>
                       </tr>
-                    }
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      @for (c of detailsCommandesJourSelectionne(); track c.id) {
+                        <tr>
+                          <td data-label="Collaborateur"><div><strong>{{ c.employeNom }}</strong><br><small style="color: #6E5A56;">{{ c.matricule }}</small></div></td>
+                          <td data-label="Plat" style="color: #332724;">{{ c.platNom }}</td>
+                          <td data-label="Taux (date T)" style="font-weight: 800; color: #606C38;">{{ c.tauxApplique }}%</td>
+                          <td data-label="Part Entreprise" style="font-weight: 800; color: #721513;">{{ (c.partEntreprise | number) }} FCFA</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
               }
             </div>
           </div>
@@ -552,8 +587,8 @@
     <!-- ONGLET 5 : UTILISATEURS DU SITE                                -->
     <!-- ============================================================== -->
     @if (activeTab() === 'UTILISATEURS') {
-      <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
-        <div style="padding: 1.15rem 1.25rem; background: #FAF8F4; border-bottom: 1px solid #EDE7DC; display: flex; justify-content: space-between; align-items: center;">
+      <div class="cuisine-table-card">
+        <div class="cuisine-table-header">
           <div>
             <h3 style="margin: 0; font-size: 1.15rem; color: #721513; font-weight: 900;">
               Effectifs du Site • {{ entreprise().sites[0]?.nom || 'Siège Plateau' }}
@@ -564,51 +599,55 @@
           </div>
         </div>
 
-        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
-          <thead>
-            <tr style="background: #FAF8F4; color: #6E5A56; font-size: 0.72rem; text-transform: uppercase; font-weight: 800; border-bottom: 1.5px solid #EDE7DC;">
-              <th style="padding: 0.85rem 1.25rem;">Matricule</th>
-              <th style="padding: 0.85rem 1.25rem;">Nom & Prénom</th>
-              <th style="padding: 0.85rem 1.25rem;">Département</th>
-              <th style="padding: 0.85rem 1.25rem; text-align: center;">Taux Subvention</th>
-              <th style="padding: 0.85rem 1.25rem; text-align: center;">Repas ce Mois</th>
-              <th style="padding: 0.85rem 1.25rem; text-align: center;">Statut</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (emp of employesSite(); track emp.id) {
-              <tr style="border-bottom: 1px solid #F0EAE1;">
-                <td style="padding: 0.85rem 1.25rem;">
-                  <span style="font-family: monospace; font-size: 0.78rem; font-weight: 800; color: #721513; background: #FAF5EA; padding: 0.2rem 0.5rem; border-radius: 6px;">
-                    {{ emp.matricule }}
-                  </span>
-                </td>
-                <td style="padding: 0.85rem 1.25rem;">
-                  <strong style="color: #332724;">{{ emp.prenom }} {{ emp.nom }}</strong>
-                  <div style="font-size: 0.75rem; color: #6E5A56;">{{ emp.email }}</div>
-                </td>
-                <td style="padding: 0.85rem 1.25rem; color: #6E5A56;">
-                  {{ emp.departement }}
-                </td>
-                <td style="padding: 0.85rem 1.25rem; text-align: center;">
-                  <span [style.background]="emp.tauxSubvention > 0 ? 'rgba(96, 108, 56, 0.12)' : '#F1F5F9'"
-                        [style.color]="emp.tauxSubvention > 0 ? '#606C38' : '#64748B'"
-                        style="padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.78rem; font-weight: 800;">
-                    {{ emp.tauxSubvention }}%
-                  </span>
-                </td>
-                <td style="padding: 0.85rem 1.25rem; text-align: center; font-weight: 800; color: #332724;">
-                  {{ emp.repasConsommesMois }}
-                </td>
-                <td style="padding: 0.85rem 1.25rem; text-align: center;">
-                  <span style="color: #606C38; font-weight: 800; font-size: 0.75rem;">
-                    <i class="fa-solid fa-circle-check"></i> Actif
-                  </span>
-                </td>
+        <div class="cuisine-table-wrap">
+          <table class="cuisine-table">
+            <thead>
+              <tr>
+                <th>Matricule</th>
+                <th>Nom &amp; Prénom</th>
+                <th>Département</th>
+                <th style="text-align: center;">Taux Subvention</th>
+                <th style="text-align: center;">Repas ce Mois</th>
+                <th style="text-align: center;">Statut</th>
               </tr>
-            }
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              @for (emp of employesSite(); track emp.id) {
+                <tr>
+                  <td data-label="Matricule">
+                    <span style="font-family: monospace; font-size: 0.78rem; font-weight: 800; color: #721513; background: #FAF5EA; padding: 0.2rem 0.5rem; border-radius: 6px;">
+                      {{ emp.matricule }}
+                    </span>
+                  </td>
+                  <td data-label="Nom &amp; Prénom">
+                    <div>
+                      <strong style="color: #332724;">{{ emp.prenom }} {{ emp.nom }}</strong>
+                      <div style="font-size: 0.75rem; color: #6E5A56;">{{ emp.email }}</div>
+                    </div>
+                  </td>
+                  <td data-label="Département" style="color: #6E5A56;">
+                    {{ emp.departement }}
+                  </td>
+                  <td data-label="Taux Subvention" style="text-align: center;">
+                    <span [style.background]="emp.tauxSubvention > 0 ? 'rgba(96, 108, 56, 0.12)' : '#F1F5F9'"
+                          [style.color]="emp.tauxSubvention > 0 ? '#606C38' : '#64748B'"
+                          style="padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.78rem; font-weight: 800;">
+                      {{ emp.tauxSubvention }}%
+                    </span>
+                  </td>
+                  <td data-label="Repas ce Mois" style="text-align: center; font-weight: 800; color: #332724;">
+                    {{ emp.repasConsommesMois }}
+                  </td>
+                  <td data-label="Statut" style="text-align: center;">
+                    <span style="color: #606C38; font-weight: 800; font-size: 0.75rem;">
+                      <i class="fa-solid fa-circle-check"></i> Actif
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       </div>
     }
 
@@ -627,7 +666,7 @@
             <div style="font-size: 2rem; font-weight: 900; color: #721513; margin-top: 0.35rem;">
               {{ totalPlatsLivresMoisSite() }} <span style="font-size: 1rem; color: #6E5A56; font-weight: 600;">plats</span>
             </div>
-            <span style="font-size: 0.75rem; color: #606C38; font-weight: 700;">Émargés & validés sur site</span>
+            <span style="font-size: 0.75rem; color: #606C38; font-weight: 700;">Émargés &amp; validés sur site</span>
           </div>
 
           <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.25rem; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
@@ -642,8 +681,8 @@
         </div>
 
         <!-- TABLEAU JOURNALIER DES REPAS LIVRÉS -->
-        <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
-          <div style="padding: 1.15rem 1.25rem; background: #FAF8F4; border-bottom: 1px solid #EDE7DC; font-weight: 800; font-size: 0.88rem; color: #721513; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+        <div class="cuisine-table-card">
+          <div class="cuisine-table-header" style="font-weight: 800; font-size: 0.88rem; color: #721513;">
             <span style="display: inline-flex; align-items: center; gap: 0.42rem;">
               <i class="fa-solid fa-calendar-check"></i> Relevé journalier de facturation
             </span>
@@ -653,43 +692,47 @@
             </button>
           </div>
 
-          <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
-            <thead>
-              <tr style="background: #FAF8F4; color: #6E5A56; font-size: 0.72rem; text-transform: uppercase; font-weight: 800; border-bottom: 1.5px solid #EDE7DC;">
-                <th style="padding: 0.85rem 1.25rem;">Date</th>
-                <th style="padding: 0.85rem 1.25rem; text-align: center;">Plats Livrés</th>
-                <th style="padding: 0.85rem 1.25rem; text-align: right;">Montant Total</th>
-                <th style="padding: 0.85rem 1.25rem; text-align: right;">Part Entreprise</th>
-                <th style="padding: 0.85rem 1.25rem; text-align: center;">Statut</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (ligne of facturationJournaliere(); track ligne.date) {
-                <tr (click)="facturationJourSelectionne.set(ligne)" style="border-bottom: 1px solid #F0EAE1; cursor: pointer;" title="Cliquer pour voir le détail nominatif">
-                  <td style="padding: 0.85rem 1.25rem; font-weight: 700; color: #332724;">
-                    <div>{{ ligne.dateAffichee }}</div>
-                    <div style="font-size: 0.7rem; color: #721513; font-weight: 700;">Voir détail →</div>
-                  </td>
-                  <td style="padding: 0.85rem 1.25rem; text-align: center; font-weight: 900; color: #721513;">
-                    {{ ligne.nbPlatsLivres }}
-                  </td>
-                  <td style="padding: 0.85rem 1.25rem; text-align: right; font-weight: 800; color: #332724;">
-                    {{ ligne.montantTotal | number }} FCFA
-                  </td>
-                  <td style="padding: 0.85rem 1.25rem; text-align: right; font-weight: 900; color: #606C38;">
-                    {{ ligne.montantPartEntreprise | number }} FCFA
-                  </td>
-                  <td style="padding: 0.85rem 1.25rem; text-align: center;">
-                    <span [style.background]="ligne.statut === 'FACTURE' ? 'rgba(96, 108, 56, 0.15)' : '#FAF5EA'"
-                          [style.color]="ligne.statut === 'FACTURE' ? '#606C38' : '#721513'"
-                          style="padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800;">
-                      {{ ligne.statut }}
-                    </span>
-                  </td>
+          <div class="cuisine-table-wrap">
+            <table class="cuisine-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th style="text-align: center;">Plats Livrés</th>
+                  <th style="text-align: right;">Montant Total</th>
+                  <th style="text-align: right;">Part Entreprise</th>
+                  <th style="text-align: center;">Statut</th>
                 </tr>
-              }
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                @for (ligne of facturationJournaliere(); track ligne.date) {
+                  <tr (click)="facturationJourSelectionne.set(ligne)" style="cursor: pointer;" title="Cliquer pour voir le détail nominatif">
+                    <td data-label="Date" style="font-weight: 700; color: #332724;">
+                      <div>
+                        <div>{{ ligne.dateAffichee }}</div>
+                        <div style="font-size: 0.7rem; color: #721513; font-weight: 700;">Voir détail →</div>
+                      </div>
+                    </td>
+                    <td data-label="Plats Livrés" style="text-align: center; font-weight: 900; color: #721513;">
+                      {{ ligne.nbPlatsLivres }}
+                    </td>
+                    <td data-label="Montant Total" style="text-align: right; font-weight: 800; color: #332724;">
+                      {{ ligne.montantTotal | number }} FCFA
+                    </td>
+                    <td data-label="Part Entreprise" style="text-align: right; font-weight: 900; color: #606C38;">
+                      {{ ligne.montantPartEntreprise | number }} FCFA
+                    </td>
+                    <td data-label="Statut" style="text-align: center;">
+                      <span [style.background]="ligne.statut === 'FACTURE' ? 'rgba(96, 108, 56, 0.15)' : '#FAF5EA'"
+                            [style.color]="ligne.statut === 'FACTURE' ? '#606C38' : '#721513'"
+                            style="padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800;">
+                        {{ ligne.statut }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <!-- MODALE DÉTAIL NOMINATIF D'UNE JOURNÉE DE FACTURATION -->
@@ -715,26 +758,28 @@
                   Aucun détail nominatif enregistré pour cette journée dans les données de démonstration.
                 </div>
               } @else {
-                <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
-                  <thead>
-                    <tr style="background: #FAF8F4; border-bottom: 1.5px solid #EDE7DC; text-align: left;">
-                      <th style="padding: 0.6rem;">Collaborateur</th>
-                      <th style="padding: 0.6rem;">Plat</th>
-                      <th style="padding: 0.6rem;">Taux (date T)</th>
-                      <th style="padding: 0.6rem;">Part Entreprise</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @for (c of detailsCommandesJourSelectionne(); track c.id) {
-                      <tr style="border-bottom: 1px solid #EDE7DC;">
-                        <td style="padding: 0.6rem;"><strong>{{ c.employeNom }}</strong><br><small style="color: #6E5A56;">{{ c.matricule }}</small></td>
-                        <td style="padding: 0.6rem; color: #332724;">{{ c.platNom }}</td>
-                        <td style="padding: 0.6rem; font-weight: 800; color: #606C38;">{{ c.tauxApplique }}%</td>
-                        <td style="padding: 0.6rem; font-weight: 800; color: #721513;">{{ (c.partEntreprise | number) }} FCFA</td>
+                <div class="cuisine-table-wrap">
+                  <table class="cuisine-table" style="min-width: 100%; font-size: 0.82rem;">
+                    <thead>
+                      <tr>
+                        <th>Collaborateur</th>
+                        <th>Plat</th>
+                        <th>Taux (date T)</th>
+                        <th>Part Entreprise</th>
                       </tr>
-                    }
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      @for (c of detailsCommandesJourSelectionne(); track c.id) {
+                        <tr>
+                          <td data-label="Collaborateur"><div><strong>{{ c.employeNom }}</strong><br><small style="color: #6E5A56;">{{ c.matricule }}</small></div></td>
+                          <td data-label="Plat" style="color: #332724;">{{ c.platNom }}</td>
+                          <td data-label="Taux (date T)" style="font-weight: 800; color: #606C38;">{{ c.tauxApplique }}%</td>
+                          <td data-label="Part Entreprise" style="font-weight: 800; color: #721513;">{{ (c.partEntreprise | number) }} FCFA</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
               }
             </div>
           </div>
