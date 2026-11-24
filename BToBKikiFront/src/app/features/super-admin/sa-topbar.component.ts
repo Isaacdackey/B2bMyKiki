@@ -8,31 +8,32 @@ import { B2bStateService } from '../../b2b/shared/b2b-state.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <header class="sa-topbar">
-      <div class="sa-topbar-left">
+    <header class="sa-topbar-header">
+      <div style="display: flex; align-items: center; gap: 0.75rem; min-width: 0; flex-wrap: wrap;">
         <button type="button" class="b2b-mobile-hamburger-btn" (click)="b2b.toggleMobileDrawer()" aria-label="Ouvrir le menu">
           <i class="fa-solid fa-bars"></i>
         </button>
-        <div class="sa-context-pill">
+        <div class="sa-topbar-entity-pill">
           <i class="fa-solid fa-crown" style="color: #721513;"></i>
           <strong>Direction Kiki Traiteur</strong>
-          <span class="sa-sep">|</span>
+          <span style="color: #CBD5E1;">|</span>
           <span><i class="fa-solid fa-location-dot" style="color: #E51D24;"></i> Hann Maristes, Dakar</span>
         </div>
       </div>
 
-      <div class="sa-topbar-right">
-        @if (showSearch) {
-          <div class="sa-search-wrap">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input
-              type="text"
-              [ngModel]="searchValue"
-              (ngModelChange)="searchValueChange.emit($event)"
-              placeholder="Rechercher une entreprise, un code contrat...">
-          </div>
-        }
-        <div class="sa-badge-role">
+      @if (showSearch) {
+        <div class="sa-topbar-search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input
+            type="text"
+            [ngModel]="searchValue"
+            (ngModelChange)="searchValueChange.emit($event)"
+            placeholder="Rechercher une entreprise, un code contrat...">
+        </div>
+      }
+
+      <div class="sa-topbar-actions">
+        <div class="sa-topbar-entity-pill" style="font-weight: 700; color: #721513;">
           <i class="fa-solid fa-user-shield"></i> Super Administrateur
         </div>
       </div>

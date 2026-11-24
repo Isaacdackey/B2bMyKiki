@@ -30,7 +30,23 @@
     --b2b-page-pt: 1rem;
     margin-left: 0 !important;
     width: 100% !important;
-    padding: 1rem 1rem 5rem;
+    padding: 0.75rem 0.85rem 5rem;
+  }
+
+  .sa-topbar-header {
+    position: static;
+    padding: 0.65rem 0.85rem;
+    gap: 0.6rem;
+  }
+
+  .sa-topbar-header .b2b-mobile-hamburger-btn {
+    display: none !important;
+  }
+
+  .sa-topbar-search {
+    order: 3;
+    flex: 1 1 100%;
+    max-width: 100%;
   }
 }
 
@@ -383,7 +399,7 @@
    ============================================================ */
 .sa-charts-grid-2 {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
   gap: 1.25rem;
   margin-bottom: 1.25rem;
 }

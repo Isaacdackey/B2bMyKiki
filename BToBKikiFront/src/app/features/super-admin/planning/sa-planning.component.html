@@ -1,4 +1,4 @@
-﻿<div class="super-admin-wrapper">
+<div class="super-admin-wrapper">
   <app-sa-topbar></app-sa-topbar>
   <main class="sa-main-content">
       <div>
@@ -15,29 +15,32 @@
           </div>
 
           <!-- Actions Globales : Déploiement & Reconduction -->
-          <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-            <button 
+          <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+            <button
               type="button"
-              (click)="modalDupliquerJourGlobal.set(true)" 
-              class="sa-btn-action" 
-              style="font-weight: 800; border: 1.5px solid #EDE7DC; background: #FFFFFF; color: #721513; padding: 0.65rem 1rem;">
-              <i class="fa-regular fa-copy"></i> Dupliquer ce Jour...
+              (click)="modalDupliquerJourGlobal.set(true)"
+              class="sa-btn-action"
+              title="Dupliquer ce jour"
+              style="font-weight: 800; border: 1.5px solid #EDE7DC; background: #FFFFFF; color: #721513; padding: 0.55rem 0.95rem;">
+              <i class="fa-regular fa-copy"></i> Dupliquer
             </button>
 
-            <button 
+            <button
               type="button"
-              (click)="reconduireSemaineSuivante()" 
-              class="sa-btn-action" 
-              style="font-weight: 800; border: 1.5px solid #C5A880; background: #FAF8F4; color: #721513; padding: 0.65rem 1rem;">
-              <i class="fa-solid fa-arrows-rotate"></i> Reconduire Semaine Suivante
+              (click)="reconduireSemaineSuivante()"
+              class="sa-btn-action"
+              title="Reconduire la semaine suivante"
+              style="font-weight: 800; border: 1.5px solid #C5A880; background: #FAF8F4; color: #721513; padding: 0.55rem 0.95rem;">
+              <i class="fa-solid fa-arrows-rotate"></i> Reconduire
             </button>
 
-            <button 
+            <button
               type="button"
-              (click)="deployerVersTousLesSites()" 
-              class="sa-btn-primary" 
-              style="background: #606C38; border-color: #606C38; box-shadow: 0 4px 14px rgba(96, 108, 56, 0.35); font-weight: 800; font-size: 0.85rem; padding: 0.65rem 1.25rem;">
-              <i class="fa-solid fa-cloud-arrow-up"></i> Publier & Synchroniser vers les Entreprises
+              (click)="deployerVersTousLesSites()"
+              class="sa-btn-primary"
+              title="Publier et synchroniser vers les entreprises"
+              style="background: #606C38; border-color: #606C38; box-shadow: 0 4px 14px rgba(96, 108, 56, 0.35); font-weight: 800; font-size: 0.84rem; padding: 0.55rem 1.1rem;">
+              <i class="fa-solid fa-cloud-arrow-up"></i> Publier
             </button>
           </div>
         </div>
@@ -56,12 +59,12 @@
           </div>
 
           <!-- Ligne 2 : Semaine | Calendrier à gauche, bouton Ajouter un plat à droite (space-between) -->
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.75rem;">
-            <div style="display: inline-flex; background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 9999px; padding: 0.2rem; gap: 0.2rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: nowrap; gap: 0.65rem;">
+            <div style="display: inline-flex; background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 9999px; padding: 0.2rem; gap: 0.2rem; flex-shrink: 0;">
               <button
                 type="button"
                 (click)="modeVuePlanning.set('semaine')"
-                style="min-height: 0; border: 0; border-radius: 9999px; padding: 0.4rem 0.85rem; font-size: 0.74rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; transition: all 0.2s;"
+                style="min-height: 0; border: 0; border-radius: 9999px; padding: 0.4rem 0.75rem; font-size: 0.74rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; transition: all 0.2s;"
                 [style.background]="modeVuePlanning() === 'semaine' ? '#721513' : 'transparent'"
                 [style.color]="modeVuePlanning() === 'semaine' ? '#FFFFFF' : '#6E5A56'">
                 <i class="fa-solid fa-table-columns"></i> Semaine
@@ -69,18 +72,18 @@
               <button
                 type="button"
                 (click)="modeVuePlanning.set('calendrier')"
-                style="min-height: 0; border: 0; border-radius: 9999px; padding: 0.4rem 0.85rem; font-size: 0.74rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; transition: all 0.2s;"
+                style="min-height: 0; border: 0; border-radius: 9999px; padding: 0.4rem 0.75rem; font-size: 0.74rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; transition: all 0.2s;"
                 [style.background]="modeVuePlanning() === 'calendrier' ? '#721513' : 'transparent'"
                 [style.color]="modeVuePlanning() === 'calendrier' ? '#FFFFFF' : '#6E5A56'">
                 <i class="fa-solid fa-calendar-days"></i> Calendrier
               </button>
             </div>
 
-            <button 
+            <button
               type="button"
-              (click)="modalAjouterPlatAuJourGlobal.set(true)" 
-              class="sa-btn-primary" 
-              style="font-size: 0.8rem; padding: 0.5rem 1.1rem;">
+              (click)="modalAjouterPlatAuJourGlobal.set(true)"
+              class="sa-btn-primary"
+              style="font-size: 0.78rem; padding: 0.48rem 0.95rem; margin-left: auto; flex-shrink: 0; white-space: nowrap;">
               <i class="fa-solid fa-plus"></i> Ajouter un plat
             </button>
           </div>
@@ -101,27 +104,29 @@
               </div>
             </div>
 
-            <!-- Onglets Jours Lundi -> Dimanche (Jour + Date uniformes sur la même ligne) -->
-            <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; margin-bottom: 1.5rem;">
-              @for (jour of ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']; track jour) {
-                <button 
-                  type="button"
-                  (click)="jourPlanningGlobalActif.set($any(jour))"
-                  style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.75rem 0.35rem; border-radius: 12px; border: 1.5px solid; text-align: center; cursor: pointer; transition: all 0.2s; min-width: 0;"
-                  [style.background]="jourPlanningGlobalActif() === jour ? '#721513' : '#FAF8F4'"
-                  [style.color]="jourPlanningGlobalActif() === jour ? '#FFFFFF' : '#332724'"
-                  [style.border-color]="jourPlanningGlobalActif() === jour ? '#721513' : '#EDE7DC'">
-                  <div style="display: flex; align-items: baseline; justify-content: center; gap: 0.28rem; white-space: nowrap; flex-wrap: nowrap;">
-                    <span style="font-size: 0.8rem; font-weight: 800; line-height: 1.1;">{{ jour }}</span>
-                    <span style="font-size: 0.68rem; font-weight: 700;" [style.color]="jourPlanningGlobalActif() === jour ? '#FAF5EA' : '#721513'">
-                      {{ datesSemaineMapSa()[jour] }}
-                    </span>
-                  </div>
-                  <div style="font-size: 0.68rem; margin-top: 0.3rem; font-weight: 600;" [style.color]="jourPlanningGlobalActif() === jour ? 'rgba(255,255,255,0.85)' : '#6E5A56'">
-                    {{ (b2b.menusPlanifiesEntreprises().find(m => (m.entrepriseId === 'ent-001' || m.entrepriseId === 'GLOBAL') && m.jourNom === jour)?.lignes?.length || 0) }} mets
-                  </div>
-                </button>
-              }
+            <!-- Onglets Jours Lundi -> Dimanche (1 ligne scrollable sans barre de scroll visible) -->
+            <div class="kiki-scroll-row-wrap" style="margin-bottom: 1.5rem;">
+              <div class="kiki-scroll-row" style="gap: 0.45rem;">
+                @for (jour of ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']; track jour) {
+                  <button
+                    type="button"
+                    (click)="jourPlanningGlobalActif.set($any(jour))"
+                    style="flex: 1 0 105px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.65rem 0.45rem; border-radius: 12px; border: 1.5px solid; text-align: center; cursor: pointer; transition: all 0.2s; min-width: 105px;"
+                    [style.background]="jourPlanningGlobalActif() === jour ? '#721513' : '#FAF8F4'"
+                    [style.color]="jourPlanningGlobalActif() === jour ? '#FFFFFF' : '#332724'"
+                    [style.border-color]="jourPlanningGlobalActif() === jour ? '#721513' : '#EDE7DC'">
+                    <div style="display: flex; align-items: baseline; justify-content: center; gap: 0.28rem; white-space: nowrap; flex-wrap: nowrap;">
+                      <span style="font-size: 0.8rem; font-weight: 800; line-height: 1.1;">{{ jour }}</span>
+                      <span style="font-size: 0.68rem; font-weight: 700;" [style.color]="jourPlanningGlobalActif() === jour ? '#FAF5EA' : '#721513'">
+                        {{ datesSemaineMapSa()[jour] }}
+                      </span>
+                    </div>
+                    <div style="font-size: 0.68rem; margin-top: 0.25rem; font-weight: 600;" [style.color]="jourPlanningGlobalActif() === jour ? 'rgba(255,255,255,0.85)' : '#6E5A56'">
+                      {{ (b2b.menusPlanifiesEntreprises().find(m => (m.entrepriseId === 'ent-001' || m.entrepriseId === 'GLOBAL') && m.jourNom === jour)?.lignes?.length || 0) }} mets
+                    </div>
+                  </button>
+                }
+              </div>
             </div>
 
             <!-- Grille des mets prévus pour ce jour dans la vue Semaine -->

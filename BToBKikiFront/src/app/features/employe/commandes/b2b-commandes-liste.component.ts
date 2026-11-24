@@ -32,19 +32,21 @@ import { CommandeHistoriqueB2B } from '../../../b2b/shared/b2b.models';
 
         <!-- Filtres Statut + Recherche -->
         <section class="cmd-filters-bar">
-          <div class="cmd-status-pills">
-            <button type="button" class="cmd-pill" [class.active]="filtreStatut() === 'TOUTES'" (click)="filtreStatut.set('TOUTES'); page.set(1)">
-              Toutes ({{ mesCommandes().length }})
-            </button>
-            <button type="button" class="cmd-pill" [class.active]="filtreStatut() === 'VALIDE'" (click)="filtreStatut.set('VALIDE'); page.set(1)">
-              Validées
-            </button>
-            <button type="button" class="cmd-pill" [class.active]="filtreStatut() === 'EN_PREPARATION'" (click)="filtreStatut.set('EN_PREPARATION'); page.set(1)">
-              En préparation
-            </button>
-            <button type="button" class="cmd-pill" [class.active]="filtreStatut() === 'LIVRE'" (click)="filtreStatut.set('LIVRE'); page.set(1)">
-              Livrées
-            </button>
+          <div class="kiki-scroll-row-wrap" style="flex: 1 1 320px; min-width: 0;">
+            <div class="cmd-status-pills kiki-scroll-row" style="flex-wrap: nowrap;">
+              <button type="button" class="cmd-pill" style="flex-shrink: 0; white-space: nowrap;" [class.active]="filtreStatut() === 'TOUTES'" (click)="filtreStatut.set('TOUTES'); page.set(1)">
+                Toutes ({{ mesCommandes().length }})
+              </button>
+              <button type="button" class="cmd-pill" style="flex-shrink: 0; white-space: nowrap;" [class.active]="filtreStatut() === 'VALIDE'" (click)="filtreStatut.set('VALIDE'); page.set(1)">
+                Validées
+              </button>
+              <button type="button" class="cmd-pill" style="flex-shrink: 0; white-space: nowrap;" [class.active]="filtreStatut() === 'EN_PREPARATION'" (click)="filtreStatut.set('EN_PREPARATION'); page.set(1)">
+                En préparation
+              </button>
+              <button type="button" class="cmd-pill" style="flex-shrink: 0; white-space: nowrap;" [class.active]="filtreStatut() === 'LIVRE'" (click)="filtreStatut.set('LIVRE'); page.set(1)">
+                Livrées
+              </button>
+            </div>
           </div>
 
           <div class="cmd-search-box">
@@ -305,6 +307,7 @@ import { CommandeHistoriqueB2B } from '../../../b2b/shared/b2b.models';
       .cmd-search-box { max-width: 100%; width: 100%; }
       .cmd-detail-grid { grid-template-columns: 1fr; }
       .cmd-pagination { justify-content: center; text-align: center; }
+      .cmd-pagination > span { display: none; }
       .cmd-table thead { display: none; }
       .cmd-table tbody { display: flex; flex-direction: column; gap: 0.85rem; padding: 0.75rem; background: #FAF8F4; }
       .cmd-table tbody tr {
@@ -318,6 +321,11 @@ import { CommandeHistoriqueB2B } from '../../../b2b/shared/b2b.models';
       .cmd-table tbody td:last-child { border-bottom: none; padding-top: 0.6rem; justify-content: flex-end; }
       .cmd-table tbody td::before {
         content: attr(data-label); font-size: 0.7rem; font-weight: 800; color: #721513; text-transform: uppercase; text-align: left;
+      }
+      .cmd-table tbody td[data-label="Statut"]::before,
+      .cmd-table tbody td[data-label="Actions"]::before {
+        display: none;
+        content: none;
       }
     }
   `]

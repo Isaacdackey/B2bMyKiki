@@ -126,7 +126,8 @@
 
   .rh-table tbody tr {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     width: 100%;
     box-sizing: border-box;
     background: #FFFFFF !important;
@@ -167,19 +168,57 @@
     flex-shrink: 0;
   }
 
-  .rh-table tfoot,
+  .rh-table tbody td[data-label="Statut"]::before,
+  .rh-table tbody td[data-label="Actions"]::before,
+  .rh-table tbody td.no-mobile-label::before {
+    display: none !important;
+    content: none !important;
+  }
+
+  .rh-table tbody td.no-mobile-label {
+    order: 1;
+    width: auto !important;
+    flex: 1 1 auto;
+    justify-content: flex-start !important;
+    border-bottom: none !important;
+    padding-top: 0.65rem !important;
+  }
+
+  .rh-table tbody td[data-label="Statut"] {
+    order: 2;
+    width: auto !important;
+    flex: 0 0 auto;
+    justify-content: flex-end !important;
+    border-bottom: none !important;
+    padding-top: 0.65rem !important;
+  }
+
+  .rh-table tfoot {
+    display: block;
+    width: 100%;
+    margin-top: 0.75rem;
+  }
+
   .rh-table tfoot tr {
     display: flex;
     flex-direction: column;
     width: 100%;
-    padding: 0.75rem 1rem;
     box-sizing: border-box;
+    background: #FFFFFF;
+    border: 1.5px solid #EDE7DC;
+    border-radius: 14px;
+    padding: 0.85rem 1rem;
     gap: 0.35rem;
   }
 
   .rh-table tfoot td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
     padding: 0.2rem 0 !important;
     border: none !important;
+    text-align: right !important;
   }
 }
 

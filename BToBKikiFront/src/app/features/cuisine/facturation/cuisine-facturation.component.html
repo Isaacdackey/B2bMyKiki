@@ -1,4 +1,4 @@
-﻿<div class="cuisine-wrapper">
+<div class="cuisine-wrapper">
   <main style="max-width: 1320px; width: 100%; margin: 0 auto; padding: 0.5rem 0 1.5rem;">
     <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
       <button type="button" class="b2b-mobile-hamburger-btn" (click)="b2b.toggleMobileDrawer()" aria-label="Ouvrir le menu">
@@ -88,11 +88,11 @@
                     <td data-label="Part Entreprise" style="text-align: right; font-weight: 900; color: #606C38;">
                       {{ ligne.montantPartEntreprise | number }} FCFA
                     </td>
-                    <td data-label="Statut" style="text-align: center;">
+                    <td data-label="Statut" class="cuisine-statut-left" style="text-align: center;">
                       <span [style.background]="ligne.statut === 'FACTURE' ? 'rgba(96, 108, 56, 0.15)' : '#FAF5EA'"
                             [style.color]="ligne.statut === 'FACTURE' ? '#606C38' : '#721513'"
                             style="padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800;">
-                        {{ ligne.statut }}
+                        {{ ligne.statut === 'FACTURE' ? 'Facturé' : ligne.statut === 'VALIDE' ? 'Validé' : 'En cours' }}
                       </span>
                     </td>
                   </tr>

@@ -78,11 +78,19 @@ export interface PeriodeFilterChange {
     </div>
   `,
   styles: [`
+    :host {
+      display: block;
+      max-width: 100%;
+      min-width: 0;
+    }
+
     .b2b-period-filter-wrap {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
       gap: 0.6rem;
+      max-width: 100%;
+      min-width: 0;
     }
 
     .b2b-period-pills {
@@ -194,17 +202,70 @@ export interface PeriodeFilterChange {
 
     @media (max-width: 768px) {
       .b2b-period-filter-wrap {
-        align-items: flex-start;
+        align-items: stretch;
         width: 100%;
+        position: relative;
       }
       .b2b-period-pills {
         width: 100%;
-        justify-content: flex-start;
-        flex-wrap: wrap;
-        border-radius: 16px;
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        gap: 0.25rem;
+        border-radius: 9999px;
+        padding: 0.25rem 1.75rem 0.25rem 0.25rem;
+        box-sizing: border-box;
+      }
+      .b2b-period-pills::-webkit-scrollbar {
+        display: none;
+      }
+      .b2b-period-filter-wrap::after {
+        content: '›';
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        height: 36px;
+        width: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: 6px;
+        border-radius: 0 9999px 9999px 0;
+        font-size: 1rem;
+        font-weight: 900;
+        color: #721513;
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.94) 60%, #FFFFFF 100%);
+        pointer-events: none;
+      }
+      .b2b-period-pill {
+        flex-shrink: 0;
+        justify-content: center;
+        padding: 0.38rem 0.72rem;
+        font-size: 0.74rem;
+        border-radius: 9999px;
       }
       .b2b-custom-date-row {
         width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.6rem;
+        border-radius: 16px;
+        padding: 0.6rem 0.75rem;
+        box-sizing: border-box;
+      }
+      .b2b-custom-date-field {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+        min-width: 0;
+      }
+      .b2b-custom-date-input {
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
       }
     }
   `]

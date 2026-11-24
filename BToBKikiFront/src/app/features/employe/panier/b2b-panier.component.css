@@ -51,7 +51,7 @@
   gap: 0.5rem;
   background: #FFFFFF;
   border: 1.5px solid #EDE7DC;
-  border-radius: 50px;
+  border-radius: 9999px;
   padding: 0.45rem 1rem;
   font-size: 0.82rem;
   font-weight: 700;
@@ -59,6 +59,8 @@
   text-decoration: none;
   transition: all 0.2s;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .btn-retour-catalogue:hover {

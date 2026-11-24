@@ -32,62 +32,47 @@
         }
       </div>
     </div>
-
-    <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
-      <a
-        routerLink="/b2b/commandes"
-        style="display: inline-flex; align-items: center; gap: 0.45rem; background: #FFFFFF; border: 1.5px solid #EDE7DC; color: #721513; border-radius: 9999px; padding: 0.48rem 0.9rem; font-size: 0.8rem; font-weight: 800; text-decoration: none;">
-        <i class="fa-solid fa-receipt"></i> Mes Commandes
-      </a>
-      <a
-        routerLink="/b2b/panier"
-        style="display: inline-flex; align-items: center; gap: 0.5rem; background: #FAF5EA; border: 1.5px solid #E2D5BE; color: #721513; border-radius: 9999px; padding: 0.48rem 0.95rem; font-size: 0.8rem; font-weight: 800; text-decoration: none; position: relative;">
-        <i class="fa-solid fa-basket-shopping" style="color: #D97706;"></i>
-        <span>{{ b2b.modeProfil() === 'SUBVENTIONNE' ? 'Mon Plateau' : 'Mon Panier' }}</span>
-        @if (nombreArticlesPanier() > 0) {
-          <span style="background: #E51D24; color: #FFFFFF; font-size: 0.68rem; font-weight: 900; min-width: 20px; height: 20px; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; padding: 0 0.3rem;">
-            {{ nombreArticlesPanier() }}
-          </span>
-        }
-      </a>
-    </div>
   </header>
 
   <!-- 2. BARRE UNIFIÉE : JOUR + CATÉGORIES + RECHERCHE -->
-  <section style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1rem 1.25rem; box-shadow: 0 4px 16px rgba(114, 21, 19, 0.04); display: flex; flex-direction: column; gap: 0.9rem;">
-    <!-- Ligne 1 : 7 Jours sur une seule ligne -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(115px, 1fr)); gap: 0.45rem;">
-      @for (jour of joursSemaine; track jour) {
-        <button
-          type="button"
-          (click)="changerJourCommande(jour)"
-          [style.background]="jourSelectionne() === jour ? '#721513' : '#FAF8F4'"
-          [style.color]="jourSelectionne() === jour ? '#FFFFFF' : '#332724'"
-          [style.border-color]="jourSelectionne() === jour ? '#721513' : '#EDE7DC'"
-          style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; padding: 0.55rem 0.4rem; border-radius: 12px; border: 1.5px solid; cursor: pointer; text-align: center; transition: all 0.18s ease;">
-          <span style="font-size: 0.82rem; font-weight: 800; line-height: 1.15;">{{ jour }}</span>
-          <span [style.color]="jourSelectionne() === jour ? '#FAF5EA' : '#6E5A56'" style="font-size: 0.68rem; font-weight: 600; white-space: nowrap;">
-            {{ datesSemaineMap[jour] }}
-          </span>
-        </button>
-      }
-    </div>
-
-    <!-- Ligne 2 : Catégories (gauche) + Recherche (droite) -->
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #FAF5EA;">
-      <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
-        @for (cat of categories(); track cat.id) {
+  <section style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1rem 1.25rem; margin-top: 0.85rem; box-shadow: 0 4px 16px rgba(114, 21, 19, 0.04); display: flex; flex-direction: column; gap: 0.85rem; position: relative; z-index: 1;">
+    <!-- Ligne 1 : 7 Jours sur une seule ligne scrollable (sans barre de scroll) -->
+    <div class="kiki-scroll-row-wrap">
+      <div class="kiki-scroll-row" style="gap: 0.45rem;">
+        @for (jour of joursSemaine; track jour) {
           <button
             type="button"
-            (click)="selectCategory(cat.id)"
-            [style.background]="categorieSelectionnee() === cat.id ? '#721513' : '#FAF8F4'"
-            [style.color]="categorieSelectionnee() === cat.id ? '#FFFFFF' : '#332724'"
-            [style.border-color]="categorieSelectionnee() === cat.id ? '#721513' : '#EDE7DC'"
-            style="border: 1.5px solid; border-radius: 9999px; padding: 0.42rem 0.85rem; font-size: 0.76rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.18s ease; white-space: nowrap;">
-            <i class="fa-solid" [ngClass]="cat.icon" style="font-size: 0.75rem;"></i>
-            <span>{{ cat.name }}</span>
+            (click)="changerJourCommande(jour)"
+            [style.background]="jourSelectionne() === jour ? '#721513' : '#FAF8F4'"
+            [style.color]="jourSelectionne() === jour ? '#FFFFFF' : '#332724'"
+            [style.border-color]="jourSelectionne() === jour ? '#721513' : '#EDE7DC'"
+            style="flex: 1 0 100px; min-width: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; padding: 0.55rem 0.4rem; border-radius: 12px; border: 1.5px solid; cursor: pointer; text-align: center; transition: all 0.18s ease;">
+            <span style="font-size: 0.8rem; font-weight: 800; line-height: 1.15;">{{ jour }}</span>
+            <span [style.color]="jourSelectionne() === jour ? '#FAF5EA' : '#6E5A56'" style="font-size: 0.68rem; font-weight: 600; white-space: nowrap;">
+              {{ datesSemaineMap[jour] }}
+            </span>
           </button>
         }
+      </div>
+    </div>
+
+    <!-- Ligne 2 : Catégories (1 ligne scrollable) + Recherche (droite) -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #FAF5EA;">
+      <div class="kiki-scroll-row-wrap" style="flex: 1 1 360px; min-width: 0;">
+        <div class="kiki-scroll-row" style="gap: 0.4rem;">
+          @for (cat of categories(); track cat.id) {
+            <button
+              type="button"
+              (click)="selectCategory(cat.id)"
+              [style.background]="categorieSelectionnee() === cat.id ? '#721513' : '#FAF8F4'"
+              [style.color]="categorieSelectionnee() === cat.id ? '#FFFFFF' : '#332724'"
+              [style.border-color]="categorieSelectionnee() === cat.id ? '#721513' : '#EDE7DC'"
+              style="flex-shrink: 0; border: 1.5px solid; border-radius: 9999px; padding: 0.42rem 0.85rem; font-size: 0.76rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.18s ease; white-space: nowrap;">
+              <i class="fa-solid" [ngClass]="cat.icon" style="font-size: 0.75rem;"></i>
+              <span>{{ cat.name }}</span>
+            </button>
+          }
+        </div>
       </div>
 
       <div style="display: flex; align-items: center; gap: 0.5rem; background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 9999px; padding: 0.42rem 0.9rem; flex: 1 1 220px; max-width: 300px;">
