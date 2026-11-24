@@ -1,0 +1,577 @@
+<div class="b2b-wrapper">
+
+  <!-- 1. EN-TÊTE COMPACT & ÉPURÉ -->
+  <header style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1rem 1.35rem; box-shadow: 0 4px 16px rgba(114, 21, 19, 0.04);">
+    <div style="display: flex; flex-direction: column; gap: 0.35rem; min-width: 0;">
+      <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 0.6rem;">
+        <h1 style="margin: 0; font-size: 1.35rem; font-weight: 900; color: #721513; letter-spacing: -0.01em;">
+          Bonjour, {{ b2b.currentEmploye().prenom }}
+        </h1>
+        <span class="b2b-badge-statut-pill" [class.is-subventionne]="b2b.modeProfil() === 'SUBVENTIONNE'" [class.is-autonome]="b2b.modeProfil() === 'AUTONOME'" style="font-size: 0.72rem; padding: 0.2rem 0.65rem;">
+          <i class="fa-solid" [class.fa-circle-check]="b2b.modeProfil() === 'SUBVENTIONNE'" [class.fa-wallet]="b2b.modeProfil() === 'AUTONOME'"></i>
+          {{ b2b.modeProfil() === 'SUBVENTIONNE' ? 'Conventionné ' + b2b.currentEmploye().tauxSubvention + '%' : 'Autonome • Wave' }}
+        </span>
+      </div>
+      <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 0.65rem; font-size: 0.78rem; color: #6E5A56; font-weight: 600;">
+        <span><i class="fa-solid fa-location-dot" style="color: #C05621;"></i> {{ b2b.siteActuel().nom }}</span>
+        <span style="color: #D6C9B8;">•</span>
+        <span [style.color]="isBloqueParCutOff() ? '#DC2626' : '#6E5A56'">
+          <i class="fa-regular fa-clock" [style.color]="isBloqueParCutOff() ? '#DC2626' : '#721513'"></i>
+          Cut-Off : <strong>{{ b2b.currentEntreprise().cutOffHeure }}</strong>
+          @if (isBloqueParCutOff()) {
+            <strong style="color: #DC2626; margin-left: 0.25rem;">(Dépassé)</strong>
+          }
+        </span>
+        @if (isBloqueParCutOff()) {
+          <button
+            type="button"
+            (click)="ouvrirModalReclamation()"
+            style="background: #E51D24; color: #FFFFFF; border: none; padding: 0.2rem 0.65rem; border-radius: 9999px; font-weight: 800; font-size: 0.7rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.3rem;">
+            <i class="fa-solid fa-triangle-exclamation"></i> Réclamation
+          </button>
+        }
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
+      <a
+        routerLink="/b2b/commandes"
+        style="display: inline-flex; align-items: center; gap: 0.45rem; background: #FFFFFF; border: 1.5px solid #EDE7DC; color: #721513; border-radius: 9999px; padding: 0.48rem 0.9rem; font-size: 0.8rem; font-weight: 800; text-decoration: none;">
+        <i class="fa-solid fa-receipt"></i> Mes Commandes
+      </a>
+      <a
+        routerLink="/b2b/panier"
+        style="display: inline-flex; align-items: center; gap: 0.5rem; background: #FAF5EA; border: 1.5px solid #E2D5BE; color: #721513; border-radius: 9999px; padding: 0.48rem 0.95rem; font-size: 0.8rem; font-weight: 800; text-decoration: none; position: relative;">
+        <i class="fa-solid fa-basket-shopping" style="color: #D97706;"></i>
+        <span>{{ b2b.modeProfil() === 'SUBVENTIONNE' ? 'Mon Plateau' : 'Mon Panier' }}</span>
+        @if (nombreArticlesPanier() > 0) {
+          <span style="background: #E51D24; color: #FFFFFF; font-size: 0.68rem; font-weight: 900; min-width: 20px; height: 20px; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; padding: 0 0.3rem;">
+            {{ nombreArticlesPanier() }}
+          </span>
+        }
+      </a>
+    </div>
+  </header>
+
+  <!-- 2. BARRE UNIFIÉE : JOUR + CATÉGORIES + RECHERCHE -->
+  <section style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1rem 1.25rem; box-shadow: 0 4px 16px rgba(114, 21, 19, 0.04); display: flex; flex-direction: column; gap: 0.9rem;">
+    <!-- Ligne 1 : 7 Jours sur une seule ligne -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(115px, 1fr)); gap: 0.45rem;">
+      @for (jour of joursSemaine; track jour) {
+        <button
+          type="button"
+          (click)="changerJourCommande(jour)"
+          [style.background]="jourSelectionne() === jour ? '#721513' : '#FAF8F4'"
+          [style.color]="jourSelectionne() === jour ? '#FFFFFF' : '#332724'"
+          [style.border-color]="jourSelectionne() === jour ? '#721513' : '#EDE7DC'"
+          style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; padding: 0.55rem 0.4rem; border-radius: 12px; border: 1.5px solid; cursor: pointer; text-align: center; transition: all 0.18s ease;">
+          <span style="font-size: 0.82rem; font-weight: 800; line-height: 1.15;">{{ jour }}</span>
+          <span [style.color]="jourSelectionne() === jour ? '#FAF5EA' : '#6E5A56'" style="font-size: 0.68rem; font-weight: 600; white-space: nowrap;">
+            {{ datesSemaineMap[jour] }}
+          </span>
+        </button>
+      }
+    </div>
+
+    <!-- Ligne 2 : Catégories (gauche) + Recherche (droite) -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #FAF5EA;">
+      <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+        @for (cat of categories(); track cat.id) {
+          <button
+            type="button"
+            (click)="selectCategory(cat.id)"
+            [style.background]="categorieSelectionnee() === cat.id ? '#721513' : '#FAF8F4'"
+            [style.color]="categorieSelectionnee() === cat.id ? '#FFFFFF' : '#332724'"
+            [style.border-color]="categorieSelectionnee() === cat.id ? '#721513' : '#EDE7DC'"
+            style="border: 1.5px solid; border-radius: 9999px; padding: 0.42rem 0.85rem; font-size: 0.76rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.18s ease; white-space: nowrap;">
+            <i class="fa-solid" [ngClass]="cat.icon" style="font-size: 0.75rem;"></i>
+            <span>{{ cat.name }}</span>
+          </button>
+        }
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 0.5rem; background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 9999px; padding: 0.42rem 0.9rem; flex: 1 1 220px; max-width: 300px;">
+        <i class="fa-solid fa-magnifying-glass" style="color: #721513; font-size: 0.8rem;"></i>
+        <input
+          type="text"
+          [ngModel]="termeRecherche()"
+          (ngModelChange)="termeRecherche.set($event)"
+          placeholder="Rechercher un plat..."
+          style="border: none; outline: none; background: transparent; font-size: 0.8rem; width: 100%; color: #332724; font-weight: 600;" />
+        @if (termeRecherche()) {
+          <button type="button" (click)="termeRecherche.set('')" style="background: none; border: none; color: #8C7E74; cursor: pointer; padding: 0;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. GRILLE DES PLATS DU JOUR -->
+  <section class="mykiki-main-section">
+    <div class="mykiki-dual-layout">
+      <div class="mykiki-dishes-col">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <h2 style="margin: 0; font-size: 1.15rem; font-weight: 900; color: #721513;">
+            Menu du {{ jourSelectionne() }}
+          </h2>
+          <span style="font-size: 0.76rem; font-weight: 800; color: #721513; background: #FAF5EA; border: 1px solid #EDE7DC; padding: 0.25rem 0.7rem; border-radius: 9999px;">
+            {{ platsFiltres().length }} plat(s)
+          </span>
+        </div>
+
+        @if (platsFiltres().length === 0) {
+        <div class="empty-phare-state">
+          <i class="fa-solid fa-utensils mb-2"></i>
+          <p>Aucun plat disponible pour {{ jourSelectionne() }} dans cette catégorie.</p>
+          <button class="btn-reset-filters" (click)="selectCategory('all'); termeRecherche.set('')">
+            Voir tous les plats
+          </button>
+        </div>
+        } @else {
+        <div class="dishes-grid">
+          @for (plat of platsPagines(); track plat.id) {
+          @let stock = getStock(plat.id);
+          <div class="dish-card" [class.is-chosen]="isPlatActiveDansMode(plat)">
+
+            <div class="dish-image-wrap">
+              <img [src]="plat.image" [alt]="plat.nom" class="dish-img" loading="lazy" decoding="async">
+
+              <div class="dish-badge-overlay">
+                <span class="dish-tag">
+                  @if (plat.categorie === 'ENTREE') { {{ b2b.modeProfil() === 'SUBVENTIONNE' ? '1. Entrée' : 'Entrée' }}
+                  }
+                  @else if (plat.categorie === 'PLAT') { {{ b2b.modeProfil() === 'SUBVENTIONNE' ? '2. Plat Chaud' :
+                  'Plat Chaud' }} }
+                  @else if (plat.categorie === 'GARNITURE') { {{ b2b.modeProfil() === 'SUBVENTIONNE' ? '3. Garniture' :
+                  'Garniture' }} }
+                  @else if (plat.categorie === 'DESSERT') { {{ b2b.modeProfil() === 'SUBVENTIONNE' ? '4. Dessert' :
+                  'Dessert' }} }
+                  @else { {{ b2b.modeProfil() === 'SUBVENTIONNE' ? '5. Boisson' : 'Boisson' }} }
+                </span>
+              </div>
+
+              <button type="button" (click)="choisirOuAjouterPlat(plat)" class="dish-fav-btn"
+                [class.in-cart]="isPlatActiveDansMode(plat)" title="Sélectionner pour mon repas">
+                <i class="fa-solid" [class.fa-check]="isPlatActiveDansMode(plat)"
+                  [class.fa-basket-shopping]="!isPlatActiveDansMode(plat)"></i>
+              </button>
+            </div>
+
+            <div class="dish-body">
+              <div class="dish-header-row">
+                <h4 class="dish-title font-serif-luxury">{{ plat.nom }}</h4>
+              </div>
+
+              <p class="dish-desc">{{ plat.description }}</p>
+
+              <!-- BADGE DES STOCKS / QUOTAS EN TEMPS RÉEL (Exigence Mentor) -->
+              <div
+                style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 10px; padding: 0.45rem 0.65rem; margin: 0.65rem 0; font-size: 0.72rem; display: flex; justify-content: space-between; align-items: center;">
+                <span style="color: #6E5A56;">
+                  Quota: <strong>{{ stock.quotaPrevu }}</strong> | Pris: <strong>{{ stock.dejaCommande }}</strong>
+                </span>
+                <span [style.color]="stock.resteDisponible > 5 ? '#606C38' : '#DC2626'" style="font-weight: 800;">
+                  <i class="fa-solid fa-box"></i> Reste : <strong>{{ stock.resteDisponible }}</strong>
+                </span>
+              </div>
+
+              <div class="dish-footer-row">
+                <div class="dish-price-box">
+                  @if (b2b.modeProfil() === 'SUBVENTIONNE') {
+                  <span class="price-amount" style="color: #606C38; font-size: 0.88rem;">
+                    <i class="fa-solid fa-circle-check"></i> Inclus dans votre formule
+                  </span>
+                  } @else {
+                  <span class="price-amount">{{ plat.prixUnitaire }} FCFA</span>
+                  }
+                </div>
+
+                <button type="button" class="btn-dish-action" [class.has-items]="isPlatActiveDansMode(plat)"
+                  (click)="choisirOuAjouterPlat(plat)">
+                  <i class="fa-solid" [ngClass]="isPlatActiveDansMode(plat) ? 'fa-check' : 'fa-plus'"></i>
+                </button>
+              </div>
+            </div>
+
+          </div>
+          }
+        </div>
+
+        @if (totalPagesMenu() > 1) {
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; padding: 0.75rem 1rem; background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 14px; flex-wrap: wrap; gap: 0.75rem;">
+            <span style="font-size: 0.78rem; color: #6E5A56; font-weight: 600;">
+              Page <strong style="color: #721513;">{{ pageMenu() }}</strong> / {{ totalPagesMenu() }}
+            </span>
+            <div style="display: flex; gap: 0.35rem; align-items: center;">
+              <button type="button" [disabled]="pageMenu() <= 1" (click)="pageMenu.set(pageMenu() - 1)" style="width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid #EDE7DC; background: #FAF8F4; color: #721513; cursor: pointer;">
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+              @for (p of pagesMenuArray(); track p) {
+                <button type="button" (click)="pageMenu.set(p)" [style.background]="pageMenu() === p ? '#721513' : '#FFFFFF'" [style.color]="pageMenu() === p ? '#FFFFFF' : '#2C1810'" style="width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid #EDE7DC; font-weight: 800; font-size: 0.78rem; cursor: pointer;">
+                  {{ p }}
+                </button>
+              }
+              <button type="button" [disabled]="pageMenu() >= totalPagesMenu()" (click)="pageMenu.set(pageMenu() + 1)" style="width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid #EDE7DC; background: #FAF8F4; color: #721513; cursor: pointer;">
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        }
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL DE CONFIRMATION / CHECKOUT (WAVE POUR LES NON SUBVENTIONNÉS 0%)   -->
+  <!-- ========================================================================= -->
+  @if (showConfirmationModal()) {
+  <div class="b2b-modal-overlay">
+    <div class="b2b-modal-card">
+
+      @if (!orderPlaced()) {
+      <div style="text-align: center;">
+        <div
+          style="width: 56px; height: 56px; border-radius: 50%; background: #FAF5EA; color: #721513; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+          <i class="fa-solid fa-utensils"></i>
+        </div>
+
+        <h3
+          style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.45rem; color: #721513; font-weight: 800;">
+          Confirmation de Commande
+        </h3>
+        <p style="margin: 0.35rem 0 1.25rem; font-size: 0.85rem; color: #6E5A56;">
+          Repas pour <strong>{{ jourSelectionne() }}</strong> • {{ b2b.siteActuel().nom }} • Créneau {{
+          b2b.creneauLivraison() }}
+        </p>
+
+        <!-- Récapitulatif selon le mode -->
+        @if (b2b.modeProfil() === 'SUBVENTIONNE' && b2b.currentEmploye().tauxSubvention > 0) {
+        <div
+          style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 14px; padding: 1.1rem; text-align: left; font-size: 0.85rem; line-height: 1.6; margin-bottom: 1.25rem;">
+          <div><strong style="color: #721513;">Entrée :</strong> {{ b2b.selection().entree?.nom }}</div>
+          <div><strong style="color: #721513;">Plat Chaud :</strong> {{ b2b.selection().plat?.nom }}</div>
+          <div><strong style="color: #721513;">Dessert :</strong> {{ b2b.selection().dessert?.nom }}</div>
+          <div><strong style="color: #721513;">Boisson :</strong> {{ b2b.selection().boisson?.nom }}</div>
+        </div>
+
+        @if (b2b.resteAPayerEmploye() === 0) {
+        <div
+          style="background: rgba(96, 108, 56, 0.12); border: 1.5px solid #606C38; color: #606C38; border-radius: 14px; padding: 0.95rem; text-align: left; font-size: 0.82rem; margin-bottom: 1.5rem;">
+          <strong><i class="fa-solid fa-circle-check"></i> Prise en charge 100% {{ b2b.currentEntreprise().nom
+            }}</strong>
+          <p style="margin: 0.25rem 0 0; color: #332724;">
+            Ce repas sera imputé directement sur la facture mensuelle de votre entreprise. Aucun paiement requis.
+          </p>
+        </div>
+        }
+        } @else {
+        <!-- Récapitulatif Autonome / 0% Subvention -->
+        <div
+          style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 14px; padding: 1rem; text-align: left; font-size: 0.85rem; max-height: 140px; overflow-y: auto; margin-bottom: 1.25rem;">
+          @for (item of b2b.panierAutonome(); track item.plat.id) {
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
+            <span>{{ item.quantite }}x {{ item.plat.nom }}</span>
+            <strong>{{ item.plat.prixUnitaire * item.quantite }} F</strong>
+          </div>
+          }
+        </div>
+
+        <!-- Bloc Paiement Wave OBLIGATOIRE (Salarié Non Subventionné 0%) -->
+        <div
+          style="background: #EFF6FF; border: 1.5px solid #93C5FD; border-radius: 14px; padding: 1rem; text-align: left; margin-bottom: 1.25rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+            <strong style="color: #1D4ED8;"><i class="fa-solid fa-mobile-screen-button"></i> Règlement Wave Sénégal
+              (Obligatoire)</strong>
+            <span style="font-weight: 900; color: #1E3A8A; font-size: 1.1rem;">{{ b2b.totalPanierAutonome() || 5000 }}
+              FCFA</span>
+          </div>
+          <label style="font-size: 0.75rem; color: #475569; font-weight: 700; display: block; margin-bottom: 0.25rem;">
+            Numéro de téléphone Wave :
+          </label>
+          <input type="text" [ngModel]="wavePhone()" (ngModelChange)="wavePhone.set($event)"
+            style="width: 100%; padding: 0.55rem 0.85rem; border: 1.5px solid #CBD5E1; border-radius: 8px; font-weight: 700; color: #0F172A; font-size: 0.9rem;">
+          <p style="margin: 0.35rem 0 0; font-size: 0.72rem; color: #64748B;">
+            Le paiement décrémentera automatiquement le stock disponible en cuisine.
+          </p>
+        </div>
+        }
+
+        <div style="display: flex; gap: 0.75rem; align-items: stretch;">
+          <button [disabled]="isWaveProcessing()" (click)="showConfirmationModal.set(false)"
+            style="flex: 1; height: 46px; min-height: 46px; max-height: 46px; padding: 0 1rem; border-radius: 9999px; background: #FAF8F4; color: #6E5A56; border: 1.5px solid #EDE7DC; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; box-sizing: border-box;">
+            Modifier
+          </button>
+
+          <button [disabled]="isWaveProcessing()" (click)="confirmerPaiementEtEnvoi()"
+            [style.background]="(b2b.modeProfil() === 'SUBVENTIONNE' && b2b.resteAPayerEmploye() === 0) ? 'linear-gradient(135deg, #606C38, #4D572D)' : 'linear-gradient(135deg, #1D4ED8, #1E40AF)'"
+            style="flex: 1.4; height: 46px; min-height: 46px; max-height: 46px; padding: 0 1.25rem; border-radius: 9999px; color: #FFFFFF; border: none; font-weight: 800; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; white-space: nowrap; box-sizing: border-box; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
+            @if (isWaveProcessing()) {
+            <span><i class="fa-solid fa-spinner fa-spin"></i> Traitement Wave...</span>
+            } @else {
+            <i class="fa-solid fa-check"></i>
+            <span>
+              {{ (b2b.modeProfil() === 'SUBVENTIONNE' && b2b.resteAPayerEmploye() === 0) ? 'Confirmer mon repas (0 F)' :
+              'Payer avec Wave (' + (b2b.totalPanierAutonome() || 5000) + ' F)' }}
+            </span>
+            }
+          </button>
+        </div>
+      </div>
+      } @else {
+      <!-- ÉCRAN DE SUCCÈS & QR CODE DU RETRAIT -->
+      <div style="text-align: center; padding: 0.5rem 0;">
+        <div
+          style="width: 54px; height: 54px; border-radius: 50%; background: rgba(96, 108, 56, 0.15); color: #606C38; font-size: 1.8rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+          <i class="fa-solid fa-check"></i>
+        </div>
+
+        <h3
+          style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.45rem; color: #721513; font-weight: 800;">
+          Commande Enregistrée pour {{ jourSelectionne() }} !
+        </h3>
+
+        @if (b2b.modeProfil() === 'SUBVENTIONNE' && b2b.currentEmploye().tauxSubvention > 0) {
+        <p style="margin: 0.35rem 0 0; font-size: 0.82rem; color: #6E5A56;">
+          Prise en charge {{ b2b.currentEmploye().tauxSubvention }}% • Imputée au compte <strong>{{
+            b2b.currentEntreprise().nom }}</strong>
+        </p>
+        } @else {
+        <p style="margin: 0.35rem 0 0; font-size: 0.82rem; color: #1D4ED8; font-weight: 700;">
+          <i class="fa-solid fa-circle-check"></i> Règlement Wave validé instantanément • Stock décrémenté
+        </p>
+        }
+
+        <!-- QR Code Dynamique Kiki Traiteur -->
+        <div
+          style="background: #FFFFFF; border: 2px solid #EDE7DC; border-radius: 18px; padding: 1.25rem; margin: 1rem auto; max-width: 260px; box-shadow: 0 8px 25px rgba(114, 21, 19, 0.08);">
+          <div
+            style="font-size: 0.7rem; color: #721513; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.65rem;">
+            <i class="fa-solid fa-qrcode"></i> QR CODE DE RETRAIT RÉFECTOIRE
+          </div>
+
+          <div
+            style="display: flex; justify-content: center; align-items: center; margin: 0 auto; background: #FAF8F4; padding: 0.65rem; border-radius: 12px; border: 1px solid #EDE7DC;">
+            <svg viewBox="0 0 25 25" width="160" height="160" shape-rendering="crispEdges">
+              <rect width="25" height="25" fill="#FAF8F4" />
+              @for (row of qrMatrix(); track $index; let r = $index) {
+              @for (cell of row; track $index; let c = $index) {
+              @if (cell) {
+              <rect [attr.x]="c" [attr.y]="r" width="1" height="1" fill="#721513" />
+              }
+              }
+              }
+            </svg>
+          </div>
+
+          <div style="margin-top: 0.75rem;">
+            <span
+              style="font-family: monospace; font-size: 0.82rem; font-weight: 800; color: #721513; background: #FAF5EA; padding: 0.2rem 0.6rem; border-radius: 6px; border: 1px solid #E2D5BE;">
+              {{ qrDataString() }}
+            </span>
+          </div>
+          <div style="font-size: 0.72rem; color: #606C38; font-weight: 700; margin-top: 0.4rem;">
+            <i class="fa-solid fa-camera"></i> À scanner à la cantine
+          </div>
+        </div>
+
+        <button (click)="fermerModalSucces()"
+          style="padding: 0.75rem 2rem; border-radius: 9999px; background: #721513; color: #FFFFFF; border: none; font-weight: 800; font-size: 0.88rem; cursor: pointer;">
+          <i class="fa-solid fa-check"></i> Terminer
+        </button>
+      </div>
+      }
+
+    </div>
+  </div>
+  }
+
+  <!-- ========================================================================= -->
+  <!-- MODAL DE RÉCLAMATION CUT-OFF (RETARDATAIRES)                              -->
+  <!-- ========================================================================= -->
+  @if (showReclamationModal()) {
+  <div class="b2b-modal-overlay">
+    <div class="b2b-modal-card" style="max-width: 480px; text-align: left;">
+
+      <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1.5px solid #EDE7DC; padding-bottom: 0.75rem;">
+        <h3
+          style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.25rem; color: #721513; font-weight: 900; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fa-solid fa-triangle-exclamation" style="color: #E51D24;"></i> Réclamation Cut-off Dépassé
+        </h3>
+        <button type="button" (click)="fermerModalReclamation()"
+          style="background: none; border: none; font-size: 1.2rem; color: #6E5A56; cursor: pointer;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      @if (!reclamationEnvoyee()) {
+      <div
+        style="background: #FEF2F2; border: 1.5px solid #FCA5A5; border-radius: 12px; padding: 0.85rem; margin-bottom: 1rem; font-size: 0.82rem; color: #991B1B;">
+        <strong>L'heure limite de cut-off ({{ b2b.currentEntreprise().cutOffHeure }}) est dépassée pour
+          aujourd'hui.</strong>
+        <p style="margin: 0.25rem 0 0; color: #7F1D1D;">
+          Transmettez une alerte au Responsable de site Kiki afin qu'il débloque manuellement votre commande pour ce
+          midi.
+        </p>
+      </div>
+
+      <div style="margin-bottom: 1.25rem;">
+        <label style="font-size: 0.78rem; font-weight: 800; color: #332724; display: block; margin-bottom: 0.35rem;">
+          Motif de votre retard :
+        </label>
+        <textarea rows="3" [ngModel]="motifReclamationInput()" (ngModelChange)="motifReclamationInput.set($event)"
+          style="width: 100%; padding: 0.65rem; border: 1.5px solid #CBD5E1; border-radius: 8px; font-size: 0.85rem; font-family: inherit; resize: vertical;">
+            </textarea>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; align-items: stretch; gap: 0.75rem;">
+        <button type="button" (click)="fermerModalReclamation()"
+          style="flex: 1; height: 44px; min-height: 44px; max-height: 44px; padding: 0 1.15rem; border: 1.5px solid #EDE7DC; background: #FAF8F4; border-radius: 9999px; font-weight: 700; font-size: 0.84rem; color: #6E5A56; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; box-sizing: border-box;">
+          Annuler
+        </button>
+        <button type="button" (click)="envoyerReclamation()"
+          style="flex: 1.4; height: 44px; min-height: 44px; max-height: 44px; padding: 0 1.25rem; border: none; background: #E51D24; color: #FFFFFF; border-radius: 9999px; font-weight: 800; font-size: 0.84rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; white-space: nowrap; box-sizing: border-box;">
+          <i class="fa-solid fa-paper-plane"></i> Transmettre au Responsable
+        </button>
+      </div>
+      } @else {
+      <div style="text-align: center; padding: 1rem 0;">
+        <div
+          style="width: 50px; height: 50px; border-radius: 50%; background: rgba(96, 108, 56, 0.15); color: #606C38; font-size: 1.6rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+          <i class="fa-solid fa-check"></i>
+        </div>
+        <h4 style="margin: 0; color: #721513; font-size: 1.2rem; font-weight: 800;">
+          Réclamation transmise avec succès !
+        </h4>
+        <p style="margin: 0.35rem 0 0; font-size: 0.82rem; color: #6E5A56;">
+          Votre alerte a été envoyée au Responsable de site. Dès validation de sa part, vous pourrez finaliser votre
+          choix.
+        </p>
+      </div>
+      }
+
+    </div>
+  </div>
+  }
+
+  <!-- MODAL INDÉPENDANT POUR REVOIR LE QR CODE À TOUT MOMENT -->
+  @if (showQrCodeModal() && derniereCommande()) {
+  <div class="b2b-modal-overlay">
+    <div class="b2b-modal-card" style="max-width: 440px; text-align: center;">
+
+      <div
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1.5px solid #EDE7DC; padding-bottom: 0.75rem;">
+        <h3
+          style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.3rem; color: #721513; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fa-solid fa-qrcode"></i> Mon QR Code Déjeuner
+        </h3>
+        <button type="button" (click)="fermerQrCodeModal()"
+          style="background: none; border: none; font-size: 1.2rem; color: #6E5A56; cursor: pointer; padding: 0.25rem;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div
+        style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 0.85rem; margin-bottom: 1rem; text-align: left; font-size: 0.8rem;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
+          <span style="color: #6E5A56;">Salarié :</span>
+          <strong style="color: #332724;">{{ b2b.currentEmploye().prenom }} {{ b2b.currentEmploye().nom }}</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
+          <span style="color: #6E5A56;">Site de retrait :</span>
+          <strong style="color: #721513;">{{ derniereCommande()?.siteNom }}</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: #6E5A56;">Jour & Heure :</span>
+          <strong style="color: #606C38;"><i class="fa-regular fa-clock"></i> {{ derniereCommande()?.date }} • {{
+            derniereCommande()?.heureRetrait }}</strong>
+        </div>
+      </div>
+
+      <!-- Switch Double Option QR Code (Montrer ou Scanner) -->
+      <div
+        style="display: inline-flex; background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 9999px; padding: 0.2rem; gap: 0.2rem; margin-bottom: 1rem;">
+        <button type="button" (click)="qrMode.set('MONTRER')"
+          style="min-height: 0; border: 0; border-radius: 9999px; padding: 0.4rem 0.9rem; font-size: 0.74rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.45rem;"
+          [style.background]="qrMode() === 'MONTRER' ? '#721513' : 'transparent'"
+          [style.color]="qrMode() === 'MONTRER' ? '#FFFFFF' : '#6E5A56'">
+          <i class="fa-solid fa-qrcode"></i> Montrer mon QR
+        </button>
+        <button type="button" (click)="qrMode.set('SCANNER'); scanCantineValide.set(false)"
+          style="min-height: 0; border: 0; border-radius: 9999px; padding: 0.4rem 0.9rem; font-size: 0.74rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.45rem;"
+          [style.background]="qrMode() === 'SCANNER' ? '#721513' : 'transparent'"
+          [style.color]="qrMode() === 'SCANNER' ? '#FFFFFF' : '#6E5A56'">
+          <i class="fa-solid fa-camera"></i> Scanner QR Cantine
+        </button>
+      </div>
+
+      @if (qrMode() === 'MONTRER') {
+      <div
+        style="background: #FFFFFF; border: 2px solid #EDE7DC; border-radius: 18px; padding: 1.25rem; margin: 0 auto 1.25rem; max-width: 260px; box-shadow: 0 8px 25px rgba(114, 21, 19, 0.08);">
+        <div
+          style="display: flex; justify-content: center; align-items: center; margin: 0 auto; background: #FAF8F4; padding: 0.65rem; border-radius: 12px; border: 1px solid #EDE7DC;">
+          <svg viewBox="0 0 25 25" width="160" height="160" shape-rendering="crispEdges">
+            <rect width="25" height="25" fill="#FAF8F4" />
+            @for (row of qrMatrix(); track $index; let r = $index) {
+            @for (cell of row; track $index; let c = $index) {
+            @if (cell) {
+            <rect [attr.x]="c" [attr.y]="r" width="1" height="1" fill="#721513" />
+            }
+            }
+            }
+          </svg>
+        </div>
+
+        <div style="margin-top: 0.75rem;">
+          <span
+            style="font-family: monospace; font-size: 0.85rem; font-weight: 800; color: #721513; background: #FAF5EA; padding: 0.25rem 0.65rem; border-radius: 6px; border: 1px solid #E2D5BE;">
+            {{ derniereCommande()?.qrCode }}
+          </span>
+        </div>
+      </div>
+      } @else {
+      <div
+        style="background: #FAF8F4; border: 1.5px dashed #C5A880; border-radius: 16px; padding: 1.25rem; margin-bottom: 1.25rem;">
+        @if (!scanCantineValide()) {
+        <div style="font-size: 2rem; color: #721513; margin-bottom: 0.5rem;"><i class="fa-solid fa-camera"></i></div>
+        <p style="font-size: 0.82rem; color: #6E5A56; margin: 0 0 0.85rem;">
+          Scannez le QR Code du jour affiché à l'entrée du réfectoire pour passer votre plateau à « À livrer ».
+        </p>
+        <button type="button" (click)="validerScanCantine()"
+          style="min-height: 0; padding: 0.55rem 1.15rem; border-radius: 9999px; background: #606C38; color: #FFFFFF; border: none; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.45rem;">
+          <i class="fa-solid fa-qrcode"></i> Simuler le scan du QR Cantine
+        </button>
+        } @else {
+        <div style="font-size: 2rem; color: #606C38; margin-bottom: 0.4rem;"><i class="fa-solid fa-circle-check"></i>
+        </div>
+        <strong style="color: #606C38; font-size: 0.92rem;">QR Cantine scanné !</strong>
+        <p style="font-size: 0.78rem; color: #6E5A56; margin: 0.3rem 0 0;">Votre commande est passée à « À livrer » au
+          comptoir.</p>
+        }
+      </div>
+      }
+
+      <button (click)="fermerQrCodeModal()"
+        style="width: 100%; padding: 0.75rem; border-radius: 9999px; background: #721513; color: #FFFFFF; border: none; font-weight: 800; font-size: 0.85rem; cursor: pointer;">
+        Fermer
+      </button>
+
+    </div>
+  </div>
+  }
+
+  <!-- MESSAGE FLASH GARNITURE APRÈS SÉLECTION D'UN PLAT CHAUD -->
+  @if (flashGarnitureMessage(); as msg) {
+  <div
+    style="position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); z-index: 1200; background: #721513; color: #FAF5EA; padding: 0.85rem 1.35rem; border-radius: 9999px; box-shadow: 0 18px 40px rgba(114, 21, 19, 0.4); display: flex; align-items: center; gap: 0.85rem; font-size: 0.86rem; font-weight: 700; max-width: 92vw;">
+    <span><i class="fa-solid fa-bowl-rice" style="color: #E6DABA; margin-right: 0.4rem;"></i> {{ msg }}</span>
+    <button type="button" (click)="selectCategory('GARNITURE'); flashGarnitureMessage.set(null)"
+      style="min-height: 0; background: #E51D24; color: #FFFFFF; border: none; border-radius: 9999px; padding: 0.35rem 0.8rem; font-size: 0.75rem; font-weight: 800; cursor: pointer; white-space: nowrap;">
+      Choisir →
+    </button>
+  </div>
+  }
+
+</div>

@@ -1,0 +1,304 @@
+﻿<div class="super-admin-wrapper">
+  <app-sa-topbar></app-sa-topbar>
+  <main class="sa-main-content">
+      <div>
+        
+        <div style="display: flex; flex-direction: column; gap: 0.85rem; margin-bottom: 1.5rem;">
+          <div>
+            <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
+              Catalogue Gastronomique Global Kiki Traiteur
+            </h2>
+            <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #6E5A56;">
+              Gestion des spécialités, tarifs unitaires et archivage des plats proposés aux entreprises.
+            </p>
+          </div>
+
+          <!-- Ligne 1 : Filtres alignés uniformément -->
+          <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 0.55rem; background: #FFFFFF; border: 1.5px solid #E2D5BE; border-radius: 12px; padding: 0 0.9rem; height: 42px; flex: 1 1 240px; max-width: 340px; box-shadow: 0 2px 8px rgba(114, 21, 19, 0.03);">
+              <i class="fa-solid fa-magnifying-glass" style="color: #6E5A56; font-size: 0.85rem; flex-shrink: 0;"></i>
+              <input 
+                type="text" 
+                [ngModel]="recherchePlatCatalogue()" 
+                (ngModelChange)="recherchePlatCatalogue.set($event)" 
+                placeholder="Rechercher un plat..." 
+                style="border: none; outline: none; background: transparent; font-size: 0.84rem; width: 100%; color: #332724; font-weight: 600; padding: 0; margin: 0;">
+            </div>
+
+            <select 
+              [ngModel]="filtreCategorieCatalogue()"
+              (ngModelChange)="filtreCategorieCatalogue.set($event)"
+              style="height: 42px; color: #721513;">
+              <option value="TOUS">Toutes les Catégories</option>
+              <option value="PLAT">Plats Chauds &amp; Spécialités</option>
+              <option value="ENTREE">Entrées &amp; Salades</option>
+              <option value="DESSERT">Desserts &amp; Douceurs</option>
+              <option value="BOISSON">Boissons &amp; Jus Frais</option>
+            </select>
+
+            <select 
+              [ngModel]="filtreArchivePlat()"
+              (ngModelChange)="filtreArchivePlat.set($event)"
+              style="height: 42px;">
+              <option value="ACTIFS">Plats Actifs</option>
+              <option value="ARCHIVES">Plats Archivés</option>
+              <option value="TOUS">Tout le Répertoire</option>
+            </select>
+          </div>
+
+          <!-- Ligne 2 : Bouton Ajouter un Plat juste en bas des filtres -->
+          <div>
+            <button (click)="ouvrirModalAjoutPlat()" class="sa-btn-primary">
+              <i class="fa-solid fa-plus"></i> Ajouter un Plat
+            </button>
+          </div>
+        </div>
+
+        <!-- ÉTAT VIDE CATALOGUE -->
+        @if (platsFiltres().length === 0) {
+          <div style="background: #FFFFFF; border: 1.5px dashed #E2D5BE; border-radius: 18px; padding: 3rem 1.5rem; text-align: center; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.03);">
+            <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(114, 21, 19, 0.06); color: #721513; display: inline-flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-bottom: 1rem;">
+              <i class="fa-solid fa-utensils"></i>
+            </div>
+            <h3 style="margin: 0 0 0.4rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.25rem; color: #721513; font-weight: 800;">
+              {{ filtreArchivePlat() === 'ARCHIVES' ? 'Aucun plat archivé' : 'Aucun plat trouvé dans cette catégorie' }}
+            </h3>
+            <p style="margin: 0 auto 1.25rem; max-width: 440px; font-size: 0.85rem; color: #6E5A56; line-height: 1.5;">
+              Modifiez vos critères de filtre ou ajoutez une nouvelle spécialité au catalogue central.
+            </p>
+            <button 
+              type="button" 
+              (click)="filtreArchivePlat.set('ACTIFS'); filtreCategorieCatalogue.set('TOUS')"
+              class="sa-btn-action"
+              style="padding: 0.6rem 1.2rem; border-radius: 9999px; font-weight: 800; color: #721513; border-color: #721513;">
+              <i class="fa-solid fa-rotate-left"></i> Réinitialiser les filtres
+            </button>
+          </div>
+        }
+
+        <!-- Grille du Catalogue Central avec Photos bien cadrées de haut -->
+        <div class="sa-catalogue-grid">
+          @for (plat of platsPagines(); track plat.id) {
+            <div [style.opacity]="plat.isArchive ? '0.6' : '1'"
+                 style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; overflow: hidden; box-shadow: 0 4px 18px rgba(114, 21, 19, 0.04); display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s, box-shadow 0.2s;">
+              <div>
+                <!-- Conteneur Photo bien cadrée de haut (Top-Down Food Framing) -->
+                <div style="position: relative; height: 180px; overflow: hidden; background: #FAF8F4; display: flex; align-items: center; justify-content: center;">
+                  <img [src]="plat.image" [alt]="plat.nom" style="width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                  
+                  <!-- Badge Catégorie -->
+                  <span [style.background]="plat.categorie === 'PLAT' ? '#721513' : plat.categorie === 'ENTREE' ? '#606C38' : plat.categorie === 'DESSERT' ? '#C05621' : '#332724'"
+                        style="position: absolute; top: 12px; left: 12px; color: #FAF8F4; padding: 0.3rem 0.75rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,0.25); display: flex; align-items: center; gap: 0.35rem;">
+                    <i class="fa-solid" [class.fa-bowl-food]="plat.categorie === 'PLAT'" [class.fa-leaf]="plat.categorie === 'ENTREE'" [class.fa-cake-candles]="plat.categorie === 'DESSERT'" [class.fa-wine-glass]="plat.categorie === 'BOISSON'"></i>
+                    {{ plat.categorie === 'PLAT' ? 'Plat Chaud' : plat.categorie === 'ENTREE' ? 'Entrée' : plat.categorie === 'DESSERT' ? 'Dessert' : 'Boisson' }}
+                  </span>
+
+                  @if (plat.isArchive) {
+                    <span style="position: absolute; top: 12px; right: 12px; background: #E51D24; color: #FFFFFF; padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 800; box-shadow: 0 2px 8px rgba(229,29,36,0.3);">
+                      <i class="fa-solid fa-box-archive"></i> Archivé
+                    </span>
+                  }
+                </div>
+
+                <div style="padding: 1.25rem;">
+                  <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.4rem;">
+                    <h3 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.15rem; color: #721513; font-weight: 800; line-height: 1.35;">
+                      {{ plat.nom }}
+                    </h3>
+                  </div>
+
+                  <p style="margin: 0 0 0.85rem; font-size: 0.8rem; color: #6E5A56; line-height: 1.5; min-height: 2.4rem;">
+                    {{ plat.description }}
+                  </p>
+
+                  <!-- Fiche nutritionnelle / allergènes si renseignés -->
+                  <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.85rem;">
+                    @if (plat.calories) {
+                      <span style="background: rgba(96, 108, 56, 0.1); color: #606C38; font-size: 0.7rem; font-weight: 800; padding: 0.2rem 0.55rem; border-radius: 6px;">
+                        <i class="fa-solid fa-fire-flame-curved"></i> {{ plat.calories }} kcal
+                      </span>
+                    }
+                    @if (plat.allergene) {
+                      <span style="background: rgba(192, 86, 33, 0.1); color: #C05621; font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 6px;">
+                        <i class="fa-solid fa-triangle-exclamation"></i> {{ plat.allergene }}
+                      </span>
+                    }
+                  </div>
+
+                  <div style="font-size: 1.25rem; font-weight: 900; color: #721513; display: flex; align-items: baseline; gap: 0.25rem;">
+                    {{ (plat.prixUnitaire | number) }} <span style="font-size: 0.8rem; color: #6E5A56; font-weight: 700;">FCFA</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Actions Plat -->
+              <div style="border-top: 1px solid #EDE7DC; padding: 0.85rem 1.25rem; background: #FAF8F4; display: flex; justify-content: space-between; align-items: center;">
+                <button (click)="ouvrirModalModifierPlat(plat)" class="sa-btn-action" style="font-weight: 700;">
+                  <i class="fa-regular fa-pen-to-square"></i> Modifier
+                </button>
+                <button (click)="b2b.toggleArchiverPlat(plat.id)" class="sa-btn-action" [style.color]="plat.isArchive ? '#606C38' : '#E51D24'" style="font-weight: 700;">
+                  <i class="fa-solid" [class.fa-box-archive]="!plat.isArchive" [class.fa-rotate-left]="plat.isArchive"></i>
+                  {{ plat.isArchive ? 'Restaurer' : 'Archiver' }}
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- BARRE DE PAGINATION CATALOGUE -->
+        @if (platsFiltres().length > 0) {
+          <div class="sa-pagination-bar">
+            <div class="sa-pagination-info">
+              Affichage de <strong>{{ ((pageCatalogue() - 1) * pageSizeCatalogue()) + 1 }}</strong> à <strong>{{ ((pageCatalogue() * pageSizeCatalogue()) > platsFiltres().length) ? platsFiltres().length : (pageCatalogue() * pageSizeCatalogue()) }}</strong> sur <strong>{{ platsFiltres().length }}</strong> spécialités
+            </div>
+
+            <div class="sa-pagination-controls">
+              <button 
+                type="button" 
+                class="sa-page-btn" 
+                [disabled]="pageCatalogue() <= 1"
+                (click)="changerPageCatalogue(pageCatalogue() - 1)">
+                <i class="fa-solid fa-chevron-left"></i> Précédent
+              </button>
+
+              @for (p of pagesCatalogueArray(); track p) {
+                <button 
+                  type="button" 
+                  class="sa-page-num" 
+                  [class.active]="pageCatalogue() === p"
+                  (click)="changerPageCatalogue(p)">
+                  {{ p }}
+                </button>
+              }
+
+              <button 
+                type="button" 
+                class="sa-page-btn" 
+                [disabled]="pageCatalogue() >= totalPagesCatalogue()"
+                (click)="changerPageCatalogue(pageCatalogue() + 1)">
+                Suivant <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        }
+
+      </div>
+  </main>
+  @if (showModalPlat()) {
+    <div class="sa-modal-overlay">
+      <div class="sa-modal-card" style="max-width: 680px; padding: 1.25rem 1.5rem; overflow: visible;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.9rem;">
+          <h3 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.25rem; color: #721513; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-solid fa-bowl-food"></i> {{ isEditModePlat() ? 'Modifier le Plat' : 'Ajouter un Plat au Catalogue' }}
+          </h3>
+          <button (click)="showModalPlat.set(false)" style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 8px; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; color: #6E5A56; cursor: pointer;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <div class="sa-form-grid-2">
+            <div>
+              <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">Nom du Plat / Spécialité</label>
+              <input type="text" [(ngModel)]="platEnEdition().nom" placeholder="Ex: Poulet Yassa Braisé au Feu de Bois" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.55rem 0.75rem; font-size: 0.84rem; font-weight: 700;">
+            </div>
+
+            <div>
+              <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">Catégorie Alimentaire</label>
+              <select [(ngModel)]="platEnEdition().categorie" style="width: 100%;">
+                <option value="PLAT">Plat Chaud Principal</option>
+                <option value="ENTREE">Entrée &amp; Salade</option>
+                <option value="DESSERT">Dessert &amp; Douceur</option>
+                <option value="BOISSON">Boisson &amp; Jus Frais</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">Description des Ingrédients &amp; Préparation</label>
+            <textarea [(ngModel)]="platEnEdition().description" rows="2" placeholder="Oignons caramélisés, citron vert, riz parfumé..." style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.5rem 0.75rem; font-size: 0.82rem; resize: none;"></textarea>
+          </div>
+
+          <!-- Import Photo via Cloudinary (sans URL ni présélections) -->
+          <div>
+            <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">
+              <i class="fa-solid fa-camera"></i> Photo du Plat (Import Cloudinary)
+            </label>
+            <label style="display: flex; align-items: center; justify-content: space-between; gap: 0.85rem; background: #FAF8F4; border: 1.5px dashed #C5A880; border-radius: 12px; padding: 0.6rem 0.9rem; cursor: pointer; transition: border-color 0.18s;">
+              <div style="display: flex; align-items: center; gap: 0.75rem; min-width: 0;">
+                @if (platEnEdition().image) {
+                  <img [src]="platEnEdition().image" alt="Aperçu du plat" style="width: 48px; height: 48px; border-radius: 10px; object-fit: cover; border: 1.5px solid #E2D5BE; flex-shrink: 0;">
+                } @else {
+                  <div style="width: 48px; height: 48px; border-radius: 10px; background: rgba(114, 21, 19, 0.08); color: #721513; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; flex-shrink: 0;">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                  </div>
+                }
+                <div style="min-width: 0;">
+                  <div style="font-size: 0.82rem; font-weight: 800; color: #2C1810;">
+                    @if (isUploadingImage()) {
+                      Envoi vers Cloudinary en cours...
+                    } @else if (platEnEdition().image) {
+                      Image importée — cliquez pour remplacer
+                    } @else {
+                      Importer une photo depuis votre appareil
+                    }
+                  </div>
+                  <div style="font-size: 0.7rem; color: #8C7E74;">PNG, JPG ou WEBP • Stockage sécurisé Cloudinary</div>
+                </div>
+              </div>
+              <span style="background: #721513; color: #FFFFFF; border-radius: 8px; padding: 0.45rem 0.85rem; font-size: 0.75rem; font-weight: 800; white-space: nowrap; flex-shrink: 0;">
+                <i class="fa-solid" [class.fa-upload]="!isUploadingImage()" [class.fa-spinner]="isUploadingImage()" [class.fa-spin]="isUploadingImage()"></i>
+                {{ isUploadingImage() ? 'Envoi...' : 'Choisir un fichier' }}
+              </span>
+              <input type="file" accept="image/*" (change)="onUploadImagePlat($event)" style="display: none;">
+            </label>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 0.75rem;">
+            <div>
+              <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">Tarif Unitaire (FCFA)</label>
+              <input type="number" [(ngModel)]="platEnEdition().prixUnitaire" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.55rem 0.75rem; font-size: 0.84rem; font-weight: 800; color: #721513;">
+            </div>
+
+            <div>
+              <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">
+                <i class="fa-solid fa-fire-flame-curved"></i> Calories (kcal)
+              </label>
+              <input type="number" [(ngModel)]="platEnEdition().calories" placeholder="550" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.55rem 0.75rem; font-size: 0.84rem;">
+            </div>
+
+            <div>
+              <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">
+                <i class="fa-solid fa-triangle-exclamation"></i> Allergènes
+              </label>
+              <select [(ngModel)]="platEnEdition().allergene" style="width: 100%;">
+                <option value="Aucun allergène majeur">Aucun allergène majeur</option>
+                <option value="Gluten">Gluten</option>
+                <option value="Arachides">Arachides</option>
+                <option value="Poisson">Poisson</option>
+                <option value="Crustacés">Crustacés</option>
+                <option value="Œufs">Œufs</option>
+                <option value="Lait / Lactose">Lait / Lactose</option>
+                <option value="Soja">Soja</option>
+                <option value="Fruits à coque">Fruits à coque</option>
+                <option value="Sésame">Sésame</option>
+                <option value="Moutarde">Moutarde</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; margin-top: 1.15rem; align-items: stretch;">
+          <button (click)="showModalPlat.set(false)" class="sa-btn-action" style="flex: 1; height: 42px; min-height: 42px; color: #6E5A56;">
+            Annuler
+          </button>
+          <button (click)="enregistrerPlat()" class="sa-btn-primary" style="flex: 1.4; height: 42px; min-height: 42px; justify-content: center;">
+            <i class="fa-solid fa-check"></i> Enregistrer le Plat
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>
+

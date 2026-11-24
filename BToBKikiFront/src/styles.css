@@ -61,10 +61,11 @@
   --touch-target-min: 44px;
 
   /* Layout */
-  --b2b-sidebar-w: 300px;
+  --b2b-sidebar-w: 255px;
 }
 
 html {
+  font-size: 14.5px;
   scroll-behavior: smooth;
   box-sizing: border-box;
   scrollbar-width: thin;
@@ -1221,12 +1222,15 @@ body:has(.fidelite-modal-overlay) .mykiki-main-content,
 
 @media (max-width: 440px) {
   .modal-actions-row {
-    flex-direction: column !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
+    gap: 0.5rem !important;
   }
 
   .modal-actions-row > button {
-    width: 100% !important;
-    flex: none !important;
+    flex: 1 1 auto !important;
+    min-width: 110px !important;
   }
 }
 

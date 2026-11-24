@@ -1,0 +1,247 @@
+import { Component, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
+import { B2bStateService } from '../../../b2b/shared/b2b-state.service';
+import { B2bApiService } from '../../../b2b/shared/b2b-api.service';
+import { UserRoleB2B } from '../../../b2b/shared/b2b.models';
+
+export interface ProfilDemo {
+  id: string;
+  nom: string;
+  roleTitre: string;
+  badge: string;
+  badgeColor: string;
+  identifiant: string;
+  description: string;
+  icone: string;
+  role: UserRoleB2B;
+  destinationUrl: string;
+}
+
+@Component({
+  selector: 'app-b2b-login',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule],
+  templateUrl: './b2b-login.component.html',
+  styleUrls: ['./b2b-login.component.css']
+})
+export class B2bLoginComponent {
+  b2b = inject(B2bStateService);
+  private api = inject(B2bApiService);
+  private router = inject(Router);
+
+  // Identifiants formulaire libre
+  username = signal('rh@totalenergies.sn');
+  password = signal('••••••••');
+  showPassword = signal(false);
+  loading = signal(false);
+
+  // 5 PROFILS OFFICIELS DU CDCF (Y COMPRIS LE SUPER ADMIN KIKI TRAITEUR)
+  profilsDemo: ProfilDemo[] = [
+    {
+      id: 'super-admin-kiki',
+      nom: 'Direction Kiki Traiteur',
+      roleTitre: 'Super Admin Kiki (Global)',
+      badge: 'Direction Générale',
+      badgeColor: '#721513',
+      identifiant: 'admin.general@kikitraiteur.sn',
+      description: 'Gestion globale de toutes les entreprises, création des sites, contractualisation des tarifs, gestion du catalogue (archivage/création) et supervision.',
+      icone: 'fa-solid fa-crown',
+      role: 'SUPER_ADMIN',
+      destinationUrl: '/b2b/super-admin'
+    },
+    {
+      id: 'responsable-entreprise',
+      nom: 'Mme Fatou Fall',
+      roleTitre: 'Responsable de l’Entreprise',
+      badge: 'Admin RH & Moyens Généraux',
+      badgeColor: '#721513',
+      identifiant: 'TotalEnergies Sénégal • RH Siège',
+      description: 'Gère la liste des salariés, active/bloque les droits de subvention, suit les consommations par site et valide la facture mensuelle proforma.',
+      icone: 'fa-solid fa-briefcase',
+      role: 'RESPONSABLE_ENTREPRISE',
+      destinationUrl: '/b2b/rh'
+    },
+    {
+      id: 'responsable-site-kiki',
+      nom: 'M. Babacar Samb',
+      roleTitre: 'Responsable de Site Kiki',
+      badge: 'Exploitation & Cantine Traiteur',
+      badgeColor: '#C05621',
+      identifiant: 'Kiki Traiteur • Gérant de Site & Dispatch',
+      description: 'Supervise la cantine sur site, contrôle les réceptions de plats chauds, suit les portions prévues, valide les BL et scanne les QR codes de retrait.',
+      icone: 'fa-solid fa-clipboard-check',
+      role: 'RESPONSABLE_SITE_KIKI',
+      destinationUrl: '/b2b/cuisine'
+    },
+    {
+      id: 'salarie-conventionne',
+      nom: 'Babacar Ndiaye',
+      roleTitre: 'Salarié Conventionné (Pris en charge)',
+      badge: 'Subventionné 100% • 0 FCFA',
+      badgeColor: '#2E7D32',
+      identifiant: 'TOT-9842 • Finance & Comptabilité',
+      description: 'Choisit sa formule déjeuner 4 composantes 100% prise en charge par TotalEnergies, valide sa commande et obtient son QR Code personnel de retrait.',
+      icone: 'fa-solid fa-user-shield',
+      role: 'SALARIE_CONVENTIONNE',
+      destinationUrl: '/b2b/commande'
+    },
+    {
+      id: 'salarie-autonome',
+      nom: 'Ousmane Ba (Prestataire IT)',
+      roleTitre: 'Salarié Autonome (Frais Personnels)',
+      badge: 'Paiement direct Wave',
+      badgeColor: '#1D4ED8',
+      identifiant: 'TOT-EXT-01 • Consultant IT Externe',
+      description: 'Commande librement ses plats à la carte sur le comptoir digital et règle directement par Wave Mobile Money avant retrait.',
+      icone: 'fa-solid fa-mobile-screen-button',
+      role: 'SALARIE_AUTONOME',
+      destinationUrl: '/b2b/commande'
+    }
+  ];
+
+  // Modal d'auto-inscription Salarié Non Subventionné (Autonome)
+  showRegisterAutonomeModal = signal(false);
+  newAutonome = signal({
+    prenom: '',
+    nom: '',
+    telephone: '+221 ',
+    email: '',
+    entrepriseId: 'ent-001',
+    siteId: 'site-1',
+    password: ''
+  });
+  registerSuccess = signal(false);
+
+  ouvrirModalInscriptionAutonome() {
+    this.showRegisterAutonomeModal.set(true);
+    this.registerSuccess.set(false);
+  }
+
+  fermerModalInscriptionAutonome() {
+    this.showRegisterAutonomeModal.set(false);
+  }
+
+  inscrireAutonome() {
+    const val = this.newAutonome();
+    if (!val.nom || !val.prenom || !val.telephone) {
+      alert('Veuillez renseigner votre prénom, nom et numéro de téléphone.');
+      return;
+    }
+
+    this.loading.set(true);
+    this.api.registerAutonome({
+      prenom: val.prenom,
+      nom: val.nom,
+      telephone: val.telephone,
+      email: val.email,
+      siteId: val.siteId,
+      password: val.password || 'Kiki2026!'
+    }).subscribe({
+      next: (res) => {
+        this.loading.set(false);
+        if (res.success && res.data) {
+          if (typeof localStorage !== 'undefined' && res.data.token) {
+            localStorage.setItem('b2b_jwt_token', res.data.token);
+          }
+          this.registerSuccess.set(true);
+          this.b2b.setSessionRole({
+            role: res.data.role,
+            nomComplet: res.data.nomComplet,
+            titrePoste: res.data.titrePoste,
+            entite: res.data.entite,
+            badge: res.data.badge,
+            badgeColor: res.data.badgeColor,
+            siteId: res.data.siteId,
+            siteNom: res.data.siteNom,
+            matricule: res.data.matricule
+          });
+          this.b2b.syncFromBackend();
+          setTimeout(() => {
+            this.showRegisterAutonomeModal.set(false);
+            this.router.navigateByUrl('/b2b/commande');
+          }, 800);
+        }
+      },
+      error: (err) => {
+        this.loading.set(false);
+        alert(err?.error?.message || 'Erreur lors de la création du compte autonome.');
+      }
+    });
+  }
+
+  selectionnerProfilDemo(p: ProfilDemo) {
+    this.loading.set(true);
+
+    if (p.role === 'SUPER_ADMIN') {
+      this.b2b.superAdminActiveSection.set('DASHBOARD');
+    }
+
+    this.b2b.setSessionRole({
+      role: p.role,
+      nomComplet: p.nom,
+      titrePoste: p.roleTitre,
+      entite: p.role === 'RESPONSABLE_SITE_KIKI' ? 'Kiki Traiteur Exploitation' : 'TotalEnergies Sénégal',
+      badge: p.badge,
+      badgeColor: p.badgeColor,
+      siteId: 'site-1',
+      siteNom: 'Siège Plateau - Dakar'
+    });
+
+    setTimeout(() => {
+      this.loading.set(false);
+      if (p.role === 'RESPONSABLE_ENTREPRISE') {
+        this.b2b.rhActiveSection.set('STATISTIQUES');
+      }
+      this.router.navigateByUrl(p.destinationUrl);
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }, 350);
+  }
+
+  seConnecter() {
+    this.loading.set(true);
+    this.api.login(this.username(), this.password()).subscribe({
+      next: (res) => {
+        this.loading.set(false);
+        if (res.success && res.data) {
+          if (typeof localStorage !== 'undefined' && res.data.token) {
+            localStorage.setItem('b2b_jwt_token', res.data.token);
+          }
+          const role = res.data.role as UserRoleB2B;
+          if (role === 'SUPER_ADMIN') {
+            this.b2b.superAdminActiveSection.set('DASHBOARD');
+          } else if (role === 'RESPONSABLE_ENTREPRISE') {
+            this.b2b.rhActiveSection.set('STATISTIQUES');
+          }
+          this.b2b.setSessionRole({
+            role,
+            nomComplet: res.data.nomComplet,
+            titrePoste: res.data.titrePoste,
+            entite: res.data.entite,
+            badge: res.data.badge,
+            badgeColor: res.data.badgeColor,
+            siteId: res.data.siteId,
+            siteNom: res.data.siteNom,
+            matricule: res.data.matricule
+          });
+          this.b2b.syncFromBackend();
+
+          const dest =
+            role === 'SUPER_ADMIN' ? '/b2b/super-admin' :
+            role === 'RESPONSABLE_ENTREPRISE' ? '/b2b/rh' :
+            role === 'RESPONSABLE_SITE_KIKI' ? '/b2b/cuisine' :
+            '/b2b/commande';
+          this.router.navigateByUrl(dest);
+        }
+      },
+      error: (err) => {
+        this.loading.set(false);
+        alert(err?.error?.message || 'Identifiants invalides ou serveur backend indisponible.');
+      }
+    });
+  }
+}
+

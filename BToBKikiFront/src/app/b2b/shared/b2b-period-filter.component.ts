@@ -88,13 +88,14 @@ export interface PeriodeFilterChange {
     .b2b-period-pills {
       display: inline-flex;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 0.25rem;
+      flex-wrap: nowrap;
+      gap: 0.2rem;
       background: #FFFFFF;
       border: 1.5px solid #EDE7DC;
       border-radius: 9999px;
-      padding: 0.28rem;
+      padding: 0.25rem;
       box-shadow: 0 2px 10px rgba(114, 21, 19, 0.04);
+      max-width: 100%;
     }
 
     .b2b-period-pill {
@@ -102,14 +103,14 @@ export interface PeriodeFilterChange {
       background: transparent;
       color: #6E5A56;
       font-family: inherit;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 700;
-      padding: 0.45rem 0.95rem;
+      padding: 0.42rem 0.8rem;
       border-radius: 9999px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.35rem;
       transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease, box-shadow 0.18s ease;
       white-space: nowrap;
     }
@@ -133,12 +134,12 @@ export interface PeriodeFilterChange {
       display: inline-flex;
       align-items: center;
       flex-wrap: wrap;
-      gap: 0.55rem;
+      gap: 0.65rem;
       background: #FFFFFF;
-      border: 1.5px solid #E2D5BE;
-      border-radius: 14px;
-      padding: 0.45rem 0.85rem;
-      box-shadow: 0 6px 20px rgba(114, 21, 19, 0.06);
+      border: 1.5px solid #EDE7DC;
+      border-radius: 9999px;
+      padding: 0.35rem 0.9rem;
+      box-shadow: 0 4px 14px rgba(114, 21, 19, 0.05);
       animation: kikiSlideDownFade 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
@@ -199,6 +200,7 @@ export interface PeriodeFilterChange {
       .b2b-period-pills {
         width: 100%;
         justify-content: flex-start;
+        flex-wrap: wrap;
         border-radius: 16px;
       }
       .b2b-custom-date-row {

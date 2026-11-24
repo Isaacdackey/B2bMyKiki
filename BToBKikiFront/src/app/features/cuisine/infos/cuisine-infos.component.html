@@ -1,0 +1,41 @@
+﻿<div class="cuisine-wrapper">
+  <main style="max-width: 1320px; width: 100%; margin: 0 auto; padding: 0.5rem 0 1.5rem;">
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+      <button type="button" class="b2b-mobile-hamburger-btn" (click)="b2b.toggleMobileDrawer()" aria-label="Ouvrir le menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+      <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.75rem; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+        <h3 style="margin: 0 0 1.25rem; font-size: 1.25rem; color: #721513; font-weight: 900;">
+          Paramètres du Contrat & Modalités de Prestation
+        </h3>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+          <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 12px; padding: 1.15rem;">
+            <div style="font-size: 0.75rem; color: #6E5A56; font-weight: 800; text-transform: uppercase;">Entreprise Cliente</div>
+            <div style="font-size: 1.1rem; font-weight: 900; color: #721513; margin-top: 0.25rem;">{{ entreprise().nom }}</div>
+            <div style="font-size: 0.82rem; color: #6E5A56; margin-top: 0.25rem;">Code : {{ entreprise().codeEntreprise }} • NINEA : {{ entreprise().ninea || 'SN-DKR-2023-0982' }}</div>
+          </div>
+
+          <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 12px; padding: 1.15rem;">
+            <div style="font-size: 0.75rem; color: #6E5A56; font-weight: 800; text-transform: uppercase;">Heure Limite (Cut-Off)</div>
+            <div style="font-size: 1.1rem; font-weight: 900; color: #E51D24; margin-top: 0.25rem;">{{ getLibelleCutOff(entreprise()) }}</div>
+            <div style="font-size: 0.82rem; color: #6E5A56; margin-top: 0.25rem;">Au-delà, une réclamation est requise</div>
+          </div>
+
+          <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 12px; padding: 1.15rem;">
+            <div style="font-size: 0.75rem; color: #6E5A56; font-weight: 800; text-transform: uppercase;">Mode de Prestation</div>
+            <div style="font-size: 1.1rem; font-weight: 900; color: #332724; margin-top: 0.25rem;">{{ getLibellePrestation(entreprise().typePrestation) }}</div>
+            <div style="font-size: 0.82rem; color: #606C38; font-weight: 700; margin-top: 0.25rem;">Composantes autorisées : Entrée, Plat, Dessert, Boisson</div>
+          </div>
+
+          <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 12px; padding: 1.15rem;">
+            <div style="font-size: 0.75rem; color: #6E5A56; font-weight: 800; text-transform: uppercase;">Prise en charge Kiki</div>
+            <div style="font-size: 1.1rem; font-weight: 900; color: #606C38; margin-top: 0.25rem;">{{ entreprise().montantPriseEnChargeRepas | number }} FCFA / repas</div>
+            <div style="font-size: 0.82rem; color: #6E5A56; margin-top: 0.25rem;">Facturation bimensuelle consolidée</div>
+          </div>
+        </div>
+      </div>
+  </main>
+</div>
+

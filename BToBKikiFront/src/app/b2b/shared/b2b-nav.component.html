@@ -85,11 +85,11 @@
 
     <!-- 0. CAS DU SUPER ADMIN KIKI TRAITEUR (DIRECTION GLOBALE) -->
     @if (b2b.currentSession().role === 'SUPER_ADMIN') {
-      <button 
-        type="button" 
+      <a
+        routerLink="/b2b/super-admin/dashboard"
+        routerLinkActive="active"
         class="b2b-sidebar-link"
-        [class.active]="b2b.superAdminActiveSection() === 'DASHBOARD'"
-        (click)="navigerSuperAdmin('DASHBOARD')"
+        (click)="onNavClick()"
         title="Tableau de bord">
         <div class="b2b-link-icon-wrap">
           <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
@@ -100,13 +100,13 @@
             <span class="b2b-link-subtitle">Analytiques &amp; performances</span>
           </div>
         }
-      </button>
+      </a>
 
-      <button 
-        type="button" 
+      <a
+        routerLink="/b2b/super-admin/entreprises"
+        routerLinkActive="active"
         class="b2b-sidebar-link"
-        [class.active]="b2b.superAdminActiveSection() === 'ENTREPRISES'"
-        (click)="navigerSuperAdmin('ENTREPRISES')"
+        (click)="onNavClick()"
         title="Entreprises Partenaires">
         <div class="b2b-link-icon-wrap">
           <i class="fa-solid fa-building" aria-hidden="true"></i>
@@ -117,13 +117,13 @@
             <span class="b2b-link-subtitle">Répertoire &amp; conventions B2B</span>
           </div>
         }
-      </button>
+      </a>
 
-      <button 
-        type="button" 
+      <a
+        routerLink="/b2b/super-admin/catalogue"
+        routerLinkActive="active"
         class="b2b-sidebar-link"
-        [class.active]="b2b.superAdminActiveSection() === 'CATALOGUE'"
-        (click)="navigerSuperAdmin('CATALOGUE')"
+        (click)="onNavClick()"
         title="Catalogue des Chefs">
         <div class="b2b-link-icon-wrap">
           <i class="fa-solid fa-bowl-food" aria-hidden="true"></i>
@@ -134,13 +134,13 @@
             <span class="b2b-link-subtitle">Formules, entrées, plats &amp; desserts</span>
           </div>
         }
-      </button>
+      </a>
 
-      <button 
-        type="button" 
+      <a
+        routerLink="/b2b/super-admin/planning"
+        routerLinkActive="active"
         class="b2b-sidebar-link"
-        [class.active]="b2b.superAdminActiveSection() === 'PLANNING'"
-        (click)="navigerSuperAdmin('PLANNING')"
+        (click)="onNavClick()"
         title="Planning & Production">
         <div class="b2b-link-icon-wrap">
           <i class="fa-regular fa-calendar-days" aria-hidden="true"></i>
@@ -151,16 +151,16 @@
             <span class="b2b-link-subtitle">Calendrier hebdo &amp; cadences</span>
           </div>
         }
-      </button>
+      </a>
     }
 
     <!-- 1. CAS DU RESPONSABLE ENTREPRISE (RH / DAF) -->
     @if (b2b.currentSession().role === 'RESPONSABLE_ENTREPRISE') {
-      <button 
-        type="button" 
+      <a
+        routerLink="/b2b/rh/dashboard"
+        routerLinkActive="active"
         class="b2b-sidebar-link"
-        [class.active]="b2b.rhActiveSection() === 'STATISTIQUES'"
-        (click)="navigerRh('STATISTIQUES')"
+        (click)="onNavClick()"
         title="Vue Globale (Dashboard)">
         <div class="b2b-link-icon-wrap">
           <i class="fa-solid fa-chart-pie" aria-hidden="true"></i>
@@ -171,13 +171,13 @@
             <span class="b2b-link-subtitle">Dashboard &amp; indicateurs RH</span>
           </div>
         }
-      </button>
+      </a>
 
-      <button 
-        type="button" 
+      <a
+        routerLink="/b2b/rh/commandes"
+        routerLinkActive="active"
         class="b2b-sidebar-link"
-        [class.active]="b2b.rhActiveSection() === 'COMMANDES_SITE'"
-        (click)="navigerRh('COMMANDES_SITE')"
+        (click)="onNavClick()"
         title="Commandes & Rapprochement">
         <div class="b2b-link-icon-wrap">
           <i class="fa-solid fa-list-check" aria-hidden="true"></i>
@@ -188,13 +188,13 @@
             <span class="b2b-link-subtitle">Suivi des repas &amp; sites</span>
           </div>
         }
-      </button>
+      </a>
 
-      <button 
-        type="button" 
+      <a
+        routerLink="/b2b/rh/employes"
+        routerLinkActive="active"
         class="b2b-sidebar-link"
-        [class.active]="b2b.rhActiveSection() === 'EMPLOYES'"
-        (click)="navigerRh('EMPLOYES')"
+        (click)="onNavClick()"
         title="Annuaire & Quotas Salariés">
         <div class="b2b-link-icon-wrap">
           <i class="fa-solid fa-users" aria-hidden="true"></i>
@@ -205,13 +205,13 @@
             <span class="b2b-link-subtitle">Salariés &amp; taux de prise en charge</span>
           </div>
         }
-      </button>
+      </a>
 
-      <button 
-        type="button" 
+      <a
+        routerLink="/b2b/rh/facturation"
+        routerLinkActive="active"
         class="b2b-sidebar-link"
-        [class.active]="b2b.rhActiveSection() === 'FACTURATION'"
-        (click)="navigerRh('FACTURATION')"
+        (click)="onNavClick()"
         title="Facturation Entreprise">
         <div class="b2b-link-icon-wrap">
           <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i>
@@ -222,16 +222,16 @@
             <span class="b2b-link-subtitle">Relevé journalier &amp; exports</span>
           </div>
         }
-      </button>
+      </a>
     }
 
     <!-- 2. CAS DU RESPONSABLE DE SITE KIKI (Gérant Cantine & Exploitation) -->
     @if (b2b.currentSession().role === 'RESPONSABLE_SITE_KIKI') {
-      <button 
-        type="button" 
+      <a
+        routerLink="/b2b/cuisine/dashboard"
+        routerLinkActive="active"
         class="b2b-sidebar-link"
-        [class.active]="b2b.cuisineActiveTab() === 'DASHBOARD'"
-        (click)="navigerCuisine('DASHBOARD')"
+        (click)="onNavClick()"
         title="Tableau de bord du Site">
         <div class="b2b-link-icon-wrap">
           <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
@@ -242,13 +242,13 @@
             <span class="b2b-link-subtitle">Indicateurs &amp; exploitation site</span>
           </div>
         }
-      </button>
+      </a>
 
-      <button 
-        type="button" 
+      <a
+        routerLink="/b2b/cuisine/menu"
+        routerLinkActive="active"
         class="b2b-sidebar-link"
-        [class.active]="b2b.cuisineActiveTab() === 'MENU'"
-        (click)="navigerCuisine('MENU')"
+        (click)="onNavClick()"
         title="Menu Planifié & Quantités">
         <div class="b2b-link-icon-wrap">
           <i class="fa-solid fa-calendar-days" aria-hidden="true"></i>
@@ -259,13 +259,13 @@
             <span class="b2b-link-subtitle">Planning, portions &amp; conformité</span>
           </div>
         }
-      </button>
+      </a>
 
-      <button 
-        type="button" 
+      <a
+        routerLink="/b2b/cuisine/commandes"
+        routerLinkActive="active"
         class="b2b-sidebar-link"
-        [class.active]="b2b.cuisineActiveTab() === 'COMMANDES'"
-        (click)="navigerCuisine('COMMANDES')"
+        (click)="onNavClick()"
         title="Commandes du Jour & Distribution">
         <div class="b2b-link-icon-wrap">
           <i class="fa-solid fa-receipt" aria-hidden="true"></i>
@@ -276,13 +276,13 @@
             <span class="b2b-link-subtitle">Scanné &amp; Marquer Livré</span>
           </div>
         }
-      </button>
+      </a>
 
-      <button 
-        type="button" 
+      <a
+        routerLink="/b2b/cuisine/qr"
+        routerLinkActive="active"
         class="b2b-sidebar-link"
-        [class.active]="b2b.cuisineActiveTab() === 'PROJECTION_QR'"
-        (click)="navigerCuisine('PROJECTION_QR')"
+        (click)="onNavClick()"
         title="QR Code Cantine du Jour">
         <div class="b2b-link-icon-wrap" style="color: #E51D24;">
           <i class="fa-solid fa-qrcode" aria-hidden="true"></i>
@@ -293,13 +293,13 @@
             <span class="b2b-link-subtitle">Écran cantine pour les employés</span>
           </div>
         }
-      </button>
+      </a>
 
-      <button 
-        type="button" 
+      <a
+        routerLink="/b2b/cuisine/reclamations"
+        routerLinkActive="active"
         class="b2b-sidebar-link"
-        [class.active]="b2b.cuisineActiveTab() === 'RECLAMATIONS'"
-        (click)="navigerCuisine('RECLAMATIONS')"
+        (click)="onNavClick()"
         title="Gestion des Réclamations (Cut-Off)">
         <div class="b2b-link-icon-wrap" style="position: relative;">
           <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
@@ -315,13 +315,13 @@
             <span class="b2b-link-subtitle">Retardataires cut-off</span>
           </div>
         }
-      </button>
+      </a>
 
-      <button 
-        type="button" 
+      <a
+        routerLink="/b2b/cuisine/utilisateurs"
+        routerLinkActive="active"
         class="b2b-sidebar-link"
-        [class.active]="b2b.cuisineActiveTab() === 'UTILISATEURS'"
-        (click)="navigerCuisine('UTILISATEURS')"
+        (click)="onNavClick()"
         title="Utilisateurs & Salariés du Site">
         <div class="b2b-link-icon-wrap">
           <i class="fa-solid fa-users-gear" aria-hidden="true"></i>
@@ -332,13 +332,13 @@
             <span class="b2b-link-subtitle">Comptes du site</span>
           </div>
         }
-      </button>
+      </a>
 
-      <button 
-        type="button" 
+      <a
+        routerLink="/b2b/cuisine/facturation"
+        routerLinkActive="active"
         class="b2b-sidebar-link"
-        [class.active]="b2b.cuisineActiveTab() === 'FACTURATION'"
-        (click)="navigerCuisine('FACTURATION')"
+        (click)="onNavClick()"
         title="Facturation & Rapprochement">
         <div class="b2b-link-icon-wrap">
           <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i>
@@ -349,13 +349,13 @@
             <span class="b2b-link-subtitle">Relevé des repas livrés</span>
           </div>
         }
-      </button>
+      </a>
 
-      <button 
-        type="button" 
+      <a
+        routerLink="/b2b/cuisine/infos"
+        routerLinkActive="active"
         class="b2b-sidebar-link"
-        [class.active]="b2b.cuisineActiveTab() === 'INFOS'"
-        (click)="navigerCuisine('INFOS')"
+        (click)="onNavClick()"
         title="Informations du Site / Entreprise">
         <div class="b2b-link-icon-wrap">
           <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
@@ -366,12 +366,12 @@
             <span class="b2b-link-subtitle">Convention, prestation &amp; cut-off</span>
           </div>
         }
-      </button>
+      </a>
     }
 
     <!-- 3. CAS DU SALARIÉ (CONVENTIONNÉ OU AUTONOME) -->
     @if (b2b.currentSession().role === 'SALARIE_CONVENTIONNE' || b2b.currentSession().role === 'SALARIE_AUTONOME') {
-      <a routerLink="/b2b/commande" routerLinkActive="active" class="b2b-sidebar-link" title="Mets du Jour & Catalogue" (click)="b2b.closeMobileDrawer()">
+      <a routerLink="/b2b/employe/menu" routerLinkActive="active" class="b2b-sidebar-link" title="Mets du Jour & Catalogue" (click)="onNavClick()">
         <div class="b2b-link-icon-wrap">
           <i class="fa-solid fa-utensils" aria-hidden="true"></i>
         </div>
@@ -384,29 +384,36 @@
       </a>
 
       <!-- Page dédiée au Panier / Plateau Déjeuner -->
-      <a routerLink="/b2b/panier" routerLinkActive="active" class="b2b-sidebar-link" title="Mon Panier / Plateau Déjeuner" (click)="b2b.closeMobileDrawer()">
+      <a routerLink="/b2b/employe/panier" routerLinkActive="active" class="b2b-sidebar-link" title="Mon Panier / Plateau Déjeuner" (click)="onNavClick()">
         <div class="b2b-link-icon-wrap">
           <i class="fa-solid fa-basket-shopping" aria-hidden="true"></i>
         </div>
         @if (!b2b.isSidebarCollapsed()) {
           <div class="b2b-link-text">
             <span class="b2b-link-title">Mon Plateau / Panier</span>
-            <span class="b2b-link-subtitle">Validation &amp; QR Code Retrait</span>
+            <span class="b2b-link-subtitle">Validation de commande</span>
+          </div>
+        }
+      </a>
+
+      <a routerLink="/b2b/employe/commandes" routerLinkActive="active" class="b2b-sidebar-link" title="Mes Commandes & QR Code" (click)="onNavClick()">
+        <div class="b2b-link-icon-wrap">
+          <i class="fa-solid fa-receipt" aria-hidden="true"></i>
+        </div>
+        @if (!b2b.isSidebarCollapsed()) {
+          <div class="b2b-link-text">
+            <span class="b2b-link-title">Mes Commandes</span>
+            <span class="b2b-link-subtitle">Suivi, détails &amp; QR Code</span>
           </div>
         }
       </a>
     }
   </nav>
 
-  <!-- Bas de Sidebar : Profil utilisateur & Bouton Déconnexion côte à côte -->
+  <!-- Bas de Sidebar : Profil utilisateur & Bouton Déconnexion côte à côte (sans contacts ni card foncée) -->
   <div class="b2b-sidebar-footer">
     @if (!b2b.isSidebarCollapsed()) {
-      <div class="b2b-footer-contact">
-        <div><i class="fa-solid fa-location-dot" aria-hidden="true"></i> Hann Maristes, Dakar</div>
-        <div><i class="fa-solid fa-phone" aria-hidden="true"></i> +221 33 832 29 66</div>
-      </div>
-
-      <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.65rem; background: rgba(0, 0, 0, 0.22); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 14px; padding: 0.6rem 0.75rem;">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.65rem; padding: 0.25rem 0.15rem;">
         <div style="display: flex; align-items: center; gap: 0.65rem; min-width: 0; flex: 1;">
           <div class="b2b-enterprise-icon" style="width: 36px; height: 36px; font-size: 0.9rem; flex-shrink: 0;">
             <i class="fa-solid" 
@@ -429,7 +436,7 @@
           (click)="b2b.closeMobileDrawer()"
           title="Déconnexion / Changer de compte"
           aria-label="Déconnexion"
-          style="width: 36px; height: 36px; border-radius: 10px; background: rgba(229, 29, 36, 0.18); border: 1px solid rgba(229, 29, 36, 0.4); color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; text-decoration: none; transition: background 0.18s;">
+          style="width: 36px; height: 36px; border-radius: 10px; background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2); color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; text-decoration: none; transition: background 0.18s;">
           <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
         </a>
       </div>
