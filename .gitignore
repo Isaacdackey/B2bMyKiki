@@ -23,6 +23,19 @@ Thumbs.db
 .vercel/
 .agents/
 
+# Agents IA & Cahier des charges (locaux)
+AGENTS.md
+CONTEXT.md
+WORKFLOW.md
+README-AGENT.md
+agents/
+rules/
+docs/
+entry-point/
+.github/copilot-instructions.md
+.github/agents/
+cahier_des_charges_technique_developpeurs_b2b.md
+
 # Logs
 *.log
 npm-debug.log*

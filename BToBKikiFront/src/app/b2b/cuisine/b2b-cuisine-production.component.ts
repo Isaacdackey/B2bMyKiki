@@ -1,4 +1,6 @@
 import { B2bNavComponent } from '../shared/b2b-nav.component';
+import { B2bPeriodFilterComponent, PeriodeFilterChange } from '../shared/b2b-period-filter.component';
+import { CountUpDirective } from '../shared/count-up.directive';
 import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -9,7 +11,7 @@ import { EntrepriseB2B, EmployeB2B, CommandeEntrepriseSite, FacturationLigneJour
 @Component({
   selector: 'app-b2b-cuisine-production',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, B2bNavComponent],
+  imports: [CommonModule, RouterModule, FormsModule, B2bNavComponent, B2bPeriodFilterComponent, CountUpDirective],
   templateUrl: './b2b-cuisine-production.component.html',
   styleUrls: ['./b2b-cuisine-production.component.css']
 })
@@ -36,8 +38,63 @@ export class B2bCuisineProductionComponent {
     return this.b2b.cuisineActiveTab;
   }
 
-  setTab(tab: 'INFOS' | 'UTILISATEURS' | 'MENU' | 'COMMANDES' | 'FACTURATION' | 'RECLAMATIONS' | 'PROJECTION_QR') {
+  setTab(tab: 'DASHBOARD' | 'INFOS' | 'UTILISATEURS' | 'MENU' | 'COMMANDES' | 'FACTURATION' | 'RECLAMATIONS' | 'PROJECTION_QR') {
     this.b2b.cuisineActiveTab.set(tab);
+  }
+
+  // Dashboard Admin Site & Filtres de période
+  dashboardDateDebut = signal<string>('2026-11-12');
+  dashboardDateFin = signal<string>('2026-11-12');
+
+  onPeriodeDashboardCuisineChange(ev: PeriodeFilterChange) {
+    this.dashboardDateDebut.set(ev.dateDebut);
+    this.dashboardDateFin.set(ev.dateFin);
+  }
+
+  commandesDashboardSite = computed(() => {
+    const d1 = this.dashboardDateDebut();
+    const d2 = this.dashboardDateFin();
+    return this.commandesSite().filter(c => (!d1 || c.date >= d1) && (!d2 || c.date <= d2));
+  });
+
+  caDashboardSite = computed(() => {
+    return this.commandesDashboardSite().reduce((acc, c) => acc + (c.montantTotal || 0), 0);
+  });
+
+  siteStatsStatuts = computed(() => {
+    const cmds = this.commandesDashboardSite();
+    const total = Math.max(1, cmds.length);
+    const enCours = cmds.filter(c => c.statut === 'EN_COURS').length;
+    const scanne = cmds.filter(c => c.statut === 'SCANNE').length;
+    const livre = cmds.filter(c => c.statut === 'LIVRE').length;
+    return [
+      { label: 'En attente de retrait', count: enCours, pct: Math.round((enCours / total) * 100), color: '#721513' },
+      { label: 'Scannés à la cantine', count: scanne, pct: Math.round((scanne / total) * 100), color: '#C05621' },
+      { label: 'Livrés / Remis', count: livre, pct: Math.round((livre / total) * 100), color: '#606C38' }
+    ];
+  });
+
+  // QR Code : Mode Projeter ou Scanner
+  qrMode = signal<'PROJETER' | 'SCANNER'>('PROJETER');
+  scanCodeInput = signal<string>('');
+  scanFeedback = signal<{ ok: boolean; message: string } | null>(null);
+
+  validerScanCode() {
+    const code = this.scanCodeInput().trim().toUpperCase();
+    if (!code) {
+      this.scanFeedback.set({ ok: false, message: 'Veuillez saisir ou scanner un code commande / matricule.' });
+      return;
+    }
+    const found = this.commandesSite().find(
+      c => c.codeCommande.toUpperCase() === code || c.matricule.toUpperCase() === code
+    );
+    if (!found) {
+      this.scanFeedback.set({ ok: false, message: `Aucune commande trouvée pour « ${code} » aujourd'hui.` });
+      return;
+    }
+    this.b2b.scannerCommandeSite(found.id);
+    this.scanFeedback.set({ ok: true, message: `Commande ${found.codeCommande} (${found.employeNom}) marquée SCANNÉE !` });
+    this.scanCodeInput.set('');
   }
 
   // Entreprise & Site géré par le Responsable de Site Kiki
@@ -164,9 +221,21 @@ export class B2bCuisineProductionComponent {
     this.b2b.debloquerReclamation(reclamationId);
   }
 
-  // FACTURATION JOURNALIÈRE DU SITE
+  // FACTURATION JOURNALIÈRE DU SITE AVEC FILTRE DE PÉRIODE
+  factureDateDebut = signal<string>('2026-11-01');
+  factureDateFin = signal<string>('2026-11-30');
+
+  onPeriodeFactureCuisineChange(ev: PeriodeFilterChange) {
+    this.factureDateDebut.set(ev.dateDebut);
+    this.factureDateFin.set(ev.dateFin);
+  }
+
   facturationJournaliere = computed<FacturationLigneJournaliere[]>(() => {
-    return this.b2b.lignesFacturationEntreprise();
+    const d1 = this.factureDateDebut();
+    const d2 = this.factureDateFin();
+    return this.b2b.lignesFacturationEntreprise().filter(
+      l => (!d1 || l.date >= d1) && (!d2 || l.date <= d2)
+    );
   });
 
   totalFactureMoisSite = computed<number>(() => {

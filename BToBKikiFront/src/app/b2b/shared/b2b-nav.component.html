@@ -260,6 +260,23 @@
       <button 
         type="button" 
         class="b2b-sidebar-link"
+        [class.active]="b2b.cuisineActiveTab() === 'DASHBOARD'"
+        (click)="navigerCuisine('DASHBOARD')"
+        title="Tableau de bord du Site">
+        <div class="b2b-link-icon-wrap">
+          <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
+        </div>
+        @if (!b2b.isSidebarCollapsed()) {
+          <div class="b2b-link-text">
+            <span class="b2b-link-title">Tableau de bord</span>
+            <span class="b2b-link-subtitle">Indicateurs &amp; exploitation site</span>
+          </div>
+        }
+      </button>
+
+      <button 
+        type="button" 
+        class="b2b-sidebar-link"
         [class.active]="b2b.cuisineActiveTab() === 'MENU'"
         (click)="navigerCuisine('MENU')"
         title="Menu Planifié & Quantités">
@@ -424,13 +441,6 @@
       <i class="fa-solid fa-user-lock" aria-hidden="true"></i>
       @if (!b2b.isSidebarCollapsed()) {
         <span>Changer de Compte / Rôle</span>
-      }
-    </a>
-
-    <a routerLink="/" class="b2b-sidebar-back-link" [title]="'Retour au Site Public'" (click)="b2b.closeMobileDrawer()">
-      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-      @if (!b2b.isSidebarCollapsed()) {
-        <span>Retour au Site Public</span>
       }
     </a>
   </div>

@@ -1458,6 +1458,19 @@
   grid-column: span 2;
 }
 
+.sa-planning-calendar-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .sa-planning-calendar-split {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 640px) {
   .sa-form-grid-2 {
     grid-template-columns: 1fr !important;

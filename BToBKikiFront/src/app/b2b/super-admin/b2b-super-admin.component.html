@@ -38,7 +38,7 @@
     @if (activeSection() === 'DASHBOARD') {
       <div class="sa-analytics-dashboard">
 
-        <!-- EN-TÊTE TABLEAU DE BORD AVEC SÉLECTEURS DE DATES & ONGLETS PÉRIODES -->
+        <!-- EN-TÊTE TABLEAU DE BORD AVEC FILTRE PÉRIODE RÉUTILISABLE -->
         <div class="sa-dashboard-title-row">
           <div>
             <h1 class="sa-dashboard-main-title">Tableau de bord</h1>
@@ -47,35 +47,21 @@
             </p>
           </div>
 
-          <div class="sa-dashboard-filters-bar">
-            <div class="sa-dashboard-date-pickers">
-              <div class="sa-date-input-box">
-                <input type="date" [ngModel]="dateDebutDashboard()" (ngModelChange)="dateDebutDashboard.set($event); onDateDashboardChange()">
-              </div>
-              <span style="color: #94A3B8; font-weight: 600;">-</span>
-              <div class="sa-date-input-box">
-                <input type="date" [ngModel]="dateFinDashboard()" (ngModelChange)="dateFinDashboard.set($event); onDateDashboardChange()">
-              </div>
-            </div>
-
-            <div class="sa-period-pills">
-              <button type="button" class="sa-period-pill" [class.active]="periodeRapideDashboard() === 'AUJOURD_HUI'" (click)="selectionnerPeriodeRapide('AUJOURD_HUI')">Aujourd'hui</button>
-              <button type="button" class="sa-period-pill" [class.active]="periodeRapideDashboard() === 'SEMAINE'" (click)="selectionnerPeriodeRapide('SEMAINE')">Cette semaine</button>
-              <button type="button" class="sa-period-pill" [class.active]="periodeRapideDashboard() === 'MOIS'" (click)="selectionnerPeriodeRapide('MOIS')">Ce mois</button>
-              <button type="button" class="sa-period-pill" [class.active]="periodeRapideDashboard() === 'TRIMESTRE'" (click)="selectionnerPeriodeRapide('TRIMESTRE')">Ce trimestre</button>
-              <button type="button" class="sa-period-pill" [class.active]="periodeRapideDashboard() === 'ANNEE'" (click)="selectionnerPeriodeRapide('ANNEE')">Cette année</button>
-            </div>
-          </div>
+          <app-b2b-period-filter
+            defaultPeriode="JOUR"
+            referenceDate="2026-11-12"
+            (periodChange)="onPeriodeDashboardChange($event)">
+          </app-b2b-period-filter>
         </div>
 
         <!-- 2 GRANDES CARTES HERO (CHIFFRE D'AFFAIRES & COMMANDES CONFIRMÉES) -->
         <div class="sa-hero-kpi-grid">
           <!-- HERO 1 : CHIFFRE D'AFFAIRES (Dégradé Ambre/Brun Chaleureux) -->
-          <div class="sa-hero-card-ca">
+          <div class="sa-hero-card-ca kiki-dash-card-enter" style="--stagger: 0;">
             <div class="sa-hero-card-top">
               <div>
                 <div class="sa-hero-label-light">CHIFFRE D'AFFAIRES</div>
-                <div class="sa-hero-big-value-light">{{ (statsDashboard().ca | number) }} FCFA</div>
+                <div class="sa-hero-big-value-light" [appCountUp]="statsDashboard().ca" countSuffix=" FCFA">{{ (statsDashboard().ca | number) }} FCFA</div>
                 <div class="sa-hero-trend-light">
                   <i class="fa-solid fa-arrow-trend-up"></i>
                   <span>{{ statsDashboard().variationCa }} vs période précédente</span>
@@ -87,16 +73,16 @@
             </div>
             <div class="sa-hero-card-footer-light">
               <span>Période précédente</span>
-              <strong>{{ (statsDashboard().caPrecedent | number) }} FCFA</strong>
+              <strong [appCountUp]="statsDashboard().caPrecedent" countSuffix=" FCFA">{{ (statsDashboard().caPrecedent | number) }} FCFA</strong>
             </div>
           </div>
 
           <!-- HERO 2 : COMMANDES CONFIRMÉES / REPAS VALIDÉS (Carte Blanche Épurée) -->
-          <div class="sa-hero-card-cmd">
+          <div class="sa-hero-card-cmd kiki-dash-card-enter" style="--stagger: 1;">
             <div class="sa-hero-card-top">
               <div>
                 <div class="sa-hero-label-dark">REPAS &amp; COMMANDES CONFIRMÉES</div>
-                <div class="sa-hero-big-value-dark">{{ (statsDashboard().commandes | number) }}</div>
+                <div class="sa-hero-big-value-dark" [appCountUp]="statsDashboard().commandes">{{ (statsDashboard().commandes | number) }}</div>
                 <div class="sa-hero-trend-dark">
                   <i class="fa-solid fa-arrow-trend-up" style="color: #10B981;"></i>
                   <span>{{ statsDashboard().variationCmd }} vs période précédente</span>
@@ -108,7 +94,7 @@
             </div>
             <div class="sa-hero-card-footer-dark">
               <span>Période précédente</span>
-              <strong>{{ (statsDashboard().commandesPrecedent | number) }} commandes</strong>
+              <strong [appCountUp]="statsDashboard().commandesPrecedent" countSuffix=" commandes">{{ (statsDashboard().commandesPrecedent | number) }} commandes</strong>
             </div>
           </div>
         </div>
@@ -117,7 +103,7 @@
         <div class="sa-charts-grid-2">
           
           <!-- GRAPHE 1 : ÉVOLUTION DES COMMANDES & DU CHIFFRE D'AFFAIRES (COURBE INTERACTIVE + ZOOM) -->
-          <div class="sa-chart-card">
+          <div class="sa-chart-card kiki-dash-card-enter" style="--stagger: 2;">
             <div class="sa-chart-header">
               <div>
                 <h3 class="sa-chart-title">Évolution des commandes &amp; du chiffre d'affaires</h3>
@@ -180,15 +166,15 @@
                   <text x="18" y="163" fill="#8C7E74" font-size="10" font-weight="700">0</text>
 
                   <!-- Aire et Courbe Total (Bordeaux Kiki #721513) -->
-                  <path [attr.d]="lineChartGeometry().areaTotal" fill="url(#caAreaGrad)"/>
-                  <path [attr.d]="lineChartGeometry().pathTotal" fill="none" stroke="#721513" stroke-width="3" stroke-linecap="round"/>
+                  <path class="kiki-fade-area" [attr.d]="lineChartGeometry().areaTotal" fill="url(#caAreaGrad)"/>
+                  <path class="kiki-draw-line" [attr.d]="lineChartGeometry().pathTotal" fill="none" stroke="#721513" stroke-width="3" stroke-linecap="round"/>
 
                   <!-- Aire et Courbe Livrées (Vert Olive Kiki #606C38) -->
-                  <path [attr.d]="lineChartGeometry().areaLivrees" fill="url(#livAreaGrad)"/>
-                  <path [attr.d]="lineChartGeometry().pathLivrees" fill="none" stroke="#606C38" stroke-width="2.5" stroke-linecap="round"/>
+                  <path class="kiki-fade-area" [attr.d]="lineChartGeometry().areaLivrees" fill="url(#livAreaGrad)"/>
+                  <path class="kiki-draw-line" [attr.d]="lineChartGeometry().pathLivrees" fill="none" stroke="#606C38" stroke-width="2.5" stroke-linecap="round"/>
 
                   <!-- Courbe Annulées (Corail Kiki #E51D24) -->
-                  <path [attr.d]="lineChartGeometry().pathAnnulees" fill="none" stroke="#E51D24" stroke-width="2.2" stroke-linecap="round"/>
+                  <path class="kiki-draw-line" [attr.d]="lineChartGeometry().pathAnnulees" fill="none" stroke="#E51D24" stroke-width="2.2" stroke-linecap="round"/>
 
                   <!-- Ligne verticale pointillée (Crosshair) au survol -->
                   @if (hoveredLinePoint(); as hPt) {
@@ -272,7 +258,7 @@
           </div>
 
           <!-- GRAPHE 2 : REVENUS PAR ENTREPRISE PARTENAIRE (HISTOGRAMME VERTICAL AVEC TOOLTIP SOMBRE CAPTURE 1) -->
-          <div class="sa-chart-card">
+          <div class="sa-chart-card kiki-dash-card-enter" style="--stagger: 3;">
             <div class="sa-chart-header">
               <div>
                 <h3 class="sa-chart-title">Revenus par entreprise</h3>
@@ -298,7 +284,7 @@
                        (mouseenter)="hoveredVBarIndex.set(idx)">
                     <span class="sa-vbar-pct">{{ rev.pct }}</span>
                     <div class="sa-vbar-track">
-                      <div class="sa-vbar-fill" [style.height.%]="rev.heightPct" [style.background]="rev.color"></div>
+                      <div class="sa-vbar-fill kiki-grow-bar-y" [style.--stagger]="idx" [style.height.%]="rev.heightPct" [style.background]="rev.color"></div>
                     </div>
                     <span class="sa-vbar-label">{{ rev.nom }}</span>
 
@@ -326,7 +312,7 @@
         <div class="sa-charts-grid-2">
 
           <!-- GRAPHE 3 : COMMANDES PAR TYPE DE PRESTATION (BARRES HORIZONTALES AVEC TOOLTIP CAPTURE 2) -->
-          <div class="sa-chart-card">
+          <div class="sa-chart-card kiki-dash-card-enter" style="--stagger: 4;">
             <div class="sa-chart-header">
               <div>
                 <h3 class="sa-chart-title">Commandes par type de prestation</h3>
@@ -347,7 +333,7 @@
                     <strong class="sa-hbar-count">{{ item.count }} repas</strong>
                   </div>
                   <div class="sa-hbar-track">
-                    <div class="sa-hbar-fill-kiki" [style.width.%]="item.pct"></div>
+                    <div class="sa-hbar-fill-kiki kiki-grow-bar-x" [style.--stagger]="idx" [style.width.%]="item.pct"></div>
                   </div>
 
                   <!-- TOOLTIP SOMBRE FLOTTANT SOUS LA BARRE HORIZONTALE (IDENTIQUE CAPTURE 2) -->
@@ -373,7 +359,7 @@
               </div>
               <div class="sa-mini-kpi-pill">
                 <span>Catalogue Actif</span>
-                <strong>{{ totalPlatsCatalogue() }} recettes</strong>
+                <strong>{{ totalPlatsCatalogue() }} plats</strong>
               </div>
               <div class="sa-mini-kpi-pill">
                 <span>Taux de Livraison</span>
@@ -388,7 +374,7 @@
         <div class="sa-bottom-dashboard-grid">
 
           <!-- CARTE GAUCHE : SYNTHÈSE DU RÉSEAU PARTENAIRE -->
-          <div class="sa-chart-card">
+          <div class="sa-chart-card kiki-dash-card-enter" style="--stagger: 5;">
             <div class="sa-chart-header">
               <div>
                 <h3 class="sa-chart-title">État du réseau B2B</h3>
@@ -882,7 +868,7 @@
                       [style.border-color]="jourMenuActif() === jour ? '#721513' : '#EDE7DC'">
                       <div style="font-size: 0.88rem; font-weight: 800; line-height: 1;">{{ jour }}</div>
                       <div style="font-size: 0.68rem; font-weight: 700;" [style.color]="jourMenuActif() === jour ? '#FAF5EA' : '#721513'">
-                        {{ datesSemaineMapSa[jour] }}
+                        {{ datesSemaineMapSa()[jour] }}
                       </div>
                     </button>
                   }
@@ -1462,7 +1448,7 @@
               Catalogue Gastronomique Global Kiki Traiteur
             </h2>
             <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: #6E5A56;">
-              Gestion des spécialités, tarifs unitaires et archivage des recettes proposées aux entreprises.
+              Gestion des spécialités, tarifs unitaires et archivage des plats proposés aux entreprises.
             </p>
           </div>
 
@@ -1500,7 +1486,7 @@
             </select>
 
             <button (click)="ouvrirModalAjoutPlat()" class="sa-btn-primary">
-              <i class="fa-solid fa-plus"></i> Créer une Recette
+              <i class="fa-solid fa-plus"></i> Ajouter un Plat
             </button>
           </div>
         </div>
@@ -1512,7 +1498,7 @@
               <i class="fa-solid fa-utensils"></i>
             </div>
             <h3 style="margin: 0 0 0.4rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.25rem; color: #721513; font-weight: 800;">
-              {{ filtreArchivePlat() === 'ARCHIVES' ? 'Aucun plat archivé' : 'Aucune recette trouvée dans cette catégorie' }}
+              {{ filtreArchivePlat() === 'ARCHIVES' ? 'Aucun plat archivé' : 'Aucun plat trouvé dans cette catégorie' }}
             </h3>
             <p style="margin: 0 auto 1.25rem; max-width: 440px; font-size: 0.85rem; color: #6E5A56; line-height: 1.5;">
               Modifiez vos critères de filtre ou ajoutez une nouvelle spécialité au catalogue central.
@@ -1704,18 +1690,19 @@
         <!-- NAVIGATION CALENDRIER DU LUNDI AU DIMANCHE -->
         <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
           
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
-            <div>
-              <span style="font-size: 0.75rem; font-weight: 800; color: #6E5A56; text-transform: uppercase; letter-spacing: 0.05em;">
-                Calendrier Modèle Hebdomadaire
-              </span>
-              <h3 style="margin: 0.2rem 0 0; font-size: 1.25rem; color: #721513; font-weight: 900;">
-                Programmation du {{ jourPlanningGlobalActif() }} : {{ menuModeleGlobalJourActif()?.theme || 'Menu du Jour' }}
-              </h3>
-            </div>
+          <!-- Ligne 1 : Titre fixe (ne saute jamais) -->
+          <div style="margin-bottom: 0.9rem;">
+            <span style="font-size: 0.75rem; font-weight: 800; color: #6E5A56; text-transform: uppercase; letter-spacing: 0.05em;">
+              Calendrier Modèle Hebdomadaire
+            </span>
+            <h3 style="margin: 0.2rem 0 0; font-size: 1.25rem; color: #721513; font-weight: 900;">
+              Programmation du {{ jourPlanningGlobalActif() }} : {{ menuModeleGlobalJourActif()?.theme || 'Menu du Jour' }}
+            </h3>
+          </div>
 
-            <!-- Switch Vue Semaine / Vue Calendrier + Boutons d'ajout rapide -->
-            <div style="display: flex; gap: 0.65rem; flex-wrap: wrap; align-items: center;">
+          <!-- Ligne 2 : Barre de filtres & actions toujours en bas du titre avec space-between -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
               <div style="display: inline-flex; background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 9999px; padding: 0.2rem; gap: 0.2rem;">
                 <button
                   type="button"
@@ -1735,7 +1722,22 @@
                 </button>
               </div>
 
-              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              @if (modeVuePlanning() === 'semaine') {
+                <div style="display: inline-flex; align-items: center; gap: 0.45rem; background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 9999px; padding: 0.2rem 0.45rem;">
+                  <button type="button" (click)="changerSemaineSa(-1)" style="min-height: 0; width: 26px; height: 26px; border: none; border-radius: 50%; background: #FFFFFF; color: #721513; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06);" title="Semaine précédente">
+                    <i class="fa-solid fa-chevron-left" style="font-size: 0.7rem;"></i>
+                  </button>
+                  <span style="font-size: 0.75rem; font-weight: 800; color: #332724; padding: 0 0.25rem; white-space: nowrap;">
+                    {{ semaineLabelSa() }}
+                  </span>
+                  <button type="button" (click)="changerSemaineSa(1)" style="min-height: 0; width: 26px; height: 26px; border: none; border-radius: 50%; background: #FFFFFF; color: #721513; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06);" title="Semaine suivante">
+                    <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+                  </button>
+                </div>
+              }
+            </div>
+
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
               <button 
                 type="button"
                 (click)="categoriePlatAAjouter.set('ENTREE'); modalAjouterPlatAuJourGlobal.set(true)" 
@@ -1764,132 +1766,174 @@
                 style="font-size: 0.75rem; font-weight: 800; color: #332724; border-color: #332724;">
                 <i class="fa-solid fa-plus"></i> Boisson
               </button>
-              </div>
             </div>
           </div>
 
           @if (modeVuePlanning() === 'semaine') {
-            <!-- Onglets Jours Lundi -> Dimanche -->
+            <!-- Onglets Jours Lundi -> Dimanche (Jour + Date sur la même ligne) -->
             <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; margin-bottom: 1.5rem;">
               @for (jour of ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']; track jour) {
                 <button 
                   type="button"
                   (click)="jourPlanningGlobalActif.set($any(jour))"
-                  style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.85rem 0.5rem; border-radius: 12px; border: 1.5px solid; text-align: center; cursor: pointer; transition: all 0.2s;"
+                  style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0.75rem 0.45rem; border-radius: 12px; border: 1.5px solid; text-align: center; cursor: pointer; transition: all 0.2s;"
                   [style.background]="jourPlanningGlobalActif() === jour ? '#721513' : '#FAF8F4'"
                   [style.color]="jourPlanningGlobalActif() === jour ? '#FFFFFF' : '#332724'"
                   [style.border-color]="jourPlanningGlobalActif() === jour ? '#721513' : '#EDE7DC'">
-                  <div style="font-size: 0.95rem; font-weight: 800; line-height: 1;">{{ jour }}</div>
-                  <div style="font-size: 0.68rem; margin-top: 0.25rem; font-weight: 700;" [style.color]="jourPlanningGlobalActif() === jour ? '#FAF5EA' : '#721513'">
-                    {{ datesSemaineMapSa[jour] }}
+                  <div style="display: flex; align-items: baseline; justify-content: center; gap: 0.35rem; flex-wrap: wrap;">
+                    <span style="font-size: 0.88rem; font-weight: 800; line-height: 1.1;">{{ jour }}</span>
+                    <span style="font-size: 0.72rem; font-weight: 700;" [style.color]="jourPlanningGlobalActif() === jour ? '#FAF5EA' : '#721513'">
+                      {{ datesSemaineMapSa()[jour] }}
+                    </span>
                   </div>
-                  <div style="font-size: 0.7rem; margin-top: 0.2rem; font-weight: 600;" [style.color]="jourPlanningGlobalActif() === jour ? 'rgba(255,255,255,0.85)' : '#6E5A56'">
+                  <div style="font-size: 0.7rem; margin-top: 0.3rem; font-weight: 600;" [style.color]="jourPlanningGlobalActif() === jour ? 'rgba(255,255,255,0.85)' : '#6E5A56'">
                     {{ (b2b.menusPlanifiesEntreprises().find(m => (m.entrepriseId === 'ent-001' || m.entrepriseId === 'GLOBAL') && m.jourNom === jour)?.lignes?.length || 0) }} mets
                   </div>
                 </button>
               }
             </div>
-          } @else {
-            <!-- Vue Calendrier Mensuel Interactif -->
-            <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.15rem; margin-bottom: 1.5rem;">
-              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.9rem;">
-                <button type="button" (click)="changerMoisCalendrier(-1)" class="sa-btn-action" style="min-height: 0; width: 34px; height: 34px; padding: 0; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;">
-                  <i class="fa-solid fa-chevron-left"></i>
-                </button>
-                <div style="font-size: 1rem; font-weight: 900; color: #721513; text-transform: capitalize;">
-                  {{ moisCalendrierLabel() }}
+
+            <!-- Grille des mets prévus pour ce jour dans la vue Semaine -->
+            @if (!menuModeleGlobalJourActif() || menuModeleGlobalJourActif()!.lignes.length === 0) {
+              <div style="background: #FAF8F4; border: 1.5px dashed #E2D5BE; border-radius: 14px; padding: 2.5rem 1.5rem; text-align: center;">
+                <div style="font-size: 2rem; color: #C5A880; margin-bottom: 0.5rem;">
+                  <i class="fa-solid fa-utensils"></i>
                 </div>
-                <button type="button" (click)="changerMoisCalendrier(1)" class="sa-btn-action" style="min-height: 0; width: 34px; height: 34px; padding: 0; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;">
-                  <i class="fa-solid fa-chevron-right"></i>
+                <h4 style="margin: 0 0 0.3rem; font-size: 1.1rem; color: #721513; font-weight: 800;">
+                  Aucun plat au programme pour ce {{ jourPlanningGlobalActif() }}
+                </h4>
+                <p style="margin: 0 auto 1rem; font-size: 0.82rem; color: #6E5A56; max-width: 400px;">
+                  Ajoutez des plats du catalogue central pour constituer le menu modèle qui sera envoyé à toutes les cantines.
+                </p>
+                <button 
+                  type="button" 
+                  (click)="categoriePlatAAjouter.set('PLAT'); modalAjouterPlatAuJourGlobal.set(true)" 
+                  class="sa-btn-primary" 
+                  style="display: inline-flex;">
+                  <i class="fa-solid fa-plus"></i> Choisir un Plat Chaud dans le Catalogue
                 </button>
               </div>
-
-              <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.4rem; margin-bottom: 0.45rem;">
-                @for (col of ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']; track col) {
-                  <div style="text-align: center; font-size: 0.7rem; font-weight: 800; color: #6E5A56; text-transform: uppercase; letter-spacing: 0.04em;">
-                    {{ col }}
+            } @else {
+              <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem;">
+                @for (ligne of menuModeleGlobalJourActif()!.lignes; track ligne.id) {
+                  <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 0.85rem; display: flex; gap: 0.85rem; align-items: center; position: relative; box-shadow: 0 2px 8px rgba(114, 21, 19, 0.03);">
+                    <div style="width: 64px; height: 64px; border-radius: 12px; overflow: hidden; border: 1.5px solid #EDE7DC; flex-shrink: 0; background: #FFFFFF;">
+                      <img [src]="ligne.image || '/assets/images/plats/p1.jpg'" [alt]="ligne.nomPlat" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div style="flex: 1; min-width: 0;">
+                      <div style="display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.2rem;">
+                        <span [style.background]="ligne.categorie === 'PLAT' ? '#721513' : ligne.categorie === 'ENTREE' ? '#606C38' : ligne.categorie === 'DESSERT' ? '#C05621' : '#332724'"
+                              style="color: #FFFFFF; font-size: 0.65rem; font-weight: 800; padding: 0.15rem 0.45rem; border-radius: 4px; text-transform: uppercase;">
+                          {{ ligne.categorie }}
+                        </span>
+                      </div>
+                      <div style="font-size: 0.88rem; font-weight: 800; color: #332724; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        {{ ligne.nomPlat }}
+                      </div>
+                      <div style="font-size: 0.72rem; color: #6E5A56; margin-top: 0.15rem;">
+                        Quantité par site : <em>À saisir</em>
+                      </div>
+                    </div>
+                    <button 
+                      type="button"
+                      (click)="retirerPlatDuProgrammeGlobal(ligne.id)" 
+                      style="border: none; background: rgba(229, 29, 36, 0.08); color: #E51D24; width: 32px; height: 32px; min-height: 0; padding: 0; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"
+                      title="Retirer ce met du menu global">
+                      <i class="fa-solid fa-trash-can" style="font-size: 0.85rem;"></i>
+                    </button>
                   </div>
                 }
               </div>
-
-              <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.4rem;">
-                @for (cell of joursCalendrierMois(); track cell.dateIso) {
-                  <button
-                    type="button"
-                    (click)="selectionnerDateCalendrier(cell)"
-                    style="min-height: 62px; padding: 0.45rem 0.35rem; border-radius: 12px; border: 1.5px solid; display: flex; flex-direction: column; align-items: center; justify-content: space-between; cursor: pointer; transition: all 0.2s;"
-                    [style.opacity]="cell.inMonth ? '1' : '0.45'"
-                    [style.background]="dateCalendrierSelectionnee() === cell.dateIso ? '#721513' : '#FFFFFF'"
-                    [style.color]="dateCalendrierSelectionnee() === cell.dateIso ? '#FFFFFF' : '#332724'"
-                    [style.border-color]="dateCalendrierSelectionnee() === cell.dateIso ? '#721513' : (cell.isToday ? '#E51D24' : '#EDE7DC')">
-                    <span style="font-size: 0.85rem; font-weight: 800; line-height: 1;">{{ cell.dateNum }}</span>
-                    <span style="font-size: 0.64rem; font-weight: 700; padding: 0.12rem 0.42rem; border-radius: 9999px;"
-                          [style.background]="dateCalendrierSelectionnee() === cell.dateIso ? 'rgba(255,255,255,0.2)' : (cell.nbMets > 0 ? 'rgba(96, 108, 56, 0.14)' : '#FAF5EA')"
-                          [style.color]="dateCalendrierSelectionnee() === cell.dateIso ? '#FFFFFF' : (cell.nbMets > 0 ? '#606C38' : '#8C7E74')">
-                      {{ cell.nbMets > 0 ? cell.nbMets + ' mets' : 'Vide' }}
-                    </span>
-                  </button>
-                }
-              </div>
-            </div>
-          }
-
-          <!-- Grille des mets prévus pour ce jour dans le calendrier modèle -->
-          @if (!menuModeleGlobalJourActif() || menuModeleGlobalJourActif()!.lignes.length === 0) {
-            <div style="background: #FAF8F4; border: 1.5px dashed #E2D5BE; border-radius: 14px; padding: 2.5rem 1.5rem; text-align: center;">
-              <div style="font-size: 2rem; color: #C5A880; margin-bottom: 0.5rem;">
-                <i class="fa-solid fa-utensils"></i>
-              </div>
-              <h4 style="margin: 0 0 0.3rem; font-size: 1.1rem; color: #721513; font-weight: 800;">
-                Aucun plat au programme pour ce {{ jourPlanningGlobalActif() }}
-              </h4>
-              <p style="margin: 0 auto 1rem; font-size: 0.82rem; color: #6E5A56; max-width: 400px;">
-                Ajoutez des plats du catalogue central pour constituer le menu modèle qui sera envoyé à toutes les cantines.
-              </p>
-              <button 
-                type="button" 
-                (click)="categoriePlatAAjouter.set('PLAT'); modalAjouterPlatAuJourGlobal.set(true)" 
-                class="sa-btn-primary" 
-                style="display: inline-flex;">
-                <i class="fa-solid fa-plus"></i> Choisir un Plat Chaud dans le Catalogue
-              </button>
-            </div>
+            }
           } @else {
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem;">
-              @for (ligne of menuModeleGlobalJourActif()!.lignes; track ligne.id) {
-                <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 0.85rem; display: flex; gap: 0.85rem; align-items: center; position: relative; box-shadow: 0 2px 8px rgba(114, 21, 19, 0.03);">
-                  
-                  <!-- Photo Cadrée de Haut -->
-                  <div style="width: 64px; height: 64px; border-radius: 12px; overflow: hidden; border: 1.5px solid #EDE7DC; flex-shrink: 0; background: #FFFFFF;">
-                    <img [src]="ligne.image || '/assets/images/plats/p1.jpg'" [alt]="ligne.nomPlat" style="width: 100%; height: 100%; object-fit: cover;">
+            <!-- Vue Calendrier Mensuel Ergonomique (Split 2 colonnes sans scroll) -->
+            <div class="sa-planning-calendar-split">
+              <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1rem;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                  <button type="button" (click)="changerMoisCalendrier(-1)" class="sa-btn-action" style="min-height: 0; width: 32px; height: 32px; padding: 0; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-chevron-left"></i>
+                  </button>
+                  <div style="font-size: 0.95rem; font-weight: 900; color: #721513; text-transform: capitalize;">
+                    {{ moisCalendrierLabel() }}
                   </div>
+                  <button type="button" (click)="changerMoisCalendrier(1)" class="sa-btn-action" style="min-height: 0; width: 32px; height: 32px; padding: 0; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-chevron-right"></i>
+                  </button>
+                </div>
 
-                  <!-- Infos -->
-                  <div style="flex: 1; min-width: 0;">
-                    <div style="display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.2rem;">
-                      <span [style.background]="ligne.categorie === 'PLAT' ? '#721513' : ligne.categorie === 'ENTREE' ? '#606C38' : ligne.categorie === 'DESSERT' ? '#C05621' : '#332724'"
-                            style="color: #FFFFFF; font-size: 0.65rem; font-weight: 800; padding: 0.15rem 0.45rem; border-radius: 4px; text-transform: uppercase;">
-                        {{ ligne.categorie }}
+                <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.3rem; margin-bottom: 0.35rem;">
+                  @for (col of ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']; track col) {
+                    <div style="text-align: center; font-size: 0.68rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">
+                      {{ col }}
+                    </div>
+                  }
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.3rem;">
+                  @for (cell of joursCalendrierMois(); track cell.dateIso) {
+                    <button
+                      type="button"
+                      (click)="selectionnerDateCalendrier(cell)"
+                      style="min-height: 48px; padding: 0.3rem 0.25rem; border-radius: 10px; border: 1.5px solid; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; cursor: pointer; transition: all 0.15s;"
+                      [style.opacity]="cell.inMonth ? '1' : '0.4'"
+                      [style.background]="dateCalendrierSelectionnee() === cell.dateIso ? '#721513' : '#FFFFFF'"
+                      [style.color]="dateCalendrierSelectionnee() === cell.dateIso ? '#FFFFFF' : '#332724'"
+                      [style.border-color]="dateCalendrierSelectionnee() === cell.dateIso ? '#721513' : (cell.isToday ? '#E51D24' : '#EDE7DC')">
+                      <span style="font-size: 0.8rem; font-weight: 800; line-height: 1;">{{ cell.dateNum }}</span>
+                      <span style="font-size: 0.58rem; font-weight: 700; padding: 0.08rem 0.32rem; border-radius: 9999px;"
+                            [style.background]="dateCalendrierSelectionnee() === cell.dateIso ? 'rgba(255,255,255,0.22)' : (cell.nbMets > 0 ? 'rgba(96, 108, 56, 0.14)' : '#FAF5EA')"
+                            [style.color]="dateCalendrierSelectionnee() === cell.dateIso ? '#FFFFFF' : (cell.nbMets > 0 ? '#606C38' : '#8C7E74')">
+                        {{ cell.nbMets > 0 ? cell.nbMets + 'm' : '—' }}
                       </span>
-                    </div>
-                    <div style="font-size: 0.88rem; font-weight: 800; color: #332724; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                      {{ ligne.nomPlat }}
-                    </div>
-                    <div style="font-size: 0.72rem; color: #6E5A56; margin-top: 0.15rem;">
-                      Quantité par site : <em>À saisir</em>
+                    </button>
+                  }
+                </div>
+              </div>
+
+              <!-- Panneau latéral droit : Plats du jour sélectionné sans scroller -->
+              <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; padding-bottom: 0.55rem; border-bottom: 1px solid #EDE7DC;">
+                  <div>
+                    <div style="font-size: 0.68rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">Menu du jour sélectionné</div>
+                    <div style="font-size: 0.95rem; font-weight: 900; color: #721513;">
+                      {{ jourPlanningGlobalActif() }} · {{ dateCalendrierSelectionnee() }}
                     </div>
                   </div>
-
-                  <!-- Retirer du modèle -->
-                  <button 
-                    type="button"
-                    (click)="retirerPlatDuProgrammeGlobal(ligne.id)" 
-                    style="border: none; background: rgba(229, 29, 36, 0.08); color: #E51D24; width: 32px; height: 32px; min-height: 0; padding: 0; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"
-                    title="Retirer ce met du menu global">
-                    <i class="fa-solid fa-trash-can" style="font-size: 0.85rem;"></i>
-                  </button>
+                  <span style="font-size: 0.72rem; font-weight: 800; background: #FFFFFF; border: 1px solid #EDE7DC; padding: 0.25rem 0.6rem; border-radius: 9999px; color: #721513;">
+                    {{ menuModeleGlobalJourActif()?.lignes?.length || 0 }} plat(s)
+                  </span>
                 </div>
-              }
+
+                @if (!menuModeleGlobalJourActif() || menuModeleGlobalJourActif()!.lignes.length === 0) {
+                  <div style="text-align: center; padding: 2rem 1rem; color: #6E5A56;">
+                    <i class="fa-solid fa-utensils" style="font-size: 1.5rem; color: #C5A880; margin-bottom: 0.5rem;"></i>
+                    <p style="margin: 0 0 0.75rem; font-size: 0.82rem; font-weight: 700;">Aucun plat programmé ce {{ jourPlanningGlobalActif() }}.</p>
+                    <button type="button" (click)="categoriePlatAAjouter.set('PLAT'); modalAjouterPlatAuJourGlobal.set(true)" class="sa-btn-primary" style="font-size: 0.75rem;">
+                      <i class="fa-solid fa-plus"></i> Ajouter un Plat
+                    </button>
+                  </div>
+                } @else {
+                  <div style="display: flex; flex-direction: column; gap: 0.6rem; max-height: 350px; overflow-y: auto; padding-right: 0.2rem;">
+                    @for (ligne of menuModeleGlobalJourActif()!.lignes; track ligne.id) {
+                      <div style="background: #FFFFFF; border: 1px solid #EDE7DC; border-radius: 12px; padding: 0.6rem 0.75rem; display: flex; gap: 0.75rem; align-items: center;">
+                        <img [src]="ligne.image || '/assets/images/plats/p1.jpg'" [alt]="ligne.nomPlat" style="width: 46px; height: 46px; border-radius: 8px; object-fit: cover; flex-shrink: 0;">
+                        <div style="flex: 1; min-width: 0;">
+                          <span [style.background]="ligne.categorie === 'PLAT' ? '#721513' : ligne.categorie === 'ENTREE' ? '#606C38' : ligne.categorie === 'DESSERT' ? '#C05621' : '#332724'"
+                                style="color: #FFFFFF; font-size: 0.6rem; font-weight: 800; padding: 0.1rem 0.4rem; border-radius: 4px; text-transform: uppercase;">
+                            {{ ligne.categorie }}
+                          </span>
+                          <div style="font-size: 0.84rem; font-weight: 800; color: #332724; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 0.15rem;">
+                            {{ ligne.nomPlat }}
+                          </div>
+                        </div>
+                        <button type="button" (click)="retirerPlatDuProgrammeGlobal(ligne.id)" style="border: none; background: rgba(229, 29, 36, 0.08); color: #E51D24; width: 30px; height: 30px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;" title="Retirer">
+                          <i class="fa-solid fa-trash-can" style="font-size: 0.78rem;"></i>
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
             </div>
           }
         </div>
@@ -2133,14 +2177,11 @@
 
             <div style="display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.5rem;">
               @for (tp of b2b.typesPrestationConfigurables(); track tp.code) {
-                <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 8px; padding: 0.45rem 0.75rem; display: flex; justify-content: space-between; align-items: center;">
+                <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 8px; padding: 0.5rem 0.75rem; display: flex; justify-content: space-between; align-items: center;">
                   <div>
                     <strong style="color: #332724; font-size: 0.82rem;">{{ tp.libelle }}</strong>
                     <div style="font-size: 0.68rem; color: #6E5A56;">{{ tp.desc }}</div>
                   </div>
-                  <span style="font-size: 0.65rem; font-family: monospace; background: #FFFFFF; border: 1px solid #EDE7DC; padding: 0.15rem 0.4rem; border-radius: 4px; color: #721513; font-weight: 700;">
-                    {{ tp.code }}
-                  </span>
                 </div>
               }
             </div>
@@ -2186,22 +2227,17 @@
             </div>
 
             <!-- Formulaire inline ultra-compact pour ajouter une catégorie -->
-            <div style="background: #FFFFFF; border: 1px dashed #C5A880; border-radius: 8px; padding: 0.5rem; display: flex; gap: 0.4rem; align-items: center;">
+            <div style="background: #FFFFFF; border: 1px dashed #C5A880; border-radius: 8px; padding: 0.5rem; display: flex; gap: 0.5rem; align-items: center;">
               <input 
                 type="text" 
                 [(ngModel)]="nouvelleCategorie().libelle" 
-                placeholder="Libellé catégorie (ex: Goûter)" 
-                style="flex: 1.5; border: 1px solid #EDE7DC; border-radius: 6px; padding: 0.35rem 0.55rem; font-size: 0.75rem;">
-              <input 
-                type="text" 
-                [(ngModel)]="nouvelleCategorie().icone" 
-                placeholder="Icône (fa-cookie)" 
-                style="flex: 1; border: 1px solid #EDE7DC; border-radius: 6px; padding: 0.35rem 0.55rem; font-size: 0.75rem;">
+                placeholder="Libellé de la catégorie (ex: Goûter)" 
+                style="flex: 1; border: 1px solid #EDE7DC; border-radius: 6px; padding: 0.4rem 0.65rem; font-size: 0.78rem;">
               <button 
                 type="button" 
                 (click)="creerNouvelleCategorie()" 
                 class="sa-btn-action" 
-                style="background: #606C38; color: #FFFFFF; border-color: #606C38; font-size: 0.72rem; padding: 0.35rem 0.75rem; white-space: nowrap; font-weight: 700;">
+                style="background: #606C38; color: #FFFFFF; border-color: #606C38; font-size: 0.75rem; padding: 0.4rem 0.9rem; white-space: nowrap; font-weight: 700;">
                 <i class="fa-solid fa-plus"></i> Ajouter
               </button>
             </div>
@@ -2272,81 +2308,96 @@
   }
 
   <!-- ============================================================== -->
-  <!-- MODAL AJOUT / MODIF PLAT CATALOGUE                            -->
+  <!-- MODAL AJOUT / MODIF PLAT CATALOGUE (COMPACT SANS SCROLLBAR)    -->
   <!-- ============================================================== -->
   @if (showModalPlat()) {
     <div class="sa-modal-overlay">
-      <div class="sa-modal-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.5rem; margin-bottom: 1.25rem;">
-          <h3 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.35rem; color: #721513; font-weight: 800;">
-            <i class="fa-solid fa-bowl-food"></i> {{ isEditModePlat() ? 'Modifier la Recette du Catalogue' : 'Ajouter un Met au Catalogue Central' }}
+      <div class="sa-modal-card" style="max-width: 680px; padding: 1.25rem 1.5rem; overflow: visible;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.9rem;">
+          <h3 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.25rem; color: #721513; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-solid fa-bowl-food"></i> {{ isEditModePlat() ? 'Modifier le Plat' : 'Ajouter un Plat au Catalogue' }}
           </h3>
-          <button (click)="showModalPlat.set(false)" style="background: none; border: none; font-size: 1.25rem; color: #6E5A56; cursor: pointer;">
+          <button (click)="showModalPlat.set(false)" style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 8px; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; color: #6E5A56; cursor: pointer;">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 1rem;">
-          <div>
-            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Nom du Plat / Spécialité</label>
-            <input type="text" [(ngModel)]="platEnEdition().nom" placeholder="Ex: Poulet Yassa Braisé au Feu de Bois" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700;">
-          </div>
-
-          <div>
-            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Description des Ingrédients & Préparation</label>
-            <textarea [(ngModel)]="platEnEdition().description" rows="2" placeholder="Oignons caramélisés, citron vert, riz parfumé..." style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem;"></textarea>
-          </div>
-
-          <!-- Choix Photo Cadrée de Haut (Top-down view) -->
-          <div>
-            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">
-              <i class="fa-solid fa-camera"></i> Photo Cadrée de Haut (Vue Aérienne / Top-Down)
-            </label>
-            <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
-              <input type="text" [(ngModel)]="platEnEdition().image" placeholder="https://res.cloudinary.com/..." style="flex: 1; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700;">
-              <label style="background: #721513; color: #FFFFFF; border-radius: 10px; padding: 0.65rem 0.9rem; font-size: 0.78rem; font-weight: 800; cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem;">
-                <i class="fa-solid" [class.fa-cloud-arrow-up]="!isUploadingImage()" [class.fa-spinner]="isUploadingImage()" [class.fa-spin]="isUploadingImage()"></i>
-                {{ isUploadingImage() ? 'Envoi...' : 'Cloudinary' }}
-                <input type="file" accept="image/*" (change)="onUploadImagePlat($event)" style="display: none;">
-              </label>
-              @if (platEnEdition().image) {
-                <img [src]="platEnEdition().image" alt="Aperçu" style="width: 44px; height: 44px; border-radius: 10px; object-fit: cover; border: 1.5px solid #EDE7DC;">
-              }
-            </div>
-            <!-- Présélections photos de qualité traiteur -->
-            <div style="font-size: 0.72rem; color: #6E5A56; margin-bottom: 0.35rem; font-weight: 700;">Photos traiteur disponibles :</div>
-            <div style="display: flex; gap: 0.4rem; overflow-x: auto; padding-bottom: 0.25rem;">
-              @for (img of ['/assets/images/plats/p1.jpg', '/assets/images/plats/p2.jpg', '/assets/images/plats/p3.jpg', '/assets/images/plats/p4.jpg', '/assets/images/plats/e1.jpg', '/assets/images/plats/e2.jpg', '/assets/images/plats/d1.jpg', '/assets/images/plats/d2.jpg', '/assets/images/plats/b1.jpg', '/assets/images/plats/b2.jpg']; track img) {
-                <button type="button" (click)="platEnEdition().image = img" style="border: 2px solid; padding: 0; border-radius: 8px; overflow: hidden; width: 40px; height: 40px; cursor: pointer; flex-shrink: 0;" [style.border-color]="platEnEdition().image === img ? '#721513' : '#EDE7DC'">
-                  <img [src]="img" style="width: 100%; height: 100%; object-fit: cover;">
-                </button>
-              }
-            </div>
-          </div>
-
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
           <div class="sa-form-grid-2">
             <div>
-              <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Catégorie Alimentaire</label>
-              <select [(ngModel)]="platEnEdition().categorie" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700; color: #721513;">
+              <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">Nom du Plat / Spécialité</label>
+              <input type="text" [(ngModel)]="platEnEdition().nom" placeholder="Ex: Poulet Yassa Braisé au Feu de Bois" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.55rem 0.75rem; font-size: 0.84rem; font-weight: 700;">
+            </div>
+
+            <div>
+              <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">Catégorie Alimentaire</label>
+              <select [(ngModel)]="platEnEdition().categorie" style="width: 100%;">
                 <option value="PLAT">Plat Chaud Principal</option>
-                <option value="ENTREE">Entrée & Salade</option>
-                <option value="DESSERT">Dessert & Douceur</option>
-                <option value="BOISSON">Boisson & Jus Frais</option>
+                <option value="ENTREE">Entrée &amp; Salade</option>
+                <option value="DESSERT">Dessert &amp; Douceur</option>
+                <option value="BOISSON">Boisson &amp; Jus Frais</option>
               </select>
             </div>
-
-            <div>
-              <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Tarif Unitaire (FCFA)</label>
-              <input type="number" [(ngModel)]="platEnEdition().prixUnitaire" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 800; color: #721513;">
-            </div>
           </div>
 
-          <div class="sa-form-grid-2">
+          <div>
+            <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">Description des Ingrédients &amp; Préparation</label>
+            <textarea [(ngModel)]="platEnEdition().description" rows="2" placeholder="Oignons caramélisés, citron vert, riz parfumé..." style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.5rem 0.75rem; font-size: 0.82rem; resize: none;"></textarea>
+          </div>
+
+          <!-- Import Photo via Cloudinary (sans URL ni présélections) -->
+          <div>
+            <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">
+              <i class="fa-solid fa-camera"></i> Photo du Plat (Import Cloudinary)
+            </label>
+            <label style="display: flex; align-items: center; justify-content: space-between; gap: 0.85rem; background: #FAF8F4; border: 1.5px dashed #C5A880; border-radius: 12px; padding: 0.6rem 0.9rem; cursor: pointer; transition: border-color 0.18s;">
+              <div style="display: flex; align-items: center; gap: 0.75rem; min-width: 0;">
+                @if (platEnEdition().image) {
+                  <img [src]="platEnEdition().image" alt="Aperçu du plat" style="width: 48px; height: 48px; border-radius: 10px; object-fit: cover; border: 1.5px solid #E2D5BE; flex-shrink: 0;">
+                } @else {
+                  <div style="width: 48px; height: 48px; border-radius: 10px; background: rgba(114, 21, 19, 0.08); color: #721513; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; flex-shrink: 0;">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                  </div>
+                }
+                <div style="min-width: 0;">
+                  <div style="font-size: 0.82rem; font-weight: 800; color: #2C1810;">
+                    @if (isUploadingImage()) {
+                      Envoi vers Cloudinary en cours...
+                    } @else if (platEnEdition().image) {
+                      Image importée — cliquez pour remplacer
+                    } @else {
+                      Importer une photo depuis votre appareil
+                    }
+                  </div>
+                  <div style="font-size: 0.7rem; color: #8C7E74;">PNG, JPG ou WEBP • Stockage sécurisé Cloudinary</div>
+                </div>
+              </div>
+              <span style="background: #721513; color: #FFFFFF; border-radius: 8px; padding: 0.45rem 0.85rem; font-size: 0.75rem; font-weight: 800; white-space: nowrap; flex-shrink: 0;">
+                <i class="fa-solid" [class.fa-upload]="!isUploadingImage()" [class.fa-spinner]="isUploadingImage()" [class.fa-spin]="isUploadingImage()"></i>
+                {{ isUploadingImage() ? 'Envoi...' : 'Choisir un fichier' }}
+              </span>
+              <input type="file" accept="image/*" (change)="onUploadImagePlat($event)" style="display: none;">
+            </label>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 0.75rem;">
             <div>
-              <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">
+              <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">Tarif Unitaire (FCFA)</label>
+              <input type="number" [(ngModel)]="platEnEdition().prixUnitaire" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.55rem 0.75rem; font-size: 0.84rem; font-weight: 800; color: #721513;">
+            </div>
+
+            <div>
+              <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">
+                <i class="fa-solid fa-fire-flame-curved"></i> Calories (kcal)
+              </label>
+              <input type="number" [(ngModel)]="platEnEdition().calories" placeholder="550" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.55rem 0.75rem; font-size: 0.84rem;">
+            </div>
+
+            <div>
+              <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">
                 <i class="fa-solid fa-triangle-exclamation"></i> Allergènes
               </label>
-              <select [(ngModel)]="platEnEdition().allergene" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700; color: #332724; background: #FFFFFF;">
+              <select [(ngModel)]="platEnEdition().allergene" style="width: 100%;">
                 <option value="Aucun allergène majeur">Aucun allergène majeur</option>
                 <option value="Gluten">Gluten</option>
                 <option value="Arachides">Arachides</option>
@@ -2360,21 +2411,14 @@
                 <option value="Moutarde">Moutarde</option>
               </select>
             </div>
-
-            <div>
-              <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">
-                <i class="fa-solid fa-fire-flame-curved"></i> Calories (kcal)
-              </label>
-              <input type="number" [(ngModel)]="platEnEdition().calories" placeholder="550" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem;">
-            </div>
           </div>
         </div>
 
-        <div style="display: flex; gap: 0.75rem; margin-top: 1.75rem; align-items: stretch;">
-          <button (click)="showModalPlat.set(false)" class="sa-btn-action" style="flex: 1; height: 44px; min-height: 44px; max-height: 44px; color: #6E5A56;">
+        <div style="display: flex; gap: 0.75rem; margin-top: 1.15rem; align-items: stretch;">
+          <button (click)="showModalPlat.set(false)" class="sa-btn-action" style="flex: 1; height: 42px; min-height: 42px; color: #6E5A56;">
             Annuler
           </button>
-          <button (click)="enregistrerPlat()" class="sa-btn-primary" style="flex: 1.4; height: 44px; min-height: 44px; max-height: 44px; justify-content: center;">
+          <button (click)="enregistrerPlat()" class="sa-btn-primary" style="flex: 1.4; height: 42px; min-height: 42px; justify-content: center;">
             <i class="fa-solid fa-check"></i> Enregistrer le Plat
           </button>
         </div>

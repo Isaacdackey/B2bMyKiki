@@ -285,9 +285,9 @@ export class B2bStateService {
     });
   }
 
-  // Onglet actif dans l'Espace Responsable de Site Kiki (Gestion de son Entreprise/Site : 5 onglets + Réclamations + Projection QR)
-  cuisineActiveTab = signal<'INFOS' | 'UTILISATEURS' | 'MENU' | 'COMMANDES' | 'FACTURATION' | 'RECLAMATIONS' | 'PROJECTION_QR'>(
-    (typeof localStorage !== 'undefined' && (localStorage.getItem('b2b_cuisine_active_tab') as any)) || 'MENU'
+  // Onglet actif dans l'Espace Responsable de Site Kiki (Dashboard + Gestion Site)
+  cuisineActiveTab = signal<'DASHBOARD' | 'INFOS' | 'UTILISATEURS' | 'MENU' | 'COMMANDES' | 'FACTURATION' | 'RECLAMATIONS' | 'PROJECTION_QR'>(
+    (typeof localStorage !== 'undefined' && (localStorage.getItem('b2b_cuisine_active_tab') as any)) || 'DASHBOARD'
   );
 
   // Mode profil employé simulé : SUBVENTIONNE (prise en charge RH 100%) ou AUTONOME (frais personnels, panier libre, Wave)

@@ -1,4 +1,6 @@
 import { B2bNavComponent } from '../shared/b2b-nav.component';
+import { B2bPeriodFilterComponent, PeriodeFilterChange, PeriodeFilterType } from '../shared/b2b-period-filter.component';
+import { CountUpDirective } from '../shared/count-up.directive';
 import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -9,7 +11,7 @@ import { EmployeB2B, CommandeHistoriqueB2B } from '../shared/b2b.models';
 @Component({
   selector: 'app-b2b-rh-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, B2bNavComponent],
+  imports: [CommonModule, RouterModule, FormsModule, B2bNavComponent, B2bPeriodFilterComponent, CountUpDirective],
   templateUrl: './b2b-rh-dashboard.component.html',
   styleUrls: ['./b2b-rh-dashboard.component.css']
 })
@@ -41,8 +43,48 @@ export class B2bRhDashboardComponent {
   dateDebut = signal<string>('2026-11-12');
   dateFin = signal<string>('2026-11-12');
 
-  // Période active sélectionnée selon la convention RH : Aujourd’hui (par défaut), Semaine, Mois, Personnalisé
-  periodeActive = signal<'AUJOURDHUI' | 'SEMAINE' | 'MOIS' | 'PERSONNALISE'>('AUJOURDHUI');
+  // Période active sélectionnée via composant réutilisable
+  periodeActive = signal<PeriodeFilterType>('JOUR');
+  tauxSubventionError = signal<string>('');
+
+  onPeriodeRhChange(ev: PeriodeFilterChange) {
+    this.periodeActive.set(ev.periode);
+    this.dateDebut.set(ev.dateDebut);
+    this.dateFin.set(ev.dateFin);
+  }
+
+  onPeriodeFactureRhChange(ev: PeriodeFilterChange) {
+    this.factureDateDebut.set(ev.dateDebut);
+    this.factureDateFin.set(ev.dateFin);
+  }
+
+  // Répartition des statuts des commandes du site sur la période (pour les graphes RH)
+  rhStatsStatuts = computed(() => {
+    const cmds = this.commandesSiteFiltrees();
+    const total = Math.max(1, cmds.length);
+    const enCours = cmds.filter(c => c.statut === 'EN_COURS').length;
+    const scanne = cmds.filter(c => c.statut === 'SCANNE').length;
+    const livre = cmds.filter(c => c.statut === 'LIVRE').length;
+    return [
+      { label: 'En cours', count: enCours, pct: Math.round((enCours / total) * 100), color: '#721513' },
+      { label: 'Scannés', count: scanne, pct: Math.round((scanne / total) * 100), color: '#C05621' },
+      { label: 'Livrés', count: livre, pct: Math.round((livre / total) * 100), color: '#606C38' }
+    ];
+  });
+
+  rhTopPlatsEntreprise = computed(() => {
+    const cmds = this.commandesSiteFiltrees();
+    const counts = new Map<string, { nom: string; count: number; montant: number }>();
+    for (const c of cmds) {
+      const cur = counts.get(c.platNom) || { nom: c.platNom, count: 0, montant: 0 };
+      cur.count += 1;
+      cur.montant += c.partEntreprise || 0;
+      counts.set(c.platNom, cur);
+    }
+    const sorted = Array.from(counts.values()).sort((a, b) => b.count - a.count).slice(0, 4);
+    const maxCount = Math.max(1, sorted[0]?.count || 1);
+    return sorted.map(item => ({ ...item, pct: Math.round((item.count / maxCount) * 100) }));
+  });
 
   // Filtre recherche employé & filtre période récapitulatif employés
   searchQuery = signal<string>('');
@@ -171,18 +213,22 @@ export class B2bRhDashboardComponent {
     }
   }
 
-  // Raccourcis de dates : Aujourd'hui, Semaine, Mois, Personnalisé
-  definirPeriode(type: 'AUJOURDHUI' | 'SEMAINE' | 'MOIS' | 'PERSONNALISE') {
-    this.periodeActive.set(type);
-    if (type === 'AUJOURDHUI') {
+  // Raccourcis de dates : Aujourd'hui, Semaine, Mois, Année, Personnalisé
+  definirPeriode(type: PeriodeFilterType | 'AUJOURDHUI') {
+    const normalized: PeriodeFilterType = type === 'AUJOURDHUI' ? 'JOUR' : type;
+    this.periodeActive.set(normalized);
+    if (normalized === 'JOUR') {
       this.dateDebut.set('2026-11-12');
       this.dateFin.set('2026-11-12');
-    } else if (type === 'SEMAINE') {
+    } else if (normalized === 'SEMAINE') {
       this.dateDebut.set('2026-11-09');
       this.dateFin.set('2026-11-15');
-    } else if (type === 'MOIS') {
+    } else if (normalized === 'MOIS') {
       this.dateDebut.set('2026-11-01');
       this.dateFin.set('2026-11-30');
+    } else if (normalized === 'ANNEE') {
+      this.dateDebut.set('2026-01-01');
+      this.dateFin.set('2026-12-31');
     }
   }
 
@@ -266,6 +312,7 @@ export class B2bRhDashboardComponent {
   }
 
   ouvrirModalAjout() {
+    this.tauxSubventionError.set('');
     this.newEmp.set({
       matricule: 'TOT-' + Math.floor(1000 + Math.random() * 9000),
       nom: '',
@@ -286,12 +333,16 @@ export class B2bRhDashboardComponent {
       alert('Veuillez renseigner le nom, prénom et email du collaborateur.');
       return;
     }
-    const taux = val.tauxSubvention ?? 100;
-    const type = taux === 0 ? 'AUTONOME' : 'SUBVENTIONNE';
+    const taux = Number(val.tauxSubvention);
+    if (isNaN(taux) || taux <= 0 || taux > 100) {
+      this.tauxSubventionError.set('Le taux de subvention doit être strictement supérieur à 0 et inférieur ou égal à 100.');
+      return;
+    }
+    this.tauxSubventionError.set('');
     this.b2b.ajouterEmploye({
       ...val,
       tauxSubvention: taux,
-      type
+      type: 'SUBVENTIONNE'
     });
     this.showAddEmployeeModal.set(false);
   }

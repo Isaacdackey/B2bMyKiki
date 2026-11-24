@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { B2bNavComponent } from '../shared/b2b-nav.component';
+import { B2bPeriodFilterComponent, PeriodeFilterChange, PeriodeFilterType } from '../shared/b2b-period-filter.component';
+import { CountUpDirective } from '../shared/count-up.directive';
 import { B2bStateService } from '../shared/b2b-state.service';
 import { CloudinaryService } from '../shared/cloudinary.service';
 import { EntrepriseB2B, SiteB2B, PlatB2B, TypePrestationB2B, CategoriePlatB2B, PlanningMenuSiteB2B } from '../shared/b2b.models';
@@ -10,7 +12,7 @@ import { EntrepriseB2B, SiteB2B, PlatB2B, TypePrestationB2B, CategoriePlatB2B, P
 @Component({
   selector: 'app-b2b-super-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, B2bNavComponent],
+  imports: [CommonModule, FormsModule, RouterModule, B2bNavComponent, B2bPeriodFilterComponent, CountUpDirective],
   templateUrl: './b2b-super-admin.component.html',
   styleUrls: ['./b2b-super-admin.component.css']
 })
@@ -51,11 +53,11 @@ export class B2bSuperAdminComponent {
   pageEntreprises = signal<number>(1);
   pageSizeEntreprises = signal<number>(3);
 
-  // Filtre Date du Tableau de Bord (style inspiré de la capture)
+  // Filtre Date du Tableau de Bord (composant réutilisable)
   dateDebutDashboard = signal<string>('2026-11-12');
   dateFinDashboard = signal<string>('2026-11-12');
-  periodeRapideDashboard = signal<'AUJOURD_HUI' | 'SEMAINE' | 'MOIS' | 'TRIMESTRE' | 'ANNEE'>('AUJOURD_HUI');
-  dateAfficheeDashboard = 'jeudi 12 novembre 2026';
+  periodeRapideDashboard = signal<PeriodeFilterType>('JOUR');
+  dashboardAnimKey = signal<number>(0);
 
   // États d'interactivité des graphes (Survol / Tooltips & Zoom Courbe)
   hoveredLineIndex = signal<number | null>(null);
@@ -69,39 +71,17 @@ export class B2bSuperAdminComponent {
   isDraggingZoom = signal<boolean>(false);
   dragStartIdx = signal<number | null>(null);
 
-  selectionnerPeriodeRapide(periode: 'AUJOURD_HUI' | 'SEMAINE' | 'MOIS' | 'TRIMESTRE' | 'ANNEE') {
-    this.periodeRapideDashboard.set(periode);
+  onPeriodeDashboardChange(ev: PeriodeFilterChange) {
+    this.periodeRapideDashboard.set(ev.periode);
+    this.dateDebutDashboard.set(ev.dateDebut);
+    this.dateFinDashboard.set(ev.dateFin);
     this.reinitialiserZoomCourbe();
-    if (periode === 'AUJOURD_HUI') {
-      this.dateDebutDashboard.set('2026-11-12');
-      this.dateFinDashboard.set('2026-11-12');
-    } else if (periode === 'SEMAINE') {
-      this.dateDebutDashboard.set('2026-11-09');
-      this.dateFinDashboard.set('2026-11-15');
-    } else if (periode === 'MOIS') {
-      this.dateDebutDashboard.set('2026-11-01');
-      this.dateFinDashboard.set('2026-11-30');
-    } else if (periode === 'TRIMESTRE') {
-      this.dateDebutDashboard.set('2026-10-01');
-      this.dateFinDashboard.set('2026-12-31');
-    } else if (periode === 'ANNEE') {
-      this.dateDebutDashboard.set('2026-01-01');
-      this.dateFinDashboard.set('2026-12-31');
-    }
-  }
-
-  onDateDashboardChange() {
-    this.reinitialiserZoomCourbe();
-    if (this.dateDebutDashboard() === this.dateFinDashboard()) {
-      this.periodeRapideDashboard.set('AUJOURD_HUI');
-    } else {
-      this.periodeRapideDashboard.set('SEMAINE');
-    }
+    this.dashboardAnimKey.update(k => k + 1);
   }
 
   statsDashboard = computed(() => {
     const p = this.periodeRapideDashboard();
-    if (p === 'AUJOURD_HUI') {
+    if (p === 'JOUR') {
       return {
         ca: 2200000,
         caPrecedent: 1980000,
@@ -181,7 +161,17 @@ export class B2bSuperAdminComponent {
         ]
       };
     } else {
-      const mult = p === 'MOIS' ? 4.2 : p === 'TRIMESTRE' ? 12.5 : 48;
+      let mult = 4.2;
+      if (p === 'ANNEE') {
+        mult = 48;
+      } else if (p === 'PERSONNALISE') {
+        const d1 = new Date(this.dateDebutDashboard() + 'T00:00:00');
+        const d2 = new Date(this.dateFinDashboard() + 'T00:00:00');
+        const diffDays = !isNaN(d1.getTime()) && !isNaN(d2.getTime())
+          ? Math.max(1, Math.round((d2.getTime() - d1.getTime()) / 86400000) + 1)
+          : 7;
+        mult = Math.max(0.2, diffDays / 7);
+      }
       const caCalc = Math.round(11450000 * mult);
       const caPrecCalc = Math.round(10600000 * mult);
       const cmdCalc = Math.round(2290 * mult);
@@ -658,6 +648,17 @@ export class B2bSuperAdminComponent {
     this.nouveauTypePrestation.set({ code: '', libelle: '', desc: '' });
   }
 
+  private deduireIconeCategorie(libelle: string): string {
+    const l = libelle.toLowerCase();
+    if (l.includes('boisson') || l.includes('jus') || l.includes('café') || l.includes('thé')) return 'fa-wine-glass';
+    if (l.includes('dessert') || l.includes('gâteau') || l.includes('sucr') || l.includes('glace')) return 'fa-cake-candles';
+    if (l.includes('entrée') || l.includes('entree') || l.includes('salade') || l.includes('soupe')) return 'fa-leaf';
+    if (l.includes('goûter') || l.includes('gouter') || l.includes('snack') || l.includes('pâtiss') || l.includes('patiss')) return 'fa-cookie-bite';
+    if (l.includes('fruit')) return 'fa-apple-whole';
+    if (l.includes('garniture') || l.includes('accompagnement')) return 'fa-bowl-rice';
+    return 'fa-utensils';
+  }
+
   creerNouvelleCategorie() {
     const cat = this.nouvelleCategorie();
     if (!cat.libelle) {
@@ -665,10 +666,11 @@ export class B2bSuperAdminComponent {
       return;
     }
     const code = cat.code || cat.libelle.toUpperCase().replace(/[^A-Z0-9]/g, '_');
+    const icone = this.deduireIconeCategorie(cat.libelle);
     this.b2b.ajouterCategorie({
       code,
       libelle: cat.libelle,
-      icone: cat.icone || 'fa-utensils',
+      icone,
       couleur: cat.couleur || '#721513'
     });
     this.nouvelleCategorie.set({ code: '', libelle: '', icone: 'fa-utensils', couleur: '#721513' });
@@ -917,22 +919,40 @@ export class B2bSuperAdminComponent {
   jourPlanningGlobalActif = signal<'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche'>(
     this.joursOrdre[this.todayIndexSa]
   );
-  datesSemaineMapSa: Record<string, string> = this.buildDatesSemaineMapSa();
+  weekOffsetSa = signal<number>(0);
 
-  private buildDatesSemaineMapSa(): Record<string, string> {
+  changerSemaineSa(delta: number): void {
+    this.weekOffsetSa.update(w => w + delta);
+  }
+
+  semaineLabelSa = computed(() => {
+    const offset = this.weekOffsetSa();
     const now = new Date();
     const monday = new Date(now);
-    monday.setDate(now.getDate() - this.todayIndexSa);
+    monday.setDate(now.getDate() - this.todayIndexSa + offset * 7);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    const moisCourts = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
+    const deb = `${String(monday.getDate()).padStart(2, '0')} ${moisCourts[monday.getMonth()]}`;
+    const fin = `${String(sunday.getDate()).padStart(2, '0')} ${moisCourts[sunday.getMonth()]}`;
+    return offset === 0 ? `Semaine en cours (${deb} - ${fin})` : `Semaine du ${deb} au ${fin}`;
+  });
+
+  datesSemaineMapSa = computed(() => {
+    const offset = this.weekOffsetSa();
+    const now = new Date();
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - this.todayIndexSa + offset * 7);
     const moisCourts = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
     const map: Record<string, string> = {};
     this.joursOrdre.forEach((jour, idx) => {
       const d = new Date(monday);
       d.setDate(monday.getDate() + idx);
       const label = `${String(d.getDate()).padStart(2, '0')} ${moisCourts[d.getMonth()]}`;
-      map[jour] = idx === this.todayIndexSa ? `${label} (Auj.)` : label;
+      map[jour] = offset === 0 && idx === this.todayIndexSa ? `${label} (Auj.)` : label;
     });
     return map;
-  }
+  });
   facturationJourSelectionne = signal<{ date: string; dateAffichee: string; nbPlatsLivres: number; montantTotal: number; montantPartEntreprise: number } | null>(null);
 
   detailsCommandesJourSelectionne = computed(() => {

@@ -25,22 +25,11 @@
               </h2>
             </div>
 
-            <!-- Filtre Période Date début / Date fin (Par défaut aujourd'hui) -->
-            <div style="display: flex; gap: 0.5rem; align-items: center; background: #FAF8F4; padding: 0.5rem 0.85rem; border-radius: 12px; border: 1.5px solid #EDE7DC; flex-wrap: wrap;">
-              <div style="display: flex; align-items: center; gap: 0.35rem;">
-                <span style="font-size: 0.75rem; font-weight: 800; color: #721513;"><i class="fa-regular fa-calendar"></i> Du :</span>
-                <input type="date" [ngModel]="dateDebut()" (ngModelChange)="dateDebut.set($event); surChangementDateManuel()" style="border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.3rem 0.5rem; font-size: 0.8rem; font-weight: 700; background: #FFFFFF; color: #332724;">
-              </div>
-              <div style="display: flex; align-items: center; gap: 0.35rem;">
-                <span style="font-size: 0.75rem; font-weight: 800; color: #721513;"><i class="fa-regular fa-calendar-check"></i> Au :</span>
-                <input type="date" [ngModel]="dateFin()" (ngModelChange)="dateFin.set($event); surChangementDateManuel()" style="border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.3rem 0.5rem; font-size: 0.8rem; font-weight: 700; background: #FFFFFF; color: #332724;">
-              </div>
-              <div style="display: flex; gap: 0.25rem;">
-                <button type="button" (click)="definirPeriode('AUJOURDHUI')" [style.background]="periodeActive() === 'AUJOURDHUI' ? '#721513' : '#FFFFFF'" [style.color]="periodeActive() === 'AUJOURDHUI' ? '#FFFFFF' : '#6E5A56'" style="padding: 0.35rem 0.65rem; border: 1px solid #EDE7DC; border-radius: 6px; font-size: 0.72rem; font-weight: 800; cursor: pointer;">Journée</button>
-                <button type="button" (click)="definirPeriode('SEMAINE')" [style.background]="periodeActive() === 'SEMAINE' ? '#721513' : '#FFFFFF'" [style.color]="periodeActive() === 'SEMAINE' ? '#FFFFFF' : '#6E5A56'" style="padding: 0.35rem 0.65rem; border: 1px solid #EDE7DC; border-radius: 6px; font-size: 0.72rem; font-weight: 800; cursor: pointer;">Semaine</button>
-                <button type="button" (click)="definirPeriode('MOIS')" [style.background]="periodeActive() === 'MOIS' ? '#721513' : '#FFFFFF'" [style.color]="periodeActive() === 'MOIS' ? '#FFFFFF' : '#6E5A56'" style="padding: 0.35rem 0.65rem; border: 1px solid #EDE7DC; border-radius: 6px; font-size: 0.72rem; font-weight: 800; cursor: pointer;">Mois</button>
-              </div>
-            </div>
+            <app-b2b-period-filter
+              defaultPeriode="JOUR"
+              referenceDate="2026-11-12"
+              (periodChange)="onPeriodeRhChange($event)">
+            </app-b2b-period-filter>
           </div>
 
         </div>
@@ -144,79 +133,129 @@
     @if (activeSection() === 'STATISTIQUES') {
       <div>
         
-        <!-- EN-TÊTE DASHBOARD RH AVEC FILTRE DATE DÉBUT / DATE FIN (PAR DÉFAUT SUR LA JOURNÉE) -->
-        <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 20px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
-            <div>
-              <span style="font-size: 0.72rem; color: #721513; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(114, 21, 19, 0.08); padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.4rem;">
-                <i class="fa-solid fa-briefcase"></i> TABLEAU DE BORD RH • {{ b2b.currentEntreprise().nom }}
-              </span>
-              <h2 style="margin: 0.35rem 0 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
-                Supervision de la Restauration & Subventions Entreprise
-              </h2>
-            </div>
+        <!-- EN-TÊTE DASHBOARD RH IDENTIQUE AU SUPER ADMIN (RESTREINT AU SITE ENTREPRISE) -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+          <div>
+            <span style="font-size: 0.72rem; color: #721513; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(114, 21, 19, 0.08); padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.4rem;">
+              <i class="fa-solid fa-briefcase"></i> TABLEAU DE BORD RH • {{ b2b.currentEntreprise().nom }}
+            </span>
+            <h1 style="margin: 0.45rem 0 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.75rem; color: #721513; font-weight: 900; letter-spacing: -0.02em;">
+              Tableau de bord Entreprise
+            </h1>
+            <p style="margin: 0.2rem 0 0; font-size: 0.85rem; color: #6E5A56;">
+              Analytiques, consommation et subventions de votre site ({{ b2b.currentEntreprise().sites[0]?.nom || b2b.currentEntreprise().nom }})
+            </p>
+          </div>
 
-            <!-- Filtre de période en haut par défaut sur la journée -->
-            <div style="display: flex; gap: 0.75rem; align-items: center; background: #FAF8F4; padding: 0.5rem 1rem; border-radius: 12px; border: 1.5px solid #EDE7DC; flex-wrap: wrap;">
-              <div style="display: flex; align-items: center; gap: 0.4rem;">
-                <span style="font-size: 0.75rem; font-weight: 800; color: #721513;"><i class="fa-regular fa-calendar"></i> Du :</span>
-                <input type="date" [ngModel]="dateDebut()" (ngModelChange)="dateDebut.set($event); surChangementDateManuel()" style="border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.35rem 0.5rem; font-size: 0.8rem; font-weight: 700; background: #FFFFFF; color: #332724;">
+          <app-b2b-period-filter
+            defaultPeriode="JOUR"
+            referenceDate="2026-11-12"
+            (periodChange)="onPeriodeRhChange($event)">
+          </app-b2b-period-filter>
+        </div>
+
+        <!-- 2 GRANDES CARTES HERO (STYLE SUPER ADMIN) -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem;">
+          <div class="kiki-dash-card-enter" style="--stagger: 0; background: linear-gradient(135deg, #721513 0%, #4A0D0B 100%); color: #FFFFFF; border-radius: 20px; padding: 1.5rem; box-shadow: 0 12px 28px rgba(114, 21, 19, 0.2); display: flex; flex-direction: column; justify-content: space-between; gap: 1.15rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+              <div>
+                <div style="font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em; opacity: 0.82;">PRISE EN CHARGE ENTREPRISE (PÉRIODE)</div>
+                <div style="font-size: 2.15rem; font-weight: 900; margin: 0.35rem 0 0.25rem;" [appCountUp]="commandesSiteFiltrees().reduce(b2b.sommePartEntreprise, 0)" countSuffix=" FCFA">
+                  {{ (commandesSiteFiltrees().reduce(b2b.sommePartEntreprise, 0) | number) }} FCFA
+                </div>
+                <div style="font-size: 0.78rem; opacity: 0.9; font-weight: 600;">
+                  <i class="fa-solid fa-building-shield"></i> Cumul mois en cours : <strong [appCountUp]="totalMontantEntrepriseMoisEnCours()" countSuffix=" FCFA">{{ (totalMontantEntrepriseMoisEnCours() | number) }} FCFA</strong>
+                </div>
               </div>
-              <div style="display: flex; align-items: center; gap: 0.4rem;">
-                <span style="font-size: 0.75rem; font-weight: 800; color: #721513;"><i class="fa-regular fa-calendar-check"></i> Au :</span>
-                <input type="date" [ngModel]="dateFin()" (ngModelChange)="dateFin.set($event); surChangementDateManuel()" style="border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.35rem 0.5rem; font-size: 0.8rem; font-weight: 700; background: #FFFFFF; color: #332724;">
+              <div style="width: 46px; height: 46px; border-radius: 14px; background: rgba(255,255,255,0.14); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0;">
+                <i class="fa-solid fa-hand-holding-dollar"></i>
               </div>
-              <div style="display: flex; gap: 0.25rem;">
-                <button type="button" (click)="definirPeriode('AUJOURDHUI')" [style.background]="periodeActive() === 'AUJOURDHUI' ? '#721513' : '#FFFFFF'" [style.color]="periodeActive() === 'AUJOURDHUI' ? '#FFFFFF' : '#6E5A56'" style="padding: 0.35rem 0.65rem; border: 1px solid #EDE7DC; border-radius: 6px; font-size: 0.72rem; font-weight: 800; cursor: pointer;">Journée</button>
-                <button type="button" (click)="definirPeriode('SEMAINE')" [style.background]="periodeActive() === 'SEMAINE' ? '#721513' : '#FFFFFF'" [style.color]="periodeActive() === 'SEMAINE' ? '#FFFFFF' : '#6E5A56'" style="padding: 0.35rem 0.65rem; border: 1px solid #EDE7DC; border-radius: 6px; font-size: 0.72rem; font-weight: 800; cursor: pointer;">Semaine</button>
-                <button type="button" (click)="definirPeriode('MOIS')" [style.background]="periodeActive() === 'MOIS' ? '#721513' : '#FFFFFF'" [style.color]="periodeActive() === 'MOIS' ? '#FFFFFF' : '#6E5A56'" style="padding: 0.35rem 0.65rem; border: 1px solid #EDE7DC; border-radius: 6px; font-size: 0.72rem; font-weight: 800; cursor: pointer;">Mois</button>
+            </div>
+            <div style="padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.16); display: flex; justify-content: space-between; font-size: 0.78rem;">
+              <span style="opacity: 0.8;">Période sélectionnée</span>
+              <strong>{{ dateDebut() }} → {{ dateFin() }}</strong>
+            </div>
+          </div>
+
+          <div class="kiki-dash-card-enter" style="--stagger: 1; background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 20px; padding: 1.5rem; box-shadow: 0 6px 22px rgba(114, 21, 19, 0.05); display: flex; flex-direction: column; justify-content: space-between; gap: 1.15rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+              <div>
+                <div style="font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em; color: #6E5A56;">REPAS COMMANDÉS &amp; EFFECTIF</div>
+                <div style="font-size: 2.15rem; font-weight: 900; color: #721513; margin: 0.35rem 0 0.25rem;" [appCountUp]="commandesSiteFiltrees().length" countSuffix=" repas">
+                  {{ commandesSiteFiltrees().length }} repas
+                </div>
+                <div style="font-size: 0.78rem; color: #606C38; font-weight: 700;">
+                  <i class="fa-solid fa-user-check"></i> <span [appCountUp]="employesPrisEnChargeCount()">{{ employesPrisEnChargeCount() }}</span> salariés subventionnés sur {{ b2b.listeEmployes().length }}
+                </div>
               </div>
+              <div style="width: 46px; height: 46px; border-radius: 14px; background: #FAF5EA; color: #721513; border: 1px solid #EDE7DC; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0;">
+                <i class="fa-solid fa-utensils"></i>
+              </div>
+            </div>
+            <div style="padding-top: 0.75rem; border-top: 1px solid #FAF5EA; display: flex; justify-content: space-between; font-size: 0.78rem; color: #6E5A56;">
+              <span>Total livrés mois en cours</span>
+              <strong style="color: #2C1810;" [appCountUp]="totalPlatsLivresMoisEnCours()" countSuffix=" plats">{{ totalPlatsLivresMoisEnCours() }} plats</strong>
             </div>
           </div>
         </div>
 
-        <!-- KPIs Principaux Épurés (Selon Cahier des Charges Étape 4) -->
-        <div class="rh-kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
-          
-          <!-- KPI 1 : Consommation Journalière -->
-          <div class="rh-kpi-card">
-            <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 0.55rem;">
-              <i class="fa-solid fa-utensils" style="color: #721513;"></i> <span>CONSOMMATION JOURNALIÈRE (AUJOURD'HUI)</span>
+        <!-- GRAPHIQUES SITE ENTREPRISE (STATUTS & TOP PLATS) -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem;">
+          <div class="kiki-dash-card-enter" style="--stagger: 2; background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 20px; padding: 1.4rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <div>
+                <h3 style="margin: 0; font-size: 1.05rem; font-weight: 900; color: #721513;">Suivi des commandes du site</h3>
+                <p style="margin: 0.15rem 0 0; font-size: 0.76rem; color: #6E5A56;">Répartition par statut de distribution</p>
+              </div>
+              <span style="width: 36px; height: 36px; border-radius: 10px; background: #FAF5EA; color: #721513; display: inline-flex; align-items: center; justify-content: center;">
+                <i class="fa-solid fa-chart-column"></i>
+              </span>
             </div>
-            <div style="font-size: 2.2rem; font-weight: 900; color: #721513; margin: 0.5rem 0 0.25rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-              {{ consommationJournaliereRepas() }} <span style="font-size: 1rem; color: #606C38; font-weight: 600;">plats commandés</span>
-            </div>
-            <div style="font-size: 0.75rem; color: #6E5A56;">
-              Montant pris en charge ce jour : <strong>{{ (consommationJournaliereMontant() | number) }} FCFA</strong>
-            </div>
-          </div>
-
-          <!-- KPI 2 : Employés Pris en Charge -->
-          <div class="rh-kpi-card">
-            <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 0.55rem;">
-              <i class="fa-solid fa-user-check" style="color: #606C38;"></i> <span>EMPLOYÉS PRIS EN CHARGE</span>
-            </div>
-            <div style="font-size: 2.2rem; font-weight: 900; color: #332724; margin: 0.5rem 0 0.25rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-              {{ employesPrisEnChargeCount() }} <span style="font-size: 1rem; color: #6E5A56;">salariés</span>
-            </div>
-            <div style="font-size: 0.75rem; color: #606C38; font-weight: 600;">
-              Sur {{ b2b.listeEmployes().length }} collaborateurs enregistrés
+            <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+              @for (st of rhStatsStatuts(); track st.label; let idx = $index) {
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.3rem;">
+                    <span style="color: #2C1810;">{{ st.label }}</span>
+                    <span [style.color]="st.color">{{ st.count }} ({{ st.pct }}%)</span>
+                  </div>
+                  <div style="height: 10px; background: #FAF5EA; border-radius: 9999px; overflow: hidden;">
+                    <div class="kiki-grow-bar-x" [style.--stagger]="idx" [style.width.%]="st.pct" [style.background]="st.color" style="height: 100%; border-radius: 9999px;"></div>
+                  </div>
+                </div>
+              }
             </div>
           </div>
 
-          <!-- KPI 3 : Prise en Charge Totale Entreprise -->
-          <div class="rh-kpi-card">
-            <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 0.55rem;">
-              <i class="fa-solid fa-hand-holding-dollar" style="color: #E51D24;"></i> <span>TOTAL DU MOIS EN COURS</span>
+          <div class="kiki-dash-card-enter" style="--stagger: 3; background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 20px; padding: 1.4rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <div>
+                <h3 style="margin: 0; font-size: 1.05rem; font-weight: 900; color: #721513;">Plats les plus commandés</h3>
+                <p style="margin: 0.15rem 0 0; font-size: 0.76rem; color: #6E5A56;">Préférences des collaborateurs sur la période</p>
+              </div>
+              <span style="width: 36px; height: 36px; border-radius: 10px; background: rgba(96, 108, 56, 0.12); color: #606C38; display: inline-flex; align-items: center; justify-content: center;">
+                <i class="fa-solid fa-bowl-food"></i>
+              </span>
             </div>
-            <div style="font-size: 2.2rem; font-weight: 900; color: #E51D24; margin: 0.5rem 0 0.25rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-              {{ (totalMontantEntrepriseMoisEnCours() | number) }} <span style="font-size: 1rem; color: #332724;">FCFA</span>
-            </div>
-            <div style="font-size: 0.75rem; color: #6E5A56;">
-              Cumul de {{ totalPlatsLivresMoisEnCours() }} repas livrés du 1er au {{ dateFin() }}
-            </div>
+            @if (rhTopPlatsEntreprise().length === 0) {
+              <div style="padding: 1.5rem; text-align: center; color: #8C7E74; font-size: 0.82rem;">
+                Aucune commande enregistrée sur cette période.
+              </div>
+            } @else {
+              <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+                @for (item of rhTopPlatsEntreprise(); track item.nom; let idx = $index) {
+                  <div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.25rem; gap: 0.5rem;">
+                      <span style="color: #2C1810; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ item.nom }}</span>
+                      <span style="color: #721513; white-space: nowrap;">{{ item.count }} repas</span>
+                    </div>
+                    <div style="height: 8px; background: #FAF5EA; border-radius: 9999px; overflow: hidden;">
+                      <div class="kiki-grow-bar-x" [style.--stagger]="idx" [style.width.%]="item.pct" style="height: 100%; background: linear-gradient(90deg, #721513, #C5A880); border-radius: 9999px;"></div>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
           </div>
-
         </div>
 
         <!-- Actions Rapides & Vue d'ensemble -->
@@ -455,21 +494,16 @@
               </div>
             </div>
 
-            <!-- Filtre Date Début / Date Fin -->
-            <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 1.25rem;">
-              <div style="font-size: 0.72rem; font-weight: 800; color: #721513; text-transform: uppercase; margin-bottom: 0.65rem;">
+            <!-- Filtre de Période Réutilisable -->
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem;">
+              <div style="font-size: 0.72rem; font-weight: 800; color: #721513; text-transform: uppercase;">
                 <i class="fa-regular fa-calendar"></i> Filtrer la période de facturation
               </div>
-              <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
-                <div style="flex: 1; min-width: 130px;">
-                  <label style="font-size: 0.7rem; color: #6E5A56; display: block; margin-bottom: 0.2rem; font-weight: 700;">Date Début :</label>
-                  <input type="date" [ngModel]="factureDateDebut()" (ngModelChange)="factureDateDebut.set($event)" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.4rem 0.6rem; font-size: 0.82rem; font-weight: 700; background: #FFFFFF; color: #332724;">
-                </div>
-                <div style="flex: 1; min-width: 130px;">
-                  <label style="font-size: 0.7rem; color: #6E5A56; display: block; margin-bottom: 0.2rem; font-weight: 700;">Date Fin :</label>
-                  <input type="date" [ngModel]="factureDateFin()" (ngModelChange)="factureDateFin.set($event)" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.4rem 0.6rem; font-size: 0.82rem; font-weight: 700; background: #FFFFFF; color: #332724;">
-                </div>
-              </div>
+              <app-b2b-period-filter
+                defaultPeriode="MOIS"
+                referenceDate="2026-11-12"
+                (periodChange)="onPeriodeFactureRhChange($event)">
+              </app-b2b-period-filter>
             </div>
 
           </div>
@@ -760,7 +794,7 @@
     <div class="rh-modal-overlay">
       <div class="rh-modal-card">
         <h3 style="margin: 0 0 1.25rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.4rem; color: #721513; font-weight: 800;">
-          <i class="fa-solid fa-user-plus"></i> Enrôler un Nouveau Collaborateur
+          <i class="fa-solid fa-user-plus"></i> Ajouter un Employé
         </h3>
 
         <div style="display: flex; flex-direction: column; gap: 1rem;">
@@ -792,13 +826,20 @@
             </div>
             <div>
               <label style="font-size: 0.75rem; color: #721513; font-weight: 800; display: block; margin-bottom: 0.25rem;">Taux de Subvention Salarié (%) :</label>
-              <select [(ngModel)]="newEmp().tauxSubvention" style="width: 100%; font-weight: 700; color: #721513; padding: 0.5rem; border-radius: 8px; border: 1.5px solid #EDE7DC;">
-                <option [ngValue]="100">100%</option>
-                <option [ngValue]="70">70%</option>
-                <option [ngValue]="50">50%</option>
-                <option [ngValue]="25">25%</option>
-                <option [ngValue]="0">0%</option>
-              </select>
+              <input
+                type="number"
+                min="1"
+                max="100"
+                step="1"
+                [(ngModel)]="newEmp().tauxSubvention"
+                (ngModelChange)="tauxSubventionError.set('')"
+                placeholder="Ex: 50 ou 100"
+                style="width: 100%; font-weight: 800; color: #721513; padding: 0.55rem 0.75rem; border-radius: 10px; border: 1.5px solid #EDE7DC;">
+              @if (tauxSubventionError()) {
+                <div style="font-size: 0.72rem; color: #DC2626; font-weight: 700; margin-top: 0.25rem;">
+                  <i class="fa-solid fa-circle-exclamation"></i> {{ tauxSubventionError() }}
+                </div>
+              }
             </div>
           </div>
         </div>
