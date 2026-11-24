@@ -8,13 +8,14 @@ import com.kikitraiteur.b2b.entreprise.data.repository.InvitationAdminRepository
 import com.kikitraiteur.b2b.entreprise.data.repository.SiteRepository;
 import com.kikitraiteur.b2b.shared.exceptions.BusinessException;
 import com.kikitraiteur.b2b.shared.exceptions.ResourceNotFoundException;
+import com.kikitraiteur.b2b.shared.mail.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -27,7 +28,10 @@ public class EntrepriseService {
     private final EntrepriseRepository entrepriseRepository;
     private final SiteRepository siteRepository;
     private final InvitationAdminRepository invitationRepository;
-    private final ObjectProvider<JavaMailSender> mailSenderProvider;
+    private final EmailService emailService;
+
+    @Value("${app.frontend.url:http://localhost:4200}")
+    private String frontendUrl;
 
     public List<EntrepriseEntity> findAll() {
         return entrepriseRepository.findAll();
@@ -117,29 +121,64 @@ public class EntrepriseService {
 
     public InvitationAdminEntity createInvitation(String entrepriseId, InvitationAdminEntity inv) {
         EntrepriseEntity ent = findById(entrepriseId);
-        inv.setId("inv-" + System.currentTimeMillis());
+        if (inv.getEmail() == null || inv.getEmail().isBlank() || !inv.getEmail().trim().matches(REGEX_EMAIL)) {
+            throw new BusinessException("Adresse email invalide pour l'invitation.");
+        }
+        if (inv.getNomComplet() == null || inv.getNomComplet().isBlank()) {
+            throw new BusinessException("Le nom complet du gestionnaire est obligatoire.");
+        }
+
+        String role = (inv.getRole() != null && !inv.getRole().isBlank())
+                ? inv.getRole().trim()
+                : "RESPONSABLE_ENTREPRISE";
+        String roleLibelle = (inv.getRoleLibelle() != null && !inv.getRoleLibelle().isBlank())
+                ? inv.getRoleLibelle().trim()
+                : ("RESPONSABLE_SITE_KIKI".equals(role) ? "Responsable de Site Kiki" : "Admin Entreprise (RH)");
+
+        inv.setId("inv-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 4));
+        inv.setEmail(inv.getEmail().trim().toLowerCase());
+        inv.setNomComplet(inv.getNomComplet().trim());
+        inv.setRole(role);
+        inv.setRoleLibelle(roleLibelle);
         inv.setEntrepriseId(ent.getId());
         inv.setEntrepriseNom(ent.getNom());
         inv.setDateEnvoi(LocalDate.now().toString());
-        inv.setTokenActivation("KIKI-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
+        inv.setTokenActivation("KIKI-" + UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase());
         inv.setStatut("EN_ATTENTE");
         InvitationAdminEntity saved = invitationRepository.save(inv);
 
-        try {
-            JavaMailSender mailSender = mailSenderProvider.getIfAvailable();
-            if (mailSender != null) {
-                SimpleMailMessage msg = new SimpleMailMessage();
-                msg.setTo(saved.getEmail());
-                msg.setSubject("Activation de votre compte Administrateur Kiki Traiteur B2B");
-                msg.setText("Bonjour " + saved.getNomComplet() + ",\n\n"
-                        + "Votre accès " + saved.getRoleLibelle() + " pour " + ent.getNom() + " est prêt.\n"
-                        + "Lien d'activation : https://kikitraiteur.sn/b2b/activation?token=" + saved.getTokenActivation()
-                        + "&email=" + saved.getEmail() + "\n\nCordialement,\nKiki Traiteur B2B");
-                mailSender.send(msg);
-            }
-        } catch (Exception e) {
-            log.warn("Envoi email non effectue (SMTP non configure) pour {}: {}", saved.getEmail(), e.getMessage());
-        }
+        sendInvitationEmail(saved, ent.getNom());
         return saved;
+    }
+
+    public InvitationAdminEntity resendInvitation(String entrepriseId, String invitationId) {
+        EntrepriseEntity ent = findById(entrepriseId);
+        InvitationAdminEntity inv = invitationRepository.findById(invitationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Invitation introuvable : " + invitationId));
+        if (!ent.getId().equals(inv.getEntrepriseId())) {
+            throw new BusinessException("Cette invitation n'appartient pas à cette entreprise.");
+        }
+        if ("ACTIVE".equalsIgnoreCase(inv.getStatut())) {
+            throw new BusinessException("Ce compte administrateur a déjà été activé.");
+        }
+        inv.setDateEnvoi(LocalDate.now().toString());
+        InvitationAdminEntity saved = invitationRepository.save(inv);
+        sendInvitationEmail(saved, ent.getNom());
+        return saved;
+    }
+
+    private void sendInvitationEmail(InvitationAdminEntity inv, String entrepriseNom) {
+        String base = (frontendUrl != null && !frontendUrl.isBlank()) ? frontendUrl.replaceAll("/+$", "") : "http://localhost:4200";
+        String activationUrl = base + "/b2b/activation?token="
+                + URLEncoder.encode(inv.getTokenActivation(), StandardCharsets.UTF_8)
+                + "&email=" + URLEncoder.encode(inv.getEmail(), StandardCharsets.UTF_8);
+
+        emailService.sendAdminInvitationEmail(
+                inv.getEmail(),
+                inv.getNomComplet(),
+                inv.getRoleLibelle(),
+                entrepriseNom,
+                activationUrl
+        );
     }
 }

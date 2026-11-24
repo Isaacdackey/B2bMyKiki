@@ -180,7 +180,10 @@ export class B2bStateService {
   }
 
   // Méthode pour ajouter une entreprise cliente
-  ajouterEntreprise(nouvelle: Omit<EntrepriseB2B, 'id' | 'sites'>) {
+  ajouterEntreprise(
+    nouvelle: Omit<EntrepriseB2B, 'id' | 'sites'>,
+    adminsToInvite: Array<{ email: string; nomComplet: string; role: 'RESPONSABLE_ENTREPRISE' | 'RESPONSABLE_SITE_KIKI' }> = []
+  ) {
     const id = 'ent-' + Date.now();
     const ent: EntrepriseB2B = {
       ...nouvelle,
@@ -191,10 +194,22 @@ export class B2bStateService {
     this.api.createEntreprise(ent).subscribe({
       next: (res) => {
         if (res.success && res.data) {
-          this.listeEntreprises.update(list => list.map(e => e.id === id ? res.data : e));
+          const savedEnt = res.data;
+          this.listeEntreprises.update(list => list.map(e => e.id === id ? savedEnt : e));
+          adminsToInvite.forEach(adm => {
+            if (adm.email && adm.nomComplet) {
+              this.creerInvitationAdmin(adm.email, adm.nomComplet, adm.role, savedEnt);
+            }
+          });
         }
       },
-      error: () => {}
+      error: () => {
+        adminsToInvite.forEach(adm => {
+          if (adm.email && adm.nomComplet) {
+            this.creerInvitationAdmin(adm.email, adm.nomComplet, adm.role, ent);
+          }
+        });
+      }
     });
     return ent;
   }
@@ -842,15 +857,22 @@ export class B2bStateService {
   }
 
   // Méthode pour créer une invitation administrateur
-  creerInvitationAdmin(email: string, nomComplet: string, role: 'RESPONSABLE_ENTREPRISE' | 'RESPONSABLE_SITE_KIKI', entreprise: EntrepriseB2B): InvitationAdminB2B {
+  creerInvitationAdmin(
+    email: string,
+    nomComplet: string,
+    role: 'RESPONSABLE_ENTREPRISE' | 'RESPONSABLE_SITE_KIKI',
+    entreprise: EntrepriseB2B,
+    onCreated?: (inv: InvitationAdminB2B) => void
+  ): InvitationAdminB2B {
     const roleLibelle = role === 'RESPONSABLE_ENTREPRISE' ? 'Admin Entreprise (RH)' : 'Responsable de Site Kiki';
     const prefix = role === 'RESPONSABLE_ENTREPRISE' ? 'RH' : 'KIKI';
     const token = `ACT-${prefix}-${Math.floor(10000 + Math.random() * 90000)}`;
     const now = new Date();
     const dateEnvoi = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    
+    const tempId = 'inv-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+
     const invitation: InvitationAdminB2B = {
-      id: 'inv-' + Date.now(),
+      id: tempId,
       email,
       nomComplet,
       role,
@@ -863,8 +885,35 @@ export class B2bStateService {
     };
 
     this.listeInvitationsAdmins.update(list => [invitation, ...list]);
-    this.api.createInvitation(entreprise.id, invitation).subscribe({ error: () => {} });
+    this.api.createInvitation(entreprise.id, invitation).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.listeInvitationsAdmins.update(list => list.map(i => i.id === tempId ? res.data : i));
+          this.showToast(`Invitation envoyée par email à ${res.data.email}`);
+          if (onCreated) onCreated(res.data);
+        } else if (onCreated) {
+          onCreated(invitation);
+        }
+      },
+      error: () => {
+        if (onCreated) onCreated(invitation);
+      }
+    });
     return invitation;
+  }
+
+  renvoyerInvitationAdmin(entrepriseId: string, invitationId: string) {
+    this.api.resendInvitation(entrepriseId, invitationId).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.listeInvitationsAdmins.update(list => list.map(i => i.id === invitationId ? res.data : i));
+          this.showToast(`Invitation renvoyée à ${res.data.email}`);
+        }
+      },
+      error: (err) => {
+        this.showToast(err?.error?.message || 'Impossible de renvoyer l’invitation.');
+      }
+    });
   }
 
   // Scanner une commande (QR code cantine)

@@ -59,6 +59,14 @@ public class EntrepriseController {
 
     @PostMapping("/{id}/invitations")
     public ApiResponse<InvitationAdminEntity> createInvitation(@PathVariable String id, @RequestBody InvitationAdminEntity inv) {
-        return ApiResponse.ok("Invitation générée", entrepriseService.createInvitation(id, inv));
+        return ApiResponse.ok("Invitation générée et envoyée par email", entrepriseService.createInvitation(id, inv));
+    }
+
+    @PostMapping("/{id}/invitations/{invitationId}/resend")
+    public ApiResponse<InvitationAdminEntity> resendInvitation(
+            @PathVariable String id,
+            @PathVariable String invitationId
+    ) {
+        return ApiResponse.ok("Invitation renvoyée par email", entrepriseService.resendInvitation(id, invitationId));
     }
 }
