@@ -65,7 +65,26 @@ export class B2bCuisineProductionComponent {
   });
 
   joursSemaine = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'] as const;
-  jourSelectionne = signal<'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche'>('Jeudi');
+  private readonly todayIndexCuisine = (new Date().getDay() + 6) % 7;
+  jourAujourdhui = this.joursSemaine[this.todayIndexCuisine];
+  jourSelectionne = signal<'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche'>(
+    this.jourAujourdhui
+  );
+  datesSemaineMapCuisine: Record<string, string> = this.buildDatesSemaineMapCuisine();
+
+  private buildDatesSemaineMapCuisine(): Record<string, string> {
+    const now = new Date();
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - this.todayIndexCuisine);
+    const moisCourts = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
+    const map: Record<string, string> = {};
+    this.joursSemaine.forEach((jour, idx) => {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + idx);
+      map[jour] = `${String(d.getDate()).padStart(2, '0')} ${moisCourts[d.getMonth()]}`;
+    });
+    return map;
+  }
 
   changerJour(jour: 'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche') {
     this.jourSelectionne.set(jour);

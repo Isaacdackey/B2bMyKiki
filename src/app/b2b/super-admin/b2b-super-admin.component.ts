@@ -1172,7 +1172,9 @@ export class B2bSuperAdminComponent {
   invitationGenereeLien = signal<string | null>(null);
 
   // Onglet 3 : Menu Planifié
-  jourMenuActif = signal<'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche'>('Lundi');
+  jourMenuActif = signal<'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche'>(
+    this.joursOrdre[this.todayIndexSa]
+  );
   modalDupliquerMenu = signal<boolean>(false);
   jourCibleDuplication = signal<'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche'>('Mercredi');
 

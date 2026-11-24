@@ -876,11 +876,14 @@
                     <button 
                       type="button"
                       (click)="jourMenuActif.set($any(jour))"
-                      style="padding: 0.75rem 0.5rem; border-radius: 10px; border: 1.5px solid; text-align: center; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center;"
+                      style="padding: 0.75rem 0.5rem; border-radius: 10px; border: 1.5px solid; text-align: center; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem;"
                       [style.background]="jourMenuActif() === jour ? '#721513' : '#FAF8F4'"
                       [style.color]="jourMenuActif() === jour ? '#FFFFFF' : '#332724'"
                       [style.border-color]="jourMenuActif() === jour ? '#721513' : '#EDE7DC'">
                       <div style="font-size: 0.88rem; font-weight: 800; line-height: 1;">{{ jour }}</div>
+                      <div style="font-size: 0.68rem; font-weight: 700;" [style.color]="jourMenuActif() === jour ? '#FAF5EA' : '#721513'">
+                        {{ datesSemaineMapSa[jour] }}
+                      </div>
                     </button>
                   }
                 </div>
