@@ -1,5 +1,6 @@
 package com.kikitraiteur.b2b.entreprise.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -49,6 +50,7 @@ public class EntrepriseEntity {
     private List<String> categoriesAutorisees = new ArrayList<>();
 
     @Builder.Default
+    @JsonProperty("isArchivee")
     private boolean isArchivee = false;
 
     @OneToMany(mappedBy = "entreprise", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)

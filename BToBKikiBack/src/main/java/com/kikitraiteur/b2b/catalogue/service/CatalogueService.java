@@ -2,9 +2,12 @@ package com.kikitraiteur.b2b.catalogue.service;
 
 import com.kikitraiteur.b2b.catalogue.data.entity.PlatEntity;
 import com.kikitraiteur.b2b.catalogue.data.repository.PlatRepository;
+import com.kikitraiteur.b2b.planning.data.entity.LigneMenuPlanifieEntity;
+import com.kikitraiteur.b2b.planning.data.repository.LigneMenuPlanifieRepository;
 import com.kikitraiteur.b2b.shared.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -13,6 +16,7 @@ import java.util.List;
 public class CatalogueService {
 
     private final PlatRepository platRepository;
+    private final LigneMenuPlanifieRepository ligneMenuPlanifieRepository;
 
     public List<PlatEntity> findAll(boolean includeArchived) {
         return includeArchived ? platRepository.findAll() : platRepository.findByIsArchiveFalse();
@@ -35,13 +39,31 @@ public class CatalogueService {
         if (updates.getImage() != null) existing.setImage(updates.getImage());
         if (updates.getAllergene() != null) existing.setAllergene(updates.getAllergene());
         if (updates.getCalories() != null) existing.setCalories(updates.getCalories());
+        existing.setDisponible(updates.isDisponible());
         return platRepository.save(existing);
     }
 
+    @Transactional
     public PlatEntity toggleArchive(String id) {
         PlatEntity existing = platRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Plat introuvable : " + id));
-        existing.setArchive(!existing.isArchive());
+        boolean nextArchive = !existing.isArchive();
+        existing.setArchive(nextArchive);
+        PlatEntity saved = platRepository.save(existing);
+
+        if (nextArchive) {
+            List<LigneMenuPlanifieEntity> lignes = ligneMenuPlanifieRepository.findByPlatId(id);
+            if (!lignes.isEmpty()) {
+                ligneMenuPlanifieRepository.deleteAll(lignes);
+            }
+        }
+        return saved;
+    }
+
+    public PlatEntity toggleDisponibilite(String id) {
+        PlatEntity existing = platRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Plat introuvable : " + id));
+        existing.setDisponible(!existing.isDisponible());
         return platRepository.save(existing);
     }
 }

@@ -34,4 +34,9 @@ public class CatalogueController {
     public ApiResponse<PlatEntity> toggleArchive(@PathVariable String id) {
         return ApiResponse.ok("Statut archivage modifié", catalogueService.toggleArchive(id));
     }
+
+    @PatchMapping("/{id}/disponibilite")
+    public ApiResponse<PlatEntity> toggleDisponibilite(@PathVariable String id) {
+        return ApiResponse.ok("Disponibilité modifiée", catalogueService.toggleDisponibilite(id));
+    }
 }

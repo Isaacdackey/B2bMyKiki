@@ -18,7 +18,7 @@ public class PlanningController {
     private final PlanningService planningService;
 
     @GetMapping
-    public ApiResponse<List<MenuPlanifieJourEntity>> getByEntreprise(@RequestParam(defaultValue = "ent-001") String entrepriseId) {
+    public ApiResponse<List<MenuPlanifieJourEntity>> getByEntreprise(@RequestParam(required = false) String entrepriseId) {
         return ApiResponse.ok(planningService.findByEntreprise(entrepriseId));
     }
 

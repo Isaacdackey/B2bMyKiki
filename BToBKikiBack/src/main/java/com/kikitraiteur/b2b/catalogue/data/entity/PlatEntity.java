@@ -1,5 +1,6 @@
 package com.kikitraiteur.b2b.catalogue.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,5 +35,6 @@ public class PlatEntity {
     private boolean disponible = true;
 
     @Builder.Default
+    @JsonProperty("isArchive")
     private boolean isArchive = false;
 }

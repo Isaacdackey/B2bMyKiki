@@ -16,13 +16,18 @@ import com.kikitraiteur.b2b.entreprise.data.repository.EmployeRepository;
 import com.kikitraiteur.b2b.entreprise.data.repository.EntrepriseRepository;
 import com.kikitraiteur.b2b.facturation.data.entity.FacturationJournaliereEntity;
 import com.kikitraiteur.b2b.facturation.data.repository.FacturationJournaliereRepository;
+import com.kikitraiteur.b2b.planning.data.entity.LigneMenuPlanifieEntity;
+import com.kikitraiteur.b2b.planning.data.entity.MenuPlanifieJourEntity;
+import com.kikitraiteur.b2b.planning.data.repository.MenuPlanifieJourRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -37,6 +42,7 @@ public class B2bDataSeeder implements CommandLineRunner {
     private final CommandeSiteRepository commandeRepository;
     private final ReclamationCutOffRepository reclamationRepository;
     private final FacturationJournaliereRepository facturationRepository;
+    private final MenuPlanifieJourRepository menuPlanifieJourRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -186,6 +192,50 @@ public class B2bDataSeeder implements CommandLineRunner {
                             .nbPlatsLivres(48).nbPresents(52).montantTotal(240000)
                             .montantPartEntreprise(216000).montantPartEmploye(24000).statut("EN_COURS").build()
             );
+        }
+
+        if (menuPlanifieJourRepository.count() == 0) {
+            LocalDate monday = LocalDate.now().with(DayOfWeek.MONDAY);
+            String[] jours = {"Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"};
+            String[] codes = {"lun", "mar", "mer", "jeu", "ven", "sam", "dim"};
+            String[] themes = {
+                    "Saveurs Sénégalaises & Terroir",
+                    "Pêche Fraîche & Grillades",
+                    "Rôtisserie & Saveurs d'Afrique",
+                    "Délices Culinaires du Chef",
+                    "Thiéboudienne Sacré du Vendredi",
+                    "Permanence & Équipes Week-End",
+                    "Service Restreint Dimanche"
+            };
+            List<PlatEntity> plats = platRepository.findAll();
+            for (int i = 0; i < 7; i++) {
+                MenuPlanifieJourEntity menu = MenuPlanifieJourEntity.builder()
+                        .id("plan-ent1-" + codes[i])
+                        .entrepriseId("ent-001")
+                        .jourNom(jours[i])
+                        .dateStr(monday.plusDays(i).toString())
+                        .theme(themes[i])
+                        .quantitesSaisies(i < 5)
+                        .statutConformite(i < 5 ? "CONFORME" : "NON_SAISI")
+                        .lignes(new ArrayList<>())
+                        .build();
+
+                int idx = 1;
+                for (PlatEntity p : plats) {
+                    if (p.isArchive()) continue;
+                    menu.getLignes().add(LigneMenuPlanifieEntity.builder()
+                            .id("lig-seed-" + codes[i] + "-" + (idx++))
+                            .categorie(p.getCategorie())
+                            .platId(p.getId())
+                            .nomPlat(p.getNom())
+                            .image(p.getImage())
+                            .quantitePrevue(i < 5 ? 40 : 0)
+                            .disponible(true)
+                            .menuPlanifie(menu)
+                            .build());
+                }
+                menuPlanifieJourRepository.save(menu);
+            }
         }
     }
 }

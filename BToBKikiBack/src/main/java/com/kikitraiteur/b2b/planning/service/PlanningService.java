@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +28,9 @@ public class PlanningService {
     private final EntrepriseRepository entrepriseRepository;
 
     public List<MenuPlanifieJourEntity> findByEntreprise(String entrepriseId) {
+        if (entrepriseId == null || entrepriseId.isBlank() || "TOUTES".equalsIgnoreCase(entrepriseId)) {
+            return menuRepository.findAll();
+        }
         return menuRepository.findByEntrepriseId(entrepriseId);
     }
 
@@ -102,11 +107,25 @@ public class PlanningService {
 
     public int deployerVersToutesEntreprises(String sourceEntrepriseId) {
         List<MenuPlanifieJourEntity> modele = menuRepository.findByEntrepriseId(sourceEntrepriseId);
+        Set<String> archivedPlatIds = platRepository.findAll().stream()
+                .filter(PlatEntity::isArchive)
+                .map(PlatEntity::getId)
+                .collect(Collectors.toSet());
+
+        // Nettoyer d'abord les plats archivés dans le modèle source lui-même
+        for (MenuPlanifieJourEntity mSource : modele) {
+            boolean removed = mSource.getLignes().removeIf(l -> archivedPlatIds.contains(l.getPlatId()));
+            if (removed) {
+                recalculerConformite(mSource);
+                menuRepository.save(mSource);
+            }
+        }
+
         List<EntrepriseEntity> entreprises = entrepriseRepository.findAll().stream()
                 .filter(e -> !e.isArchivee() && !e.getId().equals(sourceEntrepriseId))
                 .toList();
 
-        int count = 0;
+        int count = 1;
         for (EntrepriseEntity ent : entreprises) {
             for (MenuPlanifieJourEntity mSource : modele) {
                 MenuPlanifieJourEntity cible = menuRepository.findByEntrepriseIdAndJourNom(ent.getId(), mSource.getJourNom())
@@ -121,6 +140,7 @@ public class PlanningService {
 
                 cible.getLignes().clear();
                 for (LigneMenuPlanifieEntity l : mSource.getLignes()) {
+                    if (archivedPlatIds.contains(l.getPlatId())) continue;
                     if (ent.getCategoriesAutorisees().isEmpty() || ent.getCategoriesAutorisees().contains(l.getCategorie())) {
                         cible.getLignes().add(LigneMenuPlanifieEntity.builder()
                                 .id("lig-" + System.nanoTime())
