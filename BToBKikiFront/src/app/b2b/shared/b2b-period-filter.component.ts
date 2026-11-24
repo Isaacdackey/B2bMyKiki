@@ -16,43 +16,45 @@ export interface PeriodeFilterChange {
   imports: [CommonModule, FormsModule],
   template: `
     <div class="b2b-period-filter-wrap">
-      <div class="b2b-period-pills" role="tablist" aria-label="Filtre de période">
-        <button
-          type="button"
-          class="b2b-period-pill"
-          [class.active]="periodeActive() === 'JOUR'"
-          (click)="selectionnerPeriode('JOUR')">
-          Jour
-        </button>
-        <button
-          type="button"
-          class="b2b-period-pill"
-          [class.active]="periodeActive() === 'SEMAINE'"
-          (click)="selectionnerPeriode('SEMAINE')">
-          Semaine
-        </button>
-        <button
-          type="button"
-          class="b2b-period-pill"
-          [class.active]="periodeActive() === 'MOIS'"
-          (click)="selectionnerPeriode('MOIS')">
-          Mois
-        </button>
-        <button
-          type="button"
-          class="b2b-period-pill"
-          [class.active]="periodeActive() === 'ANNEE'"
-          (click)="selectionnerPeriode('ANNEE')">
-          Année
-        </button>
-        <button
-          type="button"
-          class="b2b-period-pill"
-          [class.active]="periodeActive() === 'PERSONNALISE'"
-          (click)="selectionnerPeriode('PERSONNALISE')">
-          <i class="fa-regular fa-calendar-days" aria-hidden="true"></i>
-          Personnalisé
-        </button>
+      <div class="b2b-period-pills-shell">
+        <div class="b2b-period-pills" role="tablist" aria-label="Filtre de période">
+          <button
+            type="button"
+            class="b2b-period-pill"
+            [class.active]="periodeActive() === 'JOUR'"
+            (click)="selectionnerPeriode('JOUR')">
+            Jour
+          </button>
+          <button
+            type="button"
+            class="b2b-period-pill"
+            [class.active]="periodeActive() === 'SEMAINE'"
+            (click)="selectionnerPeriode('SEMAINE')">
+            Semaine
+          </button>
+          <button
+            type="button"
+            class="b2b-period-pill"
+            [class.active]="periodeActive() === 'MOIS'"
+            (click)="selectionnerPeriode('MOIS')">
+            Mois
+          </button>
+          <button
+            type="button"
+            class="b2b-period-pill"
+            [class.active]="periodeActive() === 'ANNEE'"
+            (click)="selectionnerPeriode('ANNEE')">
+            Année
+          </button>
+          <button
+            type="button"
+            class="b2b-period-pill"
+            [class.active]="periodeActive() === 'PERSONNALISE'"
+            (click)="selectionnerPeriode('PERSONNALISE')">
+            <i class="fa-regular fa-calendar-days" aria-hidden="true"></i>
+            Personnalisé
+          </button>
+        </div>
       </div>
 
       @if (periodeActive() === 'PERSONNALISE') {
@@ -204,7 +206,11 @@ export interface PeriodeFilterChange {
       .b2b-period-filter-wrap {
         align-items: stretch;
         width: 100%;
+      }
+      .b2b-period-pills-shell {
         position: relative;
+        width: 100%;
+        max-width: 100%;
       }
       .b2b-period-pills {
         width: 100%;
@@ -215,28 +221,29 @@ export interface PeriodeFilterChange {
         -ms-overflow-style: none;
         gap: 0.25rem;
         border-radius: 9999px;
-        padding: 0.25rem 1.75rem 0.25rem 0.25rem;
+        padding: 0.25rem 2.1rem 0.25rem 0.25rem;
         box-sizing: border-box;
       }
       .b2b-period-pills::-webkit-scrollbar {
         display: none;
       }
-      .b2b-period-filter-wrap::after {
+      .b2b-period-pills-shell::after {
         content: '›';
         position: absolute;
         top: 2px;
+        bottom: 2px;
         right: 2px;
-        height: 36px;
-        width: 26px;
+        width: 34px;
         display: flex;
         align-items: center;
         justify-content: flex-end;
-        padding-right: 6px;
+        padding-right: 10px;
         border-radius: 0 9999px 9999px 0;
-        font-size: 1rem;
+        font-size: 1.15rem;
         font-weight: 900;
+        line-height: 1;
         color: #721513;
-        background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.94) 60%, #FFFFFF 100%);
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.92) 45%, #FFFFFF 100%);
         pointer-events: none;
       }
       .b2b-period-pill {

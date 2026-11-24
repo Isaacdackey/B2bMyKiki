@@ -6,7 +6,17 @@
       </button>
     </div>
       <div style="display: flex; flex-direction: column; gap: 1.25rem;">
-        
+        <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.15rem 1.4rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+          <div>
+            <h2 style="margin: 0; font-size: 1.25rem; color: #721513; font-weight: 900; display: flex; align-items: center; gap: 0.5rem;">
+              <i class="bi bi-calendar2-week"></i> Menu Planifié &amp; Quantités du Site
+            </h2>
+            <p style="margin: 0.25rem 0 0; font-size: 0.82rem; color: #6E5A56;">
+              Consultez le programme de la semaine, ajustez les portions par plat et vérifiez la conformité aux effectifs.
+            </p>
+          </div>
+        </div>
+
         <!-- SÉLECTEUR DU JOUR DE LA SEMAINE (Lundi à Dimanche en scroll horizontal sans barre visible) -->
         <div class="kiki-scroll-row-wrap">
           <div class="kiki-scroll-row" style="gap: 0.45rem;">
@@ -130,6 +140,17 @@
                 </tbody>
               </table>
             </div>
+          </div>
+        } @else {
+          <div style="background: #FFFFFF; border: 1.5px dashed #E2D5BE; border-radius: 18px; padding: 3rem 1.5rem; text-align: center;">
+            <i class="fa-solid fa-utensils" style="font-size: 2rem; color: #C5A880; display: block; margin-bottom: 0.65rem;"></i>
+            <h3 style="margin: 0 0 0.35rem; font-size: 1.15rem; color: #721513; font-weight: 900;">Aucun menu planifié pour {{ jourSelectionne() }}</h3>
+            <p style="margin: 0 auto 1rem; max-width: 420px; font-size: 0.84rem; color: #6E5A56;">
+              Ajoutez des plats du catalogue ou attendez le déploiement hebdomadaire du Super Admin.
+            </p>
+            <button type="button" (click)="ouvrirModalAjoutPlat()" style="background: #721513; color: #FFFFFF; border: none; border-radius: 9999px; padding: 0.55rem 1.2rem; font-size: 0.82rem; font-weight: 800; cursor: pointer;">
+              <i class="fa-solid fa-plus"></i> Ajouter un plat
+            </button>
           </div>
         }
       </div>

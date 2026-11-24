@@ -97,6 +97,15 @@
                     </td>
                   </tr>
                 }
+                @if (facturationJournaliere().length === 0) {
+                  <tr>
+                    <td colspan="5" style="padding: 2.5rem 1rem; text-align: center; color: #6E5A56;">
+                      <i class="fa-solid fa-file-invoice-dollar" style="font-size: 1.75rem; color: #C5A880; display: block; margin-bottom: 0.5rem;"></i>
+                      <strong>Aucune livraison facturable sur cette période</strong>
+                      <div style="font-size: 0.8rem; margin-top: 0.25rem;">Modifiez la plage de dates pour consulter les relevés précédents.</div>
+                    </td>
+                  </tr>
+                }
               </tbody>
             </table>
           </div>
