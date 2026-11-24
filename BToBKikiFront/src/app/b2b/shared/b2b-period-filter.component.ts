@@ -65,7 +65,6 @@ export interface PeriodeFilterChange {
               [ngModel]="dateDebut()"
               (ngModelChange)="onDateDebutChange($event)" />
           </div>
-          <span class="b2b-custom-date-sep">—</span>
           <div class="b2b-custom-date-field">
             <label class="b2b-custom-date-label">Au</label>
             <input
