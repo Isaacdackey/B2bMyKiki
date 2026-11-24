@@ -14,31 +14,51 @@ export class B2bNavComponent {
   b2b = inject(B2bStateService);
   private router = inject(Router);
 
-  navigerSuperAdmin(section: 'DASHBOARD' | 'ENTREPRISES' | 'CATALOGUE' | 'PLANNING') {
-    this.b2b.superAdminActiveSection.set(section);
-    this.router.navigate(['/b2b/super-admin']);
+  onNavClick() {
     this.b2b.closeMobileDrawer();
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  }
+
+  navigerSuperAdmin(section: 'DASHBOARD' | 'ENTREPRISES' | 'CATALOGUE' | 'PLANNING') {
+    this.b2b.superAdminActiveSection.set(section);
+    const routeMap = {
+      DASHBOARD: '/b2b/super-admin/dashboard',
+      ENTREPRISES: '/b2b/super-admin/entreprises',
+      CATALOGUE: '/b2b/super-admin/catalogue',
+      PLANNING: '/b2b/super-admin/planning'
+    };
+    this.router.navigate([routeMap[section]]);
+    this.onNavClick();
   }
 
   navigerRh(section: 'STATISTIQUES' | 'COMMANDES_SITE' | 'EMPLOYES' | 'FACTURATION') {
     this.b2b.rhActiveSection.set(section);
-    this.router.navigate(['/b2b/rh']);
-    this.b2b.closeMobileDrawer();
-    if (typeof window !== 'undefined') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    const routeMap = {
+      STATISTIQUES: '/b2b/rh/dashboard',
+      COMMANDES_SITE: '/b2b/rh/commandes',
+      EMPLOYES: '/b2b/rh/employes',
+      FACTURATION: '/b2b/rh/facturation'
+    };
+    this.router.navigate([routeMap[section]]);
+    this.onNavClick();
   }
 
-  navigerCuisine(tab: 'INFOS' | 'UTILISATEURS' | 'MENU' | 'COMMANDES' | 'FACTURATION' | 'RECLAMATIONS' | 'PROJECTION_QR') {
+  navigerCuisine(tab: 'DASHBOARD' | 'INFOS' | 'UTILISATEURS' | 'MENU' | 'COMMANDES' | 'FACTURATION' | 'RECLAMATIONS' | 'PROJECTION_QR') {
     this.b2b.cuisineActiveTab.set(tab);
-    this.router.navigate(['/b2b/cuisine']);
-    this.b2b.closeMobileDrawer();
-    if (typeof window !== 'undefined') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    const routeMap = {
+      DASHBOARD: '/b2b/cuisine/dashboard',
+      MENU: '/b2b/cuisine/menu',
+      COMMANDES: '/b2b/cuisine/commandes',
+      PROJECTION_QR: '/b2b/cuisine/qr',
+      RECLAMATIONS: '/b2b/cuisine/reclamations',
+      UTILISATEURS: '/b2b/cuisine/utilisateurs',
+      FACTURATION: '/b2b/cuisine/facturation',
+      INFOS: '/b2b/cuisine/infos'
+    };
+    this.router.navigate([routeMap[tab]]);
+    this.onNavClick();
   }
 
   @HostListener('window:keydown.escape')

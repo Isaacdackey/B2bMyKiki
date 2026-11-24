@@ -1,0 +1,72 @@
+﻿<div class="cuisine-wrapper">
+  <main style="max-width: 1320px; width: 100%; margin: 0 auto; padding: 0.5rem 0 1.5rem;">
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+      <button type="button" class="b2b-mobile-hamburger-btn" (click)="b2b.toggleMobileDrawer()" aria-label="Ouvrir le menu">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+      <div class="cuisine-table-card">
+        <div class="cuisine-table-header">
+          <div>
+            <h3 style="margin: 0; font-size: 1.15rem; color: #721513; font-weight: 900;">
+              Effectifs du Site • {{ entreprise().sites[0]?.nom || 'Siège Plateau' }}
+            </h3>
+            <p style="margin: 0.2rem 0 0; font-size: 0.8rem; color: #6E5A56;">
+              {{ employesSubventionnesCount() }} salarié(s) subventionné(s) • {{ employesSite().length - employesSubventionnesCount() }} autonome(s)
+            </p>
+          </div>
+        </div>
+
+        <div class="cuisine-table-wrap">
+          <table class="cuisine-table">
+            <thead>
+              <tr>
+                <th>Matricule</th>
+                <th>Nom &amp; Prénom</th>
+                <th>Département</th>
+                <th style="text-align: center;">Taux Subvention</th>
+                <th style="text-align: center;">Repas ce Mois</th>
+                <th style="text-align: center;">Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (emp of employesSite(); track emp.id) {
+                <tr>
+                  <td data-label="Matricule">
+                    <span style="font-family: monospace; font-size: 0.78rem; font-weight: 800; color: #721513; background: #FAF5EA; padding: 0.2rem 0.5rem; border-radius: 6px;">
+                      {{ emp.matricule }}
+                    </span>
+                  </td>
+                  <td data-label="Nom &amp; Prénom">
+                    <div>
+                      <strong style="color: #332724;">{{ emp.prenom }} {{ emp.nom }}</strong>
+                      <div style="font-size: 0.75rem; color: #6E5A56;">{{ emp.email }}</div>
+                    </div>
+                  </td>
+                  <td data-label="Département" style="color: #6E5A56;">
+                    {{ emp.departement }}
+                  </td>
+                  <td data-label="Taux Subvention" style="text-align: center;">
+                    <span [style.background]="emp.tauxSubvention > 0 ? 'rgba(96, 108, 56, 0.12)' : '#F1F5F9'"
+                          [style.color]="emp.tauxSubvention > 0 ? '#606C38' : '#64748B'"
+                          style="padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.78rem; font-weight: 800;">
+                      {{ emp.tauxSubvention }}%
+                    </span>
+                  </td>
+                  <td data-label="Repas ce Mois" style="text-align: center; font-weight: 800; color: #332724;">
+                    {{ emp.repasConsommesMois }}
+                  </td>
+                  <td data-label="Statut" style="text-align: center;">
+                    <span style="color: #606C38; font-weight: 800; font-size: 0.75rem;">
+                      <i class="fa-solid fa-circle-check"></i> Actif
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+  </main>
+</div>
+

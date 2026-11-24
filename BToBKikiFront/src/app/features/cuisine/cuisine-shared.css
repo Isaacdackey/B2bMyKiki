@@ -1,0 +1,369 @@
+:host {
+  display: block;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #332724 !important;
+  overflow-x: clip;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.cuisine-wrapper {
+  background-color: transparent !important;
+  color: #332724 !important;
+  min-height: 100vh;
+  padding: 1rem clamp(1rem, 2vw, 2rem) 1.5rem;
+  max-width: 100%;
+  width: auto;
+  min-width: 0;
+  box-sizing: border-box;
+  margin-left: var(--b2b-sidebar-w, 300px);
+  transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+@media (max-width: 1023px) {
+  .cuisine-wrapper {
+    --b2b-page-px: 1rem;
+    --b2b-page-pt: 1rem;
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 1rem 1rem 5rem;
+  }
+}
+
+/* EN-TÊTE & BARRE D'ONGLETS RESPONSIVE CUISINE */
+.cuisine-hero-card {
+  background: #FFFFFF;
+  border: 1.5px solid #EDE7DC;
+  border-radius: 18px;
+  padding: 1.15rem 1.35rem;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  box-shadow: 0 4px 18px rgba(114, 21, 19, 0.05);
+}
+
+.cuisine-hero-badges {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 0.35rem;
+}
+
+.cuisine-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.cuisine-tabs-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0.25rem 0 0.5rem;
+  margin-bottom: 0.85rem;
+  scrollbar-width: thin;
+}
+
+.cuisine-tab-pill {
+  min-height: 38px !important;
+  height: 38px;
+  padding: 0 0.95rem;
+  border-radius: 9999px;
+  border: 1.5px solid #EDE7DC;
+  background: #FFFFFF;
+  color: #332724;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.cuisine-tab-pill:hover {
+  border-color: #721513;
+  color: #721513;
+  background: #FAF5EA;
+}
+
+.cuisine-tab-pill.active {
+  background: #721513;
+  border-color: #721513;
+  color: #FFFFFF;
+  box-shadow: 0 3px 10px rgba(114, 21, 19, 0.22);
+}
+
+@media (max-width: 640px) {
+  .cuisine-hero-card {
+    padding: 1rem;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cuisine-hero-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .cuisine-hero-actions > button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* CARDS KPI CUISINE */
+.cuisine-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1.15rem;
+  margin-bottom: 1.75rem;
+}
+
+@media (max-width: 479px) {
+  .cuisine-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cuisine-kpi-card {
+  background: #FFFFFF !important;
+  border: 1.5px solid #EDE7DC !important;
+  border-radius: 18px !important;
+  padding: 1.25rem 1.35rem !important;
+  box-shadow: 0 8px 25px rgba(114, 21, 19, 0.05) !important;
+}
+
+/* TABLE */
+.cuisine-table-card {
+  background: #FFFFFF !important;
+  border: 1.5px solid #EDE7DC !important;
+  border-radius: 18px !important;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(114, 21, 19, 0.04) !important;
+}
+
+.cuisine-table-header {
+  padding: 1.15rem 1.5rem;
+  background: #FAF8F4;
+  border-bottom: 1.5px solid #EDE7DC;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.cuisine-table-wrap {
+  width: 100%;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cuisine-table {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+/* TRANSFORMATION RESPONSIVE MOBILE : TABLEAU -> CARTES EMPILÉES (< 768px) */
+@media (max-width: 767px) {
+  .cuisine-table-wrap {
+    overflow-x: visible !important;
+  }
+
+  .cuisine-table {
+    min-width: 100% !important;
+    display: block;
+  }
+
+  .cuisine-table thead {
+    display: none;
+  }
+
+  .cuisine-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    padding: 0.75rem;
+    background: #FAF8F4;
+  }
+
+  .cuisine-table tbody tr {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+    background: #FFFFFF !important;
+    border: 1.5px solid #EDE7DC;
+    border-radius: 16px;
+    padding: 1rem 1.1rem;
+    box-shadow: 0 4px 14px rgba(114, 21, 19, 0.05);
+    gap: 0.45rem;
+  }
+
+  .cuisine-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0.45rem 0 !important;
+    border-bottom: 1px dashed #EDE7DC !important;
+    text-align: right;
+    gap: 0.75rem;
+    font-size: 0.84rem;
+    word-break: break-word;
+  }
+
+  .cuisine-table tbody td:last-child {
+    border-bottom: none !important;
+    padding-top: 0.65rem !important;
+    justify-content: flex-end;
+  }
+
+  .cuisine-table tbody td::before {
+    content: attr(data-label);
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #721513;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    text-align: left;
+    flex-shrink: 0;
+  }
+}
+
+.cuisine-table th {
+  background-color: #FAF8F4 !important;
+  color: #721513 !important;
+  padding: 1rem 1.25rem;
+  font-weight: 700;
+  border-bottom: 1.5px solid #EDE7DC;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+}
+
+.cuisine-table td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #EDE7DC;
+  color: #332724 !important;
+}
+
+.cuisine-table tr:hover td {
+  background-color: #FAF5EA !important;
+}
+
+/* STATUT CUISSON BADGES */
+.status-badge-terminee {
+  background: rgba(96, 108, 56, 0.12) !important;
+  color: #606C38 !important;
+  border: 1px solid rgba(96, 108, 56, 0.3) !important;
+  padding: 0.3rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.status-badge-cuisson {
+  background: rgba(229, 29, 36, 0.1) !important;
+  color: #E51D24 !important;
+  border: 1px solid rgba(229, 29, 36, 0.3) !important;
+  padding: 0.3rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.status-badge-attente {
+  background: #FAF8F4 !important;
+  color: #6E5A56 !important;
+  border: 1px solid #EDE7DC !important;
+  padding: 0.3rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* BL MODAL */
+.cuisine-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(51, 39, 36, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.cuisine-modal-card {
+  background-color: #FFFFFF !important;
+  border: 1.5px solid #EDE7DC !important;
+  border-radius: 22px !important;
+  max-width: 650px;
+  width: 100%;
+  max-height: 90dvh;
+  overflow-y: auto;
+  padding: clamp(1.25rem, 3vw, 2.25rem);
+  box-shadow: 0 25px 60px rgba(114, 21, 19, 0.15) !important;
+  color: #332724 !important;
+  box-sizing: border-box;
+}
+
+.cuisine-scan-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.cuisine-bl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 1.5rem;
+}
+
+.cuisine-planning-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  gap: 1rem;
+}
+
+.cuisine-catalogue-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 340px));
+  gap: 1rem;
+}

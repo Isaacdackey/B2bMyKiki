@@ -61,10 +61,11 @@
   --touch-target-min: 44px;
 
   /* Layout */
-  --b2b-sidebar-w: 300px;
+  --b2b-sidebar-w: 255px;
 }
 
 html {
+  font-size: 14.5px;
   scroll-behavior: smooth;
   box-sizing: border-box;
   scrollbar-width: thin;
@@ -1221,13 +1222,142 @@ body:has(.fidelite-modal-overlay) .mykiki-main-content,
 
 @media (max-width: 440px) {
   .modal-actions-row {
-    flex-direction: column !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
+    gap: 0.5rem !important;
   }
 
   .modal-actions-row > button {
-    width: 100% !important;
-    flex: none !important;
+    flex: 1 1 auto !important;
+    min-width: 110px !important;
   }
 }
 
 
+
+/* ============================================================
+   SELECTS STYLISÉS GLOBALEMENT (KIKI TRAITEUR B2B)
+   ============================================================ */
+select:not(.no-custom-select) {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: #FFFFFF;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23721513' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  background-size: 14px 14px;
+  padding: 0.55rem 2.35rem 0.55rem 0.9rem;
+  border: 1.5px solid #E2D5BE;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #2C1810;
+  cursor: pointer;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+  box-shadow: 0 2px 8px rgba(114, 21, 19, 0.03);
+}
+
+select:not(.no-custom-select):hover {
+  border-color: #C5A880;
+  background-color: #FFFDF9;
+}
+
+select:not(.no-custom-select):focus {
+  outline: none;
+  border-color: #721513;
+  box-shadow: 0 0 0 3px rgba(114, 21, 19, 0.12);
+}
+
+/* ============================================================
+   ANIMATIONS PROGRESSIVES DES DASHBOARDS (CARDS, COURBES, BARRES)
+   ============================================================ */
+@keyframes kikiCardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes kikiDrawLine {
+  from {
+    stroke-dashoffset: 1400;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes kikiFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes kikiGrowBarY {
+  from {
+    transform: scaleY(0);
+    opacity: 0.4;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes kikiGrowBarX {
+  from {
+    transform: scaleX(0);
+    opacity: 0.4;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+.kiki-dash-card-enter {
+  animation: kikiCardEnter 0.52s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: calc(var(--stagger, 0) * 65ms);
+}
+
+.kiki-draw-line {
+  stroke-dasharray: 1400;
+  stroke-dashoffset: 1400;
+  animation: kikiDrawLine 0.95s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.kiki-fade-area {
+  opacity: 0;
+  animation: kikiFadeIn 0.7s ease 0.2s forwards;
+}
+
+.kiki-grow-bar-y {
+  transform-origin: bottom;
+  animation: kikiGrowBarY 0.68s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: calc(var(--stagger, 0) * 70ms);
+}
+
+.kiki-grow-bar-x {
+  transform-origin: left;
+  animation: kikiGrowBarX 0.68s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: calc(var(--stagger, 0) * 70ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

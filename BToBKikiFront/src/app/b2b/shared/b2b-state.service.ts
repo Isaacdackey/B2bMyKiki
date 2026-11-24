@@ -285,9 +285,9 @@ export class B2bStateService {
     });
   }
 
-  // Onglet actif dans l'Espace Responsable de Site Kiki (Gestion de son Entreprise/Site : 5 onglets + Réclamations + Projection QR)
-  cuisineActiveTab = signal<'INFOS' | 'UTILISATEURS' | 'MENU' | 'COMMANDES' | 'FACTURATION' | 'RECLAMATIONS' | 'PROJECTION_QR'>(
-    (typeof localStorage !== 'undefined' && (localStorage.getItem('b2b_cuisine_active_tab') as any)) || 'MENU'
+  // Onglet actif dans l'Espace Responsable de Site Kiki (Dashboard + Gestion Site)
+  cuisineActiveTab = signal<'DASHBOARD' | 'INFOS' | 'UTILISATEURS' | 'MENU' | 'COMMANDES' | 'FACTURATION' | 'RECLAMATIONS' | 'PROJECTION_QR'>(
+    (typeof localStorage !== 'undefined' && (localStorage.getItem('b2b_cuisine_active_tab') as any)) || 'DASHBOARD'
   );
 
   // Mode profil employé simulé : SUBVENTIONNE (prise en charge RH 100%) ou AUTONOME (frais personnels, panier libre, Wave)
@@ -1251,9 +1251,19 @@ export class B2bStateService {
   creneauLivraison = signal<string>('12h00 - 12h30');
 
   // CALCULS COMPUTÉS
-  siteActuel = computed(() => {
+  siteActuel = computed<SiteB2B>(() => {
+    const ent = this.currentEntreprise();
     const id = this.selectedSiteId();
-    return this.currentEntreprise().sites.find(s => s.id === id) || this.currentEntreprise().sites[0];
+    const found = ent?.sites?.find(s => s.id === id) || ent?.sites?.[0];
+    if (found) return found;
+    return {
+      id: id || 'site-1',
+      nom: ent?.nom && ent.nom !== 'Chargement...' ? ent.nom : 'Siège Plateau - Dakar',
+      adresse: ent?.adresse || 'Dakar',
+      heureCutOff: ent?.cutOffHeure || '18:00',
+      contactReferent: ent?.contactReferent || '',
+      telephoneReferent: ent?.telephone || ''
+    };
   });
 
   creneauxSiteActuel = computed(() => {
