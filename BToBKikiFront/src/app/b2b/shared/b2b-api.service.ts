@@ -36,6 +36,26 @@ export class B2bApiService {
     return this.http.post<ApiResponse<any>>(`${this.baseUrl}/auth/register-autonome`, payload);
   }
 
+  verifyInvitation(token: string): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(`${this.baseUrl}/auth/invitation/verify?token=${encodeURIComponent(token)}`);
+  }
+
+  activateInvitation(payload: { token: string; password: string; nomComplet?: string }): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.baseUrl}/auth/invitation/activate`, payload);
+  }
+
+  forgotPassword(email: string): Observable<ApiResponse<void>> {
+    return this.http.post<ApiResponse<void>>(`${this.baseUrl}/auth/forgot-password`, { email });
+  }
+
+  verifyResetToken(token: string): Observable<ApiResponse<{ email: string }>> {
+    return this.http.get<ApiResponse<{ email: string }>>(`${this.baseUrl}/auth/reset-password/verify?token=${encodeURIComponent(token)}`);
+  }
+
+  resetPassword(payload: { token: string; newPassword: string }): Observable<ApiResponse<void>> {
+    return this.http.post<ApiResponse<void>>(`${this.baseUrl}/auth/reset-password`, payload);
+  }
+
   getEntreprises(): Observable<ApiResponse<EntrepriseB2B[]>> {
     return this.http.get<ApiResponse<EntrepriseB2B[]>>(`${this.baseUrl}/b2b/entreprises`, { headers: this.getHeaders() });
   }
@@ -147,6 +167,10 @@ export class B2bApiService {
 
   createInvitation(entrepriseId: string, inv: any): Observable<ApiResponse<any>> {
     return this.http.post<ApiResponse<any>>(`${this.baseUrl}/b2b/entreprises/${entrepriseId}/invitations`, inv, { headers: this.getHeaders() });
+  }
+
+  resendInvitation(entrepriseId: string, invitationId: string): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.baseUrl}/b2b/entreprises/${entrepriseId}/invitations/${invitationId}/resend`, {}, { headers: this.getHeaders() });
   }
 
   getCommandes(entrepriseId = 'ent-001'): Observable<ApiResponse<CommandeEntrepriseSite[]>> {

@@ -953,6 +953,43 @@
                 </div>
               </div>
             </div>
+
+            @if (!isEditModeEntreprise()) {
+              <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 12px; padding: 1rem; margin-top: 0.9rem;">
+                <div style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.82rem; font-weight: 800; color: #721513; margin-bottom: 0.35rem;">
+                  <i class="fa-solid fa-paper-plane"></i> Invitations Administrateurs par Email (Brevo)
+                </div>
+                <p style="margin: 0 0 0.85rem; font-size: 0.74rem; color: #6E5A56;">
+                  Renseignez les administrateurs concernés : un email d'activation avec définition de mot de passe leur sera envoyé automatiquement à la création.
+                </p>
+
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                  <div style="background: #FFFFFF; border: 1px solid #EDE7DC; border-radius: 10px; padding: 0.75rem;">
+                    <div style="font-size: 0.74rem; font-weight: 800; color: #721513; margin-bottom: 0.45rem;">
+                      <i class="fa-solid fa-briefcase"></i> Admin Entreprise (RH / DAF)
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.5rem;">
+                      <input type="text" [(ngModel)]="adminsCreation().rhNomComplet" placeholder="Nom complet (ex: Fatou Fall)"
+                        style="width: 100%; height: 36px; border: 1px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.8rem; box-sizing: border-box;">
+                      <input type="email" [(ngModel)]="adminsCreation().rhEmail" placeholder="Email RH (ex: rh@entreprise.sn)"
+                        style="width: 100%; height: 36px; border: 1px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.8rem; box-sizing: border-box;">
+                    </div>
+                  </div>
+
+                  <div style="background: #FFFFFF; border: 1px solid #EDE7DC; border-radius: 10px; padding: 0.75rem;">
+                    <div style="font-size: 0.74rem; font-weight: 800; color: #C05621; margin-bottom: 0.45rem;">
+                      <i class="fa-solid fa-clipboard-check"></i> Admin Site Kiki (Responsable de Site)
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.5rem;">
+                      <input type="text" [(ngModel)]="adminsCreation().siteNomComplet" placeholder="Nom complet (ex: Babacar Samb)"
+                        style="width: 100%; height: 36px; border: 1px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.8rem; box-sizing: border-box;">
+                      <input type="email" [(ngModel)]="adminsCreation().siteEmail" placeholder="Email site (ex: site@kikitraiteur.sn)"
+                        style="width: 100%; height: 36px; border: 1px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.8rem; box-sizing: border-box;">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
           }
         </div>
 

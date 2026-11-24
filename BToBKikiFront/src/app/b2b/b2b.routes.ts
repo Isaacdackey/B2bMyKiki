@@ -8,6 +8,18 @@ export const B2B_ROUTES: Routes = [
     loadComponent: () => import('../features/auth/login/b2b-login.component').then(m => m.B2bLoginComponent)
   },
   {
+    path: 'activation',
+    loadComponent: () => import('../features/auth/activation/b2b-activation.component').then(m => m.B2bActivationComponent)
+  },
+  {
+    path: 'forgot-password',
+    loadComponent: () => import('../features/auth/forgot-password/b2b-forgot-password.component').then(m => m.B2bForgotPasswordComponent)
+  },
+  {
+    path: 'reset-password',
+    loadComponent: () => import('../features/auth/reset-password/b2b-reset-password.component').then(m => m.B2bResetPasswordComponent)
+  },
+  {
     path: '',
     component: B2bLayoutComponent,
     children: [

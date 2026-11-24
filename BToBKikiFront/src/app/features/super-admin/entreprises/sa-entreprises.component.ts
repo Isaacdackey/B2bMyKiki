@@ -281,6 +281,7 @@ export class SaEntreprisesComponent {
       categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON']
     });
     this.etapeEntreprise.set(1);
+    this.adminsCreation.set({ rhNomComplet: '', rhEmail: '', siteNomComplet: '', siteEmail: '' });
     this.showModalEntreprise.set(true);
   }
 
@@ -298,6 +299,7 @@ export class SaEntreprisesComponent {
       categoriesAutorisees: ent.categoriesAutorisees ? [...ent.categoriesAutorisees] : ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON']
     });
     this.etapeEntreprise.set(1);
+    this.adminsCreation.set({ rhNomComplet: '', rhEmail: '', siteNomComplet: '', siteEmail: '' });
     this.showModalEntreprise.set(true);
   }
 
@@ -305,6 +307,13 @@ export class SaEntreprisesComponent {
   readonly REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   readonly REGEX_NINEA = /^[0-9]{7,10}(?:\s?[0-9A-Z]{2,3})?$/i;
   readonly REGEX_RCCM = /^SN[-.\s]?[A-Z]{2,4}[-.\s]?(?:\d{4}[-.\s]?[A-Z][-.\s]?)?\d{2,6}$/i;
+
+  adminsCreation = signal({
+    rhNomComplet: '',
+    rhEmail: '',
+    siteNomComplet: '',
+    siteEmail: ''
+  });
 
   erreursEtape1 = signal<{ nom?: string; ninea?: string; rccm?: string; email?: string; telephone?: string }>({});
 
@@ -375,6 +384,33 @@ export class SaEntreprisesComponent {
         ]
       });
     } else {
+      const adm = this.adminsCreation();
+      const adminsToInvite: Array<{ email: string; nomComplet: string; role: 'RESPONSABLE_ENTREPRISE' | 'RESPONSABLE_SITE_KIKI' }> = [];
+
+      if (adm.rhEmail.trim() || adm.rhNomComplet.trim()) {
+        if (!this.REGEX_EMAIL.test(adm.rhEmail.trim())) {
+          alert("Adresse email invalide pour l'Admin Entreprise (RH).");
+          return;
+        }
+        adminsToInvite.push({
+          email: adm.rhEmail.trim(),
+          nomComplet: adm.rhNomComplet.trim() || val.contactReferent?.trim() || 'Admin Entreprise RH',
+          role: 'RESPONSABLE_ENTREPRISE'
+        });
+      }
+
+      if (adm.siteEmail.trim() || adm.siteNomComplet.trim()) {
+        if (!this.REGEX_EMAIL.test(adm.siteEmail.trim())) {
+          alert("Adresse email invalide pour l'Admin Site Kiki.");
+          return;
+        }
+        adminsToInvite.push({
+          email: adm.siteEmail.trim(),
+          nomComplet: adm.siteNomComplet.trim() || 'Responsable de Site Kiki',
+          role: 'RESPONSABLE_SITE_KIKI'
+        });
+      }
+
       this.b2b.ajouterEntreprise({
         nom: val.nom!,
         codeEntreprise: val.codeEntreprise!,
@@ -395,7 +431,12 @@ export class SaEntreprisesComponent {
         typePrestation: val.typePrestation || 'CUISINE_SUR_PLACE',
         categoriesAutorisees: val.categoriesAutorisees || ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'],
         isArchivee: false
-      });
+      }, adminsToInvite);
+      if (adminsToInvite.length > 0) {
+        this.b2b.showToast(`Entreprise créée et ${adminsToInvite.length} invitation(s) en cours d'envoi par email.`);
+      } else {
+        this.b2b.showToast('Entreprise créée avec succès.');
+      }
     }
     this.showModalEntreprise.set(false);
   }
@@ -760,9 +801,11 @@ export class SaEntreprisesComponent {
       return;
     }
     if (!ent) return;
-    const inv = this.b2b.creerInvitationAdmin(cur.email, cur.nomComplet, cur.role, ent);
-    const lien = `https://kikitraiteur.sn/b2b/activation?token=${inv.tokenActivation}&email=${encodeURIComponent(inv.email)}`;
-    this.invitationGenereeLien.set(lien);
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:4200';
+    this.b2b.creerInvitationAdmin(cur.email, cur.nomComplet, cur.role, ent, (invSaved) => {
+      const lien = `${origin}/b2b/activation?token=${encodeURIComponent(invSaved.tokenActivation)}&email=${encodeURIComponent(invSaved.email)}`;
+      this.invitationGenereeLien.set(lien);
+    });
   }
 
   fermerModalInvitation() {
