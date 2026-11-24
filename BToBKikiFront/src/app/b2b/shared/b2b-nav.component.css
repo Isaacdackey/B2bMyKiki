@@ -261,11 +261,17 @@
 /* Navigation Verticale */
 .b2b-sidebar-nav {
   flex: 1;
-  padding: 0.5rem 0.75rem;
+  padding: 0.45rem 0.75rem;
   overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.35rem;
+}
+
+.b2b-sidebar-nav::-webkit-scrollbar {
+  display: none;
 }
 
 .b2b-sidebar.collapsed .b2b-sidebar-nav {
