@@ -1,4 +1,4 @@
-﻿<div class="rh-wrapper">
+<div class="rh-wrapper">
   <main class="rh-main-content">
     <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
       <button type="button" class="b2b-mobile-hamburger-btn" (click)="b2b.toggleMobileDrawer()" aria-label="Ouvrir le menu">
@@ -18,31 +18,28 @@
             </p>
           </div>
 
-          <button (click)="ouvrirModalAjout()" class="rh-btn-primary">
+          <button (click)="ouvrirModalAjout()" class="rh-btn-primary" style="margin-left: auto; white-space: nowrap;">
             <i class="fa-solid fa-user-plus"></i> Créer un Employé
           </button>
         </div>
 
-        <!-- Filtres : Recherche + Période pour le récapitulatif des repas -->
-        <div style="display: flex; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap; align-items: center; background: #FFFFFF; padding: 1rem; border-radius: 14px; border: 1.5px solid #EDE7DC;">
-          <!-- Recherche -->
-          <div style="flex: 1 1 220px; position: relative;">
-            <input 
-              type="text" 
+        <!-- Filtres : Recherche stylisée + Filtre de période (même largeur) -->
+        <div class="rh-emp-toolbar">
+          <div class="rh-emp-search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input
+              type="text"
               [ngModel]="searchQuery()"
-              (ngModelChange)="searchQuery.set($event)"
-              placeholder="Rechercher par nom, matricule ou département..." 
-              style="width: 100%; background: #FAF8F4; color: #332724; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.6rem 0.85rem; font-size: 0.85rem;">
+              (ngModelChange)="searchQuery.set($event); pageEmployes.set(1)"
+              placeholder="Rechercher par nom, matricule ou département..." />
           </div>
 
-          <!-- Filtre période pour le récapitulatif des repas consommés -->
-          <div style="display: flex; align-items: center; gap: 0.5rem; background: #FAF8F4; padding: 0.4rem 0.75rem; border-radius: 10px; border: 1px solid #EDE7DC; flex-wrap: wrap;">
-            <span style="font-size: 0.75rem; font-weight: 800; color: #721513;">
-              <i class="fa-regular fa-calendar"></i> Période Récapitulatif :
-            </span>
-            <input type="date" [ngModel]="employeDateDebut()" (ngModelChange)="employeDateDebut.set($event)" style="border: 1px solid #EDE7DC; border-radius: 6px; padding: 0.25rem 0.4rem; font-size: 0.78rem; font-weight: 700; background: #FFFFFF; color: #332724;">
-            <span style="font-size: 0.75rem; color: #6E5A56;">au</span>
-            <input type="date" [ngModel]="employeDateFin()" (ngModelChange)="employeDateFin.set($event)" style="border: 1px solid #EDE7DC; border-radius: 6px; padding: 0.25rem 0.4rem; font-size: 0.78rem; font-weight: 700; background: #FFFFFF; color: #332724;">
+          <div class="rh-emp-period-box">
+            <app-b2b-period-filter
+              defaultPeriode="MOIS"
+              referenceDate="2026-11-12"
+              (periodChange)="onPeriodeEmployesChange($event)">
+            </app-b2b-period-filter>
           </div>
         </div>
 

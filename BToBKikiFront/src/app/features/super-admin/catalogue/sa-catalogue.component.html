@@ -1,4 +1,4 @@
-﻿<div class="super-admin-wrapper">
+<div class="super-admin-wrapper">
   <app-sa-topbar></app-sa-topbar>
   <main class="sa-main-content">
       <div>
@@ -13,44 +13,47 @@
             </p>
           </div>
 
-          <!-- Ligne 1 : Filtres alignés uniformément -->
-          <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
-            <div style="display: flex; align-items: center; gap: 0.55rem; background: #FFFFFF; border: 1.5px solid #E2D5BE; border-radius: 12px; padding: 0 0.9rem; height: 42px; flex: 1 1 240px; max-width: 340px; box-shadow: 0 2px 8px rgba(114, 21, 19, 0.03);">
-              <i class="fa-solid fa-magnifying-glass" style="color: #6E5A56; font-size: 0.85rem; flex-shrink: 0;"></i>
-              <input 
-                type="text" 
-                [ngModel]="recherchePlatCatalogue()" 
-                (ngModelChange)="recherchePlatCatalogue.set($event)" 
-                placeholder="Rechercher un plat..." 
-                style="border: none; outline: none; background: transparent; font-size: 0.84rem; width: 100%; color: #332724; font-weight: 600; padding: 0; margin: 0;">
+          <!-- Barre de filtres pleine largeur + bouton Ajouter sur sa propre ligne en bas à droite -->
+          <div style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;">
+            <div style="width: 100%; box-sizing: border-box; display: flex; flex-wrap: wrap; align-items: center; gap: 0.55rem; background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 0.5rem 0.65rem; box-shadow: 0 2px 8px rgba(114, 21, 19, 0.03);">
+              <div style="display: flex; align-items: center; gap: 0.5rem; background: #FAF8F4; border: 1px solid #E2D5BE; border-radius: 10px; padding: 0 0.75rem; height: 38px; flex: 1 1 200px; min-width: 0;">
+                <i class="fa-solid fa-magnifying-glass" style="color: #6E5A56; font-size: 0.82rem; flex-shrink: 0;"></i>
+                <input
+                  type="text"
+                  [ngModel]="recherchePlatCatalogue()"
+                  (ngModelChange)="recherchePlatCatalogue.set($event)"
+                  placeholder="Rechercher un plat..."
+                  style="border: none; outline: none; background: transparent; font-size: 0.84rem; width: 100%; color: #332724; font-weight: 600; padding: 0; margin: 0;">
+              </div>
+
+              <div class="sa-cat-selects" style="display: flex; align-items: center; gap: 0.55rem;">
+                <select
+                  [ngModel]="filtreCategorieCatalogue()"
+                  (ngModelChange)="filtreCategorieCatalogue.set($event)"
+                  style="height: 38px; color: #721513;">
+                  <option value="TOUS">Toutes les Catégories</option>
+                  <option value="PLAT">Plats Chauds &amp; Spécialités</option>
+                  <option value="ENTREE">Entrées &amp; Salades</option>
+                  <option value="DESSERT">Desserts &amp; Douceurs</option>
+                  <option value="BOISSON">Boissons &amp; Jus Frais</option>
+                </select>
+
+                <select
+                  [ngModel]="filtreArchivePlat()"
+                  (ngModelChange)="filtreArchivePlat.set($event)"
+                  style="height: 38px;">
+                  <option value="ACTIFS">Plats Actifs</option>
+                  <option value="ARCHIVES">Plats Archivés</option>
+                  <option value="TOUS">Tout le Répertoire</option>
+                </select>
+              </div>
             </div>
 
-            <select 
-              [ngModel]="filtreCategorieCatalogue()"
-              (ngModelChange)="filtreCategorieCatalogue.set($event)"
-              style="height: 42px; color: #721513;">
-              <option value="TOUS">Toutes les Catégories</option>
-              <option value="PLAT">Plats Chauds &amp; Spécialités</option>
-              <option value="ENTREE">Entrées &amp; Salades</option>
-              <option value="DESSERT">Desserts &amp; Douceurs</option>
-              <option value="BOISSON">Boissons &amp; Jus Frais</option>
-            </select>
-
-            <select 
-              [ngModel]="filtreArchivePlat()"
-              (ngModelChange)="filtreArchivePlat.set($event)"
-              style="height: 42px;">
-              <option value="ACTIFS">Plats Actifs</option>
-              <option value="ARCHIVES">Plats Archivés</option>
-              <option value="TOUS">Tout le Répertoire</option>
-            </select>
-          </div>
-
-          <!-- Ligne 2 : Bouton Ajouter un Plat juste en bas des filtres -->
-          <div>
-            <button (click)="ouvrirModalAjoutPlat()" class="sa-btn-primary">
-              <i class="fa-solid fa-plus"></i> Ajouter un Plat
-            </button>
+            <div style="display: flex; justify-content: flex-end; width: 100%;">
+              <button (click)="ouvrirModalAjoutPlat()" class="sa-btn-primary" style="white-space: nowrap;">
+                <i class="fa-solid fa-plus"></i> Ajouter un Plat
+              </button>
+            </div>
           </div>
         </div>
 

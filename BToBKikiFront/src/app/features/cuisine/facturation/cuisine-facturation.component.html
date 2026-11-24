@@ -1,4 +1,4 @@
-﻿<div class="cuisine-wrapper">
+<div class="cuisine-wrapper">
   <main style="max-width: 1320px; width: 100%; margin: 0 auto; padding: 0.5rem 0 1.5rem;">
     <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
       <button type="button" class="b2b-mobile-hamburger-btn" (click)="b2b.toggleMobileDrawer()" aria-label="Ouvrir le menu">
@@ -54,8 +54,8 @@
               <i class="fa-solid fa-calendar-check"></i> Relevé journalier de facturation
             </span>
             <button type="button" (click)="exporterExcelFacturationSite()"
-                    style="min-height: 0; background: #FFFFFF; border: 1.5px solid #606C38; color: #606C38; font-weight: 800; font-size: 0.74rem; padding: 0.38rem 0.85rem; border-radius: 9999px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;">
-              <i class="fa-solid fa-file-excel"></i> Exporter Excel (.csv)
+                    style="min-height: 40px; background: #FFFFFF; border: 1.5px solid #606C38; color: #606C38; font-weight: 800; font-size: 0.84rem; padding: 0.55rem 1.25rem; border-radius: 9999px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.45rem; white-space: nowrap;">
+              <i class="bi bi-file-earmark-spreadsheet"></i> Exporter Excel (.csv)
             </button>
           </div>
 
@@ -88,11 +88,11 @@
                     <td data-label="Part Entreprise" style="text-align: right; font-weight: 900; color: #606C38;">
                       {{ ligne.montantPartEntreprise | number }} FCFA
                     </td>
-                    <td data-label="Statut" style="text-align: center;">
+                    <td data-label="Statut" class="cuisine-statut-left" style="text-align: center;">
                       <span [style.background]="ligne.statut === 'FACTURE' ? 'rgba(96, 108, 56, 0.15)' : '#FAF5EA'"
                             [style.color]="ligne.statut === 'FACTURE' ? '#606C38' : '#721513'"
                             style="padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800;">
-                        {{ ligne.statut }}
+                        {{ ligne.statut === 'FACTURE' ? 'Facturé' : ligne.statut === 'VALIDE' ? 'Validé' : 'En cours' }}
                       </span>
                     </td>
                   </tr>

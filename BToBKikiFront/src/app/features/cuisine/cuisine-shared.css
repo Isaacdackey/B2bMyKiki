@@ -250,6 +250,17 @@
     text-align: left;
     flex-shrink: 0;
   }
+
+  .cuisine-table tbody td[data-label="Statut"]::before,
+  .cuisine-table tbody td.cuisine-statut-left::before {
+    display: none !important;
+    content: none !important;
+  }
+
+  .cuisine-table tbody td.cuisine-statut-left {
+    justify-content: flex-start !important;
+    text-align: left !important;
+  }
 }
 
 .cuisine-table th {

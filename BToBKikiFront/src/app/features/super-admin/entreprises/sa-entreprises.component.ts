@@ -77,6 +77,7 @@ export class SaEntreprisesComponent {
 
   // Modal Nouvelle / Modification Entreprise
   showModalEntreprise = signal<boolean>(false);
+  etapeEntreprise = signal<1 | 2 | 3>(1);
   entrepriseEnEdition = signal<Partial<EntrepriseB2B>>({
     nom: '',
     codeEntreprise: '',
@@ -279,6 +280,7 @@ export class SaEntreprisesComponent {
       typePrestation: 'CUISINE_SUR_PLACE',
       categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON']
     });
+    this.etapeEntreprise.set(1);
     this.showModalEntreprise.set(true);
   }
 
@@ -295,6 +297,7 @@ export class SaEntreprisesComponent {
       typePrestation: ent.typePrestation || 'CUISINE_SUR_PLACE',
       categoriesAutorisees: ent.categoriesAutorisees ? [...ent.categoriesAutorisees] : ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON']
     });
+    this.etapeEntreprise.set(1);
     this.showModalEntreprise.set(true);
   }
 
@@ -756,4 +759,5 @@ export class SaEntreprisesComponent {
     }), { repas: 0, presents: 0, montantTotal: 0, partEntreprise: 0, partEmploye: 0 });
   });
 }
+
 

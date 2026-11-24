@@ -1,4 +1,4 @@
-﻿<div class="super-admin-wrapper">
+<div class="super-admin-wrapper">
   <app-sa-topbar [showSearch]="true" [searchValue]="searchEntreprise()" (searchValueChange)="searchEntreprise.set($event); pageEntreprises.set(1)"></app-sa-topbar>
   <main class="sa-main-content">
       <div>
@@ -771,7 +771,195 @@
         <!-- ============================================================== -->
         <!-- VUE B : RÉPERTOIRE DES ENTREPRISES PARTENAIRES (LISTE DE CARTES)-->
         <!-- ============================================================== -->
-        @if (!entrepriseEnGestion()) {
+        @if (showModalEntreprise()) {
+          <div style="margin-bottom: 2.5rem;">
+            <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.25rem 1.5rem; margin-bottom: 1.25rem; box-shadow: 0 4px 18px rgba(114, 21, 19, 0.04);">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                  <a (click)="showModalEntreprise.set(false)" style="color: #721513; font-weight: 700; font-size: 0.82rem; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; margin-bottom: 0.35rem;">
+                    <i class="fa-solid fa-arrow-left"></i> Retour au répertoire des entreprises
+                  </a>
+                  <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.4rem; color: #721513; font-weight: 800; display: flex; align-items: center; gap: 0.55rem;">
+                    <i class="fa-solid fa-building"></i> {{ isEditModeEntreprise() ? 'Modifier la Convention Entreprise' : 'Conventionner une Nouvelle Entreprise' }}
+                  </h2>
+                </div>
+                <button type="button" (click)="showModalEntreprise.set(false)" class="sa-btn-action" style="color: #6E5A56;">
+                  <i class="fa-solid fa-xmark"></i> Fermer
+                </button>
+              </div>
+            </div>
+
+            <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.5rem; box-shadow: 0 4px 18px rgba(114, 21, 19, 0.04); display: flex; flex-direction: column; gap: 1rem;">
+        <!-- Barre Stepper 3 étapes -->
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.65rem; margin-bottom: 0.5rem;">
+          <button type="button" (click)="etapeEntreprise.set(1)"
+            [style.background]="etapeEntreprise() === 1 ? '#721513' : '#FAF8F4'"
+            [style.color]="etapeEntreprise() === 1 ? '#FFFFFF' : '#6E5A56'"
+            [style.border-color]="etapeEntreprise() === 1 ? '#721513' : '#EDE7DC'"
+            style="border: 1.5px solid; border-radius: 12px; padding: 0.65rem 0.75rem; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.45rem;">
+            <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.2); display: inline-flex; align-items: center; justify-content: center; font-size: 0.72rem;">1</span>
+            <span>Identité &amp; Contact</span>
+          </button>
+          <button type="button" (click)="etapeEntreprise.set(2)"
+            [style.background]="etapeEntreprise() === 2 ? '#721513' : '#FAF8F4'"
+            [style.color]="etapeEntreprise() === 2 ? '#FFFFFF' : '#6E5A56'"
+            [style.border-color]="etapeEntreprise() === 2 ? '#721513' : '#EDE7DC'"
+            style="border: 1.5px solid; border-radius: 12px; padding: 0.65rem 0.75rem; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.45rem;">
+            <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(114,21,19,0.1); display: inline-flex; align-items: center; justify-content: center; font-size: 0.72rem;">2</span>
+            <span>Tarif &amp; Cut-Off</span>
+          </button>
+          <button type="button" (click)="etapeEntreprise.set(3)"
+            [style.background]="etapeEntreprise() === 3 ? '#721513' : '#FAF8F4'"
+            [style.color]="etapeEntreprise() === 3 ? '#FFFFFF' : '#6E5A56'"
+            [style.border-color]="etapeEntreprise() === 3 ? '#721513' : '#EDE7DC'"
+            style="border: 1.5px solid; border-radius: 12px; padding: 0.65rem 0.75rem; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.45rem;">
+            <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(114,21,19,0.1); display: inline-flex; align-items: center; justify-content: center; font-size: 0.72rem;">3</span>
+            <span>Prestation &amp; Menu</span>
+          </button>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.85rem; flex: 1;">
+          @if (etapeEntreprise() === 1) {
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 0.75rem;">
+              <div style="display: flex; flex-direction: column;">
+                <label style="font-size: 0.72rem; font-weight: 800; color: #721513; margin-bottom: 0.35rem;">Raison Sociale (1 Site = 1 Entreprise)</label>
+                <input type="text" [(ngModel)]="entrepriseEnEdition().nom" (ngModelChange)="onNomEntrepriseChange($event)" placeholder="Ex: TotalEnergies — Siège Plateau"
+                  style="width: 100%; height: 40px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.75rem; font-size: 0.84rem; font-weight: 700; box-sizing: border-box;">
+              </div>
+              <div style="display: flex; flex-direction: column;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                  <label style="font-size: 0.72rem; font-weight: 800; color: #721513; margin: 0;">Code Entreprise</label>
+                  <button type="button" (click)="regenererCodeEntreprise()" style="background: none; border: none; font-size: 0.65rem; color: #E51D24; font-weight: 700; cursor: pointer; padding: 0;">
+                    <i class="fa-solid fa-rotate"></i> Auto
+                  </button>
+                </div>
+                <div style="position: relative;">
+                  <input type="text" [(ngModel)]="entrepriseEnEdition().codeEntreprise" readonly
+                    style="width: 100%; height: 40px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 1.8rem 0 0.75rem; font-size: 0.84rem; font-weight: 800; color: #721513; background: #FAF8F4; font-family: monospace; box-sizing: border-box;">
+                  <i class="fa-solid fa-lock" style="position: absolute; right: 0.6rem; top: 50%; transform: translateY(-50%); font-size: 0.7rem; color: #94A3B8;"></i>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;">
+              <div>
+                <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">NINEA</label>
+                <input type="text" [(ngModel)]="entrepriseEnEdition().ninea" placeholder="Ex: 001294829 2V1" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 0.82rem; font-weight: 700;">
+              </div>
+              <div>
+                <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">RCCM</label>
+                <input type="text" [(ngModel)]="entrepriseEnEdition().rccm" placeholder="Ex: SN-DKR-2012-B-1428" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 0.82rem; font-weight: 700;">
+              </div>
+              <div>
+                <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">Adresse Physique / Emplacement</label>
+                <input type="text" [(ngModel)]="entrepriseEnEdition().adresse" placeholder="Ex: Dakar Plateau" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 0.82rem;">
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem;">
+              <div>
+                <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">Email Référent RH / DAF</label>
+                <input type="email" [(ngModel)]="entrepriseEnEdition().emailContact" placeholder="rh@client.sn" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 0.82rem;">
+              </div>
+              <div>
+                <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">Téléphone Référent</label>
+                <input type="text" [(ngModel)]="entrepriseEnEdition().telephone" placeholder="+221 ..." style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 0.82rem;">
+              </div>
+            </div>
+          }
+
+          @if (etapeEntreprise() === 2) {
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.85rem;">
+              <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 12px; padding: 0.9rem;">
+                <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Cadence Facturation</label>
+                <select [(ngModel)]="entrepriseEnEdition().cadenceFacturation" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.5rem 0.65rem; font-size: 0.84rem; font-weight: 700; color: #721513; background: #FFFFFF;">
+                  <option value="HEBDOMADAIRE">Hebdomadaire</option>
+                  <option value="MENSUELLE">Mensuelle (Fin de mois)</option>
+                  <option value="BIMESTRIELLE">Bimestrielle</option>
+                </select>
+              </div>
+              <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 12px; padding: 0.9rem;">
+                <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Montant Offre / Repas (FCFA)</label>
+                <div style="position: relative;">
+                  <input type="number" [(ngModel)]="entrepriseEnEdition().montantPriseEnChargeRepas" placeholder="5000" step="500"
+                    style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.45rem 3.5rem 0.45rem 0.65rem; font-size: 0.95rem; font-weight: 800; color: #606C38; background: #FFFFFF;">
+                  <span style="position: absolute; right: 0.65rem; top: 50%; transform: translateY(-50%); font-size: 0.75rem; font-weight: 800; color: #6E5A56;">FCFA</span>
+                </div>
+                <small style="font-size: 0.68rem; color: #6E5A56; margin-top: 0.25rem; display: block;">Tarif Kiki vendu à l'entreprise</small>
+              </div>
+              <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 12px; padding: 0.9rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                  <label style="font-size: 0.75rem; font-weight: 800; color: #721513; margin: 0;">Cut-Off Heure Limite</label>
+                  <span style="font-size: 0.68rem; color: #E51D24; font-weight: 700;">Clôture auto</span>
+                </div>
+                <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 0.5rem;">
+                  <select [(ngModel)]="entrepriseEnEdition().cutOffType" style="border: 1px solid #EDE7DC; border-radius: 8px; padding: 0.45rem 0.5rem; font-size: 0.8rem; font-weight: 700; color: #721513; background: #FFFFFF;">
+                    <option value="J_MOINS_1">J - 1 (La veille)</option>
+                    <option value="JOUR_J">Jour J (Jour même)</option>
+                  </select>
+                  <input type="time" [(ngModel)]="entrepriseEnEdition().cutOffHeure" style="border: 1px solid #EDE7DC; border-radius: 8px; padding: 0.45rem 0.5rem; font-size: 0.84rem; font-weight: 800; color: #E51D24; background: #FFFFFF;">
+                </div>
+                <small style="font-size: 0.68rem; color: #6E5A56; margin-top: 0.25rem; display: block;">Passé ce délai, commandes verrouillées.</small>
+              </div>
+            </div>
+          }
+
+          @if (etapeEntreprise() === 3) {
+            <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 12px; padding: 1rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                <label style="font-size: 0.82rem; font-weight: 800; color: #721513; margin: 0; display: flex; align-items: center; gap: 0.4rem;">
+                  <i class="fa-solid fa-utensils"></i> Type de Prestation &amp; Composition
+                </label>
+                <button type="button" (click)="ouvrirModalParametres()" style="background: none; border: none; font-size: 0.72rem; color: #721513; font-weight: 800; cursor: pointer; text-decoration: underline;">
+                  <i class="fa-solid fa-sliders"></i> Paramètres
+                </button>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <select [ngModel]="entrepriseEnEdition().typePrestation || 'CUISINE_SUR_PLACE'" (ngModelChange)="onTypePrestationEntrepriseChange($event)"
+                  style="width: 100%; border: 1px solid #EDE7DC; border-radius: 8px; padding: 0.5rem 0.65rem; font-size: 0.84rem; font-weight: 800; color: #721513; background: #FFFFFF;">
+                  @for (tp of b2b.typesPrestationConfigurables(); track tp.code) {
+                    <option [value]="tp.code">{{ tp.libelle }}</option>
+                  }
+                </select>
+                <div style="display: flex; gap: 0.45rem; flex-wrap: wrap;">
+                  @for (cat of b2b.categoriesConfigurables(); track cat.code) {
+                    <button type="button" (click)="toggleCategorieEntreprise(cat.code)"
+                      [style.background]="isCategorieEntrepriseActive(cat.code) ? '#721513' : '#FFFFFF'"
+                      [style.color]="isCategorieEntrepriseActive(cat.code) ? '#FFFFFF' : '#6E5A56'"
+                      [style.border-color]="isCategorieEntrepriseActive(cat.code) ? '#721513' : '#EDE7DC'"
+                      style="border: 1px solid; padding: 0.4rem 0.7rem; border-radius: 9999px; font-size: 0.76rem; font-weight: 700; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.35rem;">
+                      <i class="fa-solid" [class.fa-check]="isCategorieEntrepriseActive(cat.code)" [class.fa-plus]="!isCategorieEntrepriseActive(cat.code)"></i>
+                      <i class="fa-solid" [class]="cat.icone"></i> {{ cat.libelle }}
+                    </button>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div style="display: flex; justify-content: space-between; gap: 0.75rem; margin-top: 1rem; padding-top: 0.5rem; flex-shrink: 0; align-items: stretch;">
+          @if (etapeEntreprise() === 1) {
+            <button type="button" (click)="showModalEntreprise.set(false)" class="sa-btn-action" style="height: 42px; min-height: 42px; padding: 0 1.25rem; color: #6E5A56;">Annuler</button>
+          } @else {
+            <button type="button" (click)="etapeEntreprise.set(etapeEntreprise() === 3 ? 2 : 1)" class="sa-btn-action" style="height: 42px; min-height: 42px; padding: 0 1.25rem; color: #721513;">
+              <i class="fa-solid fa-arrow-left"></i> Précédent
+            </button>
+          }
+          @if (etapeEntreprise() < 3) {
+            <button type="button" (click)="etapeEntreprise.set(etapeEntreprise() === 1 ? 2 : 3)" class="sa-btn-primary" style="height: 42px; min-height: 42px; padding: 0 1.5rem; justify-content: center;">
+              Suivant <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          } @else {
+            <button type="button" (click)="enregistrerEntreprise()" class="sa-btn-primary" style="height: 42px; min-height: 42px; padding: 0 1.5rem; justify-content: center;">
+              <i class="fa-solid fa-check"></i> Enregistrer l'Entreprise
+            </button>
+          }
+        </div>
+            </div>
+          </div>
+        }
+        @if (!entrepriseEnGestion() && !showModalEntreprise()) {
         <!-- ONGLETS ENTREPRISES | PRESTATIONS & CATÉGORIES -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
           <div>
@@ -1078,205 +1266,6 @@
 
       </div>
   </main>
-  @if (showModalEntreprise()) {
-    <div class="sa-modal-overlay">
-      <div class="sa-modal-card" style="max-width: 860px; width: 95%; max-height: 94dvh; overflow-y: auto; display: flex; flex-direction: column; padding: 1.15rem 1.5rem;">
-        
-        <!-- En-tête compacte fixe (sans bordure) -->
-        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.25rem; margin-bottom: 0.75rem; flex-shrink: 0;">
-          <h3 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.25rem; color: #721513; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
-            <i class="fa-solid fa-building"></i> {{ isEditModeEntreprise() ? 'Modifier la Convention Entreprise' : 'Conventionner une Nouvelle Entreprise' }}
-          </h3>
-          <button (click)="showModalEntreprise.set(false)" style="background: none; border: none; font-size: 1.25rem; color: #6E5A56; cursor: pointer; padding: 0.2rem;">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        </div>
-
-        <!-- Corps compact sans ascenseur vertical (Grille 3 colonnes) -->
-        <div style="display: flex; flex-direction: column; gap: 0.65rem; flex: 1;">
-          
-          <!-- Ligne 1 : Raison Sociale (2 col) + Code (1 col) -->
-          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 0.75rem;">
-            <!-- Colonne Raison Sociale -->
-            <div style="display: flex; flex-direction: column;">
-              <div style="height: 18px; margin-bottom: 0.35rem; display: flex; align-items: center;">
-                <label style="font-size: 0.72rem; font-weight: 800; color: #721513; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                  Raison Sociale (1 Site = 1 Entreprise)
-                </label>
-              </div>
-              <input 
-                type="text" 
-                [(ngModel)]="entrepriseEnEdition().nom" 
-                (ngModelChange)="onNomEntrepriseChange($event)"
-                placeholder="Ex: TotalEnergies — Siège Plateau" 
-                style="width: 100%; height: 38px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.82rem; font-weight: 700; box-sizing: border-box;">
-            </div>
-
-            <!-- Colonne Code Entreprise -->
-            <div style="display: flex; flex-direction: column;">
-              <div style="height: 18px; margin-bottom: 0.35rem; display: flex; justify-content: space-between; align-items: center;">
-                <label style="font-size: 0.72rem; font-weight: 800; color: #721513; margin: 0;">Code Entreprise</label>
-                <button 
-                  type="button" 
-                  (click)="regenererCodeEntreprise()" 
-                  style="background: none; border: none; font-size: 0.65rem; color: #E51D24; font-weight: 700; cursor: pointer; padding: 0; display: inline-flex; align-items: center; gap: 0.2rem;">
-                  <i class="fa-solid fa-rotate"></i> Auto
-                </button>
-              </div>
-              <div style="position: relative;">
-                <input 
-                  type="text" 
-                  [(ngModel)]="entrepriseEnEdition().codeEntreprise" 
-                  placeholder="Ex: TOT-PLA" 
-                  readonly
-                  style="width: 100%; height: 38px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 1.8rem 0 0.65rem; font-size: 0.82rem; font-weight: 800; color: #721513; background: #FAF8F4; font-family: monospace; box-sizing: border-box;">
-                <i class="fa-solid fa-lock" style="position: absolute; right: 0.6rem; top: 50%; transform: translateY(-50%); font-size: 0.7rem; color: #94A3B8;"></i>
-              </div>
-            </div>
-          </div>
-
-          <!-- Ligne 2 : NINEA + RCCM + Adresse -->
-          <div style="display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 0.75rem;">
-            <div>
-              <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">NINEA</label>
-              <input type="text" [(ngModel)]="entrepriseEnEdition().ninea" placeholder="Ex: 001294829 2V1" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.45rem 0.65rem; font-size: 0.8rem; font-weight: 700;">
-            </div>
-
-            <div>
-              <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">RCCM</label>
-              <input type="text" [(ngModel)]="entrepriseEnEdition().rccm" placeholder="Ex: SN-DKR-2012-B-1428" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.45rem 0.65rem; font-size: 0.8rem; font-weight: 700;">
-            </div>
-
-            <div>
-              <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">Adresse Physique / Emplacement</label>
-              <input type="text" [(ngModel)]="entrepriseEnEdition().adresse" placeholder="Ex: Dakar Plateau" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.45rem 0.65rem; font-size: 0.8rem;">
-            </div>
-          </div>
-
-          <!-- Ligne 3 : Contact Email + Téléphone + Cadence -->
-          <div style="display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 0.75rem;">
-            <div>
-              <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">Email Référent RH / DAF</label>
-              <input type="email" [(ngModel)]="entrepriseEnEdition().emailContact" placeholder="rh@client.sn" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.45rem 0.65rem; font-size: 0.8rem;">
-            </div>
-
-            <div>
-              <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">Téléphone Référent</label>
-              <input type="text" [(ngModel)]="entrepriseEnEdition().telephone" placeholder="+221 ..." style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.45rem 0.65rem; font-size: 0.8rem;">
-            </div>
-
-            <div>
-              <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">Cadence Facturation</label>
-              <select [(ngModel)]="entrepriseEnEdition().cadenceFacturation" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.45rem 0.5rem; font-size: 0.8rem; font-weight: 700; color: #721513;">
-                <option value="HEBDOMADAIRE">Hebdomadaire</option>
-                <option value="MENSUELLE">Mensuelle (Fin de mois)</option>
-                <option value="BIMESTRIELLE">Bimestrielle</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Ligne 4 : Tarification repas + Cut-off combinés -->
-          <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 0.75rem;">
-            <!-- Montant prise en charge -->
-            <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 10px; padding: 0.65rem;">
-              <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">
-                Montant Offre / Repas (FCFA)
-              </label>
-              <div style="position: relative;">
-                <input 
-                  type="number" 
-                  [(ngModel)]="entrepriseEnEdition().montantPriseEnChargeRepas" 
-                  placeholder="5000"
-                  step="500"
-                  style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 6px; padding: 0.35rem 3.5rem 0.35rem 0.55rem; font-size: 0.95rem; font-weight: 800; color: #606C38; background: #FFFFFF;">
-                <span style="position: absolute; right: 0.6rem; top: 50%; transform: translateY(-50%); font-size: 0.75rem; font-weight: 800; color: #6E5A56;">FCFA</span>
-              </div>
-              <small style="font-size: 0.65rem; color: #6E5A56; margin-top: 0.2rem; display: block;">
-                Tarif Kiki vendu à l'entreprise
-              </small>
-            </div>
-
-            <!-- Configuration Cut-Off inline -->
-            <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 10px; padding: 0.65rem;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
-                <label style="font-size: 0.72rem; font-weight: 800; color: #721513; margin: 0;">
-                  <i class="fa-regular fa-clock" style="color: #E51D24;"></i> Cut-Off Heure Limite
-                </label>
-                <span style="font-size: 0.65rem; color: #E51D24; font-weight: 700;">Clôture auto</span>
-              </div>
-              <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 0.5rem;">
-                <select [(ngModel)]="entrepriseEnEdition().cutOffType" style="border: 1px solid #EDE7DC; border-radius: 6px; padding: 0.35rem 0.45rem; font-size: 0.78rem; font-weight: 700; color: #721513; background: #FFFFFF;">
-                  <option value="J_MOINS_1">J - 1 (La veille)</option>
-                  <option value="JOUR_J">Jour J (Jour même)</option>
-                </select>
-                <input 
-                  type="time" 
-                  [(ngModel)]="entrepriseEnEdition().cutOffHeure" 
-                  style="border: 1px solid #EDE7DC; border-radius: 6px; padding: 0.35rem 0.45rem; font-size: 0.82rem; font-weight: 800; color: #E51D24; background: #FFFFFF;">
-              </div>
-              <small style="font-size: 0.65rem; color: #6E5A56; margin-top: 0.2rem; display: block;">
-                Passé ce délai, commandes verrouillées.
-              </small>
-            </div>
-          </div>
-
-          <!-- Ligne 5 : Type de Prestation & Catégories inline compactes -->
-          <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 10px; padding: 0.65rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem;">
-              <label style="font-size: 0.75rem; font-weight: 800; color: #721513; margin: 0; display: flex; align-items: center; gap: 0.4rem;">
-                <i class="fa-solid fa-utensils"></i> Type de Prestation &amp; Composition
-              </label>
-              <button 
-                type="button" 
-                (click)="ouvrirModalParametres()" 
-                style="background: none; border: none; font-size: 0.68rem; color: #721513; font-weight: 800; cursor: pointer; text-decoration: underline;">
-                <i class="fa-solid fa-sliders"></i> Paramètres
-              </button>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1.3fr; gap: 0.75rem; align-items: center;">
-              <select 
-                [ngModel]="entrepriseEnEdition().typePrestation || 'CUISINE_SUR_PLACE'"
-                (ngModelChange)="onTypePrestationEntrepriseChange($event)"
-                style="width: 100%; border: 1px solid #EDE7DC; border-radius: 6px; padding: 0.4rem 0.5rem; font-size: 0.78rem; font-weight: 800; color: #721513; background: #FFFFFF;">
-                @for (tp of b2b.typesPrestationConfigurables(); track tp.code) {
-                  <option [value]="tp.code">{{ tp.libelle }}</option>
-                }
-              </select>
-
-              <!-- Boutons pastilles catégories cochables -->
-              <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
-                @for (cat of b2b.categoriesConfigurables(); track cat.code) {
-                  <button 
-                    type="button"
-                    (click)="toggleCategorieEntreprise(cat.code)"
-                    [style.background]="isCategorieEntrepriseActive(cat.code) ? '#721513' : '#FFFFFF'"
-                    [style.color]="isCategorieEntrepriseActive(cat.code) ? '#FFFFFF' : '#6E5A56'"
-                    [style.border-color]="isCategorieEntrepriseActive(cat.code) ? '#721513' : '#EDE7DC'"
-                    style="border: 1px solid; padding: 0.3rem 0.55rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.3rem;">
-                    <i class="fa-solid" [class.fa-check]="isCategorieEntrepriseActive(cat.code)" [class.fa-plus]="!isCategorieEntrepriseActive(cat.code)"></i>
-                    <i class="fa-solid" [class]="cat.icone"></i> {{ cat.libelle }}
-                  </button>
-                }
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Boutons d'action en bas fixes (sans bordure) -->
-        <div style="display: flex; gap: 0.75rem; margin-top: 0.75rem; padding-top: 0.25rem; flex-shrink: 0; align-items: stretch;">
-          <button (click)="showModalEntreprise.set(false)" class="sa-btn-action" style="flex: 1; height: 42px; min-height: 42px; max-height: 42px; color: #6E5A56;">
-            Annuler
-          </button>
-          <button (click)="enregistrerEntreprise()" class="sa-btn-primary" style="flex: 1.4; height: 42px; min-height: 42px; max-height: 42px; justify-content: center;">
-            <i class="fa-solid fa-check"></i> Enregistrer l'Entreprise
-          </button>
-        </div>
-
-      </div>
-    </div>
-  }
 
   <!-- ============================================================== -->
   <!-- MODAL PARAMÈTRES (TYPES DE PRESTATION & CATÉGORIES)            -->

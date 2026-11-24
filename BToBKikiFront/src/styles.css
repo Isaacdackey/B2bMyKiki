@@ -1361,3 +1361,133 @@ select:not(.no-custom-select):focus {
     scroll-behavior: auto !important;
   }
 }
+
+/* Bouton hamburger mobile global (masqué sur desktop) */
+.b2b-mobile-hamburger-btn {
+  display: none !important;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  min-height: 40px;
+  border-radius: 12px;
+  border: 1.5px solid #EDE7DC;
+  background: #FFFFFF;
+  color: #721513;
+  font-size: 1rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(114, 21, 19, 0.06);
+}
+
+@media (max-width: 1023px) {
+  .b2b-mobile-hamburger-btn {
+    display: inline-flex !important;
+  }
+}
+
+/* Alignement uniforme FontAwesome + Bootstrap Icons + Lucide */
+.bi,
+[class^="icon-"],
+[class*=" icon-"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+/* Barre scrollable sur une seule ligne (sans barre de scroll visible, avec flou + flèche indicative) */
+.kiki-scroll-row-wrap {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.kiki-scroll-row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.45rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-right: 1.75rem;
+}
+
+.kiki-scroll-row::-webkit-scrollbar {
+  display: none;
+}
+
+.kiki-scroll-row-wrap::after {
+  content: '›';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 28px;
+  display: none;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 4px;
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #721513;
+  background: linear-gradient(90deg, rgba(250, 248, 244, 0) 0%, rgba(250, 248, 244, 0.92) 55%, #FAF8F4 100%);
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .kiki-scroll-row-wrap::after {
+    display: flex;
+  }
+
+  .sa-catalogue-toolbar {
+    flex-wrap: wrap !important;
+  }
+
+  .sa-catalogue-toolbar .sa-catalogue-add-wrap {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+/* Neutralise le header public (style.css) dans tout l'espace B2B et masque le hamburger redondant */
+app-b2b-layout header,
+.b2b-wrapper header,
+.super-admin-wrapper header,
+.rh-wrapper header,
+.cuisine-wrapper header {
+  position: static !important;
+  top: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  z-index: auto !important;
+}
+
+.b2b-mobile-hamburger-btn {
+  display: none !important;
+}
+
+@media (max-width: 767px) {
+  .rh-export-actions {
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+  .rh-export-actions > button {
+    flex: 1 1 0 !important;
+    justify-content: center !important;
+  }
+  .sa-cat-selects {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+  }
+  .sa-cat-selects > select {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+}

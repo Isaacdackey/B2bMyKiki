@@ -92,7 +92,7 @@
         (click)="onNavClick()"
         title="Tableau de bord">
         <div class="b2b-link-icon-wrap">
-          <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
+          <i class="bi bi-graph-up-arrow" aria-hidden="true"></i>
         </div>
         @if (!b2b.isSidebarCollapsed()) {
           <div class="b2b-link-text">
@@ -109,7 +109,7 @@
         (click)="onNavClick()"
         title="Entreprises Partenaires">
         <div class="b2b-link-icon-wrap">
-          <i class="fa-solid fa-building" aria-hidden="true"></i>
+          <i class="bi bi-buildings" aria-hidden="true"></i>
         </div>
         @if (!b2b.isSidebarCollapsed()) {
           <div class="b2b-link-text">
@@ -126,7 +126,7 @@
         (click)="onNavClick()"
         title="Catalogue des Chefs">
         <div class="b2b-link-icon-wrap">
-          <i class="fa-solid fa-bowl-food" aria-hidden="true"></i>
+          <i class="icon-utensils" aria-hidden="true"></i>
         </div>
         @if (!b2b.isSidebarCollapsed()) {
           <div class="b2b-link-text">
@@ -143,7 +143,7 @@
         (click)="onNavClick()"
         title="Planning & Production">
         <div class="b2b-link-icon-wrap">
-          <i class="fa-regular fa-calendar-days" aria-hidden="true"></i>
+          <i class="bi bi-calendar2-week" aria-hidden="true"></i>
         </div>
         @if (!b2b.isSidebarCollapsed()) {
           <div class="b2b-link-text">
@@ -383,14 +383,14 @@
         }
       </a>
 
-      <!-- Page dédiée au Panier / Plateau Déjeuner -->
-      <a routerLink="/b2b/employe/panier" routerLinkActive="active" class="b2b-sidebar-link" title="Mon Panier / Plateau Déjeuner" (click)="onNavClick()">
+      <!-- Page dédiée au Panier / Mon Plateau -->
+      <a routerLink="/b2b/employe/panier" routerLinkActive="active" class="b2b-sidebar-link" [title]="b2b.currentSession().role === 'SALARIE_CONVENTIONNE' ? 'Panier' : 'Mon Plateau'" (click)="onNavClick()">
         <div class="b2b-link-icon-wrap">
           <i class="fa-solid fa-basket-shopping" aria-hidden="true"></i>
         </div>
         @if (!b2b.isSidebarCollapsed()) {
           <div class="b2b-link-text">
-            <span class="b2b-link-title">Mon Plateau / Panier</span>
+            <span class="b2b-link-title">{{ b2b.currentSession().role === 'SALARIE_CONVENTIONNE' ? 'Panier' : 'Mon Plateau' }}</span>
             <span class="b2b-link-subtitle">Validation de commande</span>
           </div>
         }
