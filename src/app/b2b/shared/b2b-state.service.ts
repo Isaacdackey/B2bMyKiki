@@ -1,10 +1,12 @@
-import { Injectable, signal, computed, effect } from '@angular/core';
+﻿import { Injectable, signal, computed, effect, inject } from '@angular/core';
 import { EntrepriseB2B, SiteB2B, PlatB2B, FormuleRegle, EmployeB2B, SelectionRepas, CommandeHistoriqueB2B, LignePanierAutonome, UserRoleB2B, UserSessionB2B, CommandeEntrepriseSite, FacturationLigneJournaliere, MenuPlanifieJourEntreprise, InvitationAdminB2B, StatutCommandeSite, ReclamationCutOffB2B } from './b2b.models';
+import { B2bApiService } from './b2b-api.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class B2bStateService {
+  private api = inject(B2bApiService);
   // Session utilisateur B2B active (conformité stricte aux 4 rôles exigés par le Mentor Tonton Fufu)
   currentSession = signal<UserSessionB2B>({
     role: 'RESPONSABLE_ENTREPRISE',
@@ -78,6 +80,7 @@ export class B2bStateService {
       sites: []
     };
     this.listeEntreprises.update(list => [ent, ...list]);
+    this.api.createEntreprise(ent).subscribe({ error: () => {} });
     return ent;
   }
 
@@ -87,11 +90,13 @@ export class B2bStateService {
     if (this.currentEntreprise().id === id) {
       this.currentEntreprise.update(e => ({ ...e, ...updates }));
     }
+    this.api.updateEntreprise(id, updates).subscribe({ error: () => {} });
   }
 
   // Méthode pour archiver / désarchiver une entreprise
   toggleArchiverEntreprise(id: string) {
     this.listeEntreprises.update(list => list.map(e => e.id === id ? { ...e, isArchivee: !e.isArchivee } : e));
+    this.api.toggleArchiveEntreprise(id).subscribe({ error: () => {} });
   }
 
   // Méthode pour ajouter un site à une entreprise
@@ -133,14 +138,17 @@ export class B2bStateService {
   ajouterPlatCatalogue(plat: Omit<PlatB2B, 'id'>) {
     const nouveauPlat: PlatB2B = { ...plat, id: 'plat-' + Date.now(), disponible: true, isArchive: false };
     this.catalogueJour.update(list => [nouveauPlat, ...list]);
+    this.api.createPlat(nouveauPlat).subscribe({ error: () => {} });
   }
 
   modifierPlatCatalogue(id: string, updates: Partial<PlatB2B>) {
     this.catalogueJour.update(list => list.map(p => p.id === id ? { ...p, ...updates } : p));
+    this.api.updatePlat(id, updates).subscribe({ error: () => {} });
   }
 
   toggleArchiverPlat(id: string) {
     this.catalogueJour.update(list => list.map(p => p.id === id ? { ...p, isArchive: !p.isArchive } : p));
+    this.api.toggleArchivePlat(id).subscribe({ error: () => {} });
   }
 
   // Onglet actif dans l'Espace Responsable de Site Kiki (Gestion de son Entreprise/Site : 5 onglets + Réclamations + Projection QR)
@@ -163,6 +171,57 @@ export class B2bStateService {
     effect(() => {
       const collapsed = this.isSidebarCollapsed();
       this.updateSidebarCssVar(collapsed);
+    });
+
+    // Synchronisation initiale avec le backend Spring Boot (si démarré)
+    this.syncFromBackend();
+  }
+
+  syncFromBackend() {
+    this.api.getEntreprises().subscribe({
+      next: (res) => {
+        if (res.success && res.data?.length) {
+          this.listeEntreprises.set(res.data);
+          this.currentEntreprise.set(res.data[0]);
+        }
+      },
+      error: () => {}
+    });
+
+    this.api.getEmployes().subscribe({
+      next: (res) => {
+        if (res.success && res.data?.length) {
+          this.listeEmployes.set(res.data);
+        }
+      },
+      error: () => {}
+    });
+
+    this.api.getCatalogue(true).subscribe({
+      next: (res) => {
+        if (res.success && res.data?.length) {
+          this.catalogueJour.set(res.data);
+        }
+      },
+      error: () => {}
+    });
+
+    this.api.getCommandes().subscribe({
+      next: (res) => {
+        if (res.success && res.data?.length) {
+          this.listeCommandesSite.set(res.data);
+        }
+      },
+      error: () => {}
+    });
+
+    this.api.getReclamations().subscribe({
+      next: (res) => {
+        if (res.success && res.data?.length) {
+          this.listeReclamations.set(res.data);
+        }
+      },
+      error: () => {}
     });
   }
 
@@ -209,215 +268,20 @@ export class B2bStateService {
   panierAutonome = signal<LignePanierAutonome[]>([]);
 
   // Liste des entreprises clientes conventionnées (1 Site = 1 Entreprise)
-  listeEntreprises = signal<EntrepriseB2B[]>([
-    {
-      id: 'ent-001',
-      nom: 'TotalEnergies — Siège Plateau',
-      codeEntreprise: 'TOT-PLA',
-      ninea: '001294829 2V1',
-      rccm: 'SN-DKR-2012-B-1428',
-      adresse: 'Boulevard de la République, Dakar Plateau',
-      emailContact: 'moyens.generaux@totalenergies.sn',
-      telephone: '+221 33 832 29 66',
-      contactReferent: 'M. Babacar Ndiaye (RH)',
-      montantPriseEnChargeRepas: 5000,
-      tauxPriseEnCharge: 100,
-      plafondJournalier: 5000,
-      budgetMensuelAlloue: 18500000,
-      tarifNegocieHtva: 4500,
-      cadenceFacturation: 'MENSUELLE',
-      cutOffType: 'J_MOINS_1',
-      cutOffHeure: '18:00',
-      typePrestation: 'CUISINE_SUR_PLACE',
-      categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'],
-      isArchivee: false,
-      sites: [
-        { 
-          id: 'site-1', 
-          nom: 'TotalEnergies — Siège Plateau', 
-          adresse: 'Boulevard de la République, Dakar Plateau', 
-          heureCutOff: '18:00 (J-1)', 
-          contactReferent: 'M. Babacar Ndiaye (RH)', 
-          telephoneReferent: '+221 77 123 45 67',
-          typePrestation: 'CUISINE_SUR_PLACE',
-          categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON']
-        }
-      ]
-    },
-    {
-      id: 'ent-002',
-      nom: 'TotalEnergies — Dépôt Bel-Air Port',
-      codeEntreprise: 'TOT-BEL',
-      ninea: '001294829 2V1',
-      rccm: 'SN-DKR-2012-B-1428',
-      adresse: 'Zone Industrielle Bel-Air, Port Autonome de Dakar',
-      emailContact: 'logistique.belair@totalenergies.sn',
-      telephone: '+221 33 849 11 22',
-      contactReferent: 'Mme Aminata Sow (Logistique)',
-      montantPriseEnChargeRepas: 5000,
-      tauxPriseEnCharge: 100,
-      plafondJournalier: 5000,
-      budgetMensuelAlloue: 12000000,
-      tarifNegocieHtva: 4500,
-      cadenceFacturation: 'MENSUELLE',
-      cutOffType: 'JOUR_J',
-      cutOffHeure: '09:00',
-      typePrestation: 'LIVRAISON_BARQUETTES',
-      categoriesAutorisees: ['PLAT', 'BOISSON'],
-      isArchivee: false,
-      sites: [
-        { 
-          id: 'site-2', 
-          nom: 'TotalEnergies — Dépôt Bel-Air Port', 
-          adresse: 'Zone Industrielle Bel-Air, Port Autonome de Dakar', 
-          heureCutOff: '09:00 (Jour J)', 
-          contactReferent: 'Mme Aminata Sow (Logistique)', 
-          telephoneReferent: '+221 78 234 56 78',
-          typePrestation: 'LIVRAISON_BARQUETTES',
-          categoriesAutorisees: ['PLAT', 'BOISSON']
-        }
-      ]
-    },
-    {
-      id: 'ent-003',
-      nom: 'Sonatel Orange — Siège Technopole Pikine',
-      codeEntreprise: 'SONA-PIK',
-      ninea: '003849182 2K4',
-      rccm: 'SN-DKR-1997-B-5821',
-      adresse: 'Parc Technologique de la Sonatel, Pikine',
-      emailContact: 'comite.entreprise@orange-sonatel.sn',
-      telephone: '+221 33 839 12 00',
-      contactReferent: 'Mme Awa Cissé (RH)',
-      montantPriseEnChargeRepas: 5000,
-      tauxPriseEnCharge: 70,
-      plafondJournalier: 5000,
-      budgetMensuelAlloue: 25000000,
-      tarifNegocieHtva: 4500,
-      cadenceFacturation: 'HEBDOMADAIRE',
-      cutOffType: 'J_MOINS_1',
-      cutOffHeure: '17:30',
-      typePrestation: 'SERVICE_SUR_PLACE',
-      categoriesAutorisees: ['PLAT', 'DESSERT', 'BOISSON'],
-      isArchivee: false,
-      sites: [
-        {
-          id: 'site-sona-1',
-          nom: 'Sonatel Orange — Siège Technopole Pikine',
-          adresse: 'Parc Technologique de la Sonatel, Pikine',
-          heureCutOff: '17:30 (J-1)',
-          contactReferent: 'Mme Awa Cissé (RH)',
-          telephoneReferent: '+221 77 450 99 88',
-          typePrestation: 'SERVICE_SUR_PLACE',
-          categoriesAutorisees: ['PLAT', 'DESSERT', 'BOISSON']
-        }
-      ]
-    },
-    {
-      id: 'ent-004',
-      nom: 'Sonatel Orange — Agence Cheikh Anta Diop',
-      codeEntreprise: 'SONA-FANN',
-      ninea: '003849182 2K4',
-      rccm: 'SN-DKR-1997-B-5821',
-      adresse: 'Avenue Cheikh Anta Diop, Fann',
-      emailContact: 'agence.fann@orange-sonatel.sn',
-      telephone: '+221 33 869 40 00',
-      contactReferent: 'M. Mansour Sy',
-      montantPriseEnChargeRepas: 5000,
-      tauxPriseEnCharge: 70,
-      plafondJournalier: 5000,
-      budgetMensuelAlloue: 8000000,
-      tarifNegocieHtva: 4500,
-      cadenceFacturation: 'HEBDOMADAIRE',
-      cutOffType: 'JOUR_J',
-      cutOffHeure: '09:30',
-      typePrestation: 'LIVRAISON_BARQUETTES',
-      categoriesAutorisees: ['PLAT', 'BOISSON'],
-      isArchivee: false,
-      sites: [
-        {
-          id: 'site-sona-2',
-          nom: 'Sonatel Orange — Agence Cheikh Anta Diop',
-          adresse: 'Avenue Cheikh Anta Diop, Fann',
-          heureCutOff: '09:30 (Jour J)',
-          contactReferent: 'M. Mansour Sy',
-          telephoneReferent: '+221 78 112 33 44',
-          typePrestation: 'LIVRAISON_BARQUETTES',
-          categoriesAutorisees: ['PLAT', 'BOISSON']
-        }
-      ]
-    },
-    {
-      id: 'ent-005',
-      nom: 'CBAO Attijariwafa — Place Indépendance',
-      codeEntreprise: 'CBAO-IND',
-      ninea: '004192837 1B2',
-      rccm: 'SN-DKR-2005-B-3104',
-      adresse: '1 Place de l\'Indépendance, Dakar Plateau',
-      emailContact: 'services.generaux@cbao.sn',
-      telephone: '+221 33 849 96 96',
-      contactReferent: 'Mme Marième Diallo (DRH)',
-      montantPriseEnChargeRepas: 5000,
-      tauxPriseEnCharge: 80,
-      plafondJournalier: 5000,
-      budgetMensuelAlloue: 16000000,
-      tarifNegocieHtva: 4500,
-      cadenceFacturation: 'MENSUELLE',
-      cutOffType: 'J_MOINS_1',
-      cutOffHeure: '18:00',
-      typePrestation: 'SERVICE_SUR_PLACE',
-      categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT'],
-      isArchivee: false,
-      sites: [
-        {
-          id: 'site-cbao-1',
-          nom: 'CBAO Attijariwafa — Place Indépendance',
-          adresse: '1 Place de l\'Indépendance, Dakar Plateau',
-          heureCutOff: '18:00 (J-1)',
-          contactReferent: 'Mme Marième Diallo (DRH)',
-          telephoneReferent: '+221 77 310 22 11',
-          typePrestation: 'SERVICE_SUR_PLACE',
-          categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT']
-        }
-      ]
-    },
-    {
-      id: 'ent-006',
-      nom: 'Port Autonome de Dakar (PAD) — Direction',
-      codeEntreprise: 'PAD-DIR',
-      ninea: '001029384 2G9',
-      rccm: 'SN-DKR-1988-B-0941',
-      adresse: '21 Boulevard de la Libération, Dakar',
-      emailContact: 'intendance@portdakar.sn',
-      telephone: '+221 33 849 45 45',
-      contactReferent: 'M. Ousmane Ndoye',
-      montantPriseEnChargeRepas: 5000,
-      tauxPriseEnCharge: 100,
-      plafondJournalier: 5000,
-      budgetMensuelAlloue: 21000000,
-      tarifNegocieHtva: 4500,
-      cadenceFacturation: 'MENSUELLE',
-      cutOffType: 'JOUR_J',
-      cutOffHeure: '08:45',
-      typePrestation: 'CUISINE_SUR_PLACE',
-      categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'],
-      isArchivee: false,
-      sites: [
-        {
-          id: 'site-pad-1',
-          nom: 'Port Autonome de Dakar (PAD) — Direction',
-          adresse: '21 Boulevard de la Libération, Dakar',
-          heureCutOff: '08:45 (Jour J)',
-          contactReferent: 'M. Ousmane Ndoye',
-          telephoneReferent: '+221 77 612 90 00',
-          typePrestation: 'CUISINE_SUR_PLACE',
-          categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON']
-        }
-      ]
-    }
-  ]);
+  listeEntreprises = signal<EntrepriseB2B[]>([]);
 
   // Entreprise active
-  currentEntreprise = signal<EntrepriseB2B>(this.listeEntreprises()[0]);
+  currentEntreprise = signal<EntrepriseB2B>({
+    id: '',
+    nom: 'Chargement...',
+    codeEntreprise: '',
+    montantPriseEnChargeRepas: 5000,
+    cutOffType: 'J_MOINS_1',
+    cutOffHeure: '18:00',
+    typePrestation: 'CUISINE_SUR_PLACE',
+    categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'],
+    sites: []
+  });
 
   selectedSiteId = signal<string>('site-1');
 
@@ -588,146 +452,7 @@ export class B2bStateService {
   ]);
 
   // Commandes de site avec statuts : EN_COURS -> SCANNE -> LIVRE
-  listeCommandesSite = signal<CommandeEntrepriseSite[]>([
-    {
-      id: 'cmd-e1-01',
-      codeCommande: 'CMD-TOT-701',
-      entrepriseId: 'ent-001',
-      entrepriseNom: 'TotalEnergies — Siège Plateau',
-      matricule: 'TOT-9842',
-      employeNom: 'Babacar Ndiaye',
-      categorie: 'PLAT',
-      platNom: 'Poulet Yassa Braisé Kiki & Riz Parfumé',
-      date: '2026-11-12',
-      heure: '11:45',
-      montantTotal: 5000,
-      partEntreprise: 5000,
-      partEmploye: 0,
-      statut: 'LIVRE',
-      scanneAt: '12:05',
-      livreAt: '12:08'
-    },
-    {
-      id: 'cmd-e1-02',
-      codeCommande: 'CMD-TOT-702',
-      entrepriseId: 'ent-001',
-      entrepriseNom: 'TotalEnergies — Siège Plateau',
-      matricule: 'TOT-9843',
-      employeNom: 'Fatou Fall',
-      categorie: 'PLAT',
-      platNom: 'Capitaine Braisé & Riz Jasmin',
-      date: '2026-11-12',
-      heure: '11:50',
-      montantTotal: 5000,
-      partEntreprise: 5000,
-      partEmploye: 0,
-      statut: 'LIVRE',
-      scanneAt: '12:12',
-      livreAt: '12:14'
-    },
-    {
-      id: 'cmd-e1-03',
-      codeCommande: 'CMD-TOT-703',
-      entrepriseId: 'ent-001',
-      entrepriseNom: 'TotalEnergies — Siège Plateau',
-      matricule: 'TOT-9844',
-      employeNom: 'Mamadou Diallo',
-      categorie: 'PLAT',
-      platNom: 'Poulet Yassa Braisé Kiki & Riz Parfumé',
-      date: '2026-11-12',
-      heure: '12:02',
-      montantTotal: 5000,
-      partEntreprise: 3500,
-      partEmploye: 1500,
-      statut: 'SCANNE',
-      scanneAt: '12:20'
-    },
-    {
-      id: 'cmd-e1-04',
-      codeCommande: 'CMD-TOT-704',
-      entrepriseId: 'ent-001',
-      entrepriseNom: 'TotalEnergies — Siège Plateau',
-      matricule: 'TOT-9845',
-      employeNom: 'Aminata Sow',
-      categorie: 'PLAT',
-      platNom: 'Capitaine Braisé & Riz Jasmin',
-      date: '2026-11-12',
-      heure: '12:10',
-      montantTotal: 5000,
-      partEntreprise: 2500,
-      partEmploye: 2500,
-      statut: 'SCANNE',
-      scanneAt: '12:22'
-    },
-    {
-      id: 'cmd-e1-05',
-      codeCommande: 'CMD-TOT-705',
-      entrepriseId: 'ent-001',
-      entrepriseNom: 'TotalEnergies — Siège Plateau',
-      matricule: 'TOT-9847',
-      employeNom: 'Khady Sarr',
-      categorie: 'PLAT',
-      platNom: 'Poulet Yassa Braisé Kiki & Riz Parfumé',
-      date: '2026-11-12',
-      heure: '12:15',
-      montantTotal: 5000,
-      partEntreprise: 5000,
-      partEmploye: 0,
-      statut: 'EN_COURS'
-    },
-    {
-      id: 'cmd-e1-06',
-      codeCommande: 'CMD-TOT-706',
-      entrepriseId: 'ent-001',
-      entrepriseNom: 'TotalEnergies — Siège Plateau',
-      matricule: 'TOT-EXT-01',
-      employeNom: 'Ousmane Ba (Consultant)',
-      categorie: 'PLAT',
-      platNom: 'Capitaine Braisé & Riz Jasmin',
-      date: '2026-11-12',
-      heure: '12:18',
-      montantTotal: 5000,
-      partEntreprise: 0,
-      partEmploye: 5000,
-      statut: 'EN_COURS'
-    },
-    {
-      id: 'cmd-e1-07',
-      codeCommande: 'CMD-TOT-690',
-      entrepriseId: 'ent-001',
-      entrepriseNom: 'TotalEnergies — Siège Plateau',
-      matricule: 'TOT-9842',
-      employeNom: 'Babacar Ndiaye',
-      categorie: 'PLAT',
-      platNom: 'Thiéboudienne Penda Mbaye Royal',
-      date: '2026-11-11',
-      heure: '12:00',
-      montantTotal: 5000,
-      partEntreprise: 5000,
-      partEmploye: 0,
-      statut: 'LIVRE',
-      scanneAt: '12:15',
-      livreAt: '12:18'
-    },
-    {
-      id: 'cmd-e1-08',
-      codeCommande: 'CMD-TOT-691',
-      entrepriseId: 'ent-001',
-      entrepriseNom: 'TotalEnergies — Siège Plateau',
-      matricule: 'TOT-9843',
-      employeNom: 'Fatou Fall',
-      categorie: 'PLAT',
-      platNom: 'Poulet Yassa Braisé Kiki',
-      date: '2026-11-11',
-      heure: '12:05',
-      montantTotal: 5000,
-      partEntreprise: 5000,
-      partEmploye: 0,
-      statut: 'LIVRE',
-      scanneAt: '12:20',
-      livreAt: '12:22'
-    }
-  ]);
+  listeCommandesSite = signal<CommandeEntrepriseSite[]>([]);
 
   // Lignes de facturation journalières pour l'entreprise
   lignesFacturationEntreprise = signal<FacturationLigneJournaliere[]>([
@@ -823,6 +548,7 @@ export class B2bStateService {
       montantPrisEnChargeMois: emp.montantPrisEnChargeMois || 0
     };
     this.listeEmployes.update(list => [nouvelEmploye, ...list]);
+    this.api.createEmploye(nouvelEmploye).subscribe({ error: () => {} });
   }
 
   // Méthode pour créer une invitation administrateur
@@ -847,6 +573,7 @@ export class B2bStateService {
     };
 
     this.listeInvitationsAdmins.update(list => [invitation, ...list]);
+    this.api.createInvitation(entreprise.id, invitation).subscribe({ error: () => {} });
     return invitation;
   }
 
@@ -860,6 +587,7 @@ export class B2bStateService {
       }
       return c;
     }));
+    this.api.scannerCommande(cmdId).subscribe({ error: () => {} });
   }
 
   // Marquer une commande comme livrée
@@ -872,10 +600,12 @@ export class B2bStateService {
       }
       return c;
     }));
+    this.api.livrerCommande(cmdId).subscribe({ error: () => {} });
   }
 
   // Mettre à jour la quantité d'un plat dans un jour planifié
   updateQuantitePlatMenu(menuJourId: string, ligneId: string, quantite: number, subventionnesCount: number) {
+    this.api.updateQuantitePlanning(ligneId, Math.max(0, quantite)).subscribe({ error: () => {} });
     this.menusPlanifiesEntreprises.update(list => list.map(m => {
       if (m.id === menuJourId) {
         const newLignes = m.lignes.map(l => l.id === ligneId ? { ...l, quantitePrevue: Math.max(0, quantite) } : l);
@@ -902,49 +632,7 @@ export class B2bStateService {
   }
 
   // GESTION DES RÉCLAMATIONS RETARDATAIRES (Cut-off dépassé)
-  listeReclamations = signal<ReclamationCutOffB2B[]>([
-    {
-      id: 'rec-1',
-      entrepriseId: 'ent-001',
-      siteId: 'site-1',
-      employeId: 'emp-103',
-      employeNom: 'Mamadou Diallo',
-      matricule: 'TOT-9844',
-      departement: 'Opérations Maritimes',
-      date: '2026-11-12',
-      heureDemande: '10:42',
-      motif: 'Réunion d\'urgence avec le client offshore, retard de 12 min sur le cut-off.',
-      statut: 'EN_ATTENTE'
-    },
-    {
-      id: 'rec-2',
-      entrepriseId: 'ent-001',
-      siteId: 'site-1',
-      employeId: 'emp-105',
-      employeNom: 'Cheikh Diop',
-      matricule: 'TOT-9846',
-      departement: 'Logistique & Transit',
-      date: '2026-11-12',
-      heureDemande: '10:55',
-      motif: 'Coupure réseau sur la plateforme de transit à Diamniadio.',
-      statut: 'EN_ATTENTE'
-    },
-    {
-      id: 'rec-3',
-      entrepriseId: 'ent-001',
-      siteId: 'site-1',
-      employeId: 'emp-104',
-      employeNom: 'Aminata Sow',
-      matricule: 'TOT-9845',
-      departement: 'Maintenance & Sécurité',
-      date: '2026-11-11',
-      heureDemande: '10:38',
-      motif: 'Intervention sécurité incendie prioritaire.',
-      statut: 'DEBLOQUE',
-      debloquePar: 'Responsable de Site Kiki',
-      debloqueAt: '10:45'
-    }
-  ]);
+  listeReclamations = signal<ReclamationCutOffB2B[]>([]);
 
   // Ajouter une réclamation d'employé
   soumettreReclamation(employe: EmployeB2B, motif: string): ReclamationCutOffB2B {
@@ -983,6 +671,7 @@ export class B2bStateService {
       }
       return r;
     }));
+    this.api.debloquerReclamation(reclamationId, this.currentSession().nomComplet || 'Responsable de Site Kiki').subscribe({ error: () => {} });
   }
 
   // Vérifier si un employé est débloqué pour aujourd'hui
@@ -1090,15 +779,7 @@ export class B2bStateService {
   }
 
   // Annuaire des employés RH de l'entreprise
-  listeEmployes = signal<EmployeB2B[]>([
-    { id: 'emp-101', matricule: 'TOT-9842', nom: 'Ndiaye', prenom: 'Babacar', email: 'b.ndiaye@totalenergies.sn', telephone: '+221 77 123 45 67', siteId: 'site-1', siteNom: 'Siège Plateau', departement: 'Finance & Comptabilité', type: 'SUBVENTIONNE', tauxSubvention: 100, actif: true, repasConsommesMois: 19, montantPrisEnChargeMois: 95000 },
-    { id: 'emp-102', matricule: 'TOT-9843', nom: 'Fall', prenom: 'Fatou', email: 'f.fall@totalenergies.sn', telephone: '+221 78 456 78 90', siteId: 'site-1', siteNom: 'Siège Plateau', departement: 'Ressources Humaines', type: 'SUBVENTIONNE', tauxSubvention: 100, actif: true, repasConsommesMois: 21, montantPrisEnChargeMois: 105000 },
-    { id: 'emp-103', matricule: 'TOT-9844', nom: 'Diallo', prenom: 'Mamadou', email: 'm.diallo@totalenergies.sn', telephone: '+221 76 567 89 01', siteId: 'site-2', siteNom: 'Dépôt Bel-Air', departement: 'Opérations Maritimes', type: 'SUBVENTIONNE', tauxSubvention: 70, actif: true, repasConsommesMois: 22, montantPrisEnChargeMois: 77000 },
-    { id: 'emp-104', matricule: 'TOT-9845', nom: 'Sow', prenom: 'Aminata', email: 'a.sow@totalenergies.sn', telephone: '+221 77 678 90 12', siteId: 'site-2', siteNom: 'Dépôt Bel-Air', departement: 'Maintenance & Sécurité', type: 'SUBVENTIONNE', tauxSubvention: 50, actif: true, repasConsommesMois: 17, montantPrisEnChargeMois: 42500 },
-    { id: 'emp-105', matricule: 'TOT-9846', nom: 'Diop', prenom: 'Cheikh', email: 'c.diop@totalenergies.sn', telephone: '+221 78 789 01 23', siteId: 'site-3', siteNom: 'Plateforme Diamniadio', departement: 'Logistique & Transit', type: 'SUBVENTIONNE', tauxSubvention: 100, actif: true, repasConsommesMois: 20, montantPrisEnChargeMois: 100000 },
-    { id: 'emp-106', matricule: 'TOT-EXT-01', nom: 'Ba', prenom: 'Ousmane (Consultant)', email: 'o.ba@consultant.sn', telephone: '+221 76 890 12 34', siteId: 'site-1', siteNom: 'Siège Plateau', departement: 'Direction Projet IT', type: 'AUTONOME', tauxSubvention: 0, actif: true, repasConsommesMois: 14, montantPrisEnChargeMois: 0 },
-    { id: 'emp-107', matricule: 'TOT-9847', nom: 'Sarr', prenom: 'Khady', email: 'k.sarr@totalenergies.sn', telephone: '+221 77 901 23 45', siteId: 'site-1', siteNom: 'Siège Plateau', departement: 'Juridique & Conformité', type: 'SUBVENTIONNE', tauxSubvention: 100, actif: true, repasConsommesMois: 18, montantPrisEnChargeMois: 90000 }
-  ]);
+  listeEmployes = signal<EmployeB2B[]>([]);
 
   // Historique unifié des commandes individuelles pour rapprochement RH par site et par date
   historiqueCommandes = signal<CommandeHistoriqueB2B[]>([
@@ -1134,25 +815,7 @@ export class B2bStateService {
   dateCommande = signal<Date>(new Date());
 
   // Catalogue du jour (avec drapeau disponible modifiable par le Responsable Site Kiki)
-  catalogueJour = signal<PlatB2B[]>([
-    { id: 'e1', nom: 'Salade Niçoise au Thon Frais', description: 'Haricots verts, œufs durs, tomates, vinaigrette maison', categorie: 'ENTREE', prixUnitaire: 1200, image: '/assets/images/plats/e1.jpg', calories: 240, disponible: true },
-    { id: 'e2', nom: 'Pastels Dorés au Thon (x3)', description: 'Beignets croustillants servis avec sauce tomate piment doux', categorie: 'ENTREE', prixUnitaire: 1200, image: '/assets/images/plats/e2.jpg', calories: 310, disponible: true },
-    { id: 'e3', nom: 'Velouté de Légumes & Croûtons d\'Ail', description: 'Courgettes, carottes, pointe de crème fraîche', categorie: 'ENTREE', prixUnitaire: 1200, image: '/assets/images/plats/e3.jpg', calories: 180, disponible: true },
-    { id: 'p1', nom: 'Poulet Yassa Braisé Kiki & Riz Parfumé', description: 'Cuisse de poulet fermier marinée aux oignons caramélisés, citron vert et moutarde, riz parfumé', categorie: 'PLAT', prixUnitaire: 2800, image: '/assets/images/plats/p1.jpg', calories: 650, disponible: true },
-    { id: 'p2', nom: 'Capitaine Braisé & Riz Parfumé au Jasmin', description: 'Filet de poisson frais braisé au feu de bois, sauce moutarde oignon & piment', categorie: 'PLAT', prixUnitaire: 3200, image: '/assets/images/plats/p2.jpg', calories: 580, disponible: true },
-    { id: 'p3', nom: 'Plat Équilibré : Pavé de Bœuf aux Herbes & Légumes Vapeur', description: 'Bœuf tendre du boucher, purée de patates douces et haricots persillés', categorie: 'PLAT', prixUnitaire: 3000, image: '/assets/images/plats/p3.jpg', calories: 520, disponible: true },
-    { id: 'p4', nom: 'Thiéboudienne Penda Mbaye Royal (Riz Rouge)', description: 'Riz rouge traditionnel sénégalais mijoté aux légumes du terroir et poisson noble', categorie: 'PLAT', prixUnitaire: 2600, image: '/assets/images/plats/p4.jpg', calories: 610, disponible: true },
-    { id: 'g1', nom: 'Riz Parfumé au Jasmin', description: 'Riz blanc cuit à la vapeur, parfumé et léger', categorie: 'GARNITURE', prixUnitaire: 600, image: '/assets/images/plats/p1.jpg', calories: 220, disponible: true },
-    { id: 'g2', nom: 'Pommes de Terre Sautées aux Herbes', description: 'Pommes de terre dorées à l\'ail, persil frais et beurre doux', categorie: 'GARNITURE', prixUnitaire: 800, image: '/assets/images/plats/p3.jpg', calories: 260, disponible: true },
-    { id: 'g3', nom: 'Attiéké Frais de Saison', description: 'Semoule de manioc traditionnelle légère et parfumée', categorie: 'GARNITURE', prixUnitaire: 700, image: '/assets/images/plats/p2.jpg', calories: 240, disponible: true },
-    { id: 'g4', nom: 'Poêlée de Légumes Croquants', description: 'Carottes, haricots verts, courgettes sautées à l\'huile d\'olive', categorie: 'GARNITURE', prixUnitaire: 700, image: '/assets/images/plats/e1.jpg', calories: 140, disponible: true },
-    { id: 'd1', nom: 'Coupe de Fruits Exotiques Frais', description: 'Mangue kent, ananas pain de sucre, papaye arrosée de citron vert', categorie: 'DESSERT', prixUnitaire: 800, image: '/assets/images/plats/d1.jpg', calories: 120, disponible: true },
-    { id: 'd2', nom: 'Fondant au Chocolat Noir Intense & Cœur Coulant', description: 'Cacao noir pur d\'Afrique, crème anglaise vanillée', categorie: 'DESSERT', prixUnitaire: 1000, image: '/assets/images/plats/d2.jpg', calories: 340, disponible: true },
-    { id: 'd3', nom: 'Yaourt Onctueux Fait Maison au Miel', description: 'Lait entier local et miel de fleurs de savane', categorie: 'DESSERT', prixUnitaire: 800, image: '/assets/images/plats/d3.jpg', calories: 160, disponible: true },
-    { id: 'b1', nom: 'Jus Naturel de Bissap Frais Menthe', description: 'Infusion de fleurs d\'hibiscus, menthe sauvage, sans conservateur', categorie: 'BOISSON', prixUnitaire: 600, image: '/assets/images/plats/b1.jpg', calories: 90, disponible: true },
-    { id: 'b2', nom: 'Jus de Bouye Artisanal (Pain de Singe)', description: 'Pulpe naturelle de fruit de baobab onctueuse et vanillée', categorie: 'BOISSON', prixUnitaire: 600, image: '/assets/images/plats/b2.jpg', calories: 110, disponible: true },
-    { id: 'b3', nom: 'Eau Minérale Naturelle Kirène (50cl)', description: 'Bouteille individuelle capsule scellée', categorie: 'BOISSON', prixUnitaire: 400, image: '/assets/images/plats/b3.jpg', calories: 0, disponible: true }
-  ]);
+  catalogueJour = signal<PlatB2B[]>([]);
 
   // Méthode pour activer / désactiver la proposition d'un plat sur le site
   toggleDisponibilitePlat(platId: string) {
@@ -1278,6 +941,7 @@ export class B2bStateService {
   }
 
   toggleStatutEmploye(empId: string) {
+    this.api.toggleActifEmploye(empId).subscribe({ error: () => {} });
     let updatedEmp: EmployeB2B | null = null;
     this.listeEmployes.update(list => list.map(emp => {
       if (emp.id === empId) {
@@ -1439,6 +1103,7 @@ export class B2bStateService {
         type: nouveauTaux === 0 ? 'AUTONOME' : 'SUBVENTIONNE'
       }));
     }
+    this.api.updateTauxSubvention(empId, nouveauTaux).subscribe({ error: () => {} });
   }
 
   ajouterAuPanierAutonome(plat: PlatB2B) {

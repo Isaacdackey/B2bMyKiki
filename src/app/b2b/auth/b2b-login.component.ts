@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { B2bStateService } from '../shared/b2b-state.service';
+import { B2bApiService } from '../shared/b2b-api.service';
 import { UserRoleB2B } from '../shared/b2b.models';
 
 export interface ProfilDemo {
@@ -27,6 +28,7 @@ export interface ProfilDemo {
 })
 export class B2bLoginComponent {
   b2b = inject(B2bStateService);
+  private api = inject(B2bApiService);
   private router = inject(Router);
 
   // Identifiants formulaire libre
@@ -128,40 +130,45 @@ export class B2bLoginComponent {
       return;
     }
 
-    const matricule = `AUTO-${Date.now().toString().slice(-4)}`;
-    const site = this.b2b.currentEntreprise().sites.find(s => s.id === val.siteId);
-
-    // Enrôler l'employé en mode Autonome (0% subvention)
-    this.b2b.ajouterEmploye({
-      matricule,
-      nom: val.nom,
+    this.loading.set(true);
+    this.api.registerAutonome({
       prenom: val.prenom,
-      email: val.email || `${val.prenom.toLowerCase()}.${val.nom.toLowerCase()}@collaborateur.sn`,
+      nom: val.nom,
       telephone: val.telephone,
+      email: val.email,
       siteId: val.siteId,
-      siteNom: site ? site.nom : 'Siège Plateau',
-      departement: 'Collaborateur Autonome',
-      type: 'AUTONOME',
-      tauxSubvention: 0
+      password: val.password || 'Kiki2026!'
+    }).subscribe({
+      next: (res) => {
+        this.loading.set(false);
+        if (res.success && res.data) {
+          if (typeof localStorage !== 'undefined' && res.data.token) {
+            localStorage.setItem('b2b_jwt_token', res.data.token);
+          }
+          this.registerSuccess.set(true);
+          this.b2b.setSessionRole({
+            role: res.data.role,
+            nomComplet: res.data.nomComplet,
+            titrePoste: res.data.titrePoste,
+            entite: res.data.entite,
+            badge: res.data.badge,
+            badgeColor: res.data.badgeColor,
+            siteId: res.data.siteId,
+            siteNom: res.data.siteNom,
+            matricule: res.data.matricule
+          });
+          this.b2b.syncFromBackend();
+          setTimeout(() => {
+            this.showRegisterAutonomeModal.set(false);
+            this.router.navigateByUrl('/b2b/commande');
+          }, 800);
+        }
+      },
+      error: (err) => {
+        this.loading.set(false);
+        alert(err?.error?.message || 'Erreur lors de la création du compte autonome.');
+      }
     });
-
-    this.registerSuccess.set(true);
-
-    setTimeout(() => {
-      this.showRegisterAutonomeModal.set(false);
-      // Connecter directement l'utilisateur
-      this.b2b.setSessionRole({
-        role: 'SALARIE_AUTONOME',
-        nomComplet: `${val.prenom} ${val.nom}`,
-        titrePoste: 'Salarié Autonome (Frais Personnels)',
-        entite: this.b2b.currentEntreprise().nom,
-        badge: 'Paiement direct Wave',
-        badgeColor: '#1D4ED8',
-        siteId: val.siteId,
-        siteNom: site ? site.nom : 'Siège Plateau'
-      });
-      this.router.navigateByUrl('/b2b/commande');
-    }, 1200);
   }
 
   selectionnerProfilDemo(p: ProfilDemo) {
@@ -196,11 +203,45 @@ export class B2bLoginComponent {
 
   seConnecter() {
     this.loading.set(true);
-    setTimeout(() => {
-      this.loading.set(false);
-      // Connexion par défaut Responsable Entreprise
-      this.selectionnerProfilDemo(this.profilsDemo[0]);
-    }, 450);
+    this.api.login(this.username(), this.password()).subscribe({
+      next: (res) => {
+        this.loading.set(false);
+        if (res.success && res.data) {
+          if (typeof localStorage !== 'undefined' && res.data.token) {
+            localStorage.setItem('b2b_jwt_token', res.data.token);
+          }
+          const role = res.data.role as UserRoleB2B;
+          if (role === 'SUPER_ADMIN') {
+            this.b2b.superAdminActiveSection.set('DASHBOARD');
+          } else if (role === 'RESPONSABLE_ENTREPRISE') {
+            this.b2b.rhActiveSection.set('STATISTIQUES');
+          }
+          this.b2b.setSessionRole({
+            role,
+            nomComplet: res.data.nomComplet,
+            titrePoste: res.data.titrePoste,
+            entite: res.data.entite,
+            badge: res.data.badge,
+            badgeColor: res.data.badgeColor,
+            siteId: res.data.siteId,
+            siteNom: res.data.siteNom,
+            matricule: res.data.matricule
+          });
+          this.b2b.syncFromBackend();
+
+          const dest =
+            role === 'SUPER_ADMIN' ? '/b2b/super-admin' :
+            role === 'RESPONSABLE_ENTREPRISE' ? '/b2b/rh' :
+            role === 'RESPONSABLE_SITE_KIKI' ? '/b2b/cuisine' :
+            '/b2b/commande';
+          this.router.navigateByUrl(dest);
+        }
+      },
+      error: (err) => {
+        this.loading.set(false);
+        alert(err?.error?.message || 'Identifiants invalides ou serveur backend indisponible.');
+      }
+    });
   }
 }
 

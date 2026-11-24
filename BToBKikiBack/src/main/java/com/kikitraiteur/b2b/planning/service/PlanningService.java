@@ -1,0 +1,168 @@
+package com.kikitraiteur.b2b.planning.service;
+
+import com.kikitraiteur.b2b.catalogue.data.entity.PlatEntity;
+import com.kikitraiteur.b2b.catalogue.data.repository.PlatRepository;
+import com.kikitraiteur.b2b.entreprise.data.entity.EntrepriseEntity;
+import com.kikitraiteur.b2b.entreprise.data.repository.EntrepriseRepository;
+import com.kikitraiteur.b2b.planning.data.entity.LigneMenuPlanifieEntity;
+import com.kikitraiteur.b2b.planning.data.entity.MenuPlanifieJourEntity;
+import com.kikitraiteur.b2b.planning.data.repository.LigneMenuPlanifieRepository;
+import com.kikitraiteur.b2b.planning.data.repository.MenuPlanifieJourRepository;
+import com.kikitraiteur.b2b.shared.exceptions.ResourceNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class PlanningService {
+
+    private final MenuPlanifieJourRepository menuRepository;
+    private final LigneMenuPlanifieRepository ligneRepository;
+    private final PlatRepository platRepository;
+    private final EntrepriseRepository entrepriseRepository;
+
+    public List<MenuPlanifieJourEntity> findByEntreprise(String entrepriseId) {
+        return menuRepository.findByEntrepriseId(entrepriseId);
+    }
+
+    public MenuPlanifieJourEntity ajouterPlatAuJour(String entrepriseId, String jourNom, String platId, Integer quantitePrevue) {
+        PlatEntity plat = platRepository.findById(platId)
+                .orElseThrow(() -> new ResourceNotFoundException("Plat introuvable : " + platId));
+
+        MenuPlanifieJourEntity menu = menuRepository.findByEntrepriseIdAndJourNom(entrepriseId, jourNom)
+                .orElseGet(() -> MenuPlanifieJourEntity.builder()
+                        .id("menu-" + entrepriseId + "-" + jourNom.toLowerCase())
+                        .entrepriseId(entrepriseId)
+                        .jourNom(jourNom)
+                        .dateStr(LocalDate.now().toString())
+                        .theme("Menu du " + jourNom)
+                        .lignes(new ArrayList<>())
+                        .build());
+
+        LigneMenuPlanifieEntity ligne = LigneMenuPlanifieEntity.builder()
+                .id("lig-" + System.currentTimeMillis())
+                .categorie(plat.getCategorie())
+                .platId(plat.getId())
+                .nomPlat(plat.getNom())
+                .image(plat.getImage())
+                .quantitePrevue(quantitePrevue != null ? quantitePrevue : 0)
+                .disponible(true)
+                .menuPlanifie(menu)
+                .build();
+
+        menu.getLignes().add(ligne);
+        recalculerConformite(menu);
+        return menuRepository.save(menu);
+    }
+
+    public MenuPlanifieJourEntity dupliquerJour(String entrepriseId, String jourSource, String jourCible) {
+        MenuPlanifieJourEntity source = menuRepository.findByEntrepriseIdAndJourNom(entrepriseId, jourSource)
+                .orElseThrow(() -> new ResourceNotFoundException("Menu source introuvable pour " + jourSource));
+
+        MenuPlanifieJourEntity cible = menuRepository.findByEntrepriseIdAndJourNom(entrepriseId, jourCible)
+                .orElseGet(() -> MenuPlanifieJourEntity.builder()
+                        .id("menu-" + entrepriseId + "-" + jourCible.toLowerCase())
+                        .entrepriseId(entrepriseId)
+                        .jourNom(jourCible)
+                        .dateStr(LocalDate.now().toString())
+                        .lignes(new ArrayList<>())
+                        .build());
+
+        cible.setTheme(source.getTheme());
+        cible.getLignes().clear();
+        for (LigneMenuPlanifieEntity l : source.getLignes()) {
+            cible.getLignes().add(LigneMenuPlanifieEntity.builder()
+                    .id("lig-" + System.nanoTime())
+                    .categorie(l.getCategorie())
+                    .platId(l.getPlatId())
+                    .nomPlat(l.getNomPlat())
+                    .image(l.getImage())
+                    .quantitePrevue(l.getQuantitePrevue())
+                    .disponible(l.isDisponible())
+                    .menuPlanifie(cible)
+                    .build());
+        }
+        recalculerConformite(cible);
+        return menuRepository.save(cible);
+    }
+
+    public List<MenuPlanifieJourEntity> reconduireSemaine(String entrepriseId) {
+        List<MenuPlanifieJourEntity> menus = menuRepository.findByEntrepriseId(entrepriseId);
+        for (MenuPlanifieJourEntity m : menus) {
+            if (m.getDateStr() != null && !m.getDateStr().isBlank()) {
+                m.setDateStr(LocalDate.parse(m.getDateStr()).plusDays(7).toString());
+            }
+        }
+        return menuRepository.saveAll(menus);
+    }
+
+    public int deployerVersToutesEntreprises(String sourceEntrepriseId) {
+        List<MenuPlanifieJourEntity> modele = menuRepository.findByEntrepriseId(sourceEntrepriseId);
+        List<EntrepriseEntity> entreprises = entrepriseRepository.findAll().stream()
+                .filter(e -> !e.isArchivee() && !e.getId().equals(sourceEntrepriseId))
+                .toList();
+
+        int count = 0;
+        for (EntrepriseEntity ent : entreprises) {
+            for (MenuPlanifieJourEntity mSource : modele) {
+                MenuPlanifieJourEntity cible = menuRepository.findByEntrepriseIdAndJourNom(ent.getId(), mSource.getJourNom())
+                        .orElseGet(() -> MenuPlanifieJourEntity.builder()
+                                .id("menu-" + ent.getId() + "-" + mSource.getJourNom().toLowerCase())
+                                .entrepriseId(ent.getId())
+                                .jourNom(mSource.getJourNom())
+                                .dateStr(mSource.getDateStr())
+                                .theme(mSource.getTheme())
+                                .lignes(new ArrayList<>())
+                                .build());
+
+                cible.getLignes().clear();
+                for (LigneMenuPlanifieEntity l : mSource.getLignes()) {
+                    if (ent.getCategoriesAutorisees().isEmpty() || ent.getCategoriesAutorisees().contains(l.getCategorie())) {
+                        cible.getLignes().add(LigneMenuPlanifieEntity.builder()
+                                .id("lig-" + System.nanoTime())
+                                .categorie(l.getCategorie())
+                                .platId(l.getPlatId())
+                                .nomPlat(l.getNomPlat())
+                                .image(l.getImage())
+                                .quantitePrevue(0)
+                                .disponible(true)
+                                .menuPlanifie(cible)
+                                .build());
+                    }
+                }
+                recalculerConformite(cible);
+                menuRepository.save(cible);
+            }
+            count++;
+        }
+        return count;
+    }
+
+    public LigneMenuPlanifieEntity updateQuantite(String ligneId, Integer quantite) {
+        LigneMenuPlanifieEntity ligne = ligneRepository.findById(ligneId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ligne de menu introuvable : " + ligneId));
+        ligne.setQuantitePrevue(quantite);
+        LigneMenuPlanifieEntity saved = ligneRepository.save(ligne);
+
+        MenuPlanifieJourEntity menu = ligne.getMenuPlanifie();
+        if (menu != null) {
+            recalculerConformite(menu);
+            menuRepository.save(menu);
+        }
+        return saved;
+    }
+
+    public void deleteLigne(String ligneId) {
+        ligneRepository.deleteById(ligneId);
+    }
+
+    private void recalculerConformite(MenuPlanifieJourEntity menu) {
+        boolean allZero = menu.getLignes().stream().allMatch(l -> l.getQuantitePrevue() == null || l.getQuantitePrevue() <= 0);
+        menu.setQuantitesSaisies(!allZero);
+        menu.setStatutConformite(allZero ? "NON_SAISI" : "CONFORME");
+    }
+}
