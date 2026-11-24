@@ -31,6 +31,14 @@
     margin-left: 0 !important;
     width: 100% !important;
     padding: 1rem 1rem 5rem;
+    align-items: center;
+  }
+
+  .rh-main-content {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
   }
 }
 

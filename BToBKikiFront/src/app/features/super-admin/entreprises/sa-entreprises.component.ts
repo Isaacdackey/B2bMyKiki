@@ -583,8 +583,8 @@ export class SaEntreprisesComponent {
   jourCibleDuplication = signal<'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche'>('Mercredi');
 
   // Onglet 4 : Commandes
-  dateDebutCommandes = signal<string>('2026-11-12');
-  dateFinCommandes = signal<string>('2026-11-12');
+  dateDebutCommandes = signal<string>((() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`; })());
+  dateFinCommandes = signal<string>(new Date().toISOString().split('T')[0]);
   filtreStatutCommande = signal<'TOUS' | 'EN_COURS' | 'SCANNE' | 'LIVRE'>('TOUS');
   filtreCategorieCommande = signal<string>('TOUTES');
   filtrePlatCommande = signal<string>('TOUS');
