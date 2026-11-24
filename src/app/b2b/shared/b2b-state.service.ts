@@ -7,23 +7,80 @@ import { B2bApiService } from './b2b-api.service';
 })
 export class B2bStateService {
   private api = inject(B2bApiService);
-  // Session utilisateur B2B active (conformité stricte aux 4 rôles exigés par le Mentor Tonton Fufu)
-  currentSession = signal<UserSessionB2B>({
-    role: 'RESPONSABLE_ENTREPRISE',
-    nomComplet: 'Mme Fatou Fall',
-    titrePoste: 'Responsable RH & Moyens Généraux',
-    entite: 'TotalEnergies Sénégal',
-    siteId: 'site-1',
-    siteNom: 'Siège Plateau - Dakar',
-    badge: 'Responsable Entreprise',
-    badgeColor: '#721513'
-  });
+  private loadInitialSession(): UserSessionB2B {
+    const defaultSession: UserSessionB2B = {
+      role: 'RESPONSABLE_ENTREPRISE',
+      nomComplet: 'Mme Fatou Fall',
+      titrePoste: 'Responsable RH & Moyens Généraux',
+      entite: 'TotalEnergies Sénégal',
+      siteId: 'site-1',
+      siteNom: 'Siège Plateau - Dakar',
+      badge: 'Responsable Entreprise',
+      badgeColor: '#721513'
+    };
+
+    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+      const path = window.location?.pathname || '';
+      const raw = localStorage.getItem('b2b_current_session');
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw) as UserSessionB2B;
+          if (parsed && parsed.role) {
+            return parsed;
+          }
+        } catch {}
+      }
+
+      if (path.includes('/b2b/super-admin')) {
+        return {
+          role: 'SUPER_ADMIN',
+          nomComplet: 'Direction Kiki Traiteur',
+          titrePoste: 'Super Admin Kiki (Global)',
+          entite: 'Kiki Traiteur B2B',
+          siteId: 'site-1',
+          siteNom: 'Siège Plateau - Dakar',
+          badge: 'Direction Générale',
+          badgeColor: '#721513'
+        };
+      } else if (path.includes('/b2b/cuisine')) {
+        return {
+          role: 'RESPONSABLE_SITE_KIKI',
+          nomComplet: 'Chef Moussa Ndiaye',
+          titrePoste: 'Responsable de Site Kiki',
+          entite: 'Kiki Traiteur Exploitation',
+          siteId: 'site-1',
+          siteNom: 'Siège Plateau - Dakar',
+          badge: 'Exploitation Cantine',
+          badgeColor: '#C05621'
+        };
+      } else if (path.includes('/b2b/commande') || path.includes('/b2b/panier')) {
+        return {
+          role: 'SALARIE_CONVENTIONNE',
+          nomComplet: 'Babacar Ndiaye',
+          titrePoste: 'Salarié Conventionné',
+          entite: 'TotalEnergies Sénégal',
+          siteId: 'site-1',
+          siteNom: 'Siège Plateau - Dakar',
+          badge: 'Subventionné 100% • 0 FCFA',
+          badgeColor: '#2E7D32'
+        };
+      }
+    }
+    return defaultSession;
+  }
+
+  // Session utilisateur B2B active (persistée en localStorage pour survivre au rafraîchissement F5)
+  currentSession = signal<UserSessionB2B>(this.loadInitialSession());
 
   // Section active dans l'Espace Super Admin Kiki Traiteur
-  superAdminActiveSection = signal<'DASHBOARD' | 'ENTREPRISES' | 'SITES' | 'CATALOGUE' | 'PLANNING' | 'FACTURATION'>('DASHBOARD');
+  superAdminActiveSection = signal<'DASHBOARD' | 'ENTREPRISES' | 'SITES' | 'CATALOGUE' | 'PLANNING' | 'FACTURATION'>(
+    (typeof localStorage !== 'undefined' && (localStorage.getItem('b2b_sa_active_section') as any)) || 'DASHBOARD'
+  );
 
   // Section active dans l'Espace Responsable Entreprise (RH) : Dashboard Vue Globale par défaut
-  rhActiveSection = signal<'STATISTIQUES' | 'COMMANDES_SITE' | 'EMPLOYES' | 'FACTURATION' | 'SITES'>('STATISTIQUES');
+  rhActiveSection = signal<'STATISTIQUES' | 'COMMANDES_SITE' | 'EMPLOYES' | 'FACTURATION' | 'SITES'>(
+    (typeof localStorage !== 'undefined' && (localStorage.getItem('b2b_rh_active_section') as any)) || 'STATISTIQUES'
+  );
 
   // Helpers de réduction pour les calculs de totaux de facturation
   sommePlatsLivres(acc: number, l: FacturationLigneJournaliere) { return acc + (l.nbPlatsLivres || 0); }
@@ -80,7 +137,14 @@ export class B2bStateService {
       sites: []
     };
     this.listeEntreprises.update(list => [ent, ...list]);
-    this.api.createEntreprise(ent).subscribe({ error: () => {} });
+    this.api.createEntreprise(ent).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.listeEntreprises.update(list => list.map(e => e.id === id ? res.data : e));
+        }
+      },
+      error: () => {}
+    });
     return ent;
   }
 
@@ -90,13 +154,30 @@ export class B2bStateService {
     if (this.currentEntreprise().id === id) {
       this.currentEntreprise.update(e => ({ ...e, ...updates }));
     }
-    this.api.updateEntreprise(id, updates).subscribe({ error: () => {} });
+    this.api.updateEntreprise(id, updates).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.listeEntreprises.update(list => list.map(e => e.id === id ? { ...e, ...res.data } : e));
+          if (this.currentEntreprise().id === id) {
+            this.currentEntreprise.update(e => ({ ...e, ...res.data }));
+          }
+        }
+      },
+      error: () => {}
+    });
   }
 
   // Méthode pour archiver / désarchiver une entreprise
   toggleArchiverEntreprise(id: string) {
     this.listeEntreprises.update(list => list.map(e => e.id === id ? { ...e, isArchivee: !e.isArchivee } : e));
-    this.api.toggleArchiveEntreprise(id).subscribe({ error: () => {} });
+    this.api.toggleArchiveEntreprise(id).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.listeEntreprises.update(list => list.map(e => e.id === id ? { ...e, isArchivee: res.data.isArchivee } : e));
+        }
+      },
+      error: () => {}
+    });
   }
 
   // Méthode pour ajouter un site à une entreprise
@@ -112,6 +193,7 @@ export class B2bStateService {
     if (this.currentEntreprise().id === entrepriseId) {
       this.currentEntreprise.update(e => ({ ...e, sites: [...e.sites, nouveauSite] }));
     }
+    this.api.addSite(entrepriseId, nouveauSite).subscribe({ error: () => {} });
     return nouveauSite;
   }
 
@@ -136,29 +218,71 @@ export class B2bStateService {
 
   // Méthodes Catalogue Global Super Admin (Ajouter, Modifier, Archiver)
   ajouterPlatCatalogue(plat: Omit<PlatB2B, 'id'>) {
-    const nouveauPlat: PlatB2B = { ...plat, id: 'plat-' + Date.now(), disponible: true, isArchive: false };
+    const tempId = 'plat-' + Date.now();
+    const nouveauPlat: PlatB2B = { ...plat, id: tempId, disponible: true, isArchive: false };
     this.catalogueJour.update(list => [nouveauPlat, ...list]);
-    this.api.createPlat(nouveauPlat).subscribe({ error: () => {} });
+    this.api.createPlat(nouveauPlat).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.catalogueJour.update(list => list.map(p => p.id === tempId ? res.data : p));
+        }
+      },
+      error: () => {}
+    });
   }
 
   modifierPlatCatalogue(id: string, updates: Partial<PlatB2B>) {
     this.catalogueJour.update(list => list.map(p => p.id === id ? { ...p, ...updates } : p));
-    this.api.updatePlat(id, updates).subscribe({ error: () => {} });
+    this.api.updatePlat(id, updates).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.catalogueJour.update(list => list.map(p => p.id === id ? res.data : p));
+        }
+      },
+      error: () => {}
+    });
   }
 
   toggleArchiverPlat(id: string) {
-    this.catalogueJour.update(list => list.map(p => p.id === id ? { ...p, isArchive: !p.isArchive } : p));
-    this.api.toggleArchivePlat(id).subscribe({ error: () => {} });
+    let devientArchive = false;
+    this.catalogueJour.update(list => list.map(p => {
+      if (p.id === id) {
+        devientArchive = !p.isArchive;
+        return { ...p, isArchive: devientArchive };
+      }
+      return p;
+    }));
+    if (devientArchive) {
+      // Retirer immédiatement le plat archivé des menus planifiés pour que la synchro soit totale
+      this.menusPlanifiesEntreprises.update(menus =>
+        menus.map(m => ({
+          ...m,
+          lignes: m.lignes.filter(l => l.platId !== id)
+        }))
+      );
+    }
+    this.api.toggleArchivePlat(id).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.catalogueJour.update(list => list.map(p => p.id === id ? res.data : p));
+        }
+      },
+      error: () => {}
+    });
   }
 
   // Onglet actif dans l'Espace Responsable de Site Kiki (Gestion de son Entreprise/Site : 5 onglets + Réclamations + Projection QR)
-  cuisineActiveTab = signal<'INFOS' | 'UTILISATEURS' | 'MENU' | 'COMMANDES' | 'FACTURATION' | 'RECLAMATIONS' | 'PROJECTION_QR'>('MENU');
+  cuisineActiveTab = signal<'INFOS' | 'UTILISATEURS' | 'MENU' | 'COMMANDES' | 'FACTURATION' | 'RECLAMATIONS' | 'PROJECTION_QR'>(
+    (typeof localStorage !== 'undefined' && (localStorage.getItem('b2b_cuisine_active_tab') as any)) || 'MENU'
+  );
 
   // Mode profil employé simulé : SUBVENTIONNE (prise en charge RH 100%) ou AUTONOME (frais personnels, panier libre, Wave)
-  modeProfil = signal<'SUBVENTIONNE' | 'AUTONOME'>('SUBVENTIONNE');
+  modeProfil = signal<'SUBVENTIONNE' | 'AUTONOME'>(
+    (typeof localStorage !== 'undefined' && (localStorage.getItem('b2b_mode_profil') as any)) || 'SUBVENTIONNE'
+  );
 
   // État de la Sidebar rétractable (Collapsed / Expanded) persisté
-  isSidebarCollapsed = signal<boolean>(localStorage.getItem('b2b_sidebar_collapsed') === 'true');
+  isSidebarCollapsed = signal<boolean>(typeof localStorage !== 'undefined' && localStorage.getItem('b2b_sidebar_collapsed') === 'true');
 
   // État du Drawer Mobile (< 1024px)
   isMobileDrawerOpen = signal<boolean>(false);
@@ -167,10 +291,45 @@ export class B2bStateService {
     // Définition immédiate dès le premier rendu
     this.updateSidebarCssVar(this.isSidebarCollapsed());
 
-    // Réaction réactive aux changements d'état
+    // Réaction réactive aux changements d'état et persistance dans localStorage (survit au F5)
     effect(() => {
       const collapsed = this.isSidebarCollapsed();
       this.updateSidebarCssVar(collapsed);
+    });
+
+    effect(() => {
+      const s = this.currentSession();
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('b2b_current_session', JSON.stringify(s));
+      }
+    });
+
+    effect(() => {
+      const sec = this.superAdminActiveSection();
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('b2b_sa_active_section', sec);
+      }
+    });
+
+    effect(() => {
+      const sec = this.rhActiveSection();
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('b2b_rh_active_section', sec);
+      }
+    });
+
+    effect(() => {
+      const tab = this.cuisineActiveTab();
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('b2b_cuisine_active_tab', tab);
+      }
+    });
+
+    effect(() => {
+      const mode = this.modeProfil();
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('b2b_mode_profil', mode);
+      }
     });
 
     // Synchronisation initiale avec le backend Spring Boot (si démarré)
@@ -201,6 +360,15 @@ export class B2bStateService {
       next: (res) => {
         if (res.success && res.data?.length) {
           this.catalogueJour.set(res.data);
+          const archivedIds = new Set(res.data.filter(p => !!p.isArchive).map(p => p.id));
+          if (archivedIds.size > 0) {
+            this.menusPlanifiesEntreprises.update(menus =>
+              menus.map(m => ({
+                ...m,
+                lignes: (m.lignes || []).filter(l => !archivedIds.has(l.platId))
+              }))
+            );
+          }
         }
       },
       error: () => {}
@@ -227,7 +395,13 @@ export class B2bStateService {
     this.api.getPlanning().subscribe({
       next: (res) => {
         if (res.success && res.data?.length) {
-          this.menusPlanifiesEntreprises.set(res.data);
+          const archivedIds = new Set(this.catalogueJour().filter(p => !!p.isArchive).map(p => p.id));
+          this.menusPlanifiesEntreprises.set(
+            res.data.map(m => ({
+              ...m,
+              lignes: (m.lignes || []).filter(l => !archivedIds.has(l.platId))
+            }))
+          );
         }
       },
       error: () => {}
@@ -237,6 +411,15 @@ export class B2bStateService {
       next: (res) => {
         if (res.success && res.data?.length) {
           this.lignesFacturationEntreprise.set(res.data);
+        }
+      },
+      error: () => {}
+    });
+
+    this.api.getInvitations('ent-001').subscribe({
+      next: (res) => {
+        if (res.success && res.data?.length) {
+          this.listeInvitationsAdmins.set(res.data);
         }
       },
       error: () => {}
@@ -659,7 +842,7 @@ export class B2bStateService {
     const dateStr = now.toISOString().slice(0, 10);
     const nouvelle: ReclamationCutOffB2B = {
       id: 'rec-' + Date.now(),
-      entrepriseId: this.currentEntreprise().id,
+      entrepriseId: this.currentEntreprise().id || 'ent-001',
       siteId: employe.siteId,
       employeId: employe.id,
       employeNom: `${employe.prenom} ${employe.nom}`,
@@ -671,6 +854,14 @@ export class B2bStateService {
       statut: 'EN_ATTENTE'
     };
     this.listeReclamations.update(list => [nouvelle, ...list]);
+    this.api.createReclamation(nouvelle).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.listeReclamations.update(list => list.map(r => r.id === nouvelle.id ? res.data : r));
+        }
+      },
+      error: () => {}
+    });
     return nouvelle;
   }
 
@@ -743,17 +934,166 @@ export class B2bStateService {
       }
       return m;
     }));
+    this.api.dupliquerPlanningJour(entrepriseId, source.jourNom, cibleJourNom).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.menusPlanifiesEntreprises.update(list =>
+            list.map(m => (m.entrepriseId === entrepriseId && m.jourNom === cibleJourNom) ? res.data : m)
+          );
+        }
+      },
+      error: () => {}
+    });
+  }
+
+  // Ajouter un plat à un jour planifié (et synchroniser avec le backend)
+  ajouterPlatMenuJour(entrepriseId: string, jourNom: 'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche', plat: PlatB2B, quantitePrevue: number = 35) {
+    const tempLigneId = 'l-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4);
+    this.menusPlanifiesEntreprises.update(list => list.map(m => {
+      if ((m.entrepriseId === entrepriseId || (entrepriseId === 'ent-001' && m.entrepriseId === 'GLOBAL')) && m.jourNom === jourNom) {
+        if (m.lignes.some(l => l.platId === plat.id)) {
+          return m;
+        }
+        const nouvelleLigne = {
+          id: tempLigneId,
+          categorie: plat.categorie,
+          platId: plat.id,
+          nomPlat: plat.nom,
+          image: plat.image,
+          quantitePrevue,
+          disponible: true
+        };
+        return {
+          ...m,
+          lignes: [...m.lignes, nouvelleLigne],
+          quantitesSaisies: quantitePrevue > 0 ? true : m.quantitesSaisies
+        };
+      }
+      return m;
+    }));
+
+    this.api.ajouterPlatPlanning(entrepriseId, jourNom, plat.id, quantitePrevue).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.menusPlanifiesEntreprises.update(list =>
+            list.map(m => (m.entrepriseId === entrepriseId && m.jourNom === jourNom) ? res.data : m)
+          );
+        }
+      },
+      error: () => {}
+    });
+  }
+
+  // Supprimer une ligne d'un jour planifié (et synchroniser avec le backend)
+  supprimerLigneMenuJour(menuIdOrJourNom: string, ligneId: string) {
+    this.menusPlanifiesEntreprises.update(list => list.map(m => {
+      if (m.id === menuIdOrJourNom || m.jourNom === menuIdOrJourNom) {
+        return {
+          ...m,
+          lignes: m.lignes.filter(l => l.id !== ligneId)
+        };
+      }
+      return m;
+    }));
+    this.api.supprimerLignePlanning(ligneId).subscribe({ error: () => {} });
+  }
+
+  // Reconduire la semaine suivante (et synchroniser avec le backend)
+  reconduireSemainePlanning(entrepriseId = 'ent-001') {
+    this.deployerProgrammationGlobaleVersEntreprises();
+    this.api.reconduireSemainePlanning(entrepriseId).subscribe({
+      next: (res) => {
+        if (res.success && res.data?.length) {
+          this.syncFromBackend();
+        }
+      },
+      error: () => {}
+    });
+  }
+
+  // Enregistrer une nouvelle commande employé (et synchroniser avec le backend)
+  enregistrerCommandeSite(payload: {
+    codeCommande: string;
+    platNom: string;
+    categorie: 'ENTREE' | 'PLAT' | 'GARNITURE' | 'DESSERT' | 'BOISSON';
+    montantTotal: number;
+    partEntreprise: number;
+    partEmploye: number;
+    qrCode?: string;
+  }) {
+    const emp = this.currentEmploye();
+    const ent = this.currentEntreprise();
+    const site = this.siteActuel();
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 10);
+    const heureStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const nouvelleCmd: CommandeEntrepriseSite = {
+      id: 'cmd-' + Date.now(),
+      codeCommande: payload.codeCommande,
+      entrepriseId: ent.id || 'ent-001',
+      entrepriseNom: ent.nom || 'TotalEnergies — Siège Plateau',
+      matricule: emp.matricule,
+      employeNom: `${emp.prenom} ${emp.nom}`,
+      categorie: payload.categorie,
+      platNom: payload.platNom,
+      date: dateStr,
+      heure: heureStr,
+      montantTotal: payload.montantTotal,
+      partEntreprise: payload.partEntreprise,
+      partEmploye: payload.partEmploye,
+      statut: 'EN_COURS'
+    };
+
+    this.listeCommandesSite.update(list => [nouvelleCmd, ...list]);
+    this.historiqueCommandes.update(list => [
+      {
+        id: payload.codeCommande,
+        date: dateStr,
+        heure: heureStr,
+        matricule: emp.matricule,
+        employeNom: `${emp.prenom} ${emp.nom}`,
+        siteId: site?.id || 'site-1',
+        siteNom: site?.nom || 'Siège Plateau - Dakar',
+        formuleNom: this.modeProfil() === 'AUTONOME' ? 'Panier Libre Autonome' : this.formuleActuelle().nom,
+        platNom: payload.platNom,
+        prixTotal: payload.montantTotal,
+        partEntreprise: payload.partEntreprise,
+        partEmploye: payload.partEmploye,
+        tauxSubventionApplique: emp.tauxSubvention,
+        statut: 'VALIDE'
+      },
+      ...list
+    ]);
+
+    this.api.createCommande({
+      ...nouvelleCmd,
+      ...(payload.qrCode ? { qrCode: payload.qrCode } : {})
+    } as any).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.listeCommandesSite.update(list => list.map(c => c.id === nouvelleCmd.id ? res.data : c));
+        }
+      },
+      error: () => {}
+    });
   }
 
   // PROGRAMMATION GLOBALE & DÉPLOIEMENT VERS TOUTES LES ENTREPRISES
   // Déploie le programme global préparé par le Super Admin vers les sites/entreprises
-  // en adaptant automatiquement selon les catégories autorisées de chaque entreprise.
+  // en adaptant automatiquement selon les catégories autorisées de chaque entreprise et en excluant les plats archivés.
   deployerProgrammationGlobaleVersEntreprises() {
+    const archivedPlatIds = new Set(
+      this.catalogueJour().filter(p => !!p.isArchive).map(p => p.id)
+    );
     const programmeGlobal = this.menusPlanifiesEntreprises().filter(m => m.entrepriseId === 'ent-001' || m.entrepriseId === 'GLOBAL');
     const entreprises = this.listeEntreprises();
 
     this.menusPlanifiesEntreprises.update(listeActuelle => {
-      let nouvelleListe = [...listeActuelle];
+      // Nettoyer d'abord tout plat archivé de l'ensemble des menus existants
+      let nouvelleListe = listeActuelle.map(m => ({
+        ...m,
+        lignes: m.lignes.filter(l => !archivedPlatIds.has(l.platId))
+      }));
 
       entreprises.forEach(ent => {
         const categoriesAutorisees = ent.categoriesAutorisees || ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'];
@@ -762,29 +1102,28 @@ export class B2bStateService {
           const modeleJour = programmeGlobal.find(p => p.jourNom === jour);
           if (!modeleJour) return;
 
-          // Filtrer les lignes selon les catégories autorisées du contrat de l'entreprise
+          // Filtrer les lignes selon les catégories autorisées du contrat de l'entreprise ET exclure les plats archivés
           const lignesFiltrees = modeleJour.lignes
-            .filter(l => categoriesAutorisees.includes(l.categorie))
+            .filter(l => !archivedPlatIds.has(l.platId) && categoriesAutorisees.includes(l.categorie))
             .map(l => ({
               ...l,
-              id: 'l-' + ent.id + '-' + jour + '-' + l.platId,
-              quantitePrevue: 0 // Au gestionnaire de site de renseigner ses quantités !
+              id: ent.id === 'ent-001' ? l.id : ('l-' + ent.id + '-' + jour + '-' + l.platId),
+              quantitePrevue: ent.id === 'ent-001' ? (l.quantitePrevue || 35) : 0
             }));
 
           const existantIdx = nouvelleListe.findIndex(m => m.entrepriseId === ent.id && m.jourNom === jour);
           const menuDeploye: MenuPlanifieJourEntreprise = {
-            id: `plan-${ent.id}-${jour.toLowerCase().slice(0, 3)}`,
+            id: existantIdx >= 0 ? nouvelleListe[existantIdx].id : `plan-${ent.id}-${jour.toLowerCase().slice(0, 3)}`,
             entrepriseId: ent.id,
             jourNom: jour as any,
             dateStr: modeleJour.dateStr,
             theme: modeleJour.theme,
             lignes: lignesFiltrees,
-            quantitesSaisies: false,
-            statutConformite: 'NON_SAISI'
+            quantitesSaisies: ent.id === 'ent-001' ? modeleJour.quantitesSaisies : false,
+            statutConformite: ent.id === 'ent-001' ? modeleJour.statutConformite : 'NON_SAISI'
           };
 
           if (existantIdx >= 0) {
-            // Conserver si déjà des quantités ou écraser avec le nouveau programme
             nouvelleListe[existantIdx] = menuDeploye;
           } else {
             nouvelleListe.push(menuDeploye);
@@ -794,6 +1133,8 @@ export class B2bStateService {
 
       return nouvelleListe;
     });
+
+    this.api.deployerPlanningGlobal('ent-001').subscribe({ error: () => {} });
   }
 
   // Annuaire des employés RH de l'entreprise
@@ -843,6 +1184,7 @@ export class B2bStateService {
       }
       return p;
     }));
+    this.api.toggleDisponibilitePlat(platId).subscribe({ error: () => {} });
   }
 
   // Panier
@@ -938,24 +1280,7 @@ export class B2bStateService {
 
   // ACTIONS RH
   ajouterNouvelEmploye(nouvelEmp: Partial<EmployeB2B>) {
-    const site = this.currentEntreprise().sites.find(s => s.id === nouvelEmp.siteId);
-    const emp: EmployeB2B = {
-      id: 'emp-' + Date.now(),
-      matricule: nouvelEmp.matricule || 'TOT-' + Math.floor(1000 + Math.random() * 9000),
-      nom: nouvelEmp.nom || 'Nouveau',
-      prenom: nouvelEmp.prenom || 'Employé',
-      email: nouvelEmp.email || '',
-      telephone: nouvelEmp.telephone || '',
-      siteId: nouvelEmp.siteId || 'site-1',
-      siteNom: site ? site.nom : 'Siège Plateau',
-      departement: nouvelEmp.departement || 'Général',
-      type: nouvelEmp.type || 'SUBVENTIONNE',
-      tauxSubvention: nouvelEmp.tauxSubvention !== undefined ? nouvelEmp.tauxSubvention : 100,
-      actif: true,
-      repasConsommesMois: 0,
-      montantPrisEnChargeMois: 0
-    };
-    this.listeEmployes.update(list => [emp, ...list]);
+    this.ajouterEmploye(nouvelEmp);
   }
 
   toggleStatutEmploye(empId: string) {

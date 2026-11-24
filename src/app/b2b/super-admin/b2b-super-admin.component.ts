@@ -16,6 +16,21 @@ import { EntrepriseB2B, SiteB2B, PlatB2B, TypePrestationB2B, CategoriePlatB2B, P
 export class B2bSuperAdminComponent {
   b2b = inject(B2bStateService);
 
+  constructor() {
+    if (this.b2b.currentSession().role !== 'SUPER_ADMIN') {
+      this.b2b.setSessionRole({
+        role: 'SUPER_ADMIN',
+        nomComplet: 'Direction Kiki Traiteur',
+        titrePoste: 'Super Admin Kiki (Global)',
+        entite: 'Kiki Traiteur B2B',
+        siteId: 'site-1',
+        siteNom: 'Siège Plateau - Dakar',
+        badge: 'Direction Générale',
+        badgeColor: '#721513'
+      });
+    }
+  }
+
   get activeSection() {
     return this.b2b.superAdminActiveSection;
   }
@@ -982,7 +997,13 @@ export class B2bSuperAdminComponent {
   // Plats du jour dans le planning modèle global (Lundi à Dimanche)
   menuModeleGlobalJourActif = computed(() => {
     const jour = this.jourPlanningGlobalActif();
-    return this.b2b.menusPlanifiesEntreprises().find(m => (m.entrepriseId === 'ent-001' || m.entrepriseId === 'GLOBAL') && m.jourNom === jour);
+    const menu = this.b2b.menusPlanifiesEntreprises().find(m => (m.entrepriseId === 'ent-001' || m.entrepriseId === 'GLOBAL') && m.jourNom === jour);
+    if (!menu) return undefined;
+    const archivedIds = new Set(this.b2b.catalogueJour().filter(p => !!p.isArchive).map(p => p.id));
+    return {
+      ...menu,
+      lignes: menu.lignes.filter(l => !archivedIds.has(l.platId))
+    };
   });
 
   // Plats disponibles dans le catalogue pour ajout au planning
@@ -993,42 +1014,13 @@ export class B2bSuperAdminComponent {
 
   ajouterPlatAuProgrammeGlobal(plat: PlatB2B) {
     const jour = this.jourPlanningGlobalActif();
-    this.b2b.menusPlanifiesEntreprises.update(list => list.map(m => {
-      if ((m.entrepriseId === 'ent-001' || m.entrepriseId === 'GLOBAL') && m.jourNom === jour) {
-        // Vérifier si le plat n'est pas déjà présent
-        if (m.lignes.some(l => l.platId === plat.id)) {
-          return m;
-        }
-        const nouvelleLigne = {
-          id: 'l-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
-          categorie: plat.categorie,
-          platId: plat.id,
-          nomPlat: plat.nom,
-          image: plat.image,
-          quantitePrevue: 35,
-          disponible: true
-        };
-        return {
-          ...m,
-          lignes: [...m.lignes, nouvelleLigne]
-        };
-      }
-      return m;
-    }));
+    this.b2b.ajouterPlatMenuJour('ent-001', jour, plat, 35);
     this.modalAjouterPlatAuJourGlobal.set(false);
   }
 
   retirerPlatDuProgrammeGlobal(ligneId: string) {
     const jour = this.jourPlanningGlobalActif();
-    this.b2b.menusPlanifiesEntreprises.update(list => list.map(m => {
-      if ((m.entrepriseId === 'ent-001' || m.entrepriseId === 'GLOBAL') && m.jourNom === jour) {
-        return {
-          ...m,
-          lignes: m.lignes.filter(l => l.id !== ligneId)
-        };
-      }
-      return m;
-    }));
+    this.b2b.supprimerLigneMenuJour(jour, ligneId);
   }
 
   deployerVersTousLesSites() {
@@ -1051,19 +1043,7 @@ export class B2bSuperAdminComponent {
     const sourceMenu = this.b2b.menusPlanifiesEntreprises().find(m => (m.entrepriseId === 'ent-001' || m.entrepriseId === 'GLOBAL') && m.jourNom === sourceJour);
     if (!sourceMenu) return;
 
-    this.b2b.menusPlanifiesEntreprises.update(list => list.map(m => {
-      if ((m.entrepriseId === 'ent-001' || m.entrepriseId === 'GLOBAL') && m.jourNom === cibleJour) {
-        return {
-          ...m,
-          theme: sourceMenu.theme ? `${sourceMenu.theme} (Copié de ${sourceJour})` : m.theme,
-          lignes: sourceMenu.lignes.map(l => ({
-            ...l,
-            id: 'l-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4)
-          }))
-        };
-      }
-      return m;
-    }));
+    this.b2b.dupliquerMenuJour(sourceMenu.id, cibleJour, sourceMenu.entrepriseId);
 
     this.modalDupliquerJourGlobal.set(false);
     this.jourPlanningGlobalActif.set(cibleJour);
@@ -1072,7 +1052,7 @@ export class B2bSuperAdminComponent {
 
   reconduireSemaineSuivante() {
     if (confirm('Voulez-vous reconduire l\'intégralité du programme hebdomadaire actuel sur la semaine suivante et synchroniser automatiquement vers les cantines partenaires ?')) {
-      this.b2b.deployerProgrammationGlobaleVersEntreprises();
+      this.b2b.reconduireSemainePlanning('ent-001');
       alert('Reconduction effectuée avec succès pour la semaine suivante ! Toutes les cantines ont été mises à jour.');
     }
   }
@@ -1242,9 +1222,15 @@ export class B2bSuperAdminComponent {
     const ent = this.entrepriseEnGestion();
     const jour = this.jourMenuActif();
     if (!ent) return null;
-    return this.b2b.menusPlanifiesEntreprises().find(m => 
+    const menu = this.b2b.menusPlanifiesEntreprises().find(m => 
       (m.entrepriseId === ent.id || m.entrepriseId === 'ent-001' || m.entrepriseId === 'ent-1') && m.jourNom === jour
     ) || null;
+    if (!menu) return null;
+    const archivedIds = new Set(this.b2b.catalogueJour().filter(p => !!p.isArchive).map(p => p.id));
+    return {
+      ...menu,
+      lignes: menu.lignes.filter(l => !archivedIds.has(l.platId))
+    };
   });
 
   // Catégories autorisées pour l'entreprise en gestion

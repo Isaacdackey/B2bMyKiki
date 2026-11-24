@@ -16,6 +16,22 @@ import { PlatB2B } from '../shared/b2b.models';
 export class B2bCommandeComponent {
   b2b = inject(B2bStateService);
 
+  constructor() {
+    const r = this.b2b.currentSession().role;
+    if (r !== 'SALARIE_CONVENTIONNE' && r !== 'SALARIE_AUTONOME') {
+      this.b2b.setSessionRole({
+        role: this.b2b.modeProfil() === 'AUTONOME' ? 'SALARIE_AUTONOME' : 'SALARIE_CONVENTIONNE',
+        nomComplet: this.b2b.modeProfil() === 'AUTONOME' ? 'Ousmane Ba (Consultant)' : 'Babacar Ndiaye',
+        titrePoste: this.b2b.modeProfil() === 'AUTONOME' ? 'Salarié Autonome' : 'Salarié Conventionné',
+        entite: 'TotalEnergies Sénégal',
+        siteId: 'site-1',
+        siteNom: 'Siège Plateau - Dakar',
+        badge: this.b2b.modeProfil() === 'AUTONOME' ? 'Paiement direct Wave' : 'Subventionné 100% • 0 FCFA',
+        badgeColor: this.b2b.modeProfil() === 'AUTONOME' ? '#1D4ED8' : '#2E7D32'
+      });
+    }
+  }
+
   qrMode = signal<'MONTRER' | 'SCANNER'>('MONTRER');
   scanCantineValide = signal(false);
   flashGarnitureMessage = signal<string | null>(null);
@@ -29,6 +45,13 @@ export class B2bCommandeComponent {
 
   validerScanCantine() {
     this.scanCantineValide.set(true);
+    const emp = this.b2b.currentEmploye();
+    const cmdEnCours = this.b2b.listeCommandesSite().find(
+      c => c.statut === 'EN_COURS' && (c.matricule === emp.matricule || c.employeNom.includes(emp.nom))
+    );
+    if (cmdEnCours) {
+      this.b2b.scannerCommandeSite(cmdEnCours.id);
+    }
   }
 
   // SÉLECTION DU JOUR POUR COMMANDER TOUTE LA SEMAINE (Lundi à Dimanche)
@@ -377,8 +400,16 @@ export class B2bCommandeComponent {
     this.qrDataString.set(code);
 
     const s = this.b2b.selection();
+    const cmdCode = `CMD-B2B-${Date.now().toString().slice(-6)}`;
+    const prixTotal = this.b2b.modeProfil() === 'AUTONOME' ? this.b2b.totalPanierAutonome() : this.b2b.formuleActuelle().prixForfait;
+    const partEntreprise = this.b2b.partPriseEnChargeEntreprise();
+    const partEmploye = this.b2b.resteAPayerEmploye();
+    const platNomResume = this.b2b.modeProfil() === 'AUTONOME'
+      ? (this.b2b.panierAutonome().map(i => `${i.plat.nom} (x${i.quantite})`).join(', ') || 'Commande Autonome')
+      : (s.plat?.nom || s.entree?.nom || 'Formule Déjeuner');
+
     this.derniereCommande.set({
-      id: `CMD-B2B-${Date.now().toString().slice(-6)}`,
+      id: cmdCode,
       date: this.jourSelectionne() + ' ' + (this.datesSemaineMap[this.jourSelectionne()] || ''),
       heureRetrait: this.b2b.creneauLivraison(),
       siteNom: site.nom,
@@ -388,9 +419,19 @@ export class B2bCommandeComponent {
       dessertNom: s.dessert?.nom,
       boissonNom: s.boisson?.nom,
       qrCode: code,
-      prixTotal: this.b2b.modeProfil() === 'AUTONOME' ? this.b2b.totalPanierAutonome() : this.b2b.formuleActuelle().prixForfait,
-      partEntreprise: this.b2b.partPriseEnChargeEntreprise(),
-      partEmploye: this.b2b.resteAPayerEmploye()
+      prixTotal,
+      partEntreprise,
+      partEmploye
+    });
+
+    this.b2b.enregistrerCommandeSite({
+      codeCommande: cmdCode,
+      platNom: platNomResume,
+      categorie: 'PLAT',
+      montantTotal: prixTotal,
+      partEntreprise,
+      partEmploye,
+      qrCode: code
     });
 
     // Pour l'employé non subventionné (0% ou AUTONOME) : règlement obligatoire par Wave

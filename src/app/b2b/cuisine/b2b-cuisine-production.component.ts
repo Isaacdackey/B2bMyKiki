@@ -16,6 +16,21 @@ import { EntrepriseB2B, EmployeB2B, CommandeEntrepriseSite, FacturationLigneJour
 export class B2bCuisineProductionComponent {
   b2b = inject(B2bStateService);
 
+  constructor() {
+    if (this.b2b.currentSession().role !== 'RESPONSABLE_SITE_KIKI') {
+      this.b2b.setSessionRole({
+        role: 'RESPONSABLE_SITE_KIKI',
+        nomComplet: 'Chef Moussa Ndiaye',
+        titrePoste: 'Responsable de Site Kiki',
+        entite: 'Kiki Traiteur Exploitation',
+        siteId: 'site-1',
+        siteNom: 'Siège Plateau - Dakar',
+        badge: 'Exploitation Cantine',
+        badgeColor: '#C05621'
+      });
+    }
+  }
+
   // Synchronisation avec l'onglet actif
   get activeTab() {
     return this.b2b.cuisineActiveTab;
@@ -58,7 +73,13 @@ export class B2bCuisineProductionComponent {
 
   menuJourActif = computed(() => {
     const jour = this.jourSelectionne();
-    return this.menusSemaine().find(m => m.jourNom === jour) || null;
+    const menu = this.menusSemaine().find(m => m.jourNom === jour) || null;
+    if (!menu) return null;
+    const archivedIds = new Set(this.b2b.catalogueJour().filter(p => !!p.isArchive).map(p => p.id));
+    return {
+      ...menu,
+      lignes: menu.lignes.filter(l => !archivedIds.has(l.platId))
+    };
   });
 
   // GESTION DU QR CODE CANTINE DU JOUR À PROJETER (Grand Écran)
@@ -187,27 +208,7 @@ export class B2bCuisineProductionComponent {
     const menuJour = this.menuJourActif();
     if (!plat || !menuJour) return;
 
-    this.b2b.menusPlanifiesEntreprises.update(list => list.map(m => {
-      if (m.id === menuJour.id) {
-        const newLine = {
-          id: 'l-' + Date.now(),
-          categorie: plat.categorie,
-          platId: plat.id,
-          nomPlat: plat.nom,
-          image: plat.image,
-          quantitePrevue: this.quantiteInitialeAjout(),
-          disponible: true
-        };
-        const newLignes = [...m.lignes, newLine];
-        return {
-          ...m,
-          lignes: newLignes,
-          quantitesSaisies: true
-        };
-      }
-      return m;
-    }));
-
+    this.b2b.ajouterPlatMenuJour(menuJour.entrepriseId, menuJour.jourNom, plat, this.quantiteInitialeAjout());
     this.fermerModalAjoutPlat();
   }
 
@@ -222,15 +223,7 @@ export class B2bCuisineProductionComponent {
     const menuJour = this.menuJourActif();
     if (!menuJour) return;
 
-    this.b2b.menusPlanifiesEntreprises.update(list => list.map(m => {
-      if (m.id === menuJour.id) {
-        return {
-          ...m,
-          lignes: m.lignes.filter(l => l.id !== ligneId)
-        };
-      }
-      return m;
-    }));
+    this.b2b.supprimerLigneMenuJour(menuJour.id, ligneId);
   }
 
   // CALCUL DE CONFORMITÉ PAR CATÉGORIE POUR LE JOUR SÉLECTIONNÉ

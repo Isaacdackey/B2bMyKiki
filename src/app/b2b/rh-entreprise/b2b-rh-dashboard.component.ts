@@ -16,6 +16,21 @@ import { EmployeB2B, CommandeHistoriqueB2B } from '../shared/b2b.models';
 export class B2bRhDashboardComponent {
   b2b = inject(B2bStateService);
 
+  constructor() {
+    if (this.b2b.currentSession().role !== 'RESPONSABLE_ENTREPRISE') {
+      this.b2b.setSessionRole({
+        role: 'RESPONSABLE_ENTREPRISE',
+        nomComplet: 'Mme Fatou Fall',
+        titrePoste: 'Responsable RH & Moyens Généraux',
+        entite: 'TotalEnergies Sénégal',
+        siteId: 'site-1',
+        siteNom: 'Siège Plateau - Dakar',
+        badge: 'Responsable Entreprise',
+        badgeColor: '#721513'
+      });
+    }
+  }
+
   // Utilisation de la section persistée dans le service partagé pour synchronisation avec la navbar latérale
   get activeSection() {
     return this.b2b.rhActiveSection;

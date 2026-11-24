@@ -85,12 +85,61 @@ export class B2bApiService {
     return this.http.patch<ApiResponse<PlatB2B>>(`${this.baseUrl}/b2b/catalogue/${id}/archive`, {}, { headers: this.getHeaders() });
   }
 
-  getPlanning(entrepriseId = 'ent-001'): Observable<ApiResponse<MenuPlanifieJourEntreprise[]>> {
-    return this.http.get<ApiResponse<MenuPlanifieJourEntreprise[]>>(`${this.baseUrl}/b2b/planning?entrepriseId=${encodeURIComponent(entrepriseId)}`, { headers: this.getHeaders() });
+  toggleDisponibilitePlat(id: string): Observable<ApiResponse<PlatB2B>> {
+    return this.http.patch<ApiResponse<PlatB2B>>(`${this.baseUrl}/b2b/catalogue/${id}/disponibilite`, {}, { headers: this.getHeaders() });
+  }
+
+  getPlanning(entrepriseId?: string): Observable<ApiResponse<MenuPlanifieJourEntreprise[]>> {
+    const q = entrepriseId ? `?entrepriseId=${encodeURIComponent(entrepriseId)}` : '';
+    return this.http.get<ApiResponse<MenuPlanifieJourEntreprise[]>>(`${this.baseUrl}/b2b/planning${q}`, { headers: this.getHeaders() });
+  }
+
+  ajouterPlatPlanning(entrepriseId: string, jourNom: string, platId: string, quantitePrevue = 35): Observable<ApiResponse<MenuPlanifieJourEntreprise>> {
+    return this.http.post<ApiResponse<MenuPlanifieJourEntreprise>>(
+      `${this.baseUrl}/b2b/planning/ajouter-plat`,
+      { entrepriseId, jourNom, platId, quantitePrevue },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  supprimerLignePlanning(ligneId: string): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${this.baseUrl}/b2b/planning/lignes/${ligneId}`, { headers: this.getHeaders() });
+  }
+
+  dupliquerPlanningJour(entrepriseId: string, jourSource: string, jourCible: string): Observable<ApiResponse<MenuPlanifieJourEntreprise>> {
+    return this.http.post<ApiResponse<MenuPlanifieJourEntreprise>>(
+      `${this.baseUrl}/b2b/planning/dupliquer`,
+      { entrepriseId, jourSource, jourCible },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  reconduireSemainePlanning(entrepriseId = 'ent-001'): Observable<ApiResponse<MenuPlanifieJourEntreprise[]>> {
+    return this.http.post<ApiResponse<MenuPlanifieJourEntreprise[]>>(
+      `${this.baseUrl}/b2b/planning/reconduire-semaine?entrepriseId=${encodeURIComponent(entrepriseId)}`,
+      {},
+      { headers: this.getHeaders() }
+    );
+  }
+
+  deployerPlanningGlobal(sourceEntrepriseId = 'ent-001'): Observable<ApiResponse<number>> {
+    return this.http.post<ApiResponse<number>>(
+      `${this.baseUrl}/b2b/planning/deployer?sourceEntrepriseId=${encodeURIComponent(sourceEntrepriseId)}`,
+      {},
+      { headers: this.getHeaders() }
+    );
   }
 
   updateQuantitePlanning(ligneId: string, quantitePrevue: number): Observable<ApiResponse<any>> {
     return this.http.patch<ApiResponse<any>>(`${this.baseUrl}/b2b/planning/lignes/${ligneId}/quantite`, { quantitePrevue }, { headers: this.getHeaders() });
+  }
+
+  addSite(entrepriseId: string, site: Partial<any>): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.baseUrl}/b2b/entreprises/${entrepriseId}/sites`, site, { headers: this.getHeaders() });
+  }
+
+  getInvitations(entrepriseId = 'ent-001'): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/b2b/entreprises/${entrepriseId}/invitations`, { headers: this.getHeaders() });
   }
 
   createInvitation(entrepriseId: string, inv: any): Observable<ApiResponse<any>> {
