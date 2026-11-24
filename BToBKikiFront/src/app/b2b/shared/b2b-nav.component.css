@@ -526,10 +526,10 @@
   left: 0;
   right: 0;
   width: 100%;
-  height: calc(56px + max(18px, env(safe-area-inset-top, 0px)));
+  height: calc(64px + max(18px, env(safe-area-inset-top, 0px)));
   background: #FFFFFF;
   border-bottom: 1.5px solid #EDE7DC;
-  padding: max(18px, env(safe-area-inset-top, 0px)) 1rem 0;
+  padding: max(18px, env(safe-area-inset-top, 0px)) 1.25rem 8px;
   align-items: center;
   justify-content: space-between;
   z-index: 600;
