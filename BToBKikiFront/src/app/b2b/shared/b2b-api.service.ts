@@ -21,7 +21,7 @@ export interface ApiResponse<T> {
 @Injectable({ providedIn: 'root' })
 export class B2bApiService {
   private http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:8080/api/v1';
+  private readonly baseUrl = 'https://b2bmykiki.onrender.com/api/v1';
 
   private getHeaders(): HttpHeaders {
     const token = typeof localStorage !== 'undefined' ? localStorage.getItem('b2b_jwt_token') : null;
