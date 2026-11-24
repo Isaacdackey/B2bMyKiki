@@ -131,8 +131,10 @@ export class B2bCommandeComponent {
     let listeBase: PlatB2B[] = [];
 
     if (menu && menu.lignes && menu.lignes.length > 0) {
-      // Afficher les plats programmés par le Responsable pour ce jour précis
-      listeBase = menu.lignes.map(l => {
+      // Afficher les plats programmés par le Responsable pour ce jour précis (en excluant les plats archivés)
+      listeBase = menu.lignes
+        .filter(l => !this.b2b.catalogueJour().find(p => p.id === l.platId)?.isArchive)
+        .map(l => {
         const platOrigine = this.b2b.catalogueJour().find(p => p.id === l.platId);
         return {
           id: l.platId,
