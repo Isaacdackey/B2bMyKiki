@@ -56,9 +56,9 @@
       </div>
     </div>
 
-    <!-- Ligne 2 : Catégories (1 ligne scrollable) + Recherche (droite) -->
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #FAF5EA;">
-      <div class="kiki-scroll-row-wrap" style="flex: 1 1 360px; min-width: 0;">
+    <!-- Ligne 2 : Catégories (1 ligne scrollable pleine largeur) -->
+    <div style="display: flex; flex-direction: column; gap: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #FAF5EA;">
+      <div class="kiki-scroll-row-wrap" style="width: 100%; min-width: 0;">
         <div class="kiki-scroll-row" style="gap: 0.4rem;">
           @for (cat of categories(); track cat.id) {
             <button
@@ -75,19 +75,22 @@
         </div>
       </div>
 
-      <div style="display: flex; align-items: center; gap: 0.5rem; background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 9999px; padding: 0.42rem 0.9rem; flex: 1 1 220px; max-width: 300px;">
-        <i class="fa-solid fa-magnifying-glass" style="color: #721513; font-size: 0.8rem;"></i>
-        <input
-          type="text"
-          [ngModel]="termeRecherche()"
-          (ngModelChange)="termeRecherche.set($event)"
-          placeholder="Rechercher un plat..."
-          style="border: none; outline: none; background: transparent; font-size: 0.8rem; width: 100%; color: #332724; font-weight: 600;" />
-        @if (termeRecherche()) {
-          <button type="button" (click)="termeRecherche.set('')" style="background: none; border: none; color: #8C7E74; cursor: pointer; padding: 0;">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        }
+      <!-- Ligne 3 : Recherche en bas à droite -->
+      <div style="display: flex; justify-content: flex-end; width: 100%;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 9999px; padding: 0.42rem 0.9rem; width: 100%; max-width: 320px;">
+          <i class="fa-solid fa-magnifying-glass" style="color: #721513; font-size: 0.8rem; flex-shrink: 0;"></i>
+          <input
+            type="text"
+            [ngModel]="termeRecherche()"
+            (ngModelChange)="termeRecherche.set($event)"
+            placeholder="Rechercher un plat..."
+            style="border: none; outline: none; background: transparent; font-size: 0.8rem; width: 100%; color: #332724; font-weight: 600;" />
+          @if (termeRecherche()) {
+            <button type="button" (click)="termeRecherche.set('')" style="background: none; border: none; color: #8C7E74; cursor: pointer; padding: 0;">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          }
+        </div>
       </div>
     </div>
   </section>

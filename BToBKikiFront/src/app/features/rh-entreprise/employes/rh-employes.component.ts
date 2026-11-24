@@ -2,13 +2,14 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { B2bPeriodFilterComponent, PeriodeFilterChange } from '../../../b2b/shared/b2b-period-filter.component';
 import { B2bStateService } from '../../../b2b/shared/b2b-state.service';
 import { EmployeB2B } from '../../../b2b/shared/b2b.models';
 
 @Component({
   selector: 'app-rh-employes',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, B2bPeriodFilterComponent],
   templateUrl: './rh-employes.component.html',
   styleUrls: ['../rh-shared.css']
 })
@@ -29,6 +30,12 @@ export class RhEmployesComponent {
   selectedSiteFilter = signal<string>('TOUS');
   employeDateDebut = signal<string>('2026-11-01');
   employeDateFin = signal<string>('2026-11-12');
+
+  onPeriodeEmployesChange(ev: PeriodeFilterChange) {
+    this.employeDateDebut.set(ev.dateDebut);
+    this.employeDateFin.set(ev.dateFin);
+    this.pageEmployes.set(1);
+  }
 
   // Filtres Facturation
   factureDateDebut = signal<string>('2026-11-01');
@@ -136,3 +143,4 @@ export class RhEmployesComponent {
     this.showAddEmployeeModal.set(false);
   }
 }
+

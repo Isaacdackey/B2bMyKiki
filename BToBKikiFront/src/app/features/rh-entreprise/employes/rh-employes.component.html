@@ -23,28 +23,23 @@
           </button>
         </div>
 
-        <!-- Filtres : Recherche + Période pour le récapitulatif des repas -->
-        <div style="display: flex; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; align-items: center; background: #FFFFFF; padding: 0.85rem 1rem; border-radius: 14px; border: 1.5px solid #EDE7DC;">
-          <!-- Recherche -->
-          <div style="flex: 1 1 220px; position: relative; min-width: 0;">
-            <input 
-              type="text" 
+        <!-- Filtres : Recherche stylisée + Filtre de période (même largeur) -->
+        <div class="rh-emp-toolbar">
+          <div class="rh-emp-search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input
+              type="text"
               [ngModel]="searchQuery()"
-              (ngModelChange)="searchQuery.set($event)"
-              placeholder="Rechercher par nom, matricule ou département..." 
-              style="width: 100%; background: #FAF8F4; color: #332724; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.55rem 0.85rem; font-size: 0.84rem; box-sizing: border-box;">
+              (ngModelChange)="searchQuery.set($event); pageEmployes.set(1)"
+              placeholder="Rechercher par nom, matricule ou département..." />
           </div>
 
-          <!-- Filtre période pour le récapitulatif des repas consommés (dates côte à côte sur mobile) -->
-          <div style="display: flex; flex-direction: column; gap: 0.35rem; background: #FAF8F4; padding: 0.5rem 0.75rem; border-radius: 10px; border: 1px solid #EDE7DC; flex: 1 1 260px;">
-            <span style="font-size: 0.72rem; font-weight: 800; color: #721513;">
-              <i class="fa-regular fa-calendar"></i> Période Récapitulatif :
-            </span>
-            <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 0.4rem; width: 100%;">
-              <input type="date" [ngModel]="employeDateDebut()" (ngModelChange)="employeDateDebut.set($event)" style="width: 100%; min-width: 0; border: 1px solid #EDE7DC; border-radius: 6px; padding: 0.3rem 0.4rem; font-size: 0.76rem; font-weight: 700; background: #FFFFFF; color: #332724; box-sizing: border-box;">
-              <span style="font-size: 0.72rem; color: #6E5A56; font-weight: 700;">au</span>
-              <input type="date" [ngModel]="employeDateFin()" (ngModelChange)="employeDateFin.set($event)" style="width: 100%; min-width: 0; border: 1px solid #EDE7DC; border-radius: 6px; padding: 0.3rem 0.4rem; font-size: 0.76rem; font-weight: 700; background: #FFFFFF; color: #332724; box-sizing: border-box;">
-            </div>
+          <div class="rh-emp-period-box">
+            <app-b2b-period-filter
+              defaultPeriode="MOIS"
+              referenceDate="2026-11-12"
+              (periodChange)="onPeriodeEmployesChange($event)">
+            </app-b2b-period-filter>
           </div>
         </div>
 

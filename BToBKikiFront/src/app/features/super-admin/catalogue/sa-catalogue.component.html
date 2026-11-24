@@ -13,9 +13,9 @@
             </p>
           </div>
 
-          <!-- Barre de filtres + bouton Ajouter à droite -->
-          <div class="sa-catalogue-toolbar" style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: nowrap;">
-            <div style="flex: 1 1 0; min-width: 0; width: 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 0.55rem; background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 0.5rem 0.65rem; box-shadow: 0 2px 8px rgba(114, 21, 19, 0.03);">
+          <!-- Barre de filtres pleine largeur + bouton Ajouter sur sa propre ligne en bas à droite -->
+          <div style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;">
+            <div style="width: 100%; box-sizing: border-box; display: flex; flex-wrap: wrap; align-items: center; gap: 0.55rem; background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 0.5rem 0.65rem; box-shadow: 0 2px 8px rgba(114, 21, 19, 0.03);">
               <div style="display: flex; align-items: center; gap: 0.5rem; background: #FAF8F4; border: 1px solid #E2D5BE; border-radius: 10px; padding: 0 0.75rem; height: 38px; flex: 1 1 200px; min-width: 0;">
                 <i class="fa-solid fa-magnifying-glass" style="color: #6E5A56; font-size: 0.82rem; flex-shrink: 0;"></i>
                 <input
@@ -49,7 +49,7 @@
               </div>
             </div>
 
-            <div class="sa-catalogue-add-wrap" style="flex-shrink: 0;">
+            <div style="display: flex; justify-content: flex-end; width: 100%;">
               <button (click)="ouvrirModalAjoutPlat()" class="sa-btn-primary" style="white-space: nowrap;">
                 <i class="fa-solid fa-plus"></i> Ajouter un Plat
               </button>
