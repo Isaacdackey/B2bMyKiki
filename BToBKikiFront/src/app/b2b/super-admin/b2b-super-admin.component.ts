@@ -47,7 +47,10 @@ export class B2bSuperAdminComponent {
     }
   }
 
-  // Filtres Entreprises & Pagination
+  // Filtres Entreprises & Pagination & Sous-onglet Prestations
+  entreprisesSubTab = signal<'ENTREPRISES' | 'PRESTATIONS'>('ENTREPRISES');
+  showModalAjoutPrestation = signal<boolean>(false);
+  showModalAjoutCategorie = signal<boolean>(false);
   searchEntreprise = signal<string>('');
   filtreArchiveEntreprise = signal<'TOUTES' | 'ACTIVES' | 'ARCHIVEES'>('ACTIVES');
   pageEntreprises = signal<number>(1);
@@ -646,6 +649,7 @@ export class B2bSuperAdminComponent {
       categoriesDefaut: ['PLAT', 'BOISSON']
     });
     this.nouveauTypePrestation.set({ code: '', libelle: '', desc: '' });
+    this.showModalAjoutPrestation.set(false);
   }
 
   private deduireIconeCategorie(libelle: string): string {
@@ -685,6 +689,7 @@ export class B2bSuperAdminComponent {
       couleur: cat.couleur || '#721513'
     });
     this.nouvelleCategorie.set({ code: '', libelle: '', icone: 'fa-utensils', couleur: '#721513' });
+    this.showModalAjoutCategorie.set(false);
   }
 
   // ACTIONS ENTREPRISE (1 Site = 1 Entreprise)
