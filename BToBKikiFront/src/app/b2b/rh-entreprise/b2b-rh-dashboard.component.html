@@ -340,53 +340,55 @@
           </div>
         </div>
 
-        <!-- Tableau des Employés (sans colonne Site de livraison) -->
+        <!-- Tableau des Employés (strict minimum : Matricule, Collaborateur, Subvention, Statut, Détails) -->
         <div class="rh-table-wrap">
           <table class="rh-table">
             <thead>
               <tr>
                 <th class="col-matricule">Matricule</th>
-                <th>Collaborateur (Nom & Prénom)</th>
-                <th>Département</th>
-                <th style="text-align: center;">Taux Subventionné (%)</th>
-                <th style="text-align: center;">Repas Consommés</th>
-                <th style="text-align: right;">Total Subventionné</th>
-                <th style="text-align: center;">Statut Compte</th>
+                <th>Collaborateur</th>
+                <th style="text-align: center;">Subvention</th>
+                <th style="text-align: center;">Statut</th>
+                <th style="text-align: right;">Actions</th>
               </tr>
             </thead>
             <tbody>
               @for (emp of paginatedEmployes(); track emp.id) {
                 <tr>
-                  <td class="col-matricule" data-label="Matricule"><code style="color: #721513; font-weight: 800; background: #FAF5EA; padding: 0.25rem 0.6rem; border-radius: 6px; white-space: nowrap; display: inline-block;">{{ emp.matricule }}</code></td>
+                  <td class="col-matricule" data-label="Matricule">
+                    <code style="color: #721513; font-weight: 800; background: #FAF5EA; padding: 0.25rem 0.6rem; border-radius: 6px; white-space: nowrap; display: inline-block;">{{ emp.matricule }}</code>
+                  </td>
                   <td data-label="Collaborateur">
                     <div style="font-weight: 700; color: #332724;">{{ emp.prenom }} {{ emp.nom }}</div>
-                    <div style="font-size: 0.75rem; color: #6E5A56;">{{ emp.email }}</div>
                   </td>
-                  <td data-label="Département" style="font-weight: 600; color: #332724;">{{ emp.departement }}</td>
-                  <td data-label="Taux Subventionné" style="text-align: center;">
+                  <td data-label="Subvention" style="text-align: center;">
                     <span [style.background]="emp.tauxSubvention > 0 ? 'rgba(96, 108, 56, 0.15)' : 'rgba(29, 78, 216, 0.12)'"
                           [style.color]="emp.tauxSubvention > 0 ? '#606C38' : '#1D4ED8'"
                           [style.border]="emp.tauxSubvention > 0 ? '1px solid rgba(96, 108, 56, 0.3)' : '1px solid rgba(29, 78, 216, 0.3)'"
-                          style="padding: 0.3rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;">
-                      <i class="fa-solid" [class.fa-percent]="emp.tauxSubvention > 0" [class.fa-wallet]="emp.tauxSubvention === 0"></i>
+                          style="padding: 0.28rem 0.7rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;">
                       {{ emp.tauxSubvention }}%
                     </span>
                   </td>
-                  <td data-label="Repas Consommés" style="font-weight: 800; color: #332724; text-align: center;">{{ emp.repasConsommesMois }} repas</td>
-                  <td data-label="Total Subventionné" style="font-weight: 800; color: #606C38; text-align: right;">{{ (emp.montantPrisEnChargeMois | number) }} FCFA</td>
-                  <td data-label="Statut Compte" style="text-align: center;">
-                    <button 
-                      (click)="b2b.toggleStatutEmploye(emp.id)"
-                      [style.background]="emp.actif ? '#FAF8F4' : '#EDE7DC'"
-                      style="border: 1px solid #EDE7DC; color: #721513; padding: 0.35rem 0.75rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 700; cursor: pointer;">
-                      {{ emp.actif ? 'Désactiver' : 'Activer' }}
+                  <td data-label="Statut" style="text-align: center;">
+                    <span [style.background]="emp.actif ? 'rgba(96, 108, 56, 0.12)' : 'rgba(229, 29, 36, 0.1)'"
+                          [style.color]="emp.actif ? '#606C38' : '#DC2626'"
+                          style="padding: 0.28rem 0.7rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; display: inline-block;">
+                      {{ emp.actif ? 'Actif' : 'Inactif' }}
+                    </span>
+                  </td>
+                  <td data-label="Actions" style="text-align: right;">
+                    <button
+                      type="button"
+                      (click)="employeSelectionne.set(emp)"
+                      style="background: #FAF8F4; border: 1.5px solid #EDE7DC; color: #721513; padding: 0.35rem 0.85rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem;">
+                      <i class="fa-regular fa-eye"></i> Détails
                     </button>
                   </td>
                 </tr>
               }
               @if (paginatedEmployes().length === 0) {
                 <tr>
-                  <td colspan="8" style="text-align: center; padding: 2.5rem; color: #6E5A56;">
+                  <td colspan="5" style="text-align: center; padding: 2.5rem; color: #6E5A56;">
                     <i class="fa-solid fa-user-slash" style="font-size: 1.5rem; color: #EDE7DC; margin-bottom: 0.5rem; display: block;"></i>
                     Aucun collaborateur trouvé pour ces critères.
                   </td>
@@ -395,6 +397,64 @@
             </tbody>
           </table>
         </div>
+
+        <!-- MODAL DÉTAILS D'UN COLLABORATEUR -->
+        @if (employeSelectionne(); as empDetail) {
+          <div class="rh-modal-overlay" (click)="employeSelectionne.set(null)">
+            <div class="rh-modal-card" (click)="$event.stopPropagation()" style="max-width: 520px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.15rem;">
+                <div>
+                  <code style="color: #721513; font-weight: 800; background: #FAF5EA; padding: 0.2rem 0.55rem; border-radius: 6px; font-size: 0.75rem;">{{ empDetail.matricule }}</code>
+                  <h3 style="margin: 0.35rem 0 0; font-size: 1.3rem; color: #721513; font-weight: 900;">
+                    {{ empDetail.prenom }} {{ empDetail.nom }}
+                  </h3>
+                </div>
+                <button type="button" (click)="employeSelectionne.set(null)" style="background: none; border: none; font-size: 1.25rem; color: #6E5A56; cursor: pointer;">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 1rem; margin-bottom: 1.25rem; font-size: 0.82rem;">
+                <div>
+                  <div style="color: #6E5A56; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">Email</div>
+                  <div style="font-weight: 700; color: #2C1810; word-break: break-word;">{{ empDetail.email }}</div>
+                </div>
+                <div>
+                  <div style="color: #6E5A56; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">Téléphone</div>
+                  <div style="font-weight: 700; color: #2C1810;">{{ empDetail.telephone || 'Non renseigné' }}</div>
+                </div>
+                <div>
+                  <div style="color: #6E5A56; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">Département</div>
+                  <div style="font-weight: 700; color: #2C1810;">{{ empDetail.departement }}</div>
+                </div>
+                <div>
+                  <div style="color: #6E5A56; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">Taux Subventionné</div>
+                  <div style="font-weight: 800; color: #606C38;">{{ empDetail.tauxSubvention }}%</div>
+                </div>
+                <div>
+                  <div style="color: #6E5A56; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">Repas Consommés</div>
+                  <div style="font-weight: 800; color: #2C1810;">{{ empDetail.repasConsommesMois }} repas</div>
+                </div>
+                <div>
+                  <div style="color: #6E5A56; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">Total Subventionné</div>
+                  <div style="font-weight: 800; color: #721513;">{{ (empDetail.montantPrisEnChargeMois | number) }} FCFA</div>
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem;">
+                <button
+                  type="button"
+                  (click)="b2b.toggleStatutEmploye(empDetail.id); employeSelectionne.set(null)"
+                  style="border: 1.5px solid #EDE7DC; background: #FAF8F4; color: #721513; padding: 0.55rem 1rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 800; cursor: pointer;">
+                  {{ empDetail.actif ? 'Désactiver le compte' : 'Activer le compte' }}
+                </button>
+                <button type="button" (click)="employeSelectionne.set(null)" class="rh-btn-primary">
+                  Fermer
+                </button>
+              </div>
+            </div>
+          </div>
+        }
 
         <!-- BARRE DE PAGINATION MODERNE STYLE KIKI TRAITEUR -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; flex-wrap: wrap; gap: 1rem; padding: 0 0.5rem;">

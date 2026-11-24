@@ -96,8 +96,9 @@ export class B2bRhDashboardComponent {
   factureDateDebut = signal<string>('2026-11-01');
   factureDateFin = signal<string>('2026-11-12');
 
-  // Modal nouvel employé
+  // Modal nouvel employé & modal détails employé
   showAddEmployeeModal = signal<boolean>(false);
+  employeSelectionne = signal<EmployeB2B | null>(null);
   newEmp = signal<Partial<EmployeB2B>>({
     matricule: '',
     nom: '',
