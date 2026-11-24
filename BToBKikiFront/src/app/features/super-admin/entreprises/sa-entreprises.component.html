@@ -914,7 +914,7 @@
                   <i class="fa-solid fa-sliders"></i> Paramètres
                 </button>
               </div>
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.85rem; align-items: center;">
+              <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                 <select [ngModel]="entrepriseEnEdition().typePrestation || 'CUISINE_SUR_PLACE'" (ngModelChange)="onTypePrestationEntrepriseChange($event)"
                   style="width: 100%; border: 1px solid #EDE7DC; border-radius: 8px; padding: 0.5rem 0.65rem; font-size: 0.84rem; font-weight: 800; color: #721513; background: #FFFFFF;">
                   @for (tp of b2b.typesPrestationConfigurables(); track tp.code) {
