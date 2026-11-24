@@ -176,6 +176,8 @@ export class B2bLoginComponent {
 
     if (p.role === 'SUPER_ADMIN') {
       this.b2b.superAdminActiveSection.set('DASHBOARD');
+    } else if (p.role === 'RESPONSABLE_SITE_KIKI') {
+      this.b2b.cuisineActiveTab.set('MENU');
     }
 
     this.b2b.setSessionRole({
@@ -215,6 +217,8 @@ export class B2bLoginComponent {
             this.b2b.superAdminActiveSection.set('DASHBOARD');
           } else if (role === 'RESPONSABLE_ENTREPRISE') {
             this.b2b.rhActiveSection.set('STATISTIQUES');
+          } else if (role === 'RESPONSABLE_SITE_KIKI') {
+            this.b2b.cuisineActiveTab.set('MENU');
           }
           this.b2b.setSessionRole({
             role,

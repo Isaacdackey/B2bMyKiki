@@ -1226,19 +1226,25 @@ export class B2bSuperAdminComponent {
   nbEmployesSubventionnesEntreprise = computed(() => {
     const ent = this.entrepriseEnGestion();
     if (!ent) return 0;
-    return this.b2b.listeEmployes().filter(e => e.tauxSubvention > 0).length;
+    return this.employesEntrepriseEnGestion().filter(e => e.tauxSubvention > 0).length;
   });
 
-  // Employés de l'entreprise en gestion
+  // Employés de l'entreprise en gestion (filtrés strictement par entreprise)
   employesEntrepriseEnGestion = computed(() => {
-    return this.b2b.listeEmployes();
+    const ent = this.entrepriseEnGestion();
+    if (!ent) return [];
+    return this.b2b.listeEmployes().filter(e => {
+      const empEntId = (e as any).entrepriseId;
+      if (empEntId) return empEntId === ent.id;
+      return ent.id === 'ent-001' ? (e.siteId === 'site-1' || !e.siteId) : e.siteId === ent.id;
+    });
   });
 
   // Invitations pour l'entreprise en gestion
   invitationsEntrepriseEnGestion = computed(() => {
     const ent = this.entrepriseEnGestion();
     if (!ent) return [];
-    return this.b2b.listeInvitationsAdmins().filter(inv => inv.entrepriseId === ent.id || inv.entrepriseId === 'ent-001' || inv.entrepriseId === 'ent-1');
+    return this.b2b.listeInvitationsAdmins().filter(inv => inv.entrepriseId === ent.id);
   });
 
   // Menu du jour actif pour l'entreprise en gestion
@@ -1246,9 +1252,7 @@ export class B2bSuperAdminComponent {
     const ent = this.entrepriseEnGestion();
     const jour = this.jourMenuActif();
     if (!ent) return null;
-    const menu = this.b2b.menusPlanifiesEntreprises().find(m => 
-      (m.entrepriseId === ent.id || m.entrepriseId === 'ent-001' || m.entrepriseId === 'ent-1') && m.jourNom === jour
-    ) || null;
+    const menu = this.b2b.menusPlanifiesEntreprises().find(m => m.entrepriseId === ent.id && m.jourNom === jour) || null;
     if (!menu) return null;
     const archivedIds = new Set(this.b2b.catalogueJour().filter(p => !!p.isArchive).map(p => p.id));
     return {
@@ -1336,6 +1340,7 @@ export class B2bSuperAdminComponent {
       prenom: cur.prenom,
       email,
       telephone: cur.telephone || '+221 77 000 00 00',
+      entrepriseId: ent?.id || 'ent-001',
       siteId: ent?.id || 'site-1',
       siteNom: ent?.nom || 'Siège',
       departement: cur.departement || 'Général',
@@ -1344,7 +1349,7 @@ export class B2bSuperAdminComponent {
       actif: true,
       repasConsommesMois: 0,
       montantPrisEnChargeMois: 0
-    });
+    } as any);
     this.modalNouvelEmploye.set(false);
     this.employeEnCreation.set({ matricule: '', nom: '', prenom: '', email: '', telephone: '', departement: 'Opérations', tauxSubvention: 100 });
   }
