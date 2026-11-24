@@ -649,13 +649,24 @@ export class B2bSuperAdminComponent {
   }
 
   private deduireIconeCategorie(libelle: string): string {
-    const l = libelle.toLowerCase();
-    if (l.includes('boisson') || l.includes('jus') || l.includes('café') || l.includes('thé')) return 'fa-wine-glass';
-    if (l.includes('dessert') || l.includes('gâteau') || l.includes('sucr') || l.includes('glace')) return 'fa-cake-candles';
-    if (l.includes('entrée') || l.includes('entree') || l.includes('salade') || l.includes('soupe')) return 'fa-leaf';
-    if (l.includes('goûter') || l.includes('gouter') || l.includes('snack') || l.includes('pâtiss') || l.includes('patiss')) return 'fa-cookie-bite';
-    if (l.includes('fruit')) return 'fa-apple-whole';
-    if (l.includes('garniture') || l.includes('accompagnement')) return 'fa-bowl-rice';
+    const l = libelle
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+
+    if (/(boisson|jus|eau|soda|bissap|bouye|gingembre|cocktails?)/.test(l)) return 'fa-wine-glass';
+    if (/(cafe|the|infusion|chocolat chaud|petit.?dejeuner)/.test(l)) return 'fa-mug-hot';
+    if (/(dessert|gateau|tarte|glace|mousse|douceur|sucre)/.test(l)) return 'fa-cake-candles';
+    if (/(gouter|snack|patisser|croissant|viennoiser|cookie|biscuit|beignet|pastel)/.test(l)) return 'fa-cookie-bite';
+    if (/(entree|salade|crudite|legume|vegan|vegetarien)/.test(l)) return 'fa-leaf';
+    if (/(soupe|potage|veloute|bouillon)/.test(l)) return 'fa-bowl-food';
+    if (/(fruit|mangue|ananas|pasteque|pomme|banane)/.test(l)) return 'fa-apple-whole';
+    if (/(poisson|thieb|merou|capitaine|crevette|fruit.?de.?mer)/.test(l)) return 'fa-fish';
+    if (/(poulet|volaille|yassa|rotisserie|dibi|viande|boeuf|agneau|grill)/.test(l)) return 'fa-drumstick-bite';
+    if (/(sandwich|burger|tacos|wrap|panini)/.test(l)) return 'fa-burger';
+    if (/(pizza|tarte salee|quiche)/.test(l)) return 'fa-pizza-slice';
+    if (/(fromage|yaourt|laitier)/.test(l)) return 'fa-cheese';
+    if (/(garniture|accompagnement|riz|frite|alloco|attieke|couscous)/.test(l)) return 'fa-bowl-rice';
     return 'fa-utensils';
   }
 
