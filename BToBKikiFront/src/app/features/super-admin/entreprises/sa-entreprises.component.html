@@ -992,34 +992,33 @@
         </div>
 
         @if (entreprisesSubTab() === 'ENTREPRISES') {
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-          <div class="sa-filter-pill-box">
-            <span class="sa-filter-label"><i class="fa-solid fa-filter"></i> Filtre Statut :</span>
-            <button 
-              type="button" 
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.85rem;">
+          <div class="sa-filter-pill-box" style="flex-wrap: nowrap; overflow-x: auto; max-width: 100%; scrollbar-width: none;">
+            <button
+              type="button"
               (click)="filtreArchiveEntreprise.set('ACTIVES'); pageEntreprises.set(1)"
               [class.active]="filtreArchiveEntreprise() === 'ACTIVES'"
-              class="sa-filter-btn">
+              class="sa-filter-btn" style="flex-shrink: 0; white-space: nowrap;">
               Actives ({{ nbEntreprisesActives() }})
             </button>
-            <button 
-              type="button" 
+            <button
+              type="button"
               (click)="filtreArchiveEntreprise.set('ARCHIVEES'); pageEntreprises.set(1)"
               [class.active]="filtreArchiveEntreprise() === 'ARCHIVEES'"
-              class="sa-filter-btn">
+              class="sa-filter-btn" style="flex-shrink: 0; white-space: nowrap;">
               Archivées ({{ nbEntreprisesArchivees() }})
             </button>
-            <button 
-              type="button" 
+            <button
+              type="button"
               (click)="filtreArchiveEntreprise.set('TOUTES'); pageEntreprises.set(1)"
               [class.active]="filtreArchiveEntreprise() === 'TOUTES'"
-              class="sa-filter-btn">
+              class="sa-filter-btn" style="flex-shrink: 0; white-space: nowrap;">
               Toutes ({{ b2b.listeEntreprises().length }})
             </button>
           </div>
 
-          <!-- Bouton Conventionner une Entreprise -->
-          <button (click)="ouvrirModalNouvelleEntreprise()" class="sa-btn-primary">
+          <!-- Bouton Conventionner une Entreprise à droite -->
+          <button (click)="ouvrirModalNouvelleEntreprise()" class="sa-btn-primary" style="margin-left: auto; flex-shrink: 0; white-space: nowrap;">
             <i class="fa-solid fa-plus"></i> Conventionner une Entreprise
           </button>
         </div>

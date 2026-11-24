@@ -69,6 +69,19 @@ export class B2bStateService {
     return defaultSession;
   }
 
+  // États asynchrones globaux (Loading & Toast succès/erreur)
+  isLoading = signal<boolean>(false);
+  toastMessage = signal<{ type: 'success' | 'error'; text: string } | null>(null);
+  private toastTimer: ReturnType<typeof setTimeout> | null = null;
+
+  showToast(text: string, type: 'success' | 'error' = 'success') {
+    this.toastMessage.set({ type, text });
+    if (this.toastTimer) {
+      clearTimeout(this.toastTimer);
+    }
+    this.toastTimer = setTimeout(() => this.toastMessage.set(null), 3500);
+  }
+
   // Session utilisateur B2B active (persistée en localStorage pour survivre au rafraîchissement F5)
   currentSession = signal<UserSessionB2B>(this.loadInitialSession());
 

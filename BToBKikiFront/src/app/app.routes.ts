@@ -44,10 +44,9 @@ export const routes: Routes = [
     loadChildren: () => import('./b2b/b2b.routes').then(m => m.B2B_ROUTES)
   },
 
-  // Wildcard redirection vers la connexion B2B
+  // Page 404 pour toute route inconnue
   {
     path: '**',
-    redirectTo: 'b2b/login',
-    pathMatch: 'full'
+    loadComponent: () => import('./features/not-found/not-found.component').then(m => m.NotFoundComponent)
   }
 ];

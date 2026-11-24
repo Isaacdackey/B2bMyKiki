@@ -3,14 +3,14 @@
   <!-- ENTÊTE DE NAVIGATION PANIER -->
   <div class="panier-top-bar">
     <div class="panier-top-left">
-      <a routerLink="/b2b/commande" class="btn-retour-catalogue">
-        <i class="fa-solid fa-arrow-left"></i>
-        <span>Retour aux mets</span>
-      </a>
       <h1 class="panier-page-title font-serif-luxury">
         {{ b2b.modeProfil() === 'SUBVENTIONNE' ? 'Mon Plateau Déjeuner (Prise en charge RH)' : 'Mon Panier Déjeuner
         (Frais Personnels)' }}
       </h1>
+      <a routerLink="/b2b/commande" class="btn-retour-catalogue">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Retour aux mets</span>
+      </a>
     </div>
 
     <div class="panier-top-right">

@@ -34,9 +34,7 @@
   }
 
   .sa-topbar-header {
-    position: static;
-    padding: 0.65rem 0.85rem;
-    gap: 0.6rem;
+    display: none !important;
   }
 
   .sa-topbar-header .b2b-mobile-hamburger-btn {

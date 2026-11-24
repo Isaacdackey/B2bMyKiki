@@ -1,4 +1,4 @@
-﻿<div class="cuisine-wrapper">
+<div class="cuisine-wrapper">
   <main style="max-width: 1320px; width: 100%; margin: 0 auto; padding: 0.5rem 0 1.5rem;">
     <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
       <button type="button" class="b2b-mobile-hamburger-btn" (click)="b2b.toggleMobileDrawer()" aria-label="Ouvrir le menu">
@@ -80,6 +80,15 @@
                           <i class="fa-solid fa-check"></i> Autorisé à commander
                         </span>
                       }
+                    </td>
+                  </tr>
+                }
+                @if (reclamations().length === 0) {
+                  <tr>
+                    <td colspan="7" style="padding: 2.5rem 1rem; text-align: center; color: #6E5A56;">
+                      <i class="fa-solid fa-circle-check" style="font-size: 1.75rem; color: #606C38; display: block; margin-bottom: 0.5rem;"></i>
+                      <strong>Aucune réclamation en attente</strong>
+                      <div style="font-size: 0.8rem; margin-top: 0.25rem;">Tous les collaborateurs ont commandé avant l'heure limite (cut-off).</div>
                     </td>
                   </tr>
                 }
