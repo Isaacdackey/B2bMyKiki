@@ -875,7 +875,27 @@ export class B2bSuperAdminComponent {
   }
 
   // PROGRAMMATION GLOBALE & DÉPLOIEMENT VERS TOUTES LES ENTREPRISES
-  jourPlanningGlobalActif = signal<'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche'>('Lundi');
+  private readonly joursOrdre = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'] as const;
+  private readonly todayIndexSa = (new Date().getDay() + 6) % 7;
+  jourPlanningGlobalActif = signal<'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche'>(
+    this.joursOrdre[this.todayIndexSa]
+  );
+  datesSemaineMapSa: Record<string, string> = this.buildDatesSemaineMapSa();
+
+  private buildDatesSemaineMapSa(): Record<string, string> {
+    const now = new Date();
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - this.todayIndexSa);
+    const moisCourts = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
+    const map: Record<string, string> = {};
+    this.joursOrdre.forEach((jour, idx) => {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + idx);
+      const label = `${String(d.getDate()).padStart(2, '0')} ${moisCourts[d.getMonth()]}`;
+      map[jour] = idx === this.todayIndexSa ? `${label} (Auj.)` : label;
+    });
+    return map;
+  }
   facturationJourSelectionne = signal<{ date: string; dateAffichee: string; nbPlatsLivres: number; montantTotal: number; montantPartEntreprise: number } | null>(null);
 
   detailsCommandesJourSelectionne = computed(() => {

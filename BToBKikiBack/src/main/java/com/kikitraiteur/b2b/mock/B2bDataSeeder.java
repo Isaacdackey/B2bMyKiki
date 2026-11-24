@@ -21,7 +21,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 
 @Component
 @RequiredArgsConstructor
@@ -154,11 +157,14 @@ public class B2bDataSeeder implements CommandLineRunner {
             ));
         }
 
+        String todayIso = LocalDate.now().toString();
+        String todayLabel = LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE d MMMM yyyy", Locale.FRENCH));
+
         if (commandeRepository.count() == 0) {
             commandeRepository.saveAll(List.of(
                     CommandeSiteEntity.builder().id("cmd-1").codeCommande("CMD-4821").entrepriseId("ent-001").entrepriseNom("TotalEnergies — Siège Plateau")
                             .siteId("site-1").siteNom("Siège Plateau - Dakar").matricule("TOT-1001").employeNom("Ibrahima Sarr")
-                            .categorie("PLAT").platNom("Thiéboudienne Rouge Royal").date("2026-11-12").heure("11:45")
+                            .categorie("PLAT").platNom("Thiéboudienne Rouge Royal").date(todayIso).heure("11:45")
                             .montantTotal(5000).partEntreprise(5000).partEmploye(0).tauxSubventionApplique(100)
                             .statut("LIVRE").scanneAt("12:10").livreAt("12:14").build()
             ));
@@ -168,7 +174,7 @@ public class B2bDataSeeder implements CommandLineRunner {
             reclamationRepository.save(
                     ReclamationCutOffEntity.builder().id("rec-1").entrepriseId("ent-001").siteId("site-1")
                             .employeId("emp-2").employeNom("Awa Diop").matricule("TOT-1002").departement("Finance")
-                            .date("2026-11-12").heureDemande("10:42").motif("Réunion client prolongée ce matin")
+                            .date(todayIso).heureDemande("10:42").motif("Réunion client prolongée ce matin")
                             .statut("EN_ATTENTE").build()
             );
         }
@@ -176,7 +182,7 @@ public class B2bDataSeeder implements CommandLineRunner {
         if (facturationRepository.count() == 0) {
             facturationRepository.save(
                     FacturationJournaliereEntity.builder().id("fac-1").entrepriseId("ent-001")
-                            .date("2026-11-12").dateAffichee("Jeudi 12 novembre 2026")
+                            .date(todayIso).dateAffichee(todayLabel)
                             .nbPlatsLivres(48).nbPresents(52).montantTotal(240000)
                             .montantPartEntreprise(216000).montantPartEmploye(24000).statut("EN_COURS").build()
             );

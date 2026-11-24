@@ -9,6 +9,7 @@ import com.kikitraiteur.b2b.entreprise.data.repository.SiteRepository;
 import com.kikitraiteur.b2b.shared.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ public class EntrepriseService {
     private final EntrepriseRepository entrepriseRepository;
     private final SiteRepository siteRepository;
     private final InvitationAdminRepository invitationRepository;
-    private final JavaMailSender mailSender;
+    private final ObjectProvider<JavaMailSender> mailSenderProvider;
 
     public List<EntrepriseEntity> findAll() {
         return entrepriseRepository.findAll();
@@ -93,14 +94,17 @@ public class EntrepriseService {
         InvitationAdminEntity saved = invitationRepository.save(inv);
 
         try {
-            SimpleMailMessage msg = new SimpleMailMessage();
-            msg.setTo(saved.getEmail());
-            msg.setSubject("Activation de votre compte Administrateur Kiki Traiteur B2B");
-            msg.setText("Bonjour " + saved.getNomComplet() + ",\n\n"
-                    + "Votre accès " + saved.getRoleLibelle() + " pour " + ent.getNom() + " est prêt.\n"
-                    + "Lien d'activation : https://kikitraiteur.sn/b2b/activation?token=" + saved.getTokenActivation()
-                    + "&email=" + saved.getEmail() + "\n\nCordialement,\nKiki Traiteur B2B");
-            mailSender.send(msg);
+            JavaMailSender mailSender = mailSenderProvider.getIfAvailable();
+            if (mailSender != null) {
+                SimpleMailMessage msg = new SimpleMailMessage();
+                msg.setTo(saved.getEmail());
+                msg.setSubject("Activation de votre compte Administrateur Kiki Traiteur B2B");
+                msg.setText("Bonjour " + saved.getNomComplet() + ",\n\n"
+                        + "Votre accès " + saved.getRoleLibelle() + " pour " + ent.getNom() + " est prêt.\n"
+                        + "Lien d'activation : https://kikitraiteur.sn/b2b/activation?token=" + saved.getTokenActivation()
+                        + "&email=" + saved.getEmail() + "\n\nCordialement,\nKiki Traiteur B2B");
+                mailSender.send(msg);
+            }
         } catch (Exception e) {
             log.warn("Envoi email non effectue (SMTP non configure) pour {}: {}", saved.getEmail(), e.getMessage());
         }

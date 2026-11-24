@@ -1,4 +1,4 @@
-﻿import { Injectable, signal, computed, effect, inject } from '@angular/core';
+import { Injectable, signal, computed, effect, inject } from '@angular/core';
 import { EntrepriseB2B, SiteB2B, PlatB2B, FormuleRegle, EmployeB2B, SelectionRepas, CommandeHistoriqueB2B, LignePanierAutonome, UserRoleB2B, UserSessionB2B, CommandeEntrepriseSite, FacturationLigneJournaliere, MenuPlanifieJourEntreprise, InvitationAdminB2B, StatutCommandeSite, ReclamationCutOffB2B } from './b2b.models';
 import { B2bApiService } from './b2b-api.service';
 
@@ -219,6 +219,24 @@ export class B2bStateService {
       next: (res) => {
         if (res.success && res.data?.length) {
           this.listeReclamations.set(res.data);
+        }
+      },
+      error: () => {}
+    });
+
+    this.api.getPlanning().subscribe({
+      next: (res) => {
+        if (res.success && res.data?.length) {
+          this.menusPlanifiesEntreprises.set(res.data);
+        }
+      },
+      error: () => {}
+    });
+
+    this.api.getFacturation().subscribe({
+      next: (res) => {
+        if (res.success && res.data?.length) {
+          this.lignesFacturationEntreprise.set(res.data);
         }
       },
       error: () => {}

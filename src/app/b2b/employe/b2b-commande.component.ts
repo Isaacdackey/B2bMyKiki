@@ -33,17 +33,27 @@ export class B2bCommandeComponent {
 
   // SÉLECTION DU JOUR POUR COMMANDER TOUTE LA SEMAINE (Lundi à Dimanche)
   joursSemaine = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'] as const;
-  jourSelectionne = signal<'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche'>('Jeudi');
+  private readonly todayIndex = (new Date().getDay() + 6) % 7; // 0 = Lundi .. 6 = Dimanche
+  jourSelectionne = signal<'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche'>(
+    this.joursSemaine[this.todayIndex]
+  );
 
-  datesSemaineMap: Record<string, string> = {
-    'Lundi': '09 Nov',
-    'Mardi': '10 Nov',
-    'Mercredi': '11 Nov',
-    'Jeudi': '12 Nov (Aujourd\'hui)',
-    'Vendredi': '13 Nov',
-    'Samedi': '14 Nov',
-    'Dimanche': '15 Nov'
-  };
+  datesSemaineMap: Record<string, string> = this.buildDatesSemaineMap();
+
+  private buildDatesSemaineMap(): Record<string, string> {
+    const now = new Date();
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - this.todayIndex);
+    const moisCourts = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
+    const map: Record<string, string> = {};
+    this.joursSemaine.forEach((jour, idx) => {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + idx);
+      const label = `${String(d.getDate()).padStart(2, '0')} ${moisCourts[d.getMonth()]}`;
+      map[jour] = idx === this.todayIndex ? `${label} (Aujourd'hui)` : label;
+    });
+    return map;
+  }
 
   changerJourCommande(jour: 'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche') {
     this.jourSelectionne.set(jour);

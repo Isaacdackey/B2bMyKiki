@@ -1777,7 +1777,10 @@
                   [style.color]="jourPlanningGlobalActif() === jour ? '#FFFFFF' : '#332724'"
                   [style.border-color]="jourPlanningGlobalActif() === jour ? '#721513' : '#EDE7DC'">
                   <div style="font-size: 0.95rem; font-weight: 800; line-height: 1;">{{ jour }}</div>
-                  <div style="font-size: 0.7rem; margin-top: 0.35rem; font-weight: 600;" [style.color]="jourPlanningGlobalActif() === jour ? 'rgba(255,255,255,0.85)' : '#6E5A56'">
+                  <div style="font-size: 0.68rem; margin-top: 0.25rem; font-weight: 700;" [style.color]="jourPlanningGlobalActif() === jour ? '#FAF5EA' : '#721513'">
+                    {{ datesSemaineMapSa[jour] }}
+                  </div>
+                  <div style="font-size: 0.7rem; margin-top: 0.2rem; font-weight: 600;" [style.color]="jourPlanningGlobalActif() === jour ? 'rgba(255,255,255,0.85)' : '#6E5A56'">
                     {{ (b2b.menusPlanifiesEntreprises().find(m => (m.entrepriseId === 'ent-001' || m.entrepriseId === 'GLOBAL') && m.jourNom === jour)?.lignes?.length || 0) }} mets
                   </div>
                 </button>
