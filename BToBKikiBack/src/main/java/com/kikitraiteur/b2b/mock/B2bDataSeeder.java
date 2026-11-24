@@ -9,11 +9,15 @@ import com.kikitraiteur.b2b.commande.data.entity.CommandeSiteEntity;
 import com.kikitraiteur.b2b.commande.data.entity.ReclamationCutOffEntity;
 import com.kikitraiteur.b2b.commande.data.repository.CommandeSiteRepository;
 import com.kikitraiteur.b2b.commande.data.repository.ReclamationCutOffRepository;
+import com.kikitraiteur.b2b.entreprise.data.entity.CategoriePlatEntity;
 import com.kikitraiteur.b2b.entreprise.data.entity.EmployeEntity;
 import com.kikitraiteur.b2b.entreprise.data.entity.EntrepriseEntity;
 import com.kikitraiteur.b2b.entreprise.data.entity.SiteEntity;
+import com.kikitraiteur.b2b.entreprise.data.entity.TypePrestationEntity;
+import com.kikitraiteur.b2b.entreprise.data.repository.CategoriePlatRepository;
 import com.kikitraiteur.b2b.entreprise.data.repository.EmployeRepository;
 import com.kikitraiteur.b2b.entreprise.data.repository.EntrepriseRepository;
+import com.kikitraiteur.b2b.entreprise.data.repository.TypePrestationRepository;
 import com.kikitraiteur.b2b.facturation.data.entity.FacturationJournaliereEntity;
 import com.kikitraiteur.b2b.facturation.data.repository.FacturationJournaliereRepository;
 import com.kikitraiteur.b2b.planning.data.entity.LigneMenuPlanifieEntity;
@@ -43,6 +47,8 @@ public class B2bDataSeeder implements CommandLineRunner {
     private final ReclamationCutOffRepository reclamationRepository;
     private final FacturationJournaliereRepository facturationRepository;
     private final MenuPlanifieJourRepository menuPlanifieJourRepository;
+    private final TypePrestationRepository typePrestationRepository;
+    private final CategoriePlatRepository categoriePlatRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -236,6 +242,29 @@ public class B2bDataSeeder implements CommandLineRunner {
                 }
                 menuPlanifieJourRepository.save(menu);
             }
+        }
+
+        if (typePrestationRepository.count() == 0) {
+            typePrestationRepository.saveAll(List.of(
+                    TypePrestationEntity.builder().code("CUISINE_SUR_PLACE").libelle("Cuisine et service sur place")
+                            .desc("Préparation et dressage en restaurant d’entreprise sur place")
+                            .categoriesDefaut(List.of("ENTREE", "PLAT", "DESSERT", "BOISSON")).build(),
+                    TypePrestationEntity.builder().code("SERVICE_SUR_PLACE").libelle("Service sur place (Réfectoire)")
+                            .desc("Plats cuisinés acheminés chauds et servis à l’assiette au réfectoire")
+                            .categoriesDefaut(List.of("ENTREE", "PLAT", "DESSERT", "BOISSON")).build(),
+                    TypePrestationEntity.builder().code("LIVRAISON_BARQUETTES").libelle("Livraison en barquettes")
+                            .desc("Conditionnement individuel hermétique scellé et étiqueté")
+                            .categoriesDefaut(List.of("PLAT", "BOISSON")).build()
+            ));
+        }
+
+        if (categoriePlatRepository.count() == 0) {
+            categoriePlatRepository.saveAll(List.of(
+                    CategoriePlatEntity.builder().code("ENTREE").libelle("Entrée").icone("fa-leaf").couleur("#606C38").build(),
+                    CategoriePlatEntity.builder().code("PLAT").libelle("Plat chaud").icone("fa-bowl-food").couleur("#721513").build(),
+                    CategoriePlatEntity.builder().code("DESSERT").libelle("Dessert").icone("fa-cake-candles").couleur("#C5A880").build(),
+                    CategoriePlatEntity.builder().code("BOISSON").libelle("Boisson").icone("fa-wine-glass").couleur("#332724").build()
+            ));
         }
     }
 }

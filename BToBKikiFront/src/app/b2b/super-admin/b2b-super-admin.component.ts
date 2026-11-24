@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { B2bNavComponent } from '../shared/b2b-nav.component';
 import { B2bStateService } from '../shared/b2b-state.service';
+import { CloudinaryService } from '../shared/cloudinary.service';
 import { EntrepriseB2B, SiteB2B, PlatB2B, TypePrestationB2B, CategoriePlatB2B, PlanningMenuSiteB2B } from '../shared/b2b.models';
 
 @Component({
@@ -15,6 +16,8 @@ import { EntrepriseB2B, SiteB2B, PlatB2B, TypePrestationB2B, CategoriePlatB2B, P
 })
 export class B2bSuperAdminComponent {
   b2b = inject(B2bStateService);
+  private cloudinary = inject(CloudinaryService);
+  isUploadingImage = signal<boolean>(false);
 
   constructor() {
     if (this.b2b.currentSession().role !== 'SUPER_ADMIN') {
@@ -887,6 +890,25 @@ export class B2bSuperAdminComponent {
       });
     }
     this.showModalPlat.set(false);
+  }
+
+  onUploadImagePlat(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    this.isUploadingImage.set(true);
+    this.cloudinary.uploadImage(file).subscribe({
+      next: (url) => {
+        this.platEnEdition.update(p => ({ ...p, image: url }));
+        this.isUploadingImage.set(false);
+      },
+      error: (err) => {
+        this.isUploadingImage.set(false);
+        const msg = err?.error?.error?.message || err?.message || 'Erreur inconnue';
+        alert(`Erreur lors de l'upload vers Cloudinary : ${msg}`);
+      }
+    });
   }
 
   // PROGRAMMATION GLOBALE & DÉPLOIEMENT VERS TOUTES LES ENTREPRISES

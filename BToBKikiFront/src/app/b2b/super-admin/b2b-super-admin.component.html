@@ -2303,7 +2303,12 @@
               <i class="fa-solid fa-camera"></i> Photo Cadrée de Haut (Vue Aérienne / Top-Down)
             </label>
             <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
-              <input type="text" [(ngModel)]="platEnEdition().image" placeholder="/assets/images/plats/p1.jpg" style="flex: 1; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700;">
+              <input type="text" [(ngModel)]="platEnEdition().image" placeholder="https://res.cloudinary.com/..." style="flex: 1; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.65rem; font-size: 0.85rem; font-weight: 700;">
+              <label style="background: #721513; color: #FFFFFF; border-radius: 10px; padding: 0.65rem 0.9rem; font-size: 0.78rem; font-weight: 800; cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem;">
+                <i class="fa-solid" [class.fa-cloud-arrow-up]="!isUploadingImage()" [class.fa-spinner]="isUploadingImage()" [class.fa-spin]="isUploadingImage()"></i>
+                {{ isUploadingImage() ? 'Envoi...' : 'Cloudinary' }}
+                <input type="file" accept="image/*" (change)="onUploadImagePlat($event)" style="display: none;">
+              </label>
               @if (platEnEdition().image) {
                 <img [src]="platEnEdition().image" alt="Aperçu" style="width: 44px; height: 44px; border-radius: 10px; object-fit: cover; border: 1.5px solid #EDE7DC;">
               }

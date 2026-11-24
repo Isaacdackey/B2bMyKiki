@@ -120,12 +120,26 @@ export class B2bStateService {
 
   // Ajouter un nouveau type de prestation
   ajouterTypePrestation(item: { code: string; libelle: string; desc: string; categoriesDefaut: string[] }) {
-    this.typesPrestationConfigurables.update(list => [...list, item]);
+    this.typesPrestationConfigurables.update(list => {
+      const next = [...list, item];
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('b2b_types_prestation', JSON.stringify(next));
+      }
+      return next;
+    });
+    this.api.createPrestation(item).subscribe({ error: () => {} });
   }
 
   // Ajouter une nouvelle catégorie alimentaire
   ajouterCategorie(item: { code: string; libelle: string; icone: string; couleur: string }) {
-    this.categoriesConfigurables.update(list => [...list, item]);
+    this.categoriesConfigurables.update(list => {
+      const next = [...list, item];
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('b2b_categories_config', JSON.stringify(next));
+      }
+      return next;
+    });
+    this.api.createCategorie(item).subscribe({ error: () => {} });
   }
 
   // Méthode pour ajouter une entreprise cliente
@@ -333,6 +347,20 @@ export class B2bStateService {
     });
 
     // Synchronisation initiale avec le backend Spring Boot (si démarré)
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const savedTypes = localStorage.getItem('b2b_types_prestation');
+        if (savedTypes) {
+          const parsed = JSON.parse(savedTypes);
+          if (Array.isArray(parsed) && parsed.length) this.typesPrestationConfigurables.set(parsed);
+        }
+        const savedCats = localStorage.getItem('b2b_categories_config');
+        if (savedCats) {
+          const parsed = JSON.parse(savedCats);
+          if (Array.isArray(parsed) && parsed.length) this.categoriesConfigurables.set(parsed);
+        }
+      } catch {}
+    }
     this.syncFromBackend();
   }
 
@@ -420,6 +448,30 @@ export class B2bStateService {
       next: (res) => {
         if (res.success && res.data?.length) {
           this.listeInvitationsAdmins.set(res.data);
+        }
+      },
+      error: () => {}
+    });
+
+    this.api.getPrestations().subscribe({
+      next: (res) => {
+        if (res.success && res.data?.length) {
+          this.typesPrestationConfigurables.set(res.data);
+          if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('b2b_types_prestation', JSON.stringify(res.data));
+          }
+        }
+      },
+      error: () => {}
+    });
+
+    this.api.getCategories().subscribe({
+      next: (res) => {
+        if (res.success && res.data?.length) {
+          this.categoriesConfigurables.set(res.data);
+          if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('b2b_categories_config', JSON.stringify(res.data));
+          }
         }
       },
       error: () => {}

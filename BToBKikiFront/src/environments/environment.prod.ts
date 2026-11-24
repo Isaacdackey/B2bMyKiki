@@ -6,8 +6,8 @@ export const environment = {
   production: true,
   apiUrl: 'https://kiki-backend-iuyo.onrender.com',
   cloudinary: {
-    cloudName: 'dx2imkeka',
-    apiKey: '516674256915647',
+    cloudName: 'drqsusznh',
+    apiKey: '218493326687862',
     uploadPreset: 'kikitraiteur',
     folder: 'kikitraiteur',
     apiUrl: 'https://api.cloudinary.com/v1_1'

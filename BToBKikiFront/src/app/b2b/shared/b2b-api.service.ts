@@ -177,4 +177,20 @@ export class B2bApiService {
   getFacturation(entrepriseId = 'ent-001'): Observable<ApiResponse<FacturationLigneJournaliere[]>> {
     return this.http.get<ApiResponse<FacturationLigneJournaliere[]>>(`${this.baseUrl}/b2b/facturation?entrepriseId=${encodeURIComponent(entrepriseId)}`, { headers: this.getHeaders() });
   }
+
+  getPrestations(): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/b2b/parametres/prestations`, { headers: this.getHeaders() });
+  }
+
+  createPrestation(item: any): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.baseUrl}/b2b/parametres/prestations`, item, { headers: this.getHeaders() });
+  }
+
+  getCategories(): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/b2b/parametres/categories`, { headers: this.getHeaders() });
+  }
+
+  createCategorie(item: any): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.baseUrl}/b2b/parametres/categories`, item, { headers: this.getHeaders() });
+  }
 }
