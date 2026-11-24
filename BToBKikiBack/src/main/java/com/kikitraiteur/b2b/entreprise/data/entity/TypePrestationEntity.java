@@ -1,5 +1,6 @@
 package com.kikitraiteur.b2b.entreprise.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,4 +29,9 @@ public class TypePrestationEntity {
     @Column(name = "categorie")
     @Builder.Default
     private List<String> categoriesDefaut = new ArrayList<>();
+
+    @Builder.Default
+    @JsonProperty("isArchive")
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean isArchive = false;
 }

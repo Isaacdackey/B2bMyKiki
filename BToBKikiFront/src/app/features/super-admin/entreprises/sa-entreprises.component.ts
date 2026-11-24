@@ -1,4 +1,4 @@
-﻿import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -301,12 +301,62 @@ export class SaEntreprisesComponent {
     this.showModalEntreprise.set(true);
   }
 
-  enregistrerEntreprise() {
+  readonly REGEX_TEL_SN = /^(?:\+221|00221)?[\s.-]?(?:7[05678]|3[03])(?:[\s.-]?\d){7}$/;
+  readonly REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  readonly REGEX_NINEA = /^[0-9]{7,10}(?:\s?[0-9A-Z]{2,3})?$/i;
+  readonly REGEX_RCCM = /^SN[-.\s]?[A-Z]{2,4}[-.\s]?(?:\d{4}[-.\s]?[A-Z][-.\s]?)?\d{2,6}$/i;
+
+  erreursEtape1 = signal<{ nom?: string; ninea?: string; rccm?: string; email?: string; telephone?: string }>({});
+
+  validerEtape1(): boolean {
     const val = this.entrepriseEnEdition();
-    if (!val.nom || !val.codeEntreprise) {
-      alert('Veuillez renseigner au moins le nom de l\'entreprise et son code.');
-      return;
+    const errs: { nom?: string; ninea?: string; rccm?: string; email?: string; telephone?: string } = {};
+
+    if (!val.nom || !val.nom.trim()) {
+      errs.nom = 'La raison sociale est obligatoire.';
     }
+    if (val.ninea && val.ninea.trim() && !this.REGEX_NINEA.test(val.ninea.trim())) {
+      errs.ninea = 'Format NINEA invalide (ex: 001294829 2V1).';
+    }
+    if (val.rccm && val.rccm.trim() && !this.REGEX_RCCM.test(val.rccm.trim())) {
+      errs.rccm = 'Format RCCM sénégalais invalide (ex: SN-DKR-2012-B-1428).';
+    }
+    if (val.emailContact && val.emailContact.trim() && !this.REGEX_EMAIL.test(val.emailContact.trim())) {
+      errs.email = 'Adresse email invalide (ex: rh@entreprise.sn).';
+    }
+    if (val.telephone && val.telephone.trim() && val.telephone.trim() !== '+221' && !this.REGEX_TEL_SN.test(val.telephone.trim())) {
+      errs.telephone = 'Numéro sénégalais invalide (ex: +221 77 123 45 67).';
+    }
+
+    this.erreursEtape1.set(errs);
+    return Object.keys(errs).length === 0;
+  }
+
+  onTelephoneChange(value: string) {
+    let digits = (value || '').replace(/\D/g, '');
+    if (digits.startsWith('00221')) digits = digits.slice(5);
+    else if (digits.startsWith('221')) digits = digits.slice(3);
+    digits = digits.slice(0, 9);
+
+    const parts: string[] = [];
+    if (digits.length > 0) parts.push(digits.slice(0, 2));
+    if (digits.length > 2) parts.push(digits.slice(2, 5));
+    if (digits.length > 5) parts.push(digits.slice(5, 7));
+    if (digits.length > 7) parts.push(digits.slice(7, 9));
+
+    const formatted = parts.length > 0 ? `+221 ${parts.join(' ')}` : '+221 ';
+    this.entrepriseEnEdition.update(e => ({ ...e, telephone: formatted }));
+  }
+
+  allerEtape2() {
+    if (this.validerEtape1()) {
+      this.etapeEntreprise.set(2);
+    }
+  }
+
+  enregistrerEntreprise() {
+    if (!this.validerEtape1()) return;
+    const val = this.entrepriseEnEdition();
 
     if (this.isEditModeEntreprise() && val.id) {
       this.b2b.modifierEntreprise(val.id, {
@@ -517,19 +567,25 @@ export class SaEntreprisesComponent {
   nbEmployesSubventionnesEntreprise = computed(() => {
     const ent = this.entrepriseEnGestion();
     if (!ent) return 0;
-    return this.b2b.listeEmployes().filter(e => e.tauxSubvention > 0).length;
+    return this.employesEntrepriseEnGestion().filter(e => e.tauxSubvention > 0).length;
   });
 
-  // Employés de l'entreprise en gestion
+  // Employés de l'entreprise en gestion (filtrés strictement par entreprise)
   employesEntrepriseEnGestion = computed(() => {
-    return this.b2b.listeEmployes();
+    const ent = this.entrepriseEnGestion();
+    if (!ent) return [];
+    return this.b2b.listeEmployes().filter(e => {
+      const empEntId = (e as any).entrepriseId;
+      if (empEntId) return empEntId === ent.id;
+      return ent.id === 'ent-001' ? (e.siteId === 'site-1' || !e.siteId) : e.siteId === ent.id;
+    });
   });
 
   // Invitations pour l'entreprise en gestion
   invitationsEntrepriseEnGestion = computed(() => {
     const ent = this.entrepriseEnGestion();
     if (!ent) return [];
-    return this.b2b.listeInvitationsAdmins().filter(inv => inv.entrepriseId === ent.id || inv.entrepriseId === 'ent-001' || inv.entrepriseId === 'ent-1');
+    return this.b2b.listeInvitationsAdmins().filter(inv => inv.entrepriseId === ent.id);
   });
 
   // Menu du jour actif pour l'entreprise en gestion
@@ -537,9 +593,7 @@ export class SaEntreprisesComponent {
     const ent = this.entrepriseEnGestion();
     const jour = this.jourMenuActif();
     if (!ent) return null;
-    const menu = this.b2b.menusPlanifiesEntreprises().find(m => 
-      (m.entrepriseId === ent.id || m.entrepriseId === 'ent-001' || m.entrepriseId === 'ent-1') && m.jourNom === jour
-    ) || null;
+    const menu = this.b2b.menusPlanifiesEntreprises().find(m => m.entrepriseId === ent.id && m.jourNom === jour) || null;
     if (!menu) return null;
     const archivedIds = new Set(this.b2b.catalogueJour().filter(p => !!p.isArchive).map(p => p.id));
     return {
@@ -611,22 +665,55 @@ export class SaEntreprisesComponent {
     this.modalDupliquerMenu.set(false);
   }
 
+  erreursEmploye = signal<{ prenom?: string; nom?: string; matricule?: string; email?: string; telephone?: string }>({});
+  readonly REGEX_MATRICULE = /^[A-Z0-9-]{3,20}$/i;
+
+  onTelephoneEmployeChange(value: string) {
+    let digits = (value || '').replace(/\D/g, '');
+    if (digits.startsWith('00221')) digits = digits.slice(5);
+    else if (digits.startsWith('221')) digits = digits.slice(3);
+    digits = digits.slice(0, 9);
+
+    const parts: string[] = [];
+    if (digits.length > 0) parts.push(digits.slice(0, 2));
+    if (digits.length > 2) parts.push(digits.slice(2, 5));
+    if (digits.length > 5) parts.push(digits.slice(5, 7));
+    if (digits.length > 7) parts.push(digits.slice(7, 9));
+
+    const formatted = parts.length > 0 ? `+221 ${parts.join(' ')}` : '+221 ';
+    this.employeEnCreation.update(e => ({ ...e, telephone: formatted }));
+  }
+
   // Création employé
   enregistrerNouvelEmploye() {
     const cur = this.employeEnCreation();
     const ent = this.entrepriseEnGestion();
-    if (!cur.nom || !cur.prenom) {
-      alert('Veuillez renseigner le nom et le prénom de l\'employé.');
-      return;
+    const errs: { prenom?: string; nom?: string; matricule?: string; email?: string; telephone?: string } = {};
+
+    if (!cur.prenom || !cur.prenom.trim()) errs.prenom = 'Le prénom est obligatoire.';
+    if (!cur.nom || !cur.nom.trim()) errs.nom = 'Le nom est obligatoire.';
+    if (cur.matricule && cur.matricule.trim() && !this.REGEX_MATRICULE.test(cur.matricule.trim())) {
+      errs.matricule = 'Format invalide (ex: TOT-1042).';
     }
-    const matricule = cur.matricule || `${ent?.codeEntreprise || 'EMP'}-${Math.floor(1000 + Math.random() * 9000)}`;
-    const email = cur.email || `${cur.prenom.toLowerCase()}.${cur.nom.toLowerCase()}@client.sn`;
+    if (cur.email && cur.email.trim() && !this.REGEX_EMAIL.test(cur.email.trim())) {
+      errs.email = 'Adresse email invalide.';
+    }
+    if (cur.telephone && cur.telephone.trim() && cur.telephone.trim() !== '+221' && !this.REGEX_TEL_SN.test(cur.telephone.trim())) {
+      errs.telephone = 'Numéro sénégalais invalide (ex: +221 77 123 45 67).';
+    }
+
+    this.erreursEmploye.set(errs);
+    if (Object.keys(errs).length > 0) return;
+
+    const matricule = (cur.matricule || '').trim() || `${ent?.codeEntreprise || 'EMP'}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const email = (cur.email || '').trim() || `${cur.prenom!.trim().toLowerCase()}.${cur.nom!.trim().toLowerCase()}@client.sn`;
     this.b2b.ajouterEmploye({
       matricule,
-      nom: cur.nom,
-      prenom: cur.prenom,
+      nom: cur.nom!.trim(),
+      prenom: cur.prenom!.trim(),
       email,
-      telephone: cur.telephone || '+221 77 000 00 00',
+      telephone: (cur.telephone && cur.telephone.trim() !== '+221') ? cur.telephone.trim() : '+221 77 000 00 00',
+      entrepriseId: ent?.id || 'ent-001',
       siteId: ent?.id || 'site-1',
       siteNom: ent?.nom || 'Siège',
       departement: cur.departement || 'Général',
@@ -635,7 +722,8 @@ export class SaEntreprisesComponent {
       actif: true,
       repasConsommesMois: 0,
       montantPrisEnChargeMois: 0
-    });
+    } as any);
+    this.erreursEmploye.set({});
     this.modalNouvelEmploye.set(false);
     this.employeEnCreation.set({ matricule: '', nom: '', prenom: '', email: '', telephone: '', departement: 'Opérations', tauxSubvention: 100 });
   }
@@ -696,7 +784,7 @@ export class SaEntreprisesComponent {
   commandesFiltreesEntreprise = computed(() => {
     const ent = this.entrepriseEnGestion();
     if (!ent) return [];
-    let list = this.b2b.listeCommandesSite().filter(c => c.entrepriseId === ent.id || c.entrepriseId === 'ent-001' || c.entrepriseId === 'ent-1');
+    let list = this.b2b.listeCommandesSite().filter(c => c.entrepriseId === ent.id);
 
     // Filtre période
     const debut = this.dateDebutCommandes();
@@ -743,9 +831,15 @@ export class SaEntreprisesComponent {
 
   // Facturation journalière filtrée
   lignesFacturationFiltrees = computed(() => {
+    const ent = this.entrepriseEnGestion();
+    if (!ent) return [];
     const debut = this.dateDebutFacturation();
     const fin = this.dateFinFacturation();
-    return this.b2b.lignesFacturationEntreprise().filter(l => l.date >= debut && l.date <= fin);
+    return this.b2b.lignesFacturationEntreprise().filter(l => {
+      const lEntId = (l as any).entrepriseId;
+      const matchEnt = lEntId ? lEntId === ent.id : ent.id === 'ent-001';
+      return matchEnt && l.date >= debut && l.date <= fin;
+    });
   });
 
   totalFacturationPeriode = computed(() => {

@@ -2,6 +2,7 @@ package com.kikitraiteur.b2b.entreprise.service;
 
 import com.kikitraiteur.b2b.entreprise.data.entity.EmployeEntity;
 import com.kikitraiteur.b2b.entreprise.data.repository.EmployeRepository;
+import com.kikitraiteur.b2b.shared.exceptions.BusinessException;
 import com.kikitraiteur.b2b.shared.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,23 @@ public class EmployeService {
         return employeRepository.findAll();
     }
 
+    private static final String REGEX_TEL_SN = "^(?:\\+221|00221)?[\\s.-]?(?:7[05678]|3[03])(?:[\\s.-]?\\d){7}$";
+    private static final String REGEX_EMAIL = "^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$";
+    private static final String REGEX_MATRICULE = "^[A-Z0-9-]{3,20}$";
+
     public EmployeEntity create(EmployeEntity emp) {
+        if (emp.getEmail() != null && !emp.getEmail().isBlank() && !emp.getEmail().trim().matches(REGEX_EMAIL)) {
+            throw new BusinessException("Adresse email invalide.");
+        }
+        if (emp.getTelephone() != null && !emp.getTelephone().isBlank()
+                && !"+221".equals(emp.getTelephone().trim())
+                && !emp.getTelephone().trim().matches(REGEX_TEL_SN)) {
+            throw new BusinessException("Numéro de téléphone sénégalais invalide (ex: +221 77 123 45 67).");
+        }
+        if (emp.getMatricule() != null && !emp.getMatricule().isBlank()
+                && !emp.getMatricule().trim().toUpperCase().matches(REGEX_MATRICULE)) {
+            throw new BusinessException("Format de matricule invalide (ex: TOT-1042).");
+        }
         if (emp.getId() == null || emp.getId().isBlank()) {
             emp.setId("emp-" + System.currentTimeMillis());
         }

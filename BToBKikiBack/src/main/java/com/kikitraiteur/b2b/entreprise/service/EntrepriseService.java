@@ -6,6 +6,7 @@ import com.kikitraiteur.b2b.entreprise.data.entity.SiteEntity;
 import com.kikitraiteur.b2b.entreprise.data.repository.EntrepriseRepository;
 import com.kikitraiteur.b2b.entreprise.data.repository.InvitationAdminRepository;
 import com.kikitraiteur.b2b.entreprise.data.repository.SiteRepository;
+import com.kikitraiteur.b2b.shared.exceptions.BusinessException;
 import com.kikitraiteur.b2b.shared.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +38,33 @@ public class EntrepriseService {
                 .orElseThrow(() -> new ResourceNotFoundException("Entreprise introuvable : " + id));
     }
 
+    private static final String REGEX_TEL_SN = "^(?:\\+221|00221)?[\\s.-]?(?:7[05678]|3[03])(?:[\\s.-]?\\d){7}$";
+    private static final String REGEX_EMAIL = "^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$";
+    private static final String REGEX_NINEA = "^[0-9]{7,10}(?:\\s?[0-9A-Z]{2,3})?$";
+    private static final String REGEX_RCCM = "^SN[-.\\s]?[A-Z]{2,4}[-.\\s]?(?:\\d{4}[-.\\s]?[A-Z][-.\\s]?)?\\d{2,6}$";
+
+    private void validerEntreprise(EntrepriseEntity ent) {
+        if (ent.getEmailContact() != null && !ent.getEmailContact().isBlank()
+                && !ent.getEmailContact().trim().matches(REGEX_EMAIL)) {
+            throw new BusinessException("Adresse email invalide (ex: rh@entreprise.sn).");
+        }
+        if (ent.getTelephone() != null && !ent.getTelephone().isBlank()
+                && !"+221".equals(ent.getTelephone().trim())
+                && !ent.getTelephone().trim().matches(REGEX_TEL_SN)) {
+            throw new BusinessException("Numéro de téléphone sénégalais invalide (ex: +221 77 123 45 67).");
+        }
+        if (ent.getNinea() != null && !ent.getNinea().isBlank()
+                && !ent.getNinea().trim().toUpperCase().matches(REGEX_NINEA)) {
+            throw new BusinessException("Format NINEA invalide (ex: 001294829 2V1).");
+        }
+        if (ent.getRccm() != null && !ent.getRccm().isBlank()
+                && !ent.getRccm().trim().toUpperCase().matches(REGEX_RCCM)) {
+            throw new BusinessException("Format RCCM sénégalais invalide (ex: SN-DKR-2012-B-1428).");
+        }
+    }
+
     public EntrepriseEntity create(EntrepriseEntity ent) {
+        validerEntreprise(ent);
         if (ent.getId() == null || ent.getId().isBlank()) {
             ent.setId("ent-" + System.currentTimeMillis());
         }
@@ -45,6 +72,7 @@ public class EntrepriseService {
     }
 
     public EntrepriseEntity update(String id, EntrepriseEntity updates) {
+        validerEntreprise(updates);
         EntrepriseEntity existing = findById(id);
         if (updates.getNom() != null) existing.setNom(updates.getNom());
         if (updates.getCodeEntreprise() != null) existing.setCodeEntreprise(updates.getCodeEntreprise());
@@ -77,6 +105,10 @@ public class EntrepriseService {
         }
         site.setEntreprise(ent);
         return siteRepository.save(site);
+    }
+
+    public List<InvitationAdminEntity> getAllInvitations() {
+        return invitationRepository.findAll();
     }
 
     public List<InvitationAdminEntity> getInvitations(String entrepriseId) {

@@ -800,7 +800,7 @@
             <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.2); display: inline-flex; align-items: center; justify-content: center; font-size: 0.72rem;">1</span>
             <span>Identité &amp; Contact</span>
           </button>
-          <button type="button" (click)="etapeEntreprise.set(2)"
+          <button type="button" (click)="allerEtape2()"
             [style.background]="etapeEntreprise() === 2 ? '#721513' : '#FAF8F4'"
             [style.color]="etapeEntreprise() === 2 ? '#FFFFFF' : '#6E5A56'"
             [style.border-color]="etapeEntreprise() === 2 ? '#721513' : '#EDE7DC'"
@@ -820,14 +820,20 @@
 
         <div style="display: flex; flex-direction: column; gap: 0.85rem; flex: 1;">
           @if (etapeEntreprise() === 1) {
-            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 0.75rem;">
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 0.75rem; align-items: end;">
               <div style="display: flex; flex-direction: column;">
-                <label style="font-size: 0.72rem; font-weight: 800; color: #721513; margin-bottom: 0.35rem;">Raison Sociale (1 Site = 1 Entreprise)</label>
+                <div style="height: 20px; margin-bottom: 0.35rem; display: flex; align-items: center;">
+                  <label style="font-size: 0.72rem; font-weight: 800; color: #721513; margin: 0;">Raison Sociale (1 Site = 1 Entreprise)</label>
+                </div>
                 <input type="text" [(ngModel)]="entrepriseEnEdition().nom" (ngModelChange)="onNomEntrepriseChange($event)" placeholder="Ex: TotalEnergies — Siège Plateau"
+                  [style.border-color]="erreursEtape1().nom ? '#E51D24' : '#EDE7DC'"
                   style="width: 100%; height: 40px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.75rem; font-size: 0.84rem; font-weight: 700; box-sizing: border-box;">
+                @if (erreursEtape1().nom) {
+                  <small style="color: #E51D24; font-size: 0.7rem; font-weight: 700; margin-top: 0.2rem;">{{ erreursEtape1().nom }}</small>
+                }
               </div>
               <div style="display: flex; flex-direction: column;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+                <div style="height: 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
                   <label style="font-size: 0.72rem; font-weight: 800; color: #721513; margin: 0;">Code Entreprise</label>
                   <button type="button" (click)="regenererCodeEntreprise()" style="background: none; border: none; font-size: 0.65rem; color: #E51D24; font-weight: 700; cursor: pointer; padding: 0;">
                     <i class="fa-solid fa-rotate"></i> Auto
@@ -844,11 +850,17 @@
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;">
               <div>
                 <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">NINEA</label>
-                <input type="text" [(ngModel)]="entrepriseEnEdition().ninea" placeholder="Ex: 001294829 2V1" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 0.82rem; font-weight: 700;">
+                <input type="text" [(ngModel)]="entrepriseEnEdition().ninea" placeholder="Ex: 001294829 2V1" [style.border-color]="erreursEtape1().ninea ? '#E51D24' : '#EDE7DC'" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 0.82rem; font-weight: 700;">
+                @if (erreursEtape1().ninea) {
+                  <small style="color: #E51D24; font-size: 0.7rem; font-weight: 700; margin-top: 0.2rem; display: block;">{{ erreursEtape1().ninea }}</small>
+                }
               </div>
               <div>
                 <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">RCCM</label>
-                <input type="text" [(ngModel)]="entrepriseEnEdition().rccm" placeholder="Ex: SN-DKR-2012-B-1428" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 0.82rem; font-weight: 700;">
+                <input type="text" [(ngModel)]="entrepriseEnEdition().rccm" placeholder="Ex: SN-DKR-2012-B-1428" [style.border-color]="erreursEtape1().rccm ? '#E51D24' : '#EDE7DC'" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 0.82rem; font-weight: 700;">
+                @if (erreursEtape1().rccm) {
+                  <small style="color: #E51D24; font-size: 0.7rem; font-weight: 700; margin-top: 0.2rem; display: block;">{{ erreursEtape1().rccm }}</small>
+                }
               </div>
               <div>
                 <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">Adresse Physique / Emplacement</label>
@@ -859,11 +871,17 @@
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem;">
               <div>
                 <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">Email Référent RH / DAF</label>
-                <input type="email" [(ngModel)]="entrepriseEnEdition().emailContact" placeholder="rh@client.sn" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 0.82rem;">
+                <input type="email" [(ngModel)]="entrepriseEnEdition().emailContact" placeholder="rh@client.sn" [style.border-color]="erreursEtape1().email ? '#E51D24' : '#EDE7DC'" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 0.82rem;">
+                @if (erreursEtape1().email) {
+                  <small style="color: #E51D24; font-size: 0.7rem; font-weight: 700; margin-top: 0.2rem; display: block;">{{ erreursEtape1().email }}</small>
+                }
               </div>
               <div>
                 <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">Téléphone Référent</label>
-                <input type="text" [(ngModel)]="entrepriseEnEdition().telephone" placeholder="+221 ..." style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 0.82rem;">
+                <input type="text" [ngModel]="entrepriseEnEdition().telephone" (ngModelChange)="onTelephoneChange($event)" placeholder="+221 77 765 76 56" [style.border-color]="erreursEtape1().telephone ? '#E51D24' : '#EDE7DC'" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 0.82rem;">
+                @if (erreursEtape1().telephone) {
+                  <small style="color: #E51D24; font-size: 0.7rem; font-weight: 700; margin-top: 0.2rem; display: block;">{{ erreursEtape1().telephone }}</small>
+                }
               </div>
             </div>
           }
@@ -947,7 +965,7 @@
             </button>
           }
           @if (etapeEntreprise() < 3) {
-            <button type="button" (click)="etapeEntreprise.set(etapeEntreprise() === 1 ? 2 : 3)" class="sa-btn-primary" style="height: 42px; min-height: 42px; padding: 0 1.5rem; justify-content: center;">
+            <button type="button" (click)="etapeEntreprise() === 1 ? allerEtape2() : etapeEntreprise.set(3)" class="sa-btn-primary" style="height: 42px; min-height: 42px; padding: 0 1.5rem; justify-content: center;">
               Suivant <i class="fa-solid fa-arrow-right"></i>
             </button>
           } @else {
@@ -992,8 +1010,8 @@
         </div>
 
         @if (entreprisesSubTab() === 'ENTREPRISES') {
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.85rem;">
-          <div class="sa-filter-pill-box" style="flex-wrap: nowrap; overflow-x: auto; max-width: 100%; scrollbar-width: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;">
+          <div class="sa-filter-pill-box" style="flex-wrap: nowrap; overflow-x: auto; width: fit-content; max-width: 100%; scrollbar-width: none;">
             <button
               type="button"
               (click)="filtreArchiveEntreprise.set('ACTIVES'); pageEntreprises.set(1)"
@@ -1018,7 +1036,7 @@
           </div>
 
           <!-- Bouton Conventionner une Entreprise à droite -->
-          <button (click)="ouvrirModalNouvelleEntreprise()" class="sa-btn-primary" style="margin-left: auto; flex-shrink: 0; white-space: nowrap;">
+          <button (click)="ouvrirModalNouvelleEntreprise()" class="sa-btn-primary" style="flex-shrink: 0; white-space: nowrap;">
             <i class="fa-solid fa-plus"></i> Conventionner une Entreprise
           </button>
         </div>
@@ -1227,9 +1245,22 @@
 
               <div style="display: flex; flex-direction: column; gap: 0.6rem;">
                 @for (tp of b2b.typesPrestationConfigurables(); track tp.code) {
-                  <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 12px; padding: 0.75rem 1rem;">
-                    <strong style="color: #2C1810; font-size: 0.88rem; display: block;">{{ tp.libelle }}</strong>
-                    <div style="font-size: 0.75rem; color: #6E5A56; margin-top: 0.15rem;">{{ tp.desc }}</div>
+                  <div [style.opacity]="$any(tp).isArchive ? '0.55' : '1'" style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 12px; padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; gap: 0.75rem;">
+                    <div>
+                      <strong style="color: #2C1810; font-size: 0.88rem; display: block;">
+                        {{ tp.libelle }}
+                        @if ($any(tp).isArchive) {
+                          <span style="font-size: 0.68rem; color: #E51D24; font-weight: 800; margin-left: 0.35rem;">(Archivé)</span>
+                        }
+                      </strong>
+                      <div style="font-size: 0.75rem; color: #6E5A56; margin-top: 0.15rem;">{{ tp.desc }}</div>
+                    </div>
+                    <button type="button" (click)="b2b.toggleArchiverTypePrestation(tp.code)" class="sa-btn-action"
+                      [style.color]="$any(tp).isArchive ? '#606C38' : '#E51D24'"
+                      style="height: 32px; min-height: 32px; padding: 0 0.75rem; font-size: 0.72rem; flex-shrink: 0;">
+                      <i class="fa-solid" [class.fa-box-archive]="!$any(tp).isArchive" [class.fa-rotate-left]="$any(tp).isArchive"></i>
+                      {{ $any(tp).isArchive ? 'Restaurer' : 'Archiver' }}
+                    </button>
                   </div>
                 }
               </div>
@@ -1251,9 +1282,15 @@
 
               <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
                 @for (cat of b2b.categoriesConfigurables(); track cat.code) {
-                  <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 12px; padding: 0.6rem 0.95rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+                  <div [style.opacity]="$any(cat).isArchive ? '0.55' : '1'" style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 12px; padding: 0.5rem 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem;">
                     <i class="fa-solid" [class]="cat.icone" [style.color]="cat.couleur" style="font-size: 0.95rem;"></i>
                     <span style="font-size: 0.85rem; font-weight: 700; color: #2C1810;">{{ cat.libelle }}</span>
+                    <button type="button" (click)="b2b.toggleArchiverCategorie(cat.code)"
+                      [title]="$any(cat).isArchive ? 'Restaurer' : 'Archiver'"
+                      [style.color]="$any(cat).isArchive ? '#606C38' : '#E51D24'"
+                      style="background: none; border: none; cursor: pointer; padding: 0 0.2rem; font-size: 0.75rem;">
+                      <i class="fa-solid" [class.fa-box-archive]="!$any(cat).isArchive" [class.fa-rotate-left]="$any(cat).isArchive"></i>
+                    </button>
                   </div>
                 }
               </div>
@@ -1503,18 +1540,27 @@
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
             <div>
               <label style="font-size: 0.75rem; font-weight: 800; color: #332724; display: block; margin-bottom: 0.35rem;">Prénom *</label>
-              <input type="text" [(ngModel)]="employeEnCreation().prenom" placeholder="Ex: Moussa" style="width: 100%; height: 38px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.85rem;">
+              <input type="text" [(ngModel)]="employeEnCreation().prenom" placeholder="Ex: Moussa" [style.border-color]="erreursEmploye().prenom ? '#E51D24' : '#EDE7DC'" style="width: 100%; height: 38px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.85rem;">
+              @if (erreursEmploye().prenom) {
+                <small style="color: #E51D24; font-size: 0.7rem; font-weight: 700; margin-top: 0.2rem; display: block;">{{ erreursEmploye().prenom }}</small>
+              }
             </div>
             <div>
               <label style="font-size: 0.75rem; font-weight: 800; color: #332724; display: block; margin-bottom: 0.35rem;">Nom *</label>
-              <input type="text" [(ngModel)]="employeEnCreation().nom" placeholder="Ex: Diagne" style="width: 100%; height: 38px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.85rem;">
+              <input type="text" [(ngModel)]="employeEnCreation().nom" placeholder="Ex: Diagne" [style.border-color]="erreursEmploye().nom ? '#E51D24' : '#EDE7DC'" style="width: 100%; height: 38px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.85rem;">
+              @if (erreursEmploye().nom) {
+                <small style="color: #E51D24; font-size: 0.7rem; font-weight: 700; margin-top: 0.2rem; display: block;">{{ erreursEmploye().nom }}</small>
+              }
             </div>
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
             <div>
               <label style="font-size: 0.75rem; font-weight: 800; color: #332724; display: block; margin-bottom: 0.35rem;">Matricule (laisser vide si auto)</label>
-              <input type="text" [(ngModel)]="employeEnCreation().matricule" placeholder="Ex: TOT-1042" style="width: 100%; height: 38px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.85rem;">
+              <input type="text" [(ngModel)]="employeEnCreation().matricule" placeholder="Ex: TOT-1042" [style.border-color]="erreursEmploye().matricule ? '#E51D24' : '#EDE7DC'" style="width: 100%; height: 38px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.85rem;">
+              @if (erreursEmploye().matricule) {
+                <small style="color: #E51D24; font-size: 0.7rem; font-weight: 700; margin-top: 0.2rem; display: block;">{{ erreursEmploye().matricule }}</small>
+              }
             </div>
             <div>
               <label style="font-size: 0.75rem; font-weight: 800; color: #332724; display: block; margin-bottom: 0.35rem;">Département</label>
@@ -1525,11 +1571,17 @@
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
             <div>
               <label style="font-size: 0.75rem; font-weight: 800; color: #332724; display: block; margin-bottom: 0.35rem;">Email Professionnel</label>
-              <input type="email" [(ngModel)]="employeEnCreation().email" placeholder="moussa.diagne@entreprise.sn" style="width: 100%; height: 38px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.85rem;">
+              <input type="email" [(ngModel)]="employeEnCreation().email" placeholder="moussa.diagne@entreprise.sn" [style.border-color]="erreursEmploye().email ? '#E51D24' : '#EDE7DC'" style="width: 100%; height: 38px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.85rem;">
+              @if (erreursEmploye().email) {
+                <small style="color: #E51D24; font-size: 0.7rem; font-weight: 700; margin-top: 0.2rem; display: block;">{{ erreursEmploye().email }}</small>
+              }
             </div>
             <div>
               <label style="font-size: 0.75rem; font-weight: 800; color: #332724; display: block; margin-bottom: 0.35rem;">Téléphone</label>
-              <input type="tel" [(ngModel)]="employeEnCreation().telephone" placeholder="+221 77 123 45 67" style="width: 100%; height: 38px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.85rem;">
+              <input type="tel" [ngModel]="employeEnCreation().telephone" (ngModelChange)="onTelephoneEmployeChange($event)" placeholder="+221 77 123 45 67" [style.border-color]="erreursEmploye().telephone ? '#E51D24' : '#EDE7DC'" style="width: 100%; height: 38px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.85rem;">
+              @if (erreursEmploye().telephone) {
+                <small style="color: #E51D24; font-size: 0.7rem; font-weight: 700; margin-top: 0.2rem; display: block;">{{ erreursEmploye().telephone }}</small>
+              }
             </div>
           </div>
 

@@ -1,7 +1,17 @@
 package com.kikitraiteur.b2b.entreprise.data.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "b2b_categories_plat")
@@ -19,4 +29,9 @@ public class CategoriePlatEntity {
 
     private String icone;
     private String couleur;
+
+    @Builder.Default
+    @JsonProperty("isArchive")
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean isArchive = false;
 }

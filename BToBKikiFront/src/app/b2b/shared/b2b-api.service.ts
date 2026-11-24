@@ -138,8 +138,11 @@ export class B2bApiService {
     return this.http.post<ApiResponse<any>>(`${this.baseUrl}/b2b/entreprises/${entrepriseId}/sites`, site, { headers: this.getHeaders() });
   }
 
-  getInvitations(entrepriseId = 'ent-001'): Observable<ApiResponse<any[]>> {
-    return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/b2b/entreprises/${entrepriseId}/invitations`, { headers: this.getHeaders() });
+  getInvitations(entrepriseId?: string): Observable<ApiResponse<any[]>> {
+    const url = (!entrepriseId || entrepriseId === 'ALL')
+      ? `${this.baseUrl}/b2b/entreprises/invitations`
+      : `${this.baseUrl}/b2b/entreprises/${entrepriseId}/invitations`;
+    return this.http.get<ApiResponse<any[]>>(url, { headers: this.getHeaders() });
   }
 
   createInvitation(entrepriseId: string, inv: any): Observable<ApiResponse<any>> {
@@ -192,5 +195,13 @@ export class B2bApiService {
 
   createCategorie(item: any): Observable<ApiResponse<any>> {
     return this.http.post<ApiResponse<any>>(`${this.baseUrl}/b2b/parametres/categories`, item, { headers: this.getHeaders() });
+  }
+
+  toggleArchivePrestation(code: string): Observable<ApiResponse<any>> {
+    return this.http.patch<ApiResponse<any>>(`${this.baseUrl}/b2b/parametres/prestations/${encodeURIComponent(code)}/archive`, {}, { headers: this.getHeaders() });
+  }
+
+  toggleArchiveCategorie(code: string): Observable<ApiResponse<any>> {
+    return this.http.patch<ApiResponse<any>>(`${this.baseUrl}/b2b/parametres/categories/${encodeURIComponent(code)}/archive`, {}, { headers: this.getHeaders() });
   }
 }

@@ -47,6 +47,11 @@ public class EntrepriseController {
         return ApiResponse.ok("Site ajouté", entrepriseService.addSite(id, site));
     }
 
+    @GetMapping("/invitations")
+    public ApiResponse<List<InvitationAdminEntity>> getAllInvitations() {
+        return ApiResponse.ok(entrepriseService.getAllInvitations());
+    }
+
     @GetMapping("/{id}/invitations")
     public ApiResponse<List<InvitationAdminEntity>> getInvitations(@PathVariable String id) {
         return ApiResponse.ok(entrepriseService.getInvitations(id));

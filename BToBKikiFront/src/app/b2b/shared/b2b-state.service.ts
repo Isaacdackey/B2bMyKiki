@@ -131,6 +131,30 @@ export class B2bStateService {
     { code: 'BOISSON', libelle: 'Boisson', icone: 'fa-wine-glass', couleur: '#332724' }
   ]);
 
+  // Archiver / Désarchiver un type de prestation
+  toggleArchiverTypePrestation(code: string) {
+    this.typesPrestationConfigurables.update(list => {
+      const next = list.map((t: any) => t.code === code ? { ...t, isArchive: !t.isArchive } : t);
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('b2b_types_prestation', JSON.stringify(next));
+      }
+      return next;
+    });
+    this.api.toggleArchivePrestation(code).subscribe({ error: () => {} });
+  }
+
+  // Archiver / Désarchiver une catégorie alimentaire
+  toggleArchiverCategorie(code: string) {
+    this.categoriesConfigurables.update(list => {
+      const next = list.map((c: any) => c.code === code ? { ...c, isArchive: !c.isArchive } : c);
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('b2b_categories_config', JSON.stringify(next));
+      }
+      return next;
+    });
+    this.api.toggleArchiveCategorie(code).subscribe({ error: () => {} });
+  }
+
   // Ajouter un nouveau type de prestation
   ajouterTypePrestation(item: { code: string; libelle: string; desc: string; categoriesDefaut: string[] }) {
     this.typesPrestationConfigurables.update(list => {
@@ -457,7 +481,7 @@ export class B2bStateService {
       error: () => {}
     });
 
-    this.api.getInvitations('ent-001').subscribe({
+    this.api.getInvitations('ALL').subscribe({
       next: (res) => {
         if (res.success && res.data?.length) {
           this.listeInvitationsAdmins.set(res.data);

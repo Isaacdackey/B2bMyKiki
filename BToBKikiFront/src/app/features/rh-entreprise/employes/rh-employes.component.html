@@ -242,15 +242,17 @@
             </div>
             <div>
               <label style="font-size: 0.75rem; color: #721513; font-weight: 800; display: block; margin-bottom: 0.25rem;">Taux de Subvention Salarié (%) :</label>
-              <input
-                type="number"
-                min="1"
-                max="100"
-                step="1"
+              <select
                 [(ngModel)]="newEmp().tauxSubvention"
                 (ngModelChange)="tauxSubventionError.set('')"
-                placeholder="Ex: 50 ou 100"
-                style="width: 100%; font-weight: 800; color: #721513; padding: 0.55rem 0.75rem; border-radius: 10px; border: 1.5px solid #EDE7DC;">
+                style="width: 100%; font-weight: 800; color: #721513; padding: 0.55rem 0.75rem; border-radius: 10px; border: 1.5px solid #EDE7DC; background: #fff;">
+                <option [ngValue]="100">100%</option>
+                <option [ngValue]="75">75%</option>
+                <option [ngValue]="70">70%</option>
+                <option [ngValue]="50">50%</option>
+                <option [ngValue]="25">25%</option>
+                <option [ngValue]="0">0%</option>
+              </select>
               @if (tauxSubventionError()) {
                 <div style="font-size: 0.72rem; color: #DC2626; font-weight: 700; margin-top: 0.25rem;">
                   <i class="fa-solid fa-circle-exclamation"></i> {{ tauxSubventionError() }}
