@@ -1,19 +1,32 @@
 package com.kikitraiteur.b2b.entreprise.service;
 
 import com.kikitraiteur.b2b.entreprise.data.entity.EmployeEntity;
+import com.kikitraiteur.b2b.entreprise.data.entity.InvitationAdminEntity;
 import com.kikitraiteur.b2b.entreprise.data.repository.EmployeRepository;
+import com.kikitraiteur.b2b.entreprise.data.repository.InvitationAdminRepository;
 import com.kikitraiteur.b2b.shared.exceptions.BusinessException;
 import com.kikitraiteur.b2b.shared.exceptions.ResourceNotFoundException;
+import com.kikitraiteur.b2b.shared.mail.EmailService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class EmployeService {
 
     private final EmployeRepository employeRepository;
+    private final InvitationAdminRepository invitationRepository;
+    private final EmailService emailService;
+
+    @Value("${app.frontend.url:https://btob-kiki.vercel.app}")
+    private String frontendUrl;
 
     public List<EmployeEntity> findAll(String entrepriseId) {
         if (entrepriseId != null && !entrepriseId.isBlank()) {
@@ -46,7 +59,45 @@ public class EmployeService {
             emp.setMatricule("EMP-" + (System.currentTimeMillis() % 10000));
         }
         emp.setType(emp.getTauxSubvention() != null && emp.getTauxSubvention() > 0 ? "SUBVENTIONNE" : "AUTONOME");
-        return employeRepository.save(emp);
+        EmployeEntity saved = employeRepository.save(emp);
+        if (saved.getEmail() != null && !saved.getEmail().isBlank()) {
+            envoyerInvitationActivationEmploye(saved);
+        }
+        return saved;
+    }
+
+    private void envoyerInvitationActivationEmploye(EmployeEntity emp) {
+        try {
+            InvitationAdminEntity inv = new InvitationAdminEntity();
+            inv.setId("inv-" + System.currentTimeMillis());
+            inv.setEntrepriseId(emp.getEntrepriseId() != null && !emp.getEntrepriseId().isBlank() ? emp.getEntrepriseId() : "ent-001");
+            inv.setEmail(emp.getEmail().trim().toLowerCase());
+            inv.setNomComplet(((emp.getPrenom() != null ? emp.getPrenom() : "") + " " + (emp.getNom() != null ? emp.getNom() : "")).trim());
+            boolean subv = "SUBVENTIONNE".equals(emp.getType());
+            inv.setRole(subv ? "SALARIE_CONVENTIONNE" : "SALARIE_AUTONOME");
+            inv.setRoleLibelle(subv ? "Salarié Conventionné" : "Salarié Autonome");
+            inv.setTokenActivation("KIKI-" + UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase());
+            inv.setStatut("EN_ATTENTE");
+            inv.setDateEnvoi(LocalDate.now().toString());
+            invitationRepository.save(inv);
+
+            String base = (frontendUrl != null && !frontendUrl.isBlank() && !frontendUrl.contains("localhost"))
+                    ? frontendUrl.replaceAll("/+$", "")
+                    : "https://btob-kiki.vercel.app";
+            String activationUrl = base + "/b2b/activation?token="
+                    + URLEncoder.encode(inv.getTokenActivation(), StandardCharsets.UTF_8)
+                    + "&email=" + URLEncoder.encode(inv.getEmail(), StandardCharsets.UTF_8);
+
+            emailService.sendAdminInvitationEmail(
+                    inv.getEmail(),
+                    inv.getNomComplet(),
+                    inv.getRoleLibelle(),
+                    emp.getSiteNom() != null && !emp.getSiteNom().isBlank() ? emp.getSiteNom() : "Votre entreprise",
+                    activationUrl
+            );
+        } catch (Exception ignored) {
+            // Ne pas bloquer la création de l'employé si l'envoi d'email échoue
+        }
     }
 
     public List<EmployeEntity> importBatch(List<EmployeEntity> employes) {

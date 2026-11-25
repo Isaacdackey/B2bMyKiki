@@ -29,6 +29,7 @@ public class PlatEntity {
 
     private String image;
     private String allergene;
+    private String garniture;
     private Integer calories;
 
     @Builder.Default

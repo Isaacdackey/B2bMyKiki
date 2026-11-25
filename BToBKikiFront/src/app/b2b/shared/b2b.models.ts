@@ -92,6 +92,7 @@ export interface PlatB2B {
   prixUnitaire: number;
   image: string;
   allergene?: string;
+  garniture?: string;
   calories?: number;
   disponible?: boolean; // Activable / désactivable par le Responsable de Site selon le stock
   isArchive?: boolean; // Archivage du catalogue par le Super Admin

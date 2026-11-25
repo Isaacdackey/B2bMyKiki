@@ -174,13 +174,20 @@
         }
 
         @if (platsFiltres().length === 0) {
-        <div class="empty-phare-state">
-          <i class="fa-solid fa-utensils mb-2"></i>
-          <p>Aucun plat disponible pour {{ jourSelectionne() }} dans cette catégorie.</p>
-          <button class="btn-reset-filters" (click)="selectCategory('all'); termeRecherche.set('')">
-            Voir tous les plats
-          </button>
-        </div>
+        @if (b2b.menusPlanifiesEntreprises().length === 0) {
+          <div class="empty-phare-state">
+            <i class="fa-solid fa-spinner fa-spin mb-2" style="color: #721513;"></i>
+            <p>Chargement du menu du {{ jourSelectionne() }}...</p>
+          </div>
+        } @else {
+          <div class="empty-phare-state">
+            <i class="fa-solid fa-utensils mb-2"></i>
+            <p>Aucun plat disponible pour {{ jourSelectionne() }} dans cette catégorie.</p>
+            <button class="btn-reset-filters" (click)="selectCategory('all'); termeRecherche.set('')">
+              Voir tous les plats
+            </button>
+          </div>
+        }
         } @else {
         <div class="dishes-grid">
           @for (plat of platsPagines(); track plat.id) {

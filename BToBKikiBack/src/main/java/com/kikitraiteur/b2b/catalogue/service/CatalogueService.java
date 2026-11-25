@@ -38,6 +38,7 @@ public class CatalogueService {
         if (updates.getPrixUnitaire() != null) existing.setPrixUnitaire(updates.getPrixUnitaire());
         if (updates.getImage() != null) existing.setImage(updates.getImage());
         if (updates.getAllergene() != null) existing.setAllergene(updates.getAllergene());
+        if (updates.getGarniture() != null) existing.setGarniture(updates.getGarniture());
         if (updates.getCalories() != null) existing.setCalories(updates.getCalories());
         existing.setDisponible(updates.isDisponible());
         return platRepository.save(existing);

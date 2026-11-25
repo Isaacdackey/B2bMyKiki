@@ -231,6 +231,23 @@
               <option value="BOISSON">Boisson &amp; Jus Frais</option>
             </select>
           </div>
+
+          @if (platEnEdition().categorie === 'PLAT') {
+            <div style="grid-column: 1 / -1;">
+              <label style="font-size: 0.78rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">
+                <i class="fa-solid fa-bowl-rice"></i> Garniture associée (Plat Chaud)
+              </label>
+              <select [(ngModel)]="platEnEdition().garniture" style="width: 100%; min-height: 42px;">
+                <option value="">Aucune / Au choix du client</option>
+                <option value="Riz Parfumé">Riz Parfumé</option>
+                <option value="Alloco Doré">Alloco Doré</option>
+                <option value="Frites Maison">Frites Maison</option>
+                <option value="Attiéké">Attiéké</option>
+                <option value="Légumes Sautés">Légumes Sautés</option>
+                <option value="Purée de Pommes de Terre">Purée de Pommes de Terre</option>
+              </select>
+            </div>
+          }
         </div>
 
         <div>

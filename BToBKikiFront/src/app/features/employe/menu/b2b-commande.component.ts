@@ -223,7 +223,7 @@ export class B2bCommandeComponent implements OnInit {
       }
     } else {
       // Fallback catalogue complet
-      listeBase = this.b2b.catalogueJour().filter(p => !p.isArchive);
+      listeBase = [];
     }
 
     // Respecter les catégories autorisées par la convention de l'entreprise

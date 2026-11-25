@@ -109,21 +109,35 @@ public class AuthService {
             throw new BusinessException("Ce compte administrateur a déjà été activé.");
         }
 
-        RoleName roleName = "RESPONSABLE_SITE_KIKI".equalsIgnoreCase(inv.getRole())
-                ? RoleName.RESPONSABLE_SITE_KIKI
-                : RoleName.RESPONSABLE_ENTREPRISE;
+        RoleName roleName;
+        String badge;
+        String badgeColor;
+        String titrePoste;
+        if ("RESPONSABLE_SITE_KIKI".equalsIgnoreCase(inv.getRole())) {
+            roleName = RoleName.RESPONSABLE_SITE_KIKI;
+            badge = "Exploitation & Cantine";
+            badgeColor = "#C05621";
+            titrePoste = "Responsable de Site Kiki";
+        } else if ("SALARIE_CONVENTIONNE".equalsIgnoreCase(inv.getRole())) {
+            roleName = RoleName.SALARIE_CONVENTIONNE;
+            badge = "Subventionné";
+            badgeColor = "#2E7D32";
+            titrePoste = "Salarié Conventionné";
+        } else if ("SALARIE_AUTONOME".equalsIgnoreCase(inv.getRole())) {
+            roleName = RoleName.SALARIE_AUTONOME;
+            badge = "Autonome 0%";
+            badgeColor = "#1D4ED8";
+            titrePoste = "Salarié Autonome";
+        } else {
+            roleName = RoleName.RESPONSABLE_ENTREPRISE;
+            badge = "Admin RH";
+            badgeColor = "#721513";
+            titrePoste = "Responsable de l'Entreprise (RH)";
+        }
 
         String nomComplet = (request.getNomComplet() != null && !request.getNomComplet().isBlank())
                 ? request.getNomComplet().trim()
                 : inv.getNomComplet();
-
-        String badge = roleName == RoleName.RESPONSABLE_SITE_KIKI
-                ? "Exploitation & Cantine"
-                : "Admin RH";
-        String badgeColor = roleName == RoleName.RESPONSABLE_SITE_KIKI ? "#C05621" : "#721513";
-        String titrePoste = roleName == RoleName.RESPONSABLE_SITE_KIKI
-                ? "Responsable de Site Kiki"
-                : "Responsable de l'Entreprise (RH)";
 
         UserEntity user = userRepository.findByEmailIgnoreCase(inv.getEmail())
                 .orElseGet(UserEntity::new);
