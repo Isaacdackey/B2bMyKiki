@@ -6,6 +6,7 @@ import com.kikitraiteur.b2b.entreprise.data.entity.SiteEntity;
 import com.kikitraiteur.b2b.entreprise.service.EntrepriseService;
 import com.kikitraiteur.b2b.shared.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,21 +28,25 @@ public class EntrepriseController {
         return ApiResponse.ok(entrepriseService.findById(id));
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PostMapping
     public ApiResponse<EntrepriseEntity> create(@RequestBody EntrepriseEntity ent) {
         return ApiResponse.ok("Entreprise créée", entrepriseService.create(ent));
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PutMapping("/{id}")
     public ApiResponse<EntrepriseEntity> update(@PathVariable String id, @RequestBody EntrepriseEntity ent) {
         return ApiResponse.ok("Entreprise mise à jour", entrepriseService.update(id, ent));
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PatchMapping("/{id}/archive")
     public ApiResponse<EntrepriseEntity> toggleArchive(@PathVariable String id) {
         return ApiResponse.ok("Statut archivage modifié", entrepriseService.toggleArchive(id));
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PostMapping("/{id}/sites")
     public ApiResponse<SiteEntity> addSite(@PathVariable String id, @RequestBody SiteEntity site) {
         return ApiResponse.ok("Site ajouté", entrepriseService.addSite(id, site));
@@ -57,11 +62,13 @@ public class EntrepriseController {
         return ApiResponse.ok(entrepriseService.getInvitations(id));
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PostMapping("/{id}/invitations")
     public ApiResponse<InvitationAdminEntity> createInvitation(@PathVariable String id, @RequestBody InvitationAdminEntity inv) {
         return ApiResponse.ok("Invitation générée et envoyée par email", entrepriseService.createInvitation(id, inv));
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PostMapping("/{id}/invitations/{invitationId}/resend")
     public ApiResponse<InvitationAdminEntity> resendInvitation(
             @PathVariable String id,

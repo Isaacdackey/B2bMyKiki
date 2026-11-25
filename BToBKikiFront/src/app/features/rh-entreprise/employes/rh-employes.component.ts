@@ -16,13 +16,6 @@ import { EmployeB2B } from '../../../b2b/shared/b2b.models';
 export class RhEmployesComponent {
   b2b = inject(B2bStateService);
   constructor() {
-    if (this.b2b.currentSession().role !== 'RESPONSABLE_ENTREPRISE') {
-      this.b2b.setSessionRole({
-        role: 'RESPONSABLE_ENTREPRISE', nomComplet: 'Aminata Diop (DRH)', titrePoste: 'Directrice des Ressources Humaines',
-        entite: 'TotalEnergies Sénégal', siteId: 'site-1', siteNom: 'Siège Plateau - Dakar',
-        badge: 'Direction RH', badgeColor: '#606C38'
-      });
-    }
   }
 
   tauxSubventionError = signal<string>('');

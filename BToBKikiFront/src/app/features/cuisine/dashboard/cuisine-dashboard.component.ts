@@ -18,13 +18,6 @@ export class CuisineDashboardComponent {
   qrMode = signal<'PROJETER' | 'SCANNER'>('PROJETER');
   private router = inject(Router);
   constructor() {
-    if (this.b2b.currentSession().role !== 'RESPONSABLE_SITE_KIKI') {
-      this.b2b.setSessionRole({
-        role: 'RESPONSABLE_SITE_KIKI', nomComplet: 'Moussa Kane (Gérant Cantine)', titrePoste: 'Responsable de Site Kiki Traiteur',
-        entite: 'TotalEnergies Sénégal', siteId: 'site-1', siteNom: 'Siège Plateau - Dakar',
-        badge: 'Gérant Exploitation Site', badgeColor: '#3D5A80'
-      });
-    }
   }
 
   setTab(tab: 'DASHBOARD' | 'INFOS' | 'UTILISATEURS' | 'MENU' | 'COMMANDES' | 'FACTURATION' | 'RECLAMATIONS' | 'PROJECTION_QR') {

@@ -16,18 +16,6 @@ import { FacturationLigneJournaliere } from '../../../b2b/shared/b2b.models';
 export class CuisineFacturationComponent {
   b2b = inject(B2bStateService);
   constructor() {
-    if (this.b2b.currentSession().role !== 'RESPONSABLE_SITE_KIKI') {
-      this.b2b.setSessionRole({
-        role: 'RESPONSABLE_SITE_KIKI',
-        nomComplet: 'Moussa Kane (Gérant Cantine)',
-        titrePoste: 'Responsable de Site Kiki Traiteur',
-        entite: 'TotalEnergies Sénégal',
-        siteId: 'site-1',
-        siteNom: 'Siège Plateau - Dakar',
-        badge: 'Gérant Exploitation Site',
-        badgeColor: '#3D5A80'
-      });
-    }
   }
 
   factureDateDebut = signal<string>('2026-11-01');

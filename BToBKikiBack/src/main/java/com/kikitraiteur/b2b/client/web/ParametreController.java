@@ -7,6 +7,7 @@ import com.kikitraiteur.b2b.entreprise.data.repository.TypePrestationRepository;
 import com.kikitraiteur.b2b.shared.exceptions.ResourceNotFoundException;
 import com.kikitraiteur.b2b.shared.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class ParametreController {
         return ApiResponse.ok(typePrestationRepository.findAll());
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PostMapping("/prestations")
     public ApiResponse<TypePrestationEntity> createPrestation(@RequestBody TypePrestationEntity item) {
         return ApiResponse.ok("Type de prestation enregistré", typePrestationRepository.save(item));
@@ -34,11 +36,13 @@ public class ParametreController {
         return ApiResponse.ok(categoriePlatRepository.findAll());
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PostMapping("/categories")
     public ApiResponse<CategoriePlatEntity> createCategorie(@RequestBody CategoriePlatEntity item) {
         return ApiResponse.ok("Catégorie enregistrée", categoriePlatRepository.save(item));
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PatchMapping("/prestations/{code}/archive")
     public ApiResponse<TypePrestationEntity> toggleArchivePrestation(@PathVariable String code) {
         TypePrestationEntity entity = typePrestationRepository.findById(code)
@@ -47,6 +51,7 @@ public class ParametreController {
         return ApiResponse.ok("Statut archivage modifié", typePrestationRepository.save(entity));
     }
 
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PatchMapping("/categories/{code}/archive")
     public ApiResponse<CategoriePlatEntity> toggleArchiveCategorie(@PathVariable String code) {
         CategoriePlatEntity entity = categoriePlatRepository.findById(code)

@@ -9,6 +9,7 @@ import com.kikitraiteur.b2b.shared.response.ApiResponse;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -42,6 +43,7 @@ public class AlerteController {
         private List<DestinataireRelance> destinataires;
     }
 
+    @PreAuthorize("hasAnyRole('RESPONSABLE_ENTREPRISE', 'SUPER_ADMIN')")
     @PostMapping("/relance")
     public ApiResponse<List<AlerteCommandeEntity>> envoyerRelance(@RequestBody RelanceCommandeRequest req) {
         if (req.getDestinataires() == null || req.getDestinataires().isEmpty()) {

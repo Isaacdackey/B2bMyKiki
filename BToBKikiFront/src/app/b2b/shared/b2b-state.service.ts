@@ -8,21 +8,21 @@ import { B2bApiService } from './b2b-api.service';
 export class B2bStateService {
   private api = inject(B2bApiService);
   private loadInitialSession(): UserSessionB2B {
-    const defaultSession: UserSessionB2B = {
-      role: 'RESPONSABLE_ENTREPRISE',
-      nomComplet: 'Mme Fatou Fall',
-      titrePoste: 'Responsable RH & Moyens Généraux',
-      entite: 'TotalEnergies Sénégal',
-      siteId: 'site-1',
-      siteNom: 'Siège Plateau - Dakar',
-      badge: 'Responsable Entreprise',
+    const emptySession: UserSessionB2B = {
+      role: 'SALARIE_CONVENTIONNE',
+      nomComplet: '',
+      titrePoste: '',
+      entite: '',
+      siteId: '',
+      siteNom: '',
+      badge: '',
       badgeColor: '#721513'
     };
 
     if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
-      const path = window.location?.pathname || '';
+      const hasToken = !!localStorage.getItem('b2b_jwt_token');
       const raw = localStorage.getItem('b2b_current_session');
-      if (raw) {
+      if (hasToken && raw) {
         try {
           const parsed = JSON.parse(raw) as UserSessionB2B;
           if (parsed && parsed.role) {
@@ -30,43 +30,8 @@ export class B2bStateService {
           }
         } catch {}
       }
-
-      if (path.includes('/b2b/super-admin')) {
-        return {
-          role: 'SUPER_ADMIN',
-          nomComplet: 'Direction Kiki Traiteur',
-          titrePoste: 'Super Admin Kiki (Global)',
-          entite: 'Kiki Traiteur B2B',
-          siteId: 'site-1',
-          siteNom: 'Siège Plateau - Dakar',
-          badge: 'Direction Générale',
-          badgeColor: '#721513'
-        };
-      } else if (path.includes('/b2b/cuisine')) {
-        return {
-          role: 'RESPONSABLE_SITE_KIKI',
-          nomComplet: 'Chef Moussa Ndiaye',
-          titrePoste: 'Responsable de Site Kiki',
-          entite: 'Kiki Traiteur Exploitation',
-          siteId: 'site-1',
-          siteNom: 'Siège Plateau - Dakar',
-          badge: 'Exploitation Cantine',
-          badgeColor: '#C05621'
-        };
-      } else if (path.includes('/b2b/commande') || path.includes('/b2b/panier')) {
-        return {
-          role: 'SALARIE_CONVENTIONNE',
-          nomComplet: 'Babacar Ndiaye',
-          titrePoste: 'Salarié Conventionné',
-          entite: 'TotalEnergies Sénégal',
-          siteId: 'site-1',
-          siteNom: 'Siège Plateau - Dakar',
-          badge: 'Subventionné 100% • 0 FCFA',
-          badgeColor: '#2E7D32'
-        };
-      }
     }
-    return defaultSession;
+    return emptySession;
   }
 
   // États asynchrones globaux (Loading & Toast succès/erreur)
@@ -437,6 +402,9 @@ export class B2bStateService {
   }
 
   syncFromBackend() {
+    if (typeof localStorage !== 'undefined' && !localStorage.getItem('b2b_jwt_token')) {
+      return;
+    }
     this.api.getEntreprises().subscribe({
       next: (res) => {
         if (res.success && res.data?.length) {
@@ -642,246 +610,33 @@ export class B2bStateService {
 
   // Employé actif pour la commande
   currentEmploye = signal<EmployeB2B>({
-    id: 'emp-101',
-    matricule: 'TOT-9842',
-    nom: 'Ndiaye',
-    prenom: 'Babacar',
-    email: 'b.ndiaye@totalenergies.sn',
-    telephone: '+221 77 123 45 67',
-    siteId: 'site-1',
-    siteNom: 'Siège Plateau - Dakar',
-    departement: 'Finance & Comptabilité',
+    id: '',
+    matricule: '',
+    nom: '',
+    prenom: '',
+    email: '',
+    telephone: '',
+    siteId: '',
+    siteNom: '',
+    departement: '',
     type: 'SUBVENTIONNE',
-    tauxSubvention: 100, // Prise en charge 100%
+    tauxSubvention: 100,
     actif: true,
-    repasConsommesMois: 18,
-    montantPrisEnChargeMois: 90000
+    repasConsommesMois: 0,
+    montantPrisEnChargeMois: 0
   });
 
   // Liste des invitations administrateurs par email
-  listeInvitationsAdmins = signal<InvitationAdminB2B[]>([
-    {
-      id: 'inv-1',
-      email: 'moyens.generaux@totalenergies.sn',
-      nomComplet: 'Mme Fatou Fall (RH / DAF)',
-      role: 'RESPONSABLE_ENTREPRISE',
-      roleLibelle: 'Admin Entreprise (RH)',
-      entrepriseId: 'ent-001',
-      entrepriseNom: 'TotalEnergies — Siège Plateau',
-      dateEnvoi: '2026-11-10 09:30',
-      tokenActivation: 'ACT-TOT-RH-99827',
-      statut: 'ACTIVE'
-    },
-    {
-      id: 'inv-2',
-      email: 'chef.cantine.plateau@kikitraiteur.sn',
-      nomComplet: 'Mamadou Seck (Chef Gérant)',
-      role: 'RESPONSABLE_SITE_KIKI',
-      roleLibelle: 'Responsable de Site Kiki',
-      entrepriseId: 'ent-001',
-      entrepriseNom: 'TotalEnergies — Siège Plateau',
-      dateEnvoi: '2026-11-11 11:15',
-      tokenActivation: 'ACT-KIKI-SITE-44219',
-      statut: 'EN_ATTENTE'
-    }
-  ]);
+  listeInvitationsAdmins = signal<InvitationAdminB2B[]>([]);
 
   // Menus planifiés par entreprise (Calendrier Semaine Lundi - Dimanche avec quantités & conformité)
-  menusPlanifiesEntreprises = signal<MenuPlanifieJourEntreprise[]>([
-    {
-      id: 'plan-ent1-lun',
-      entrepriseId: 'ent-001',
-      jourNom: 'Lundi',
-      dateStr: '2026-11-09',
-      theme: 'Saveurs Sénégalaises & Terroir',
-      quantitesSaisies: true,
-      statutConformite: 'CONFORME',
-      lignes: [
-        { id: 'l1', categorie: 'ENTREE', platId: 'e1', nomPlat: 'Salade Niçoise au Thon Frais', quantitePrevue: 35, disponible: true },
-        { id: 'l2', categorie: 'ENTREE', platId: 'e2', nomPlat: 'Pastels Dorés au Thon (x3)', quantitePrevue: 40, disponible: true },
-        { id: 'l3', categorie: 'PLAT', platId: 'p1', nomPlat: 'Poulet Yassa Braisé Kiki & Riz Parfumé', quantitePrevue: 45, disponible: true },
-        { id: 'l4', categorie: 'PLAT', platId: 'p4', nomPlat: 'Thiéboudienne Penda Mbaye Royal', quantitePrevue: 35, disponible: true },
-        { id: 'l5', categorie: 'DESSERT', platId: 'd1', nomPlat: 'Coupe de Fruits Exotiques Frais', quantitePrevue: 40, disponible: true },
-        { id: 'l6', categorie: 'DESSERT', platId: 'd2', nomPlat: 'Fondant Chocolat Intense', quantitePrevue: 35, disponible: true },
-        { id: 'l7', categorie: 'BOISSON', platId: 'b1', nomPlat: 'Jus Naturel de Bissap Frais Menthe', quantitePrevue: 45, disponible: true },
-        { id: 'l8', categorie: 'BOISSON', platId: 'b3', nomPlat: 'Eau Minérale Naturelle Kirène (50cl)', quantitePrevue: 35, disponible: true }
-      ]
-    },
-    {
-      id: 'plan-ent1-mar',
-      entrepriseId: 'ent-001',
-      jourNom: 'Mardi',
-      dateStr: '2026-11-10',
-      theme: 'Pêche Fraîche & Grillades',
-      quantitesSaisies: true,
-      statutConformite: 'CONFORME',
-      lignes: [
-        { id: 'l9', categorie: 'ENTREE', platId: 'e3', nomPlat: 'Velouté de Légumes & Croûtons d\'Ail', quantitePrevue: 30, disponible: true },
-        { id: 'l10', categorie: 'ENTREE', platId: 'e1', nomPlat: 'Salade Niçoise au Thon Frais', quantitePrevue: 45, disponible: true },
-        { id: 'l11', categorie: 'PLAT', platId: 'p2', nomPlat: 'Capitaine Braisé & Riz Jasmin', quantitePrevue: 50, disponible: true },
-        { id: 'l12', categorie: 'PLAT', platId: 'p3', nomPlat: 'Pavé de Bœuf aux Herbes & Légumes', quantitePrevue: 30, disponible: true },
-        { id: 'l13', categorie: 'DESSERT', platId: 'd3', nomPlat: 'Yaourt Onctueux Fait Maison au Miel', quantitePrevue: 40, disponible: true },
-        { id: 'l14', categorie: 'DESSERT', platId: 'd1', nomPlat: 'Coupe de Fruits Exotiques Frais', quantitePrevue: 35, disponible: true },
-        { id: 'l15', categorie: 'BOISSON', platId: 'b2', nomPlat: 'Jus de Bouye Artisanal', quantitePrevue: 40, disponible: true },
-        { id: 'l16', categorie: 'BOISSON', platId: 'b1', nomPlat: 'Jus de Bissap Frais Menthe', quantitePrevue: 40, disponible: true }
-      ]
-    },
-    {
-      id: 'plan-ent1-mer',
-      entrepriseId: 'ent-001',
-      jourNom: 'Mercredi',
-      dateStr: '2026-11-11',
-      theme: 'Rôtisserie & Saveurs d\'Afrique',
-      quantitesSaisies: true,
-      statutConformite: 'CONFORME',
-      lignes: [
-        { id: 'l17', categorie: 'ENTREE', platId: 'e2', nomPlat: 'Pastels Dorés au Thon (x3)', quantitePrevue: 45, disponible: true },
-        { id: 'l18', categorie: 'PLAT', platId: 'p1', nomPlat: 'Poulet Yassa Braisé Kiki & Riz Parfumé', quantitePrevue: 50, disponible: true },
-        { id: 'l19', categorie: 'PLAT', platId: 'p4', nomPlat: 'Thiéboudienne Penda Mbaye Royal', quantitePrevue: 30, disponible: true },
-        { id: 'l20', categorie: 'DESSERT', platId: 'd2', nomPlat: 'Fondant Chocolat Intense', quantitePrevue: 40, disponible: true },
-        { id: 'l21', categorie: 'BOISSON', platId: 'b1', nomPlat: 'Jus Naturel de Bissap Frais Menthe', quantitePrevue: 45, disponible: true },
-        { id: 'l22', categorie: 'BOISSON', platId: 'b3', nomPlat: 'Eau Minérale Naturelle Kirène (50cl)', quantitePrevue: 35, disponible: true }
-      ]
-    },
-    {
-      id: 'plan-ent1-jeu',
-      entrepriseId: 'ent-001',
-      jourNom: 'Jeudi',
-      dateStr: '2026-11-12',
-      theme: 'Délices Culinaires du Chef',
-      quantitesSaisies: true,
-      statutConformite: 'CONFORME',
-      lignes: [
-        { id: 'l23', categorie: 'ENTREE', platId: 'e1', nomPlat: 'Salade Niçoise au Thon Frais', quantitePrevue: 40, disponible: true },
-        { id: 'l24', categorie: 'PLAT', platId: 'p2', nomPlat: 'Capitaine Braisé & Riz Jasmin', quantitePrevue: 45, disponible: true },
-        { id: 'l25', categorie: 'PLAT', platId: 'p1', nomPlat: 'Poulet Yassa Braisé Kiki & Riz Parfumé', quantitePrevue: 35, disponible: true },
-        { id: 'l26', categorie: 'DESSERT', platId: 'd1', nomPlat: 'Coupe de Fruits Exotiques Frais', quantitePrevue: 40, disponible: true },
-        { id: 'l27', categorie: 'DESSERT', platId: 'd3', nomPlat: 'Yaourt Onctueux Fait Maison au Miel', quantitePrevue: 35, disponible: true },
-        { id: 'l28', categorie: 'BOISSON', platId: 'b2', nomPlat: 'Jus de Bouye Artisanal', quantitePrevue: 40, disponible: true },
-        { id: 'l29', categorie: 'BOISSON', platId: 'b1', nomPlat: 'Jus de Bissap Frais Menthe', quantitePrevue: 40, disponible: true }
-      ]
-    },
-    {
-      id: 'plan-ent1-ven',
-      entrepriseId: 'ent-001',
-      jourNom: 'Vendredi',
-      dateStr: '2026-11-13',
-      theme: 'Thiéboudienne Sacré du Vendredi',
-      quantitesSaisies: true,
-      statutConformite: 'CONFORME',
-      lignes: [
-        { id: 'l30', categorie: 'ENTREE', platId: 'e2', nomPlat: 'Pastels Dorés au Thon (x3)', quantitePrevue: 50, disponible: true },
-        { id: 'l31', categorie: 'PLAT', platId: 'p4', nomPlat: 'Thiéboudienne Penda Mbaye Royal (Riz Rouge)', quantitePrevue: 65, disponible: true },
-        { id: 'l32', categorie: 'PLAT', platId: 'p3', nomPlat: 'Pavé de Bœuf aux Herbes & Légumes', quantitePrevue: 20, disponible: true },
-        { id: 'l33', categorie: 'DESSERT', platId: 'd2', nomPlat: 'Fondant Chocolat Intense', quantitePrevue: 45, disponible: true },
-        { id: 'l34', categorie: 'BOISSON', platId: 'b1', nomPlat: 'Jus Naturel de Bissap Frais Menthe', quantitePrevue: 55, disponible: true },
-        { id: 'l35', categorie: 'BOISSON', platId: 'b2', nomPlat: 'Jus de Bouye Artisanal', quantitePrevue: 30, disponible: true }
-      ]
-    },
-    {
-      id: 'plan-ent1-sam',
-      entrepriseId: 'ent-001',
-      jourNom: 'Samedi',
-      dateStr: '2026-11-14',
-      theme: 'Permanence & Équipes Week-End',
-      quantitesSaisies: false,
-      statutConformite: 'NON_SAISI',
-      lignes: [
-        { id: 'l36', categorie: 'PLAT', platId: 'p1', nomPlat: 'Poulet Yassa Braisé Kiki & Riz Parfumé', quantitePrevue: 0, disponible: true },
-        { id: 'l37', categorie: 'BOISSON', platId: 'b1', nomPlat: 'Jus Naturel de Bissap Frais Menthe', quantitePrevue: 0, disponible: true }
-      ]
-    },
-    {
-      id: 'plan-ent1-dim',
-      entrepriseId: 'ent-001',
-      jourNom: 'Dimanche',
-      dateStr: '2026-11-15',
-      theme: 'Service Restreint Dimanche',
-      quantitesSaisies: false,
-      statutConformite: 'NON_SAISI',
-      lignes: [
-        { id: 'l38', categorie: 'PLAT', platId: 'p4', nomPlat: 'Thiéboudienne Penda Mbaye Royal', quantitePrevue: 0, disponible: true },
-        { id: 'l39', categorie: 'BOISSON', platId: 'b3', nomPlat: 'Eau Minérale Naturelle Kirène (50cl)', quantitePrevue: 0, disponible: true }
-      ]
-    }
-  ]);
+  menusPlanifiesEntreprises = signal<MenuPlanifieJourEntreprise[]>([]);
 
   // Commandes de site avec statuts : EN_COURS -> SCANNE -> LIVRE
   listeCommandesSite = signal<CommandeEntrepriseSite[]>([]);
 
   // Lignes de facturation journalières pour l'entreprise
-  lignesFacturationEntreprise = signal<FacturationLigneJournaliere[]>([
-    {
-      date: '2026-11-12',
-      dateAffichee: 'Jeudi 12 novembre 2026',
-      nbPlatsLivres: 48,
-      nbPresents: 52,
-      montantTotal: 240000,
-      montantPartEntreprise: 216000,
-      montantPartEmploye: 24000,
-      statut: 'EN_COURS'
-    },
-    {
-      date: '2026-11-11',
-      dateAffichee: 'Mercredi 11 novembre 2026',
-      nbPlatsLivres: 50,
-      nbPresents: 54,
-      montantTotal: 250000,
-      montantPartEntreprise: 228000,
-      montantPartEmploye: 22000,
-      statut: 'VALIDE'
-    },
-    {
-      date: '2026-11-10',
-      dateAffichee: 'Mardi 10 novembre 2026',
-      nbPlatsLivres: 53,
-      nbPresents: 55,
-      montantTotal: 265000,
-      montantPartEntreprise: 242000,
-      montantPartEmploye: 23000,
-      statut: 'VALIDE'
-    },
-    {
-      date: '2026-11-09',
-      dateAffichee: 'Lundi 09 novembre 2026',
-      nbPlatsLivres: 49,
-      nbPresents: 51,
-      montantTotal: 245000,
-      montantPartEntreprise: 221000,
-      montantPartEmploye: 24000,
-      statut: 'VALIDE'
-    },
-    {
-      date: '2026-11-06',
-      dateAffichee: 'Vendredi 06 novembre 2026',
-      nbPlatsLivres: 58,
-      nbPresents: 60,
-      montantTotal: 290000,
-      montantPartEntreprise: 265000,
-      montantPartEmploye: 25000,
-      statut: 'FACTURE'
-    },
-    {
-      date: '2026-11-05',
-      dateAffichee: 'Jeudi 05 novembre 2026',
-      nbPlatsLivres: 51,
-      nbPresents: 53,
-      montantTotal: 255000,
-      montantPartEntreprise: 232000,
-      montantPartEmploye: 23000,
-      statut: 'FACTURE'
-    },
-    {
-      date: '2026-11-04',
-      dateAffichee: 'Mercredi 04 novembre 2026',
-      nbPlatsLivres: 52,
-      nbPresents: 55,
-      montantTotal: 260000,
-      montantPartEntreprise: 236000,
-      montantPartEmploye: 24000,
-      statut: 'FACTURE'
-    }
-  ]);
+  lignesFacturationEntreprise = signal<FacturationLigneJournaliere[]>([]);
 
   // Méthode pour ajouter un employé
   ajouterEmploye(emp: Partial<EmployeB2B>) {
@@ -1396,20 +1151,7 @@ export class B2bStateService {
   listeEmployes = signal<EmployeB2B[]>([]);
 
   // Historique unifié des commandes individuelles pour rapprochement RH par site et par date
-  historiqueCommandes = signal<CommandeHistoriqueB2B[]>([
-    { id: 'CMD-101', date: '2026-11-06', heure: '10:14', matricule: 'TOT-9842', employeNom: 'Babacar Ndiaye', siteId: 'site-1', siteNom: 'Siège Plateau - Dakar', formuleNom: 'Formule Déjeuner 4 comp.', platNom: 'Poulet Yassa Braisé Kiki', prixTotal: 5000, partEntreprise: 5000, partEmploye: 0, statut: 'LIVRE' },
-    { id: 'CMD-102', date: '2026-11-06', heure: '10:22', matricule: 'TOT-9843', employeNom: 'Fatou Fall', siteId: 'site-1', siteNom: 'Siège Plateau - Dakar', formuleNom: 'Formule Déjeuner 4 comp.', platNom: 'Capitaine Braisé & Riz Jasmin', prixTotal: 5000, partEntreprise: 5000, partEmploye: 0, statut: 'LIVRE' },
-    { id: 'CMD-103', date: '2026-11-06', heure: '09:35', matricule: 'TOT-9844', employeNom: 'Mamadou Diallo', siteId: 'site-2', siteNom: 'Dépôt Bel-Air / Port', formuleNom: 'Formule Déjeuner 4 comp.', platNom: 'Thiéboudienne Penda Mbaye', prixTotal: 5000, partEntreprise: 5000, partEmploye: 0, statut: 'LIVRE' },
-    { id: 'CMD-104', date: '2026-11-06', heure: '09:40', matricule: 'TOT-9845', employeNom: 'Aminata Sow', siteId: 'site-2', siteNom: 'Dépôt Bel-Air / Port', formuleNom: 'Formule Déjeuner 4 comp.', platNom: 'Pavé de Bœuf aux Herbes', prixTotal: 5000, partEntreprise: 5000, partEmploye: 0, statut: 'LIVRE' },
-    { id: 'CMD-105', date: '2026-11-06', heure: '09:55', matricule: 'TOT-9846', employeNom: 'Cheikh Diop', siteId: 'site-3', siteNom: 'Plateforme Diamniadio', formuleNom: 'Formule Déjeuner 4 comp.', platNom: 'Poulet Yassa Braisé Kiki', prixTotal: 5000, partEntreprise: 5000, partEmploye: 0, statut: 'LIVRE' },
-    { id: 'CMD-106', date: '2026-11-05', heure: '10:12', matricule: 'TOT-9847', employeNom: 'Khady Sarr', siteId: 'site-1', siteNom: 'Siège Plateau - Dakar', formuleNom: 'Formule Déjeuner 4 comp.', platNom: 'Capitaine Braisé & Riz Jasmin', prixTotal: 5000, partEntreprise: 5000, partEmploye: 0, statut: 'LIVRE' },
-    { id: 'CMD-107', date: '2026-11-05', heure: '10:28', matricule: 'TOT-9842', employeNom: 'Babacar Ndiaye', siteId: 'site-1', siteNom: 'Siège Plateau - Dakar', formuleNom: 'Formule Déjeuner 4 comp.', platNom: 'Pavé de Bœuf aux Herbes', prixTotal: 5000, partEntreprise: 5000, partEmploye: 0, statut: 'LIVRE' },
-    { id: 'CMD-108', date: '2026-11-05', heure: '09:30', matricule: 'TOT-9844', employeNom: 'Mamadou Diallo', siteId: 'site-2', siteNom: 'Dépôt Bel-Air / Port', formuleNom: 'Formule Déjeuner 4 comp.', platNom: 'Poulet Yassa Braisé Kiki', prixTotal: 5000, partEntreprise: 5000, partEmploye: 0, statut: 'LIVRE' },
-    { id: 'CMD-109', date: '2026-11-04', heure: '10:15', matricule: 'TOT-9843', employeNom: 'Fatou Fall', siteId: 'site-1', siteNom: 'Siège Plateau - Dakar', formuleNom: 'Formule Déjeuner 4 comp.', platNom: 'Thiéboudienne Penda Mbaye', prixTotal: 5000, partEntreprise: 5000, partEmploye: 0, statut: 'LIVRE' },
-    { id: 'CMD-110', date: '2026-11-04', heure: '09:42', matricule: 'TOT-9846', employeNom: 'Cheikh Diop', siteId: 'site-3', siteNom: 'Plateforme Diamniadio', formuleNom: 'Formule Déjeuner 4 comp.', platNom: 'Capitaine Braisé & Riz Jasmin', prixTotal: 5000, partEntreprise: 5000, partEmploye: 0, statut: 'LIVRE' },
-    { id: 'CMD-111', date: '2026-10-30', heure: '10:20', matricule: 'TOT-9842', employeNom: 'Babacar Ndiaye', siteId: 'site-1', siteNom: 'Siège Plateau - Dakar', formuleNom: 'Formule Déjeuner 4 comp.', platNom: 'Poulet Yassa Braisé Kiki', prixTotal: 5000, partEntreprise: 5000, partEmploye: 0, statut: 'LIVRE' },
-    { id: 'CMD-112', date: '2026-10-30', heure: '09:38', matricule: 'TOT-9845', employeNom: 'Aminata Sow', siteId: 'site-2', siteNom: 'Dépôt Bel-Air / Port', formuleNom: 'Formule Déjeuner 4 comp.', platNom: 'Pavé de Bœuf aux Herbes', prixTotal: 5000, partEntreprise: 5000, partEmploye: 0, statut: 'LIVRE' }
-  ]);
+  historiqueCommandes = signal<CommandeHistoriqueB2B[]>([]);
 
   // Formule repas active
   formuleActuelle = signal<FormuleRegle>({

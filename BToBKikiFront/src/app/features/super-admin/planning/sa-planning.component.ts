@@ -17,13 +17,6 @@ export class SaPlanningComponent {
   b2b = inject(B2bStateService);
 
   constructor() {
-    if (this.b2b.currentSession().role !== 'SUPER_ADMIN') {
-      this.b2b.setSessionRole({
-        role: 'SUPER_ADMIN', nomComplet: 'Direction Kiki Traiteur', titrePoste: 'Super Admin Kiki (Global)',
-        entite: 'Kiki Traiteur B2B', siteId: 'site-1', siteNom: 'Siège Plateau - Dakar',
-        badge: 'Direction Générale', badgeColor: '#721513'
-      });
-    }
   }
 
   filtreSitePlanning = signal<string>('TOUS'); // 'TOUS' ou id spécifique (ex: 'site-1')
@@ -45,20 +38,7 @@ export class SaPlanningComponent {
     return list;
   });
 
-  planningSemaineGlobal = signal<PlanningMenuSiteB2B[]>([
-    // Menus Généraux / Tous les sites
-    { id: 'sem-1', jour: 'Lundi', date: '03 Nov', cadence: 'HEBDO', theme: 'Tradition Sénégalaise', platVedette: 'Thiéboudienne Penda Mbaye', entreeProposee: 'Pastels au Poisson & Crevettes', dessertPropose: 'Thiagree Onctueux à la Vanille', boissonProposee: 'Bissap Frais Menthe', siteId: 'TOUS', siteNom: 'Tous les sites (Menu Standard)', totalPrevu: 410, statut: 'CLOTURE' },
-    { id: 'sem-2', jour: 'Mardi (Aujourd\'hui)', date: '04 Nov', cadence: 'HEBDO', theme: 'Grillades & Fraîcheur Dakaroise', platVedette: 'Poulet Yassa Braisé au Feu de Bois', entreeProposee: 'Salade Niçoise au Thon Frais', dessertPropose: 'Salade de Fruits Exotiques', boissonProposee: 'Bouye & Pain de Singe', siteId: 'TOUS', siteNom: 'Tous les sites (Menu Standard)', totalPrevu: 440, statut: 'EN_PRODUCTION' },
-    { id: 'sem-3', jour: 'Mercredi', date: '05 Nov', cadence: 'HEBDO', theme: 'Saveurs de l\'Atlantique', platVedette: 'Filet de Mérou Sauce Tomate Épicée', entreeProposee: 'Accras de Morue Dakaroise', dessertPropose: 'Fondant Chocolat Intense', boissonProposee: 'Jus de Gingembre & Ananas', siteId: 'TOUS', siteNom: 'Tous les sites (Menu Standard)', totalPrevu: 390, statut: 'VALIDE' },
-    { id: 'sem-4', jour: 'Jeudi', date: '06 Nov', cadence: 'HEBDO', theme: 'Spécial Teranga & Rôtisserie', platVedette: 'Mafé de Bœuf Mijoté aux Légumes', entreeProposee: 'Velouté de Potiron & Coriandre', dessertPropose: 'Tartelette Mangue Caramélisée', boissonProposee: 'Cocktail Kiki Vitalité', siteId: 'TOUS', siteNom: 'Tous les sites (Menu Standard)', totalPrevu: 430, statut: 'PROGRAMME' },
-    { id: 'sem-5', jour: 'Vendredi', date: '07 Nov', cadence: 'HEBDO', theme: 'Street Food Gourmet Sénégalais', platVedette: 'Dibi d\'Agneau Kiki & Alloco', entreeProposee: 'Fatayas Croustillants à la Viande', dessertPropose: 'Crème Brûlée Vanille Bourbon', boissonProposee: 'Nectar de Corossol', siteId: 'TOUS', siteNom: 'Tous les sites (Menu Standard)', totalPrevu: 470, statut: 'PROGRAMME' },
-
-    // Menus Exclusifs / Spécifiques par Site
-    { id: 'sem-tot-1', jour: 'Mardi (Aujourd\'hui)', date: '04 Nov', cadence: 'HEBDO', theme: 'VIP Total Plateau', platVedette: 'Capitaine Braisé & Riz Jasmin Parfumé', entreeProposee: 'Carpaccio de Saumon & Citron Vert', dessertPropose: 'Éclair Café Gourmand', boissonProposee: 'Jus de Passion Frais', siteId: 'site-1', siteNom: 'Siège Plateau - Dakar', entrepriseNom: 'TotalEnergies Sénégal', totalPrevu: 140, statut: 'EN_PRODUCTION' },
-    { id: 'sem-tot-2', jour: 'Mercredi', date: '05 Nov', cadence: 'HEBDO', theme: 'Executive Dining', platVedette: 'Sombé de Lotte & Crevettes Géantes', entreeProposee: 'Salade Gourmet Chèvre Chaud', dessertPropose: 'Fondant Baobab', boissonProposee: 'Cocktail Agrumes', siteId: 'site-1', siteNom: 'Siège Plateau - Dakar', entrepriseNom: 'TotalEnergies Sénégal', totalPrevu: 135, statut: 'VALIDE' },
-    { id: 'sem-depot-1', jour: 'Mardi (Aujourd\'hui)', date: '04 Nov', cadence: 'HEBDO', theme: 'Menu Express Portuaire', platVedette: 'Riz au Poisson Rouge Épicé', entreeProposee: 'Beignets Salés', dessertPropose: 'Yaourt Maison', boissonProposee: 'Bissap Glacé', siteId: 'site-2', siteNom: 'Dépôt Bel-Air / Port', entrepriseNom: 'TotalEnergies Sénégal', totalPrevu: 95, statut: 'EN_PRODUCTION' },
-    { id: 'sem-sona-1', jour: 'Mardi (Aujourd\'hui)', date: '04 Nov', cadence: 'HEBDO', theme: 'High-Tech Lunch Pikine', platVedette: 'Cordon Bleu Maison & Riz Parfumé', entreeProposee: 'Salade Croquante au Poulet', dessertPropose: 'Tarte Citron Meringuée', boissonProposee: 'Bissap Blanc & Menthe', siteId: 'site-sona-1', siteNom: 'Siège Technopole Pikine', entrepriseNom: 'Sonatel Orange', totalPrevu: 180, statut: 'EN_PRODUCTION' }
-  ]);
+  planningSemaineGlobal = signal<PlanningMenuSiteB2B[]>([]);
 
   planningFiltreParSite = computed(() => {
     const siteId = this.filtreSitePlanning();

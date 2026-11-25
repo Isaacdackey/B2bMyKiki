@@ -8,13 +8,13 @@ export function b2bRoleGuard(allowedRoles: UserRoleB2B[]): CanActivateFn {
     const b2b = inject(B2bStateService);
     const router = inject(Router);
     const hasToken = typeof localStorage !== 'undefined' && !!localStorage.getItem('b2b_jwt_token');
-    const role = b2b.currentSession().role;
 
-    if (!hasToken && typeof localStorage !== 'undefined' && !localStorage.getItem('b2b_current_session')) {
-      b2b.showToast('Veuillez vous connecter pour accéder à cet espace.', 'error');
+    if (!hasToken) {
+      b2b.showToast('Session expirée ou non connectée. Veuillez vous authentifier.', 'error');
       return router.createUrlTree(['/b2b/login']);
     }
 
+    const role = b2b.currentSession().role;
     if (!allowedRoles.includes(role)) {
       b2b.showToast('Accès refusé pour ce profil utilisateur.', 'error');
       return router.createUrlTree(['/b2b/login']);

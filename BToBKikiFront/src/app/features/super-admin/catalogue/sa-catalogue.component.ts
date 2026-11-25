@@ -20,18 +20,6 @@ export class SaCatalogueComponent {
   isUploadingImage = signal<boolean>(false);
 
   constructor() {
-    if (this.b2b.currentSession().role !== 'SUPER_ADMIN') {
-      this.b2b.setSessionRole({
-        role: 'SUPER_ADMIN',
-        nomComplet: 'Direction Kiki Traiteur',
-        titrePoste: 'Super Admin Kiki (Global)',
-        entite: 'Kiki Traiteur B2B',
-        siteId: 'site-1',
-        siteNom: 'Siège Plateau - Dakar',
-        badge: 'Direction Générale',
-        badgeColor: '#721513'
-      });
-    }
   }
 
   showModalPlat = signal<boolean>(false);

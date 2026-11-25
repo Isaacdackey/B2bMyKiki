@@ -38,19 +38,6 @@ export class B2bCommandeComponent implements OnInit {
   }
 
   constructor() {
-    const r = this.b2b.currentSession().role;
-    if (r !== 'SALARIE_CONVENTIONNE' && r !== 'SALARIE_AUTONOME') {
-      this.b2b.setSessionRole({
-        role: this.b2b.modeProfil() === 'AUTONOME' ? 'SALARIE_AUTONOME' : 'SALARIE_CONVENTIONNE',
-        nomComplet: this.b2b.modeProfil() === 'AUTONOME' ? 'Ousmane Ba (Consultant)' : 'Babacar Ndiaye',
-        titrePoste: this.b2b.modeProfil() === 'AUTONOME' ? 'Salarié Autonome' : 'Salarié Conventionné',
-        entite: 'TotalEnergies Sénégal',
-        siteId: 'site-1',
-        siteNom: 'Siège Plateau - Dakar',
-        badge: this.b2b.modeProfil() === 'AUTONOME' ? 'Paiement direct Wave' : 'Subventionné 100% • 0 FCFA',
-        badgeColor: this.b2b.modeProfil() === 'AUTONOME' ? '#1D4ED8' : '#2E7D32'
-      });
-    }
   }
 
   qrMode = signal<'MONTRER' | 'SCANNER'>('MONTRER');
@@ -362,21 +349,7 @@ export class B2bCommandeComponent implements OnInit {
     prixTotal: number;
     partEntreprise: number;
     partEmploye: number;
-  } | null>({
-    id: 'CMD-TOT-20261109-001',
-    date: 'Aujourd’hui',
-    heureRetrait: '12h00 - 12h30',
-    siteNom: 'Siège Plateau - Dakar',
-    formuleNom: 'Formule Déjeuner 4 comp.',
-    entreeNom: 'Pastels Dorés au Thon (x3)',
-    platNom: 'Poulet Yassa Braisé Kiki & Riz Parfumé',
-    dessertNom: 'Fondant au Chocolat Noir',
-    boissonNom: 'Jus Naturel de Bissap Frais Menthe',
-    qrCode: 'KT-TOT-9842-SITE1-20261109',
-    prixTotal: 5000,
-    partEntreprise: 5000,
-    partEmploye: 0
-  });
+  } | null>(null);
 
   // Modal spécifique pour réafficher le QR Code de retrait
   showQrCodeModal = signal(false);

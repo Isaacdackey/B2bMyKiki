@@ -15,18 +15,6 @@ import { EntrepriseB2B } from '../../../b2b/shared/b2b.models';
 export class CuisineInfosComponent {
   b2b = inject(B2bStateService);
   constructor() {
-    if (this.b2b.currentSession().role !== 'RESPONSABLE_SITE_KIKI') {
-      this.b2b.setSessionRole({
-        role: 'RESPONSABLE_SITE_KIKI',
-        nomComplet: 'Moussa Kane (Gérant Cantine)',
-        titrePoste: 'Responsable de Site Kiki Traiteur',
-        entite: 'TotalEnergies Sénégal',
-        siteId: 'site-1',
-        siteNom: 'Siège Plateau - Dakar',
-        badge: 'Gérant Exploitation Site',
-        badgeColor: '#3D5A80'
-      });
-    }
   }
 
   entreprise = computed(() => this.b2b.currentEntreprise());

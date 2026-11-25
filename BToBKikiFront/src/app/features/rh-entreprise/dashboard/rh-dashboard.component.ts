@@ -20,18 +20,6 @@ export class RhDashboardComponent {
   private api = inject(B2bApiService);
   private router = inject(Router);
   constructor() {
-    if (this.b2b.currentSession().role !== 'RESPONSABLE_ENTREPRISE') {
-      this.b2b.setSessionRole({
-        role: 'RESPONSABLE_ENTREPRISE',
-        nomComplet: 'Aminata Diop (DRH)',
-        titrePoste: 'Directrice des Ressources Humaines',
-        entite: 'TotalEnergies Sénégal',
-        siteId: 'site-1',
-        siteNom: 'Siège Plateau - Dakar',
-        badge: 'Direction RH',
-        badgeColor: '#606C38'
-      });
-    }
   }
 
   activeSection = {
