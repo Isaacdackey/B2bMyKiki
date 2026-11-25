@@ -111,7 +111,7 @@ export class CuisineCommandesComponent {
   validerCommandePourEmploye() {
     const plat = this.platsDisponibles().find(p => p.id === this.platSelectionneId());
     if (!plat) {
-      alert('Veuillez sélectionner un plat.');
+      this.b2b.showToast('Veuillez sélectionner un plat.', 'error');
       return;
     }
 
@@ -123,13 +123,13 @@ export class CuisineCommandesComponent {
       employeNom = this.inviteNom().trim();
       matricule = this.inviteMatricule().trim() || `INV-${Date.now().toString().slice(-4)}`;
       if (!employeNom) {
-        alert('Veuillez saisir le nom du collaborateur.');
+        this.b2b.showToast('Veuillez saisir le nom du collaborateur.', 'error');
         return;
       }
     } else {
       const emp = this.employeSelectionne();
       if (!emp) {
-        alert('Veuillez sélectionner un employé dans la liste ou passer en mode sans compte.');
+        this.b2b.showToast('Veuillez sélectionner un employé dans la liste ou passer en mode sans compte.', 'error');
         return;
       }
       matricule = emp.matricule;

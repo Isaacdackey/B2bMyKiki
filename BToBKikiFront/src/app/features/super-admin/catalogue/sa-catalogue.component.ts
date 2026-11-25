@@ -110,7 +110,7 @@ export class SaCatalogueComponent {
   enregistrerPlat() {
     const p = this.platEnEdition();
     if (!p.nom || !p.prixUnitaire) {
-      alert('Veuillez renseigner le nom du met et son tarif.');
+      this.b2b.showToast('Veuillez renseigner le nom du met et son tarif.', 'error');
       return;
     }
 
@@ -143,7 +143,7 @@ export class SaCatalogueComponent {
       error: (err) => {
         this.isUploadingImage.set(false);
         const msg = err?.error?.error?.message || err?.message || 'Erreur inconnue';
-        alert(`Erreur lors de l'upload vers Cloudinary : ${msg}`);
+        this.b2b.showToast(`Erreur lors de l'upload vers Cloudinary : ${msg}`, 'error');
       }
     });
   }

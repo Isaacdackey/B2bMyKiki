@@ -103,7 +103,7 @@ export class RhCommandesComponent {
     const q = this.quantitesGroupe();
     const lignes = this.platsDisponiblesGroupe().filter(p => (q[p.id] || 0) > 0);
     if (lignes.length === 0) {
-      alert('Veuillez saisir une quantité pour au moins un plat.');
+      this.b2b.showToast('Veuillez saisir une quantité pour au moins un plat.', 'error');
       return;
     }
     const libelle = this.groupeLibelle().trim() || 'Commande Groupée RH';

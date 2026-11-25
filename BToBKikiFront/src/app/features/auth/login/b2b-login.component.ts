@@ -126,7 +126,7 @@ export class B2bLoginComponent {
   inscrireAutonome() {
     const val = this.newAutonome();
     if (!val.nom || !val.prenom || !val.telephone) {
-      alert('Veuillez renseigner votre prénom, nom et numéro de téléphone.');
+      this.b2b.showToast('Veuillez renseigner votre prénom, nom et numéro de téléphone.', 'error');
       return;
     }
 
@@ -166,7 +166,7 @@ export class B2bLoginComponent {
       },
       error: (err) => {
         this.loading.set(false);
-        alert(err?.error?.message || 'Erreur lors de la création du compte autonome.');
+        this.b2b.showToast(err?.error?.message || 'Erreur lors de la création du compte autonome.', 'error');
       }
     });
   }
@@ -243,7 +243,7 @@ export class B2bLoginComponent {
       },
       error: (err) => {
         this.loading.set(false);
-        alert(err?.error?.message || 'Identifiants invalides ou serveur backend indisponible.');
+        this.b2b.showToast(err?.error?.message || 'Identifiants invalides ou serveur backend indisponible.', 'error');
       }
     });
   }

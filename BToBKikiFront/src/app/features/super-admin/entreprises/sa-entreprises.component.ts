@@ -203,7 +203,7 @@ export class SaEntreprisesComponent {
   creerNouveauTypePrestation() {
     const tp = this.nouveauTypePrestation();
     if (!tp.libelle) {
-      alert('Veuillez renseigner un libellé pour la prestation.');
+      this.b2b.showToast('Veuillez renseigner un libellé pour la prestation.', 'error');
       return;
     }
     const code = tp.code || tp.libelle.toUpperCase().replace(/[^A-Z0-9]/g, '_');
@@ -250,7 +250,7 @@ export class SaEntreprisesComponent {
   creerNouvelleCategorie() {
     const cat = this.nouvelleCategorie();
     if (!cat.libelle) {
-      alert('Veuillez renseigner un libellé pour la catégorie.');
+      this.b2b.showToast('Veuillez renseigner un libellé pour la catégorie.', 'error');
       return;
     }
     const code = cat.code || cat.libelle.toUpperCase().replace(/[^A-Z0-9]/g, '_');
@@ -421,7 +421,7 @@ export class SaEntreprisesComponent {
 
       if (adm.rhEmail.trim() || adm.rhNomComplet.trim()) {
         if (!this.REGEX_EMAIL.test(adm.rhEmail.trim())) {
-          alert("Adresse email invalide pour l'Admin Entreprise (RH).");
+          this.b2b.showToast("Adresse email invalide pour l'Admin Entreprise (RH).", 'error');
           return;
         }
         adminsToInvite.push({
@@ -433,7 +433,7 @@ export class SaEntreprisesComponent {
 
       if (adm.siteEmail.trim() || adm.siteNomComplet.trim()) {
         if (!this.REGEX_EMAIL.test(adm.siteEmail.trim())) {
-          alert("Adresse email invalide pour l'Admin Site Kiki.");
+          this.b2b.showToast("Adresse email invalide pour l'Admin Site Kiki.", 'error');
           return;
         }
         adminsToInvite.push({
@@ -511,7 +511,7 @@ export class SaEntreprisesComponent {
     const s = this.siteEnEdition();
     const entId = this.entrepriseCibleSiteId();
     if (!s.nom || !s.adresse) {
-      alert('Veuillez renseigner le nom du site et son adresse.');
+      this.b2b.showToast('Veuillez renseigner le nom du site et son adresse.', 'error');
       return;
     }
 
@@ -831,14 +831,14 @@ export class SaEntreprisesComponent {
       const text = String(reader.result || '').replace(/^\uFEFF/, '');
       const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
       if (lines.length === 0) {
-        alert('Le fichier importé est vide.');
+        this.b2b.showToast('Le fichier importé est vide.', 'error');
         input.value = '';
         return;
       }
 
       const sep = lines[0].includes(';') ? ';' : ',';
       const startIndex = lines[0].toLowerCase().includes('matricule') ? 1 : 0;
-      let count = 0;
+      const batch: any[] = [];
 
       for (let i = startIndex; i < lines.length; i++) {
         const cols = lines[i].split(sep).map(c => c.trim().replace(/^"|"$/g, ''));
@@ -848,7 +848,8 @@ export class SaEntreprisesComponent {
         const tauxParsed = parseInt(tauxRaw.replace('%', '').trim(), 10);
         const tauxSubvention = Number.isFinite(tauxParsed) ? Math.max(0, Math.min(100, tauxParsed)) : 100;
 
-        this.b2b.ajouterEmploye({
+        batch.push({
+          id: 'emp-' + Date.now() + '-' + i,
           matricule,
           prenom: prenom || 'Collaborateur',
           nom: nom || '',
@@ -863,14 +864,13 @@ export class SaEntreprisesComponent {
           repasConsommesMois: 0,
           montantPrisEnChargeMois: 0
         });
-        count++;
       }
 
       input.value = '';
-      if (count > 0) {
-        alert(`Importation réussie : ${count} collaborateur(s) ajouté(s).`);
+      if (batch.length > 0) {
+        this.b2b.importerEmployesBatch(batch);
       } else {
-        alert('Aucune ligne valide trouvée. Utilisez le modèle CSV (Matricule;Prenom;Nom;Email;Telephone;Departement;TauxSubvention).');
+        this.b2b.showToast('Aucune ligne valide trouvée. Utilisez le modèle CSV (Matricule;Prenom;Nom;Email;Telephone;Departement;TauxSubvention).', 'error');
       }
     };
     reader.readAsText(file, 'UTF-8');
@@ -881,11 +881,13 @@ export class SaEntreprisesComponent {
     const cur = this.invitationEnCreation();
     const ent = this.entrepriseEnGestion();
     if (!cur.email || !cur.nomComplet) {
-      alert('Veuillez renseigner le nom et l\'adresse email du gestionnaire.');
+      this.b2b.showToast('Veuillez renseigner le nom et l\'adresse email du gestionnaire.', 'error');
       return;
     }
     if (!ent) return;
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:4200';
+    const origin = (typeof window !== 'undefined' && !window.location.origin.includes('localhost'))
+      ? window.location.origin
+      : 'https://btob-kiki.vercel.app';
     this.b2b.creerInvitationAdmin(cur.email, cur.nomComplet, cur.role, ent, (invSaved) => {
       const lien = `${origin}/b2b/activation?token=${encodeURIComponent(invSaved.tokenActivation)}&email=${encodeURIComponent(invSaved.email)}`;
       this.invitationGenereeLien.set(lien);
@@ -901,7 +903,7 @@ export class SaEntreprisesComponent {
   copierLienActivation(lien: string) {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
       navigator.clipboard.writeText(lien);
-      alert('Lien d\'activation copié dans le presse-papier !');
+      this.b2b.showToast('Lien d\'activation copié dans le presse-papier !', 'success');
     } else {
       prompt('Copiez ce lien d\'activation :', lien);
     }

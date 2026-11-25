@@ -30,7 +30,7 @@ public class EntrepriseService {
     private final InvitationAdminRepository invitationRepository;
     private final EmailService emailService;
 
-    @Value("${app.frontend.url:http://localhost:4200}")
+    @Value("${app.frontend.url:https://btob-kiki.vercel.app}")
     private String frontendUrl;
 
     public List<EntrepriseEntity> findAll() {
@@ -168,17 +168,22 @@ public class EntrepriseService {
     }
 
     private void sendInvitationEmail(InvitationAdminEntity inv, String entrepriseNom) {
-        String base = (frontendUrl != null && !frontendUrl.isBlank()) ? frontendUrl.replaceAll("/+$", "") : "http://localhost:4200";
+        String base = (frontendUrl != null && !frontendUrl.isBlank() && !frontendUrl.contains("localhost"))
+                ? frontendUrl.replaceAll("/+$", "")
+                : "https://btob-kiki.vercel.app";
         String activationUrl = base + "/b2b/activation?token="
                 + URLEncoder.encode(inv.getTokenActivation(), StandardCharsets.UTF_8)
                 + "&email=" + URLEncoder.encode(inv.getEmail(), StandardCharsets.UTF_8);
 
-        emailService.sendAdminInvitationEmail(
+        boolean sent = emailService.sendAdminInvitationEmail(
                 inv.getEmail(),
                 inv.getNomComplet(),
                 inv.getRoleLibelle(),
                 entrepriseNom,
                 activationUrl
         );
+        if (!sent) {
+            throw new BusinessException("Invitation enregistrée mais échec d'envoi email Brevo/SMTP. Vérifiez BREVO_API_KEY et BREVO_SENDER_EMAIL.");
+        }
     }
 }

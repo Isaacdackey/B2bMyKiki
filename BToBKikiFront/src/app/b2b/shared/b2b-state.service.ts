@@ -528,6 +528,36 @@ export class B2bStateService {
     this.api.getPrestations().subscribe({
       next: (res) => {
         if (res.success && res.data?.length) {
+          this.typesPrestationConfigurables.set(
+            res.data.map((tp: any) => ({
+              code: tp.code,
+              libelle: tp.libelle,
+              desc: tp.description || tp.desc || '',
+              categoriesDefaut: tp.categoriesDefaut || ['PLAT', 'BOISSON'],
+              cutOffType: tp.cutOffType,
+              cutOffHeure: tp.cutOffHeure,
+              reglesCutOff: tp.reglesCutOff,
+              joursDisponibles: tp.joursDisponibles,
+              isArchive: tp.isArchive
+            }))
+          );
+        }
+      },
+      error: () => {}
+    });
+
+    this.api.getCategories().subscribe({
+      next: (res) => {
+        if (res.success && res.data?.length) {
+          this.categoriesConfigurables.set(res.data);
+        }
+      },
+      error: () => {}
+    });
+
+    this.api.getPrestations().subscribe({
+      next: (res) => {
+        if (res.success && res.data?.length) {
           this.typesPrestationConfigurables.set(res.data);
           if (typeof localStorage !== 'undefined') {
             localStorage.setItem('b2b_types_prestation', JSON.stringify(res.data));
@@ -876,6 +906,22 @@ export class B2bStateService {
     this.api.createEmploye(nouvelEmploye).subscribe({ error: () => {} });
   }
 
+  importerEmployesBatch(employes: Partial<EmployeB2B>[]) {
+    if (!employes.length) return;
+    this.api.importEmployesBatch(employes).subscribe({
+      next: (res) => {
+        const saved = res.data || [];
+        if (saved.length > 0) {
+          this.listeEmployes.update(list => [...saved, ...list]);
+          this.showToast(`Importation réussie : ${saved.length} collaborateur(s) enregistré(s).`, 'success');
+        }
+      },
+      error: (err) => {
+        this.showToast(err?.error?.message || 'Erreur lors de l\'importation CSV.', 'error');
+      }
+    });
+  }
+
   // Méthode pour créer une invitation administrateur
   creerInvitationAdmin(
     email: string,
@@ -915,7 +961,8 @@ export class B2bStateService {
           onCreated(invitation);
         }
       },
-      error: () => {
+      error: (err) => {
+        this.showToast(err?.error?.message || `Impossible d'envoyer l'invitation par email à ${email}.`, 'error');
         if (onCreated) onCreated(invitation);
       }
     });

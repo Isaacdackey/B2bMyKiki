@@ -24,7 +24,7 @@ public class AlerteController {
     private final AlerteCommandeRepository alerteRepository;
     private final EmailService emailService;
 
-    @Value("${app.frontend.url:http://localhost:4200}")
+    @Value("${app.frontend.url:https://btob-kiki.vercel.app}")
     private String frontendUrl;
 
     @Data
@@ -53,12 +53,13 @@ public class AlerteController {
         String exp = (req.getExpediteurNom() != null && !req.getExpediteurNom().isBlank())
                 ? req.getExpediteurNom().trim()
                 : "Service RH";
-        String base = (frontendUrl != null && !frontendUrl.isBlank())
+        String base = (frontendUrl != null && !frontendUrl.isBlank() && !frontendUrl.contains("localhost"))
                 ? frontendUrl.replaceAll("/+$", "")
-                : "http://localhost:4200";
+                : "https://btob-kiki.vercel.app";
         String orderUrl = base + "/b2b/employe/menu";
 
         List<AlerteCommandeEntity> savedAll = new ArrayList<>();
+        int emailsEnvoyes = 0;
         for (DestinataireRelance dest : req.getDestinataires()) {
             if (dest.getEmail() == null || dest.getEmail().isBlank()) {
                 continue;
@@ -80,10 +81,12 @@ public class AlerteController {
                     .build();
 
             savedAll.add(alerteRepository.save(alerte));
-            emailService.sendOrderReminderEmail(email, nom, req.getEntrepriseNom(), exp, msg, orderUrl);
+            if (emailService.sendOrderReminderEmail(email, nom, req.getEntrepriseNom(), exp, msg, orderUrl)) {
+                emailsEnvoyes++;
+            }
         }
 
-        return ApiResponse.ok(savedAll.size() + " alerte(s) et email(s) envoyé(s)", savedAll);
+        return ApiResponse.ok(savedAll.size() + " alerte(s) créée(s) et " + emailsEnvoyes + " email(s) envoyé(s)", savedAll);
     }
 
     @GetMapping

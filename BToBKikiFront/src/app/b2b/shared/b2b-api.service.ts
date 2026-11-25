@@ -82,6 +82,10 @@ export class B2bApiService {
     return this.http.post<ApiResponse<EmployeB2B>>(`${this.baseUrl}/b2b/employes`, emp, { headers: this.getHeaders() });
   }
 
+  importEmployesBatch(employes: Partial<EmployeB2B>[]): Observable<ApiResponse<EmployeB2B[]>> {
+    return this.http.post<ApiResponse<EmployeB2B[]>>(`${this.baseUrl}/b2b/employes/import`, employes, { headers: this.getHeaders() });
+  }
+
   updateTauxSubvention(id: string, tauxSubvention: number): Observable<ApiResponse<EmployeB2B>> {
     return this.http.patch<ApiResponse<EmployeB2B>>(`${this.baseUrl}/b2b/employes/${id}/taux`, { tauxSubvention }, { headers: this.getHeaders() });
   }
@@ -246,5 +250,21 @@ export class B2bApiService {
 
   marquerAlerteLue(id: string): Observable<ApiResponse<any>> {
     return this.http.patch<ApiResponse<any>>(`${this.baseUrl}/b2b/alertes/${encodeURIComponent(id)}/lire`, {}, { headers: this.getHeaders() });
+  }
+
+  initierPaiementWave(payload: {
+    commandeId: string;
+    entrepriseId: string;
+    employeMatricule: string;
+    employeNom: string;
+    montantTotal: number;
+    partEntreprise: number;
+    partEmploye: number;
+  }): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.baseUrl}/b2b/paiements/wave/checkout`, payload, { headers: this.getHeaders() });
+  }
+
+  confirmerSimulationWave(paiementId: string): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.baseUrl}/b2b/paiements/wave/${encodeURIComponent(paiementId)}/simulate-confirm`, {}, { headers: this.getHeaders() });
   }
 }

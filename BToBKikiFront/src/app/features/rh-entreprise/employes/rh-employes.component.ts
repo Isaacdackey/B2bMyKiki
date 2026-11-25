@@ -126,7 +126,7 @@ export class RhEmployesComponent {
   enregistrerEmploye() {
     const val = this.newEmp();
     if (!val.nom || !val.prenom || !val.email) {
-      alert('Veuillez renseigner le nom, prénom et email du collaborateur.');
+      this.b2b.showToast('Veuillez renseigner le nom, prénom et email du collaborateur.', 'error');
       return;
     }
     const taux = Number(val.tauxSubvention);

@@ -15,17 +15,6 @@ import { B2bStateService } from './b2b-state.service';
       </div>
     }
 
-    @if (b2b.toastMessage(); as toast) {
-      <div
-        role="status"
-        style="position: fixed; bottom: 1.25rem; right: 1.25rem; z-index: 999999; display: flex; align-items: center; gap: 0.6rem; padding: 0.75rem 1.15rem; border-radius: 14px; font-size: 0.84rem; font-weight: 800; box-shadow: 0 10px 30px rgba(0,0,0,0.18); max-width: min(92vw, 380px);"
-        [style.background]="toast.type === 'success' ? '#606C38' : '#DC2626'"
-        [style.color]="'#FFFFFF'">
-        <i class="fa-solid" [class.fa-circle-check]="toast.type === 'success'" [class.fa-circle-exclamation]="toast.type === 'error'"></i>
-        <span>{{ toast.text }}</span>
-      </div>
-    }
-
     <app-b2b-nav></app-b2b-nav>
     <router-outlet></router-outlet>
   `,

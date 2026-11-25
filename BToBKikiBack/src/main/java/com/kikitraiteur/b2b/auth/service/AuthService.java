@@ -35,7 +35,7 @@ public class AuthService {
     private final JwtTokenService jwtTokenService;
     private final EmailService emailService;
 
-    @Value("${app.frontend.url:http://localhost:4200}")
+    @Value("${app.frontend.url:https://btob-kiki.vercel.app}")
     private String frontendUrl;
 
     public AuthResponse login(LoginRequest request) {
@@ -169,9 +169,9 @@ public class AuthService {
                     .build();
             passwordResetTokenRepository.save(resetToken);
 
-            String base = (frontendUrl != null && !frontendUrl.isBlank())
+            String base = (frontendUrl != null && !frontendUrl.isBlank() && !frontendUrl.contains("localhost"))
                     ? frontendUrl.replaceAll("/+$", "")
-                    : "http://localhost:4200";
+                    : "https://btob-kiki.vercel.app";
             String resetUrl = base + "/b2b/reset-password?token=" + URLEncoder.encode(token, StandardCharsets.UTF_8);
             emailService.sendPasswordResetEmail(user.getEmail(), user.getNomComplet(), resetUrl);
         });

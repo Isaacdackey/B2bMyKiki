@@ -10,6 +10,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -115,14 +116,18 @@ public class EmailService {
     }
 
     public boolean sendHtmlEmail(String toEmail, String toName, String subject, String htmlContent) {
-        if (brevoApiKey != null && !brevoApiKey.isBlank()) {
+        String apiKey = brevoApiKey != null ? brevoApiKey.trim() : "";
+        String fromEmail = (senderEmail != null && !senderEmail.isBlank()) ? senderEmail.trim() : "noreply@kikitraiteur.sn";
+        String fromName = (senderName != null && !senderName.isBlank()) ? senderName.trim() : "Kiki Traiteur B2B";
+
+        if (!apiKey.isEmpty()) {
             try {
                 RestClient restClient = RestClient.create();
                 Map<String, Object> payload = Map.of(
-                        "sender", Map.of("name", senderName, "email", senderEmail),
+                        "sender", Map.of("name", fromName, "email", fromEmail),
                         "to", List.of(Map.of(
-                                "email", toEmail,
-                                "name", (toName != null && !toName.isBlank()) ? toName : toEmail
+                                "email", toEmail.trim(),
+                                "name", (toName != null && !toName.isBlank()) ? toName.trim() : toEmail.trim()
                         )),
                         "subject", subject,
                         "htmlContent", htmlContent
@@ -130,7 +135,8 @@ public class EmailService {
 
                 restClient.post()
                         .uri(BREVO_API_URL)
-                        .header("api-key", brevoApiKey.trim())
+                        .header("api-key", apiKey)
+                        .header("accept", MediaType.APPLICATION_JSON_VALUE)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(payload)
                         .retrieve()
@@ -138,6 +144,8 @@ public class EmailService {
 
                 log.info("Email Brevo envoye avec succes a {} ({})", toEmail, subject);
                 return true;
+            } catch (RestClientResponseException ex) {
+                log.error("Echec envoi email via API Brevo pour {} [HTTP {}]: {}", toEmail, ex.getStatusCode(), ex.getResponseBodyAsString());
             } catch (Exception ex) {
                 log.error("Echec envoi email via API Brevo pour {}: {}", toEmail, ex.getMessage());
             }

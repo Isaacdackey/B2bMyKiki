@@ -228,7 +228,7 @@ export class SaPlanningComponent {
 
   deployerVersTousLesSites() {
     this.b2b.deployerProgrammationGlobaleVersEntreprises();
-    alert('Succès ! La programmation globale a été synchronisée vers toutes les entreprises partenaires (filtrée selon les catégories autorisées par leurs conventions respectives).');
+    this.b2b.showToast('Programmation globale synchronisée vers toutes les entreprises partenaires.', 'success');
   }
 
   // DUPLICATION & RECONDUCTION DU PLANNING GLOBAL
@@ -239,7 +239,7 @@ export class SaPlanningComponent {
     const sourceJour = this.jourPlanningGlobalActif();
     const cibleJour = this.jourCibleDuplicationGlobal();
     if (sourceJour === cibleJour) {
-      alert('Veuillez sélectionner un jour de destination différent du jour source.');
+      this.b2b.showToast('Veuillez sélectionner un jour de destination différent du jour source.', 'error');
       return;
     }
 
@@ -250,13 +250,13 @@ export class SaPlanningComponent {
 
     this.modalDupliquerJourGlobal.set(false);
     this.jourPlanningGlobalActif.set(cibleJour);
-    alert(`Le menu du ${sourceJour} a été dupliqué avec succès vers le ${cibleJour} !`);
+    this.b2b.showToast(`Menu du ${sourceJour} dupliqué vers ${cibleJour} !`, 'success');
   }
 
   reconduireSemaineSuivante() {
     if (confirm('Voulez-vous reconduire l\'intégralité du programme hebdomadaire actuel sur la semaine suivante et synchroniser automatiquement vers les cantines partenaires ?')) {
       this.b2b.reconduireSemainePlanning('ent-001');
-      alert('Reconduction effectuée avec succès pour la semaine suivante ! Toutes les cantines ont été mises à jour.');
+      this.b2b.showToast('Reconduction effectuée pour la semaine suivante !', 'success');
     }
   }
 
@@ -314,7 +314,7 @@ export class SaPlanningComponent {
   enregistrerPlanningGlobal() {
     const edit = this.planningEnEdition();
     if (!edit.theme || !edit.platVedette) {
-      alert('Veuillez renseigner le thème et le plat vedette.');
+      this.b2b.showToast('Veuillez renseigner le thème et le plat vedette.', 'error');
       return;
     }
 
