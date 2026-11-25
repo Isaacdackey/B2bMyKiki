@@ -35,12 +35,17 @@ CREATE TABLE IF NOT EXISTS b2b_entreprise_categories (
 CREATE TABLE IF NOT EXISTS b2b_sites (
     id VARCHAR(255) PRIMARY KEY,
     nom VARCHAR(255) NOT NULL,
-    adresse VARCHAR(255) NOT NULL,
+    adresse VARCHAR(255),
     heure_cut_off VARCHAR(255),
     contact_referent VARCHAR(255),
     telephone_referent VARCHAR(255),
     type_prestation VARCHAR(255),
-    entreprise_id VARCHAR(255) NOT NULL REFERENCES b2b_entreprises(id) ON DELETE CASCADE
+    entreprise_id VARCHAR(255) REFERENCES b2b_entreprises(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS b2b_site_creneaux (
+    site_id VARCHAR(255) NOT NULL REFERENCES b2b_sites(id) ON DELETE CASCADE,
+    creneau VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS b2b_users (
@@ -84,19 +89,20 @@ CREATE TABLE IF NOT EXISTS b2b_invitations_admin (
 
 CREATE TABLE IF NOT EXISTS b2b_employes (
     id VARCHAR(255) PRIMARY KEY,
-    matricule VARCHAR(255) NOT NULL,
+    matricule VARCHAR(255) NOT NULL UNIQUE,
     nom VARCHAR(255) NOT NULL,
     prenom VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL,
+    email VARCHAR(255),
     telephone VARCHAR(255),
+    entreprise_id VARCHAR(255),
     site_id VARCHAR(255),
     site_nom VARCHAR(255),
     departement VARCHAR(255),
-    type VARCHAR(64) NOT NULL,
-    taux_subvention INTEGER NOT NULL,
+    type VARCHAR(64),
+    taux_subvention INTEGER,
     actif BOOLEAN NOT NULL DEFAULT TRUE,
     repas_consommes_mois INTEGER DEFAULT 0,
-    montant_pris_en_charge_mois BIGINT DEFAULT 0
+    montant_pris_en_charge_mois INTEGER DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS b2b_plats (
@@ -112,24 +118,25 @@ CREATE TABLE IF NOT EXISTS b2b_plats (
     is_archive BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-CREATE TABLE IF NOT EXISTS b2b_menus_planifies_jour (
+CREATE TABLE IF NOT EXISTS b2b_menus_planifies (
     id VARCHAR(255) PRIMARY KEY,
     entreprise_id VARCHAR(255) NOT NULL,
     jour_nom VARCHAR(64) NOT NULL,
-    date VARCHAR(64),
-    theme_jour VARCHAR(255),
+    date_str VARCHAR(64),
+    theme VARCHAR(255),
+    quantites_saisies BOOLEAN NOT NULL DEFAULT FALSE,
     statut_conformite VARCHAR(64)
 );
 
 CREATE TABLE IF NOT EXISTS b2b_lignes_menu_planifie (
     id VARCHAR(255) PRIMARY KEY,
-    plat_id VARCHAR(255) NOT NULL,
-    nom_plat VARCHAR(255) NOT NULL,
-    categorie VARCHAR(64) NOT NULL,
+    categorie VARCHAR(64),
+    plat_id VARCHAR(255),
+    nom_plat VARCHAR(255),
+    image VARCHAR(1024),
     quantite_prevue INTEGER DEFAULT 0,
-    quantite_commandee INTEGER DEFAULT 0,
     disponible BOOLEAN NOT NULL DEFAULT TRUE,
-    menu_jour_id VARCHAR(255) REFERENCES b2b_menus_planifies_jour(id) ON DELETE CASCADE
+    menu_planifie_id VARCHAR(255) REFERENCES b2b_menus_planifies(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS b2b_commandes_site (
@@ -167,20 +174,20 @@ CREATE TABLE IF NOT EXISTS b2b_reclamations_cutoff (
 CREATE TABLE IF NOT EXISTS b2b_types_prestation (
     code VARCHAR(255) PRIMARY KEY,
     libelle VARCHAR(255) NOT NULL,
-    description TEXT,
+    description_texte VARCHAR(500),
     cut_off_type VARCHAR(64),
     cut_off_heure VARCHAR(32),
-    regles_cut_off TEXT,
+    regles_cut_off VARCHAR(500),
     is_archive BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-CREATE TABLE IF NOT EXISTS b2b_types_prestation_categories (
-    type_prestation_code VARCHAR(255) NOT NULL REFERENCES b2b_types_prestation(code) ON DELETE CASCADE,
+CREATE TABLE IF NOT EXISTS b2b_prestation_categories_defaut (
+    prestation_code VARCHAR(255) NOT NULL REFERENCES b2b_types_prestation(code) ON DELETE CASCADE,
     categorie VARCHAR(255)
 );
 
-CREATE TABLE IF NOT EXISTS b2b_types_prestation_jours (
-    type_prestation_code VARCHAR(255) NOT NULL REFERENCES b2b_types_prestation(code) ON DELETE CASCADE,
+CREATE TABLE IF NOT EXISTS b2b_prestation_jours_dispo (
+    prestation_code VARCHAR(255) NOT NULL REFERENCES b2b_types_prestation(code) ON DELETE CASCADE,
     jour VARCHAR(64)
 );
 

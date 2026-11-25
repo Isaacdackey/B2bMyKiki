@@ -7,18 +7,18 @@
 -- ============================================================================
 
 -- 1. Types de Prestation & Catégories Alimentaires
-INSERT INTO b2b_types_prestation (code, libelle, description, cut_off_type, cut_off_heure, regles_cut_off, is_archive) VALUES
+INSERT INTO b2b_types_prestation (code, libelle, description_texte, cut_off_type, cut_off_heure, regles_cut_off, is_archive) VALUES
     ('CUISINE_SUR_PLACE', 'Cuisine et service sur place', 'Préparation et dressage en restaurant d''entreprise sur place', 'JOUR_J', '10:30', 'Clôture le matin même avant lancement en cuisine sur site', FALSE),
     ('SERVICE_SUR_PLACE', 'Service sur place (Réfectoire)', 'Plats cuisinés acheminés chauds et servis à l''assiette au réfectoire', 'J_MOINS_1', '18:00', 'Préparation centrale, clôture la veille au soir', FALSE),
     ('LIVRAISON_BARQUETTES', 'Livraison en barquettes', 'Conditionnement individuel hermétique scellé et étiqueté', 'J_MOINS_1', '16:00', 'Conditionnement et étiquetage individuel J-1', FALSE)
 ON CONFLICT (code) DO NOTHING;
 
-INSERT INTO b2b_types_prestation_categories (type_prestation_code, categorie) VALUES
+INSERT INTO b2b_prestation_categories_defaut (prestation_code, categorie) VALUES
     ('CUISINE_SUR_PLACE', 'ENTREE'), ('CUISINE_SUR_PLACE', 'PLAT'), ('CUISINE_SUR_PLACE', 'DESSERT'), ('CUISINE_SUR_PLACE', 'BOISSON'),
     ('SERVICE_SUR_PLACE', 'ENTREE'), ('SERVICE_SUR_PLACE', 'PLAT'), ('SERVICE_SUR_PLACE', 'DESSERT'), ('SERVICE_SUR_PLACE', 'BOISSON'),
     ('LIVRAISON_BARQUETTES', 'PLAT'), ('LIVRAISON_BARQUETTES', 'BOISSON');
 
-INSERT INTO b2b_types_prestation_jours (type_prestation_code, jour) VALUES
+INSERT INTO b2b_prestation_jours_dispo (prestation_code, jour) VALUES
     ('CUISINE_SUR_PLACE', 'Lundi'), ('CUISINE_SUR_PLACE', 'Mardi'), ('CUISINE_SUR_PLACE', 'Mercredi'), ('CUISINE_SUR_PLACE', 'Jeudi'), ('CUISINE_SUR_PLACE', 'Vendredi'),
     ('SERVICE_SUR_PLACE', 'Lundi'), ('SERVICE_SUR_PLACE', 'Mardi'), ('SERVICE_SUR_PLACE', 'Mercredi'), ('SERVICE_SUR_PLACE', 'Jeudi'), ('SERVICE_SUR_PLACE', 'Vendredi'),
     ('LIVRAISON_BARQUETTES', 'Lundi'), ('LIVRAISON_BARQUETTES', 'Mardi'), ('LIVRAISON_BARQUETTES', 'Mercredi'), ('LIVRAISON_BARQUETTES', 'Jeudi'), ('LIVRAISON_BARQUETTES', 'Vendredi');
@@ -73,14 +73,14 @@ ON CONFLICT (email) DO NOTHING;
 
 -- 4. Annuaire Employés
 INSERT INTO b2b_employes (
-    id, matricule, nom, prenom, email, telephone, site_id, site_nom, departement, type, taux_subvention, actif, repas_consommes_mois, montant_pris_en_charge_mois
+    id, matricule, nom, prenom, email, telephone, entreprise_id, site_id, site_nom, departement, type, taux_subvention, actif, repas_consommes_mois, montant_pris_en_charge_mois
 ) VALUES
     ('emp-001', 'TOT-9842', 'Ndiaye', 'Babacar', 'babacar.ndiaye@totalenergies.sn', '+221 77 200 30 40',
-     'site-1', 'Siège Plateau - Dakar', 'Finance & Comptabilité', 'SUBVENTIONNE', 100, TRUE, 18, 90000),
+     'ent-001', 'site-1', 'Siège Plateau - Dakar', 'Finance & Comptabilité', 'SUBVENTIONNE', 100, TRUE, 18, 90000),
     ('emp-002', 'TOT-9843', 'Diop', 'Awa', 'awa.diop@totalenergies.sn', '+221 77 200 30 41',
-     'site-1', 'Siège Plateau - Dakar', 'Ressources Humaines', 'SUBVENTIONNE', 70, TRUE, 14, 49000),
+     'ent-001', 'site-1', 'Siège Plateau - Dakar', 'Ressources Humaines', 'SUBVENTIONNE', 70, TRUE, 14, 49000),
     ('emp-003', 'TOT-EXT-01', 'Ba', 'Ousmane', 'ousmane.ba@totalenergies.sn', '+221 77 200 30 42',
-     'site-1', 'Siège Plateau - Dakar', 'IT & Systèmes', 'AUTONOME', 0, TRUE, 6, 0)
+     'ent-001', 'site-1', 'Siège Plateau - Dakar', 'IT & Systèmes', 'AUTONOME', 0, TRUE, 6, 0)
 ON CONFLICT (id) DO NOTHING;
 
 -- 5. Catalogue de Plats
@@ -99,20 +99,20 @@ INSERT INTO b2b_plats (
 ON CONFLICT (id) DO NOTHING;
 
 -- 6. Planning Hebdomadaire Exemple
-INSERT INTO b2b_menus_planifies_jour (id, entreprise_id, jour_nom, date, theme_jour, statut_conformite) VALUES
-    ('plan-ent1-lun', 'ent-001', 'Lundi', '2026-11-23', 'Saveurs Sénégalaises & Terroir', 'CONFORME'),
-    ('plan-ent1-mar', 'ent-001', 'Mardi', '2026-11-24', 'Grillades & Fraîcheur Dakaroise', 'CONFORME'),
-    ('plan-ent1-mer', 'ent-001', 'Mercredi', '2026-11-25', 'Rôtisserie & Saveurs d''Afrique', 'CONFORME'),
-    ('plan-ent1-jeu', 'ent-001', 'Jeudi', '2026-11-26', 'Délices Culinaires du Chef', 'CONFORME'),
-    ('plan-ent1-ven', 'ent-001', 'Vendredi', '2026-11-27', 'Thiéboudienne Sacré du Vendredi', 'CONFORME')
+INSERT INTO b2b_menus_planifies (id, entreprise_id, jour_nom, date_str, theme, quantites_saisies, statut_conformite) VALUES
+    ('plan-ent1-lun', 'ent-001', 'Lundi', '2026-11-23', 'Saveurs Sénégalaises & Terroir', TRUE, 'CONFORME'),
+    ('plan-ent1-mar', 'ent-001', 'Mardi', '2026-11-24', 'Grillades & Fraîcheur Dakaroise', TRUE, 'CONFORME'),
+    ('plan-ent1-mer', 'ent-001', 'Mercredi', '2026-11-25', 'Rôtisserie & Saveurs d''Afrique', TRUE, 'CONFORME'),
+    ('plan-ent1-jeu', 'ent-001', 'Jeudi', '2026-11-26', 'Délices Culinaires du Chef', TRUE, 'CONFORME'),
+    ('plan-ent1-ven', 'ent-001', 'Vendredi', '2026-11-27', 'Thiéboudienne Sacré du Vendredi', TRUE, 'CONFORME')
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO b2b_lignes_menu_planifie (id, plat_id, nom_plat, categorie, quantite_prevue, quantite_commandee, disponible, menu_jour_id) VALUES
-    ('l-lun-1', 'e2', 'Pastels Dorés au Thon (x3)', 'ENTREE', 40, 0, TRUE, 'plan-ent1-lun'),
-    ('l-lun-2', 'p1', 'Poulet Yassa Braisé Kiki & Riz Parfumé', 'PLAT', 45, 0, TRUE, 'plan-ent1-lun'),
-    ('l-lun-3', 'b1', 'Jus Naturel de Bissap Frais Menthe', 'BOISSON', 60, 0, TRUE, 'plan-ent1-lun'),
-    ('l-mer-1', 'e1', 'Salade Niçoise au Thon Frais', 'ENTREE', 40, 0, TRUE, 'plan-ent1-mer'),
-    ('l-mer-2', 'p4', 'Thiéboudienne Penda Mbaye Royal', 'PLAT', 50, 0, TRUE, 'plan-ent1-mer'),
-    ('l-mer-3', 'd1', 'Coupe de Fruits Exotiques Frais', 'DESSERT', 45, 0, TRUE, 'plan-ent1-mer'),
-    ('l-mer-4', 'b1', 'Jus Naturel de Bissap Frais Menthe', 'BOISSON', 60, 0, TRUE, 'plan-ent1-mer')
+INSERT INTO b2b_lignes_menu_planifie (id, plat_id, nom_plat, categorie, quantite_prevue, disponible, menu_planifie_id) VALUES
+    ('l-lun-1', 'e2', 'Pastels Dorés au Thon (x3)', 'ENTREE', 40, TRUE, 'plan-ent1-lun'),
+    ('l-lun-2', 'p1', 'Poulet Yassa Braisé Kiki & Riz Parfumé', 'PLAT', 45, TRUE, 'plan-ent1-lun'),
+    ('l-lun-3', 'b1', 'Jus Naturel de Bissap Frais Menthe', 'BOISSON', 60, TRUE, 'plan-ent1-lun'),
+    ('l-mer-1', 'e1', 'Salade Niçoise au Thon Frais', 'ENTREE', 40, TRUE, 'plan-ent1-mer'),
+    ('l-mer-2', 'p4', 'Thiéboudienne Penda Mbaye Royal', 'PLAT', 50, TRUE, 'plan-ent1-mer'),
+    ('l-mer-3', 'd1', 'Coupe de Fruits Exotiques Frais', 'DESSERT', 45, TRUE, 'plan-ent1-mer'),
+    ('l-mer-4', 'b1', 'Jus Naturel de Bissap Frais Menthe', 'BOISSON', 60, TRUE, 'plan-ent1-mer')
 ON CONFLICT (id) DO NOTHING;
