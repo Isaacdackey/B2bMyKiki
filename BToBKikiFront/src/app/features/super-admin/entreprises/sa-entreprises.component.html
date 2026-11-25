@@ -735,17 +735,15 @@
                         <th style="padding: 0.85rem 1rem; text-align: right;">Part Employés</th>
                         <th style="padding: 0.85rem 1rem; text-align: right;">Montant Total</th>
                         <th style="padding: 0.85rem 1rem; text-align: center;">Statut</th>
+                        <th style="padding: 0.85rem 1rem; text-align: right;">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       @for (ligne of lignesFacturationFiltrees(); track ligne.date) {
                         <tr (click)="facturationJourSelectionne.set(ligne)" style="border-bottom: 1px solid #F0EAE1; cursor: pointer;" title="Cliquer pour voir le détail nominatif">
                           <td data-label="Date" style="padding: 0.85rem 1rem; font-weight: 800; color: #332724;">
-                            <div>
-                              <i class="fa-regular fa-calendar" style="color: #721513; margin-right: 0.35rem;"></i>
-                              {{ ligne.dateAffichee }}
-                            </div>
-                            <div style="font-size: 0.7rem; color: #721513; font-weight: 700; margin-top: 0.15rem;">Voir détail →</div>
+                            <i class="fa-regular fa-calendar" style="color: #721513; margin-right: 0.35rem;"></i>
+                            {{ ligne.dateAffichee }}
                           </td>
                           <td data-label="Plats Livrés" style="padding: 0.85rem 1rem; text-align: center; font-weight: 800; color: #721513;">
                             {{ ligne.nbPlatsLivres }} plats
@@ -768,6 +766,12 @@
                               [style.color]="ligne.statut === 'FACTURE' ? '#606C38' : (ligne.statut === 'VALIDE' ? '#721513' : '#6E5A56')">
                               {{ ligne.statut === 'FACTURE' ? 'Facturé' : (ligne.statut === 'VALIDE' ? 'Validé' : 'En cours') }}
                             </span>
+                          </td>
+                          <td data-label="Actions" style="padding: 0.85rem 1rem; text-align: right;">
+                            <button type="button" (click)="$event.stopPropagation(); facturationJourSelectionne.set(ligne)"
+                              style="background: #FAF8F4; border: 1.5px solid #EDE7DC; color: #721513; border-radius: 9999px; padding: 0.38rem 0.85rem; font-size: 0.76rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
+                              <i class="fa-regular fa-eye"></i> Détails
+                            </button>
                           </td>
                         </tr>
                       }
@@ -1046,21 +1050,21 @@
             </p>
           </div>
 
-          <div style="display: flex; width: 100%; background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 9999px; padding: 0.25rem; gap: 0.25rem; box-shadow: 0 2px 8px rgba(114, 21, 19, 0.04); box-sizing: border-box;">
+          <div class="sa-subtab-bar">
             <button
               type="button"
+              class="sa-subtab-btn"
               (click)="entreprisesSubTab.set('ENTREPRISES')"
               [style.background]="entreprisesSubTab() === 'ENTREPRISES' ? '#721513' : 'transparent'"
-              [style.color]="entreprisesSubTab() === 'ENTREPRISES' ? '#FFFFFF' : '#6E5A56'"
-              style="flex: 1; justify-content: center; border: none; border-radius: 9999px; padding: 0.5rem 0.85rem; font-size: 0.8rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; white-space: nowrap;">
+              [style.color]="entreprisesSubTab() === 'ENTREPRISES' ? '#FFFFFF' : '#6E5A56'">
               <i class="fa-solid fa-building"></i> Entreprises ({{ b2b.listeEntreprises().length }})
             </button>
             <button
               type="button"
+              class="sa-subtab-btn"
               (click)="entreprisesSubTab.set('PRESTATIONS')"
               [style.background]="entreprisesSubTab() === 'PRESTATIONS' ? '#721513' : 'transparent'"
-              [style.color]="entreprisesSubTab() === 'PRESTATIONS' ? '#FFFFFF' : '#6E5A56'"
-              style="flex: 1; justify-content: center; border: none; border-radius: 9999px; padding: 0.5rem 0.85rem; font-size: 0.8rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; white-space: nowrap;">
+              [style.color]="entreprisesSubTab() === 'PRESTATIONS' ? '#FFFFFF' : '#6E5A56'">
               <i class="fa-solid fa-sliders"></i> Prestations &amp; Catégories
             </button>
           </div>

@@ -68,16 +68,14 @@
                   <th style="text-align: right;">Montant Total</th>
                   <th style="text-align: right;">Part Entreprise</th>
                   <th style="text-align: center;">Statut</th>
+                  <th style="text-align: right;">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 @for (ligne of facturationJournaliere(); track ligne.date) {
                   <tr (click)="facturationJourSelectionne.set(ligne)" style="cursor: pointer;" title="Cliquer pour voir le détail nominatif">
                     <td data-label="Date" style="font-weight: 700; color: #332724;">
-                      <div>
-                        <div>{{ ligne.dateAffichee }}</div>
-                        <div style="font-size: 0.7rem; color: #721513; font-weight: 700;">Voir détail →</div>
-                      </div>
+                      {{ ligne.dateAffichee }}
                     </td>
                     <td data-label="Plats Livrés" style="text-align: center; font-weight: 900; color: #721513;">
                       {{ ligne.nbPlatsLivres }}
@@ -95,11 +93,17 @@
                         {{ ligne.statut === 'FACTURE' ? 'Facturé' : ligne.statut === 'VALIDE' ? 'Validé' : 'En cours' }}
                       </span>
                     </td>
+                    <td data-label="Actions" style="text-align: right;">
+                      <button type="button" (click)="$event.stopPropagation(); facturationJourSelectionne.set(ligne)"
+                        style="background: #FAF8F4; border: 1.5px solid #EDE7DC; color: #721513; border-radius: 9999px; padding: 0.38rem 0.85rem; font-size: 0.76rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
+                        <i class="fa-regular fa-eye"></i> Détails
+                      </button>
+                    </td>
                   </tr>
                 }
                 @if (facturationJournaliere().length === 0) {
                   <tr>
-                    <td colspan="5" style="padding: 2.5rem 1rem; text-align: center; color: #6E5A56;">
+                    <td colspan="6" style="padding: 2.5rem 1rem; text-align: center; color: #6E5A56;">
                       <i class="fa-solid fa-file-invoice-dollar" style="font-size: 1.75rem; color: #C5A880; display: block; margin-bottom: 0.5rem;"></i>
                       <strong>Aucune livraison facturable sur cette période</strong>
                       <div style="font-size: 0.8rem; margin-top: 0.25rem;">Modifiez la plage de dates pour consulter les relevés précédents.</div>

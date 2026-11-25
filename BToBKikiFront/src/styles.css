@@ -1297,6 +1297,69 @@ select:not(.no-custom-select) option {
   font-weight: 600;
 }
 
+@supports (appearance: base-select) {
+  select:not(.no-custom-select),
+  select:not(.no-custom-select)::picker(select) {
+    appearance: base-select !important;
+  }
+
+  select:not(.no-custom-select) {
+    background-image: none !important;
+    padding-right: 0.9rem !important;
+    align-items: center;
+  }
+
+  select:not(.no-custom-select)::picker-icon {
+    color: #721513;
+    transition: transform 0.2s ease;
+    margin-left: auto;
+  }
+
+  select:not(.no-custom-select):open::picker-icon {
+    transform: rotate(180deg);
+  }
+
+  select:not(.no-custom-select)::picker(select) {
+    background: #FFFFFF;
+    border: 1.5px solid #E2D5BE;
+    border-radius: 14px;
+    padding: 0.35rem;
+    margin-top: 0.35rem;
+    box-shadow: 0 14px 36px rgba(114, 21, 19, 0.14);
+    min-width: anchor-size(width);
+  }
+
+  select:not(.no-custom-select) option {
+    padding: 0.55rem 0.85rem;
+    border-radius: 9px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #2C1810;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+
+  select:not(.no-custom-select) option:hover,
+  select:not(.no-custom-select) option:focus-visible {
+    background-color: #FAF5EA;
+    color: #721513;
+  }
+
+  select:not(.no-custom-select) option:checked {
+    background-color: #721513;
+    color: #FFFFFF;
+  }
+
+  select:not(.no-custom-select) option::checkmark {
+    order: 1;
+    margin-left: auto;
+    font-size: 0.78rem;
+  }
+}
+
 /* ============================================================
    ANIMATIONS PROGRESSIVES DES DASHBOARDS (CARDS, COURBES, BARRES)
    ============================================================ */

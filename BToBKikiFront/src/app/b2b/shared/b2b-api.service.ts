@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import {
   EntrepriseB2B,
   EmployeB2B,
@@ -21,7 +22,7 @@ export interface ApiResponse<T> {
 @Injectable({ providedIn: 'root' })
 export class B2bApiService {
   private http = inject(HttpClient);
-  private readonly baseUrl = 'https://b2bmykiki.onrender.com/api/v1';
+  private readonly baseUrl = `${environment.apiUrl}/api/v1`;
 
   private getHeaders(): HttpHeaders {
     const token = typeof localStorage !== 'undefined' ? localStorage.getItem('b2b_jwt_token') : null;

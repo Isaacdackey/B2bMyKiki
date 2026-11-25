@@ -122,7 +122,7 @@ export class SaPlanningComponent {
       const d = new Date(monday);
       d.setDate(monday.getDate() + idx);
       const label = `${String(d.getDate()).padStart(2, '0')} ${moisCourts[d.getMonth()]}`;
-      map[jour] = offset === 0 && idx === this.todayIndexSa ? `${label} (Auj.)` : label;
+      map[jour] = label;
     });
     return map;
   });

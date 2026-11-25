@@ -4,7 +4,7 @@
  */
 export const environment = {
   production: false,
-  apiUrl: 'https://b2bmykiki.onrender.com',
+  apiUrl: 'http://localhost:8080',
   cloudinary: {
     cloudName: 'drqsusznh',
     apiKey: '218493326687862',

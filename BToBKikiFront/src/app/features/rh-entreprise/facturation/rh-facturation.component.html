@@ -93,6 +93,7 @@
                 <th>Montant Total</th>
                 <th>Part Prise en Charge Entreprise</th>
                 <th style="text-align: center;">Statut</th>
+                <th style="text-align: right;">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -124,8 +125,8 @@
                 </td>
                 <td class="no-mobile-label" style="text-align: right;">
                   <button type="button" (click)="$event.stopPropagation(); facturationJourSelectionne.set(l)"
-                    style="background: #FAF8F4; border: 1.5px solid #EDE7DC; color: #721513; border-radius: 9999px; padding: 0.35rem 0.8rem; font-size: 0.74rem; font-weight: 800; cursor: pointer; white-space: nowrap;">
-                    Détails →
+                    style="background: #FAF8F4; border: 1.5px solid #EDE7DC; color: #721513; border-radius: 9999px; padding: 0.38rem 0.85rem; font-size: 0.76rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
+                    <i class="fa-regular fa-eye"></i> Détails
                   </button>
                 </td>
               </tr>
