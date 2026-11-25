@@ -1,9 +1,10 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { B2bStateService } from '../../../b2b/shared/b2b-state.service';
-import { PlatB2B } from '../../../b2b/shared/b2b.models';
+import { B2bApiService } from '../../../b2b/shared/b2b-api.service';
+import { AlerteCommandeB2B, PlatB2B } from '../../../b2b/shared/b2b.models';
 
 @Component({
   selector: 'app-b2b-commande',
@@ -12,8 +13,29 @@ import { PlatB2B } from '../../../b2b/shared/b2b.models';
   templateUrl: './b2b-commande.component.html',
   styleUrls: ['./b2b-commande.component.css']
 })
-export class B2bCommandeComponent {
+export class B2bCommandeComponent implements OnInit {
   b2b = inject(B2bStateService);
+  private api = inject(B2bApiService);
+  alertesCommande = signal<AlerteCommandeB2B[]>([]);
+
+  ngOnInit(): void {
+    const email = this.b2b.currentEmploye().email;
+    if (email) {
+      this.api.getAlertesEmploye(email).subscribe({
+        next: (res) => {
+          if (res.success && Array.isArray(res.data)) {
+            this.alertesCommande.set(res.data.filter(a => !a.lu));
+          }
+        },
+        error: () => {}
+      });
+    }
+  }
+
+  marquerAlerteLue(id: string) {
+    this.alertesCommande.update(list => list.filter(a => a.id !== id));
+    this.api.marquerAlerteLue(id).subscribe({ error: () => {} });
+  }
 
   constructor() {
     const r = this.b2b.currentSession().role;
@@ -44,13 +66,12 @@ export class B2bCommandeComponent {
 
   validerScanCantine() {
     this.scanCantineValide.set(true);
-    const emp = this.b2b.currentEmploye();
-    const cmdEnCours = this.b2b.listeCommandesSite().find(
-      c => c.statut === 'EN_COURS' && (c.matricule === emp.matricule || c.employeNom.includes(emp.nom))
-    );
-    if (cmdEnCours) {
-      this.b2b.scannerCommandeSite(cmdEnCours.id);
+    const cmdId = this.derniereCommande()?.id;
+    if (cmdId && this.b2b.scannerParQrOuCode(cmdId)) {
+      return;
     }
+    const emp = this.b2b.currentEmploye();
+    this.b2b.scannerParQrOuCode(emp.matricule);
   }
 
   // SÉLECTION DU JOUR POUR COMMANDER TOUTE LA SEMAINE (Lundi à Dimanche)
@@ -77,7 +98,23 @@ export class B2bCommandeComponent {
     return map;
   }
 
+  isJourPasse(jour: string): boolean {
+    const idx = this.joursSemaine.indexOf(jour as any);
+    return idx >= 0 && idx < this.todayIndex;
+  }
+
+  private getDateIsoPourJour(jour: string): string {
+    const idx = Math.max(0, this.joursSemaine.indexOf(jour as any));
+    const now = new Date();
+    const d = new Date(now);
+    d.setDate(now.getDate() - this.todayIndex + idx);
+    return d.toISOString().slice(0, 10);
+  }
+
   changerJourCommande(jour: 'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche') {
+    if (this.isJourPasse(jour)) {
+      return;
+    }
     this.jourSelectionne.set(jour);
     this.pageMenu.set(1);
   }
@@ -99,18 +136,26 @@ export class B2bCommandeComponent {
     this.isAfterCutOff.update(v => !v);
   }
 
-  // Vérifier si la commande est bloquée par le cut-off
+  // Vérifier si la commande est bloquée par le cut-off (dépend du type de prestation & de la convention)
   isBloqueParCutOff = computed(() => {
-    // Si c'est pour un jour futur (Vendredi, Samedi, Dimanche), pas de blocage cut-off !
     const jour = this.jourSelectionne();
+    if (this.isJourPasse(jour)) {
+      return true;
+    }
+    const ent = this.b2b.currentEntreprise();
+    if (ent.cutOffType === 'SANS_CUTOFF') {
+      return false;
+    }
+    const prest = this.b2b.typesPrestationConfigurables().find(t => t.code === ent.typePrestation) as any;
+    if (prest?.joursDisponibles?.length && !prest.joursDisponibles.includes(jour)) {
+      return true;
+    }
     if (jour === 'Vendredi' || jour === 'Samedi' || jour === 'Dimanche') {
       return false;
     }
-    // Si l'employé a été débloqué par le responsable de site, il n'est plus bloqué !
     if (this.b2b.isEmployeDebloqueAujourdhui(this.b2b.currentEmploye().id)) {
       return false;
     }
-    // Sinon, dépend de la simulation ou de l'état cut-off
     return this.isAfterCutOff();
   });
 
@@ -179,6 +224,15 @@ export class B2bCommandeComponent {
     } else {
       // Fallback catalogue complet
       listeBase = this.b2b.catalogueJour().filter(p => !p.isArchive);
+    }
+
+    // Respecter les catégories autorisées par la convention de l'entreprise
+    const autorisees = this.b2b.currentEntreprise()?.categoriesAutorisees;
+    if (autorisees && autorisees.length > 0) {
+      listeBase = listeBase.filter(p =>
+        autorisees.includes(p.categorie) ||
+        (p.categorie === 'GARNITURE' && autorisees.includes('PLAT'))
+      );
     }
 
     if (cat !== 'all') {
@@ -255,14 +309,18 @@ export class B2bCommandeComponent {
 
   categories = computed(() => {
     const isSub = this.b2b.modeProfil() === 'SUBVENTIONNE';
-    return [
-      { id: 'all', name: 'Tous', icon: 'fa-globe' },
+    const autorisees = this.b2b.currentEntreprise().categoriesAutorisees || [];
+    const base = [
       { id: 'ENTREE', name: isSub ? '1. Entrée' : 'Entrées', icon: 'fa-cookie-bite' },
       { id: 'PLAT', name: isSub ? '2. Plat Chaud' : 'Plats Chauds', icon: 'fa-utensils' },
       { id: 'GARNITURE', name: isSub ? '3. Garniture' : 'Garnitures', icon: 'fa-bowl-rice' },
       { id: 'DESSERT', name: isSub ? '4. Dessert' : 'Desserts', icon: 'fa-cake-candles' },
       { id: 'BOISSON', name: isSub ? '5. Boisson' : 'Boissons', icon: 'fa-wine-glass-alt' }
     ];
+    const filtrees = autorisees.length > 0
+      ? base.filter(c => autorisees.includes(c.id) || (c.id === 'GARNITURE' && autorisees.includes('PLAT')))
+      : base;
+    return [{ id: 'all', name: 'Tous', icon: 'fa-globe' }, ...filtrees];
   });
 
   selectCategory(catId: string) {
@@ -355,30 +413,144 @@ export class B2bCommandeComponent {
     }
   });
 
+  // Commandes enregistrées directement pour chaque jour de la semaine (avec QR Code dédié par jour)
+  commandesSemaine = signal<Record<string, {
+    id: string;
+    dateIso: string;
+    plats: PlatB2B[];
+    qrCode: string;
+    prixTotal: number;
+    partEntreprise: number;
+    partEmploye: number;
+  }>>({});
+
+  commandeDuJourActif = computed(() => this.commandesSemaine()[this.jourSelectionne()] || null);
+
+  aDejaCommandeJour(jour: string): boolean {
+    const cmd = this.commandesSemaine()[jour];
+    return !!cmd && cmd.plats.length > 0;
+  }
+
+  ouvrirQrCodeJour() {
+    const cmdJour = this.commandeDuJourActif();
+    const site = this.b2b.siteActuel();
+    const jour = this.jourSelectionne();
+    if (cmdJour) {
+      this.derniereCommande.set({
+        id: cmdJour.id,
+        date: `${jour} ${this.datesSemaineMap[jour] || ''}`.trim(),
+        heureRetrait: this.b2b.creneauLivraison(),
+        siteNom: site.nom,
+        formuleNom: this.b2b.modeProfil() === 'AUTONOME' ? 'À la carte' : this.b2b.formuleActuelle().nom,
+        entreeNom: cmdJour.plats.find(p => p.categorie === 'ENTREE')?.nom,
+        platNom: cmdJour.plats.find(p => p.categorie === 'PLAT')?.nom,
+        dessertNom: cmdJour.plats.find(p => p.categorie === 'DESSERT')?.nom,
+        boissonNom: cmdJour.plats.find(p => p.categorie === 'BOISSON')?.nom,
+        qrCode: cmdJour.qrCode,
+        prixTotal: cmdJour.prixTotal,
+        partEntreprise: cmdJour.partEntreprise,
+        partEmploye: cmdJour.partEmploye
+      });
+      this.qrDataString.set(cmdJour.qrCode);
+      this.showQrCodeModal.set(true);
+      return;
+    }
+    this.ouvrirQrCodeModal();
+  }
+
   choisirOuAjouterPlat(plat: PlatB2B) {
+    const jour = this.jourSelectionne();
+    if (this.isJourPasse(jour)) {
+      return;
+    }
     if (this.isBloqueParCutOff()) {
       this.ouvrirModalReclamation();
       return;
     }
     if (this.b2b.modeProfil() === 'SUBVENTIONNE') {
       this.b2b.choisirPlat(plat);
+    }
+
+    const emp = this.b2b.currentEmploye();
+    const site = this.b2b.siteActuel();
+    const dateIso = this.getDateIsoPourJour(jour);
+    const codeCommande = `CMD-${emp.matricule}-${dateIso}`;
+    const qrCode = `KT-${emp.matricule}-${site.id}-${dateIso}`;
+
+    const existante = this.commandesSemaine()[jour];
+    let platsJour = existante ? [...existante.plats] : [];
+    if (this.b2b.modeProfil() === 'SUBVENTIONNE') {
+      platsJour = platsJour.filter(p => p.categorie !== plat.categorie);
+      platsJour.push(plat);
     } else {
-      this.b2b.ajouterAuPanierAutonome(plat);
+      const deja = platsJour.some(p => p.id === plat.id);
+      platsJour = deja ? platsJour.filter(p => p.id !== plat.id) : [...platsJour, plat];
+    }
+
+    const prixTotal = this.b2b.modeProfil() === 'AUTONOME'
+      ? platsJour.reduce((s, p) => s + (p.prixUnitaire || 0), 0)
+      : this.b2b.formuleActuelle().prixForfait;
+    const taux = this.b2b.modeProfil() === 'SUBVENTIONNE' ? (emp.tauxSubvention || 0) : 0;
+    const partEntreprise = Math.round((prixTotal * taux) / 100);
+    const partEmploye = Math.max(0, prixTotal - partEntreprise);
+
+    this.commandesSemaine.update(map => ({
+      ...map,
+      [jour]: {
+        id: codeCommande,
+        dateIso,
+        plats: platsJour,
+        qrCode,
+        prixTotal,
+        partEntreprise,
+        partEmploye
+      }
+    }));
+
+    const platNomResume = platsJour.map(p => p.nom).join(' + ') || plat.nom;
+    this.derniereCommande.set({
+      id: codeCommande,
+      date: `${jour} ${this.datesSemaineMap[jour] || ''}`.trim(),
+      heureRetrait: this.b2b.creneauLivraison(),
+      siteNom: site.nom,
+      formuleNom: this.b2b.modeProfil() === 'AUTONOME' ? 'À la carte' : this.b2b.formuleActuelle().nom,
+      entreeNom: platsJour.find(p => p.categorie === 'ENTREE')?.nom,
+      platNom: platsJour.find(p => p.categorie === 'PLAT')?.nom,
+      dessertNom: platsJour.find(p => p.categorie === 'DESSERT')?.nom,
+      boissonNom: platsJour.find(p => p.categorie === 'BOISSON')?.nom,
+      qrCode,
+      prixTotal,
+      partEntreprise,
+      partEmploye
+    });
+    this.qrDataString.set(qrCode);
+
+    if (platsJour.length > 0) {
+      this.b2b.enregistrerCommandeSite({
+        codeCommande,
+        platNom: platNomResume,
+        categorie: plat.categorie,
+        montantTotal: prixTotal,
+        partEntreprise,
+        partEmploye,
+        qrCode,
+        date: dateIso
+      });
     }
 
     if (plat.categorie === 'PLAT') {
-      this.flashGarnitureMessage.set('Plat chaud sélectionné ! Choisissez maintenant votre garniture.');
+      this.flashGarnitureMessage.set('Plat chaud enregistré ! Vous pouvez aussi choisir votre garniture.');
       if (this.flashGarnitureTimer) clearTimeout(this.flashGarnitureTimer);
       this.flashGarnitureTimer = setTimeout(() => this.flashGarnitureMessage.set(null), 4000);
     }
   }
 
   isPlatActiveDansMode(plat: PlatB2B): boolean {
-    if (this.b2b.modeProfil() === 'SUBVENTIONNE') {
-      return this.isPlatSelected(plat);
-    } else {
-      return this.b2b.quantitePlatAutonome(plat.id) > 0;
+    const cmdJour = this.commandeDuJourActif();
+    if (cmdJour) {
+      return cmdJour.plats.some(p => p.id === plat.id);
     }
+    return false;
   }
 
   isPlatSelected(plat: PlatB2B): boolean {

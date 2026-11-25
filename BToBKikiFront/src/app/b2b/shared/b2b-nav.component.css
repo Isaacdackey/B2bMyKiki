@@ -542,7 +542,7 @@
   border: 1.5px solid #EDE7DC;
   background: #FAF8F4;
   color: #721513;
-  border-radius: 50% !important;
+  border-radius: 12px !important;
   display: flex;
   align-items: center;
   justify-content: center;

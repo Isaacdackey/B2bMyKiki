@@ -350,23 +350,6 @@
           </div>
         }
       </a>
-
-      <a
-        routerLink="/b2b/cuisine/infos"
-        routerLinkActive="active"
-        class="b2b-sidebar-link"
-        (click)="onNavClick()"
-        title="Informations du Site / Entreprise">
-        <div class="b2b-link-icon-wrap">
-          <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-        </div>
-        @if (!b2b.isSidebarCollapsed()) {
-          <div class="b2b-link-text">
-            <span class="b2b-link-title">Infos Entreprise</span>
-            <span class="b2b-link-subtitle">Convention, prestation &amp; cut-off</span>
-          </div>
-        }
-      </a>
     }
 
     <!-- 3. CAS DU SALARIÉ (CONVENTIONNÉ OU AUTONOME) -->
@@ -379,19 +362,6 @@
           <div class="b2b-link-text">
             <span class="b2b-link-title">Mets &amp; Formule</span>
             <span class="b2b-link-subtitle">{{ b2b.currentSession().role === 'SALARIE_CONVENTIONNE' ? 'Formule 100% Subventionnée' : 'À la carte • Paiement Wave' }}</span>
-          </div>
-        }
-      </a>
-
-      <!-- Page dédiée au Panier / Mon Plateau -->
-      <a routerLink="/b2b/employe/panier" routerLinkActive="active" class="b2b-sidebar-link" [title]="b2b.currentSession().role === 'SALARIE_CONVENTIONNE' ? 'Panier' : 'Mon Plateau'" (click)="onNavClick()">
-        <div class="b2b-link-icon-wrap">
-          <i class="fa-solid fa-basket-shopping" aria-hidden="true"></i>
-        </div>
-        @if (!b2b.isSidebarCollapsed()) {
-          <div class="b2b-link-text">
-            <span class="b2b-link-title">{{ b2b.currentSession().role === 'SALARIE_CONVENTIONNE' ? 'Panier' : 'Mon Plateau' }}</span>
-            <span class="b2b-link-subtitle">Validation de commande</span>
           </div>
         }
       </a>

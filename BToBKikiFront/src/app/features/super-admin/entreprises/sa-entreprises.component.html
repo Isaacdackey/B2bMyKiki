@@ -90,7 +90,7 @@
                   [style.color]="gererActiveTab() === 'FACTURATION' ? '#FFFFFF' : '#332724'"
                   [style.border-color]="gererActiveTab() === 'FACTURATION' ? '#721513' : '#EDE7DC'"
                   class="sa-btn-action" style="font-weight: 800; font-size: 0.85rem; padding: 0.6rem 1.1rem; border-radius: 10px;">
-                  <i class="fa-solid fa-file-invoice-dollar"></i> Facturation Journalière
+                  <i class="fa-solid fa-file-invoice-dollar"></i> Facturation
                 </button>
               </div>
             </div>
@@ -278,19 +278,23 @@
                       </p>
                     </div>
 
-                    <div style="display: flex; gap: 0.5rem; flex-wrap: nowrap; margin-left: auto; justify-content: flex-end; max-width: 100%;">
-                      <button (click)="importerFichierEmployes()" class="sa-btn-action" style="font-size: 0.76rem; padding: 0.45rem 0.75rem; font-weight: 700; color: #606C38; border-color: #606C38; white-space: nowrap;">
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-left: auto; justify-content: flex-end; max-width: 100%;">
+                      <button type="button" (click)="exporterModeleEmployes()" class="sa-btn-action" style="font-size: 0.76rem; padding: 0.45rem 0.75rem; font-weight: 700; color: #721513; border-color: #C5A880; background: #FAF5EA; white-space: nowrap;">
+                        <i class="fa-solid fa-file-excel"></i> Modèle CSV/Excel
+                      </button>
+                      <input #importEmployesInput type="file" accept=".csv,.txt" (change)="onImporterFichierEmployes($event)" style="display: none;">
+                      <button type="button" (click)="importEmployesInput.click()" class="sa-btn-action" style="font-size: 0.76rem; padding: 0.45rem 0.75rem; font-weight: 700; color: #606C38; border-color: #606C38; white-space: nowrap;">
                         <i class="fa-solid fa-file-import"></i> Importer (CSV/Excel)
                       </button>
-                      <button (click)="modalNouvelEmploye.set(true)" class="sa-btn-primary" style="font-size: 0.76rem; padding: 0.45rem 0.85rem; white-space: nowrap;">
+                      <button type="button" (click)="modalNouvelEmploye.set(true)" class="sa-btn-primary" style="font-size: 0.76rem; padding: 0.45rem 0.85rem; white-space: nowrap;">
                         <i class="fa-solid fa-user-plus"></i> Ajouter un Employé
                       </button>
                     </div>
                   </div>
 
-                  <!-- Tableau des Collaborateurs -->
+                  <!-- Tableau des Collaborateurs (Cards sur mobile) -->
                   <div style="overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
+                    <table class="sa-employes-table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
                       <thead>
                         <tr style="background: #FAF8F4; border-bottom: 2px solid #EDE7DC; color: #6E5A56; font-size: 0.75rem; text-transform: uppercase;">
                           <th style="padding: 0.75rem 1rem;">Matricule</th>
@@ -305,20 +309,20 @@
                       <tbody>
                         @for (emp of employesEntrepriseEnGestion(); track emp.id) {
                           <tr style="border-bottom: 1px solid #F0EAE1;">
-                            <td style="padding: 0.75rem 1rem; font-weight: 800; color: #721513;">
+                            <td data-label="Matricule" style="padding: 0.75rem 1rem; font-weight: 800; color: #721513;">
                               {{ emp.matricule }}
                             </td>
-                            <td style="padding: 0.75rem 1rem; font-weight: 800; color: #332724;">
+                            <td data-label="Nom & Prénom" style="padding: 0.75rem 1rem; font-weight: 800; color: #332724;">
                               {{ emp.prenom }} {{ emp.nom }}
                             </td>
-                            <td style="padding: 0.75rem 1rem; color: #6E5A56;">
+                            <td data-label="Département" style="padding: 0.75rem 1rem; color: #6E5A56;">
                               {{ emp.departement }}
                             </td>
-                            <td style="padding: 0.75rem 1rem; color: #6E5A56; font-size: 0.8rem;">
+                            <td data-label="Contact" style="padding: 0.75rem 1rem; color: #6E5A56; font-size: 0.8rem;">
                               <div>{{ emp.email }}</div>
                               <div>{{ emp.telephone }}</div>
                             </td>
-                            <td style="padding: 0.75rem 1rem; text-align: center;">
+                            <td data-label="Prise en charge" style="padding: 0.75rem 1rem; text-align: center;">
                               <!-- Sélecteur rapide de taux de prise en charge -->
                               <select 
                                 [value]="emp.tauxSubvention" 
@@ -332,7 +336,7 @@
                                 <option [value]="0" [selected]="emp.tauxSubvention === 0">0%</option>
                               </select>
                             </td>
-                            <td style="padding: 0.75rem 1rem; text-align: center;">
+                            <td data-label="Profil" style="padding: 0.75rem 1rem; text-align: center;">
                               <span style="font-size: 0.72rem; font-weight: 800; padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;"
                                 [style.background]="emp.tauxSubvention > 0 ? 'rgba(96, 108, 56, 0.12)' : 'rgba(110, 90, 86, 0.1)'"
                                 [style.color]="emp.tauxSubvention > 0 ? '#606C38' : '#6E5A56'">
@@ -343,7 +347,7 @@
                                 }
                               </span>
                             </td>
-                            <td style="padding: 0.75rem 1rem; text-align: center;">
+                            <td data-label="Statut" style="padding: 0.75rem 1rem; text-align: center;">
                               <span style="font-size: 0.78rem; font-weight: 700; color: #606C38; display: inline-flex; align-items: center; justify-content: center; gap: 0.25rem;">
                                 <i class="fa-solid fa-check"></i> Actif
                               </span>
@@ -937,9 +941,11 @@
                 <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 0.5rem;">
                   <select [(ngModel)]="entrepriseEnEdition().cutOffType" style="border: 1px solid #EDE7DC; border-radius: 8px; padding: 0.45rem 0.5rem; font-size: 0.8rem; font-weight: 700; color: #721513; background: #FFFFFF;">
                     <option value="J_MOINS_1">J - 1 (La veille)</option>
+                    <option value="J_MOINS_2">J - 2 (Avant-veille)</option>
                     <option value="JOUR_J">Jour J (Jour même)</option>
+                    <option value="SANS_CUTOFF">Sans Cut-Off (Libre)</option>
                   </select>
-                  <input type="time" [(ngModel)]="entrepriseEnEdition().cutOffHeure" style="border: 1px solid #EDE7DC; border-radius: 8px; padding: 0.45rem 0.5rem; font-size: 0.84rem; font-weight: 800; color: #E51D24; background: #FFFFFF;">
+                  <input type="time" [(ngModel)]="entrepriseEnEdition().cutOffHeure" [disabled]="entrepriseEnEdition().cutOffType === 'SANS_CUTOFF'" style="border: 1px solid #EDE7DC; border-radius: 8px; padding: 0.45rem 0.5rem; font-size: 0.84rem; font-weight: 800; color: #E51D24; background: #FFFFFF;">
                 </div>
                 <small style="font-size: 0.68rem; color: #6E5A56; margin-top: 0.25rem; display: block;">Passé ce délai, commandes verrouillées.</small>
               </div>
@@ -1302,7 +1308,7 @@
                   </h3>
                   <p style="margin: 0.15rem 0 0; font-size: 0.76rem; color: #6E5A56;">Options contractuelles proposées aux entreprises</p>
                 </div>
-                <button type="button" (click)="nouveauTypePrestation.set({ code: '', libelle: '', desc: '' }); showModalAjoutPrestation.set(true)" class="sa-btn-primary" style="font-size: 0.78rem; padding: 0.5rem 0.95rem;">
+                <button type="button" (click)="resetNouveauTypePrestation(); showModalAjoutPrestation.set(true)" class="sa-btn-primary" style="font-size: 0.78rem; padding: 0.5rem 0.95rem;">
                   <i class="fa-solid fa-plus"></i> Ajouter
                 </button>
               </div>
@@ -1318,6 +1324,22 @@
                         }
                       </strong>
                       <div style="font-size: 0.75rem; color: #6E5A56; margin-top: 0.15rem;">{{ tp.desc }}</div>
+                      <div style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.4rem;">
+                        <span style="font-size: 0.68rem; font-weight: 800; color: #721513; background: #FFF5F2; border: 1px solid #F1DCD6; padding: 0.12rem 0.5rem; border-radius: 9999px;">
+                          <i class="fa-regular fa-clock"></i>
+                          {{ tp.cutOffType === 'SANS_CUTOFF' ? 'Sans Cut-Off (Libre)' : (tp.cutOffType || 'J_MOINS_1') + ' • ' + (tp.cutOffHeure || '18:00') }}
+                        </span>
+                        @if (tp.joursDisponibles?.length) {
+                          <span style="font-size: 0.68rem; font-weight: 700; color: #606C38; background: #F5F7EF; border: 1px solid #DCE4C8; padding: 0.12rem 0.5rem; border-radius: 9999px;">
+                            <i class="fa-regular fa-calendar"></i> {{ tp.joursDisponibles?.join(', ') }}
+                          </span>
+                        }
+                        @if (tp.reglesCutOff) {
+                          <span style="font-size: 0.68rem; color: #6E5A56; background: #FFFFFF; border: 1px solid #EDE7DC; padding: 0.12rem 0.5rem; border-radius: 9999px;">
+                            {{ tp.reglesCutOff }}
+                          </span>
+                        }
+                      </div>
                     </div>
                     <button type="button" (click)="b2b.toggleArchiverTypePrestation(tp.code)" class="sa-btn-action"
                       [style.color]="$any(tp).isArchive ? '#606C38' : '#E51D24'"
@@ -1392,6 +1414,29 @@
           <div>
             <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.3rem;">Description courte</label>
             <input type="text" [(ngModel)]="nouveauTypePrestation().desc" placeholder="Ex: Service traiteur pour événements..." style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.6rem 0.75rem; font-size: 0.85rem;">
+          </div>
+          <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 0.65rem;">
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.3rem;">Cut-Off par défaut</label>
+              <select [(ngModel)]="nouveauTypePrestation().cutOffType" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.6rem 0.65rem; font-size: 0.82rem; font-weight: 700; color: #721513; background: #FFFFFF;">
+                <option value="J_MOINS_1">J - 1 (La veille)</option>
+                <option value="J_MOINS_2">J - 2 (Avant-veille)</option>
+                <option value="JOUR_J">Jour J (Jour même)</option>
+                <option value="SANS_CUTOFF">Sans Cut-Off (Libre)</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.3rem;">Heure limite</label>
+              <input type="time" [(ngModel)]="nouveauTypePrestation().cutOffHeure" [disabled]="nouveauTypePrestation().cutOffType === 'SANS_CUTOFF'" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.55rem 0.65rem; font-size: 0.85rem; font-weight: 800; color: #E51D24;">
+            </div>
+          </div>
+          <div>
+            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.3rem;">Règles de Cut-Off</label>
+            <input type="text" [(ngModel)]="nouveauTypePrestation().reglesCutOff" placeholder="Ex: Tolérance 30 min sur validation cuisine..." style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.6rem 0.75rem; font-size: 0.85rem;">
+          </div>
+          <div>
+            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.3rem;">Jours disponibles</label>
+            <input type="text" [(ngModel)]="nouveauTypePrestation().joursDisponiblesText" placeholder="Lundi, Mardi, Mercredi, Jeudi, Vendredi" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.6rem 0.75rem; font-size: 0.85rem;">
           </div>
         </div>
         <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem;">

@@ -1,10 +1,12 @@
-﻿import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { B2bPeriodFilterComponent, PeriodeFilterChange, PeriodeFilterType } from '../../../b2b/shared/b2b-period-filter.component';
 import { CountUpDirective } from '../../../b2b/shared/count-up.directive';
 import { B2bStateService } from '../../../b2b/shared/b2b-state.service';
+import { B2bApiService } from '../../../b2b/shared/b2b-api.service';
+import { EmployeB2B } from '../../../b2b/shared/b2b.models';
 
 @Component({
   selector: 'app-rh-dashboard',
@@ -15,6 +17,7 @@ import { B2bStateService } from '../../../b2b/shared/b2b-state.service';
 })
 export class RhDashboardComponent {
   b2b = inject(B2bStateService);
+  private api = inject(B2bApiService);
   private router = inject(Router);
   constructor() {
     if (this.b2b.currentSession().role !== 'RESPONSABLE_ENTREPRISE') {
@@ -131,6 +134,87 @@ export class RhDashboardComponent {
   employesPrisEnChargeCount = computed(() => {
     return this.b2b.listeEmployes().filter(e => e.tauxSubvention > 0).length;
   });
+
+  // Comparaison Effectif / Commandés / Non-commandés sur la période
+  employesActifsEntreprise = computed(() => {
+    return this.b2b.listeEmployes().filter(e => e.actif);
+  });
+
+  employesAyantCommande = computed(() => {
+    const cmds = this.commandesSiteFiltrees();
+    const matricules = new Set(cmds.map(c => (c.matricule || '').toLowerCase()));
+    const noms = new Set(cmds.map(c => (c.employeNom || '').toLowerCase()));
+    return this.employesActifsEntreprise().filter(emp => {
+      const full = `${emp.prenom} ${emp.nom}`.toLowerCase();
+      return matricules.has((emp.matricule || '').toLowerCase()) || noms.has(full);
+    });
+  });
+
+  employesNonCommandes = computed(() => {
+    const ids = new Set(this.employesAyantCommande().map(e => e.id));
+    return this.employesActifsEntreprise().filter(e => !ids.has(e.id));
+  });
+
+  tauxParticipationCommande = computed(() => {
+    const total = this.employesActifsEntreprise().length;
+    if (total === 0) return 0;
+    return Math.round((this.employesAyantCommande().length / total) * 100);
+  });
+
+  showModalRelance = signal<boolean>(false);
+  messageRelance = signal<string>("Bonjour, n'oubliez pas de passer votre commande de repas sur la plateforme Kiki Traiteur avant l'heure limite.");
+  envoiRelanceEnCours = signal<boolean>(false);
+
+  relancerIndividuel(emp: EmployeB2B) {
+    if (!emp.email) {
+      this.b2b.showToast(`Aucune adresse email renseignée pour ${emp.prenom} ${emp.nom}.`);
+      return;
+    }
+    this.envoiRelanceEnCours.set(true);
+    this.api.envoyerRelanceCommande({
+      entrepriseId: this.b2b.currentEntreprise().id,
+      entrepriseNom: this.b2b.currentEntreprise().nom,
+      expediteurNom: this.b2b.currentSession().nomComplet || 'Service RH',
+      message: this.messageRelance(),
+      destinataires: [{ email: emp.email, nomComplet: `${emp.prenom} ${emp.nom}` }]
+    }).subscribe({
+      next: () => {
+        this.envoiRelanceEnCours.set(false);
+        this.b2b.showToast(`Alerte et email envoyés à ${emp.prenom} ${emp.nom}.`);
+      },
+      error: () => {
+        this.envoiRelanceEnCours.set(false);
+        this.b2b.showToast(`Alerte enregistrée localement pour ${emp.prenom} ${emp.nom}.`);
+      }
+    });
+  }
+
+  relancerGroupe() {
+    const cibles = this.employesNonCommandes().filter(e => !!e.email);
+    if (cibles.length === 0) {
+      this.b2b.showToast('Aucun collaborateur avec email valide à relancer.');
+      return;
+    }
+    this.envoiRelanceEnCours.set(true);
+    this.api.envoyerRelanceCommande({
+      entrepriseId: this.b2b.currentEntreprise().id,
+      entrepriseNom: this.b2b.currentEntreprise().nom,
+      expediteurNom: this.b2b.currentSession().nomComplet || 'Service RH',
+      message: this.messageRelance(),
+      destinataires: cibles.map(e => ({ email: e.email, nomComplet: `${e.prenom} ${e.nom}` }))
+    }).subscribe({
+      next: () => {
+        this.envoiRelanceEnCours.set(false);
+        this.showModalRelance.set(false);
+        this.b2b.showToast(`Relance groupée envoyée à ${cibles.length} collaborateur(s) (plateforme + email).`);
+      },
+      error: () => {
+        this.envoiRelanceEnCours.set(false);
+        this.showModalRelance.set(false);
+        this.b2b.showToast(`Relance groupée traitée pour ${cibles.length} collaborateur(s).`);
+      }
+    });
+  }
 
   // Consommation journalière calculée pour la journée
   consommationJournaliereRepas = computed(() => {

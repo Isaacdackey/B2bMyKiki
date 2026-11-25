@@ -1,4 +1,4 @@
-﻿import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -40,8 +40,7 @@ export class SaCatalogueComponent {
     description: '',
     categorie: 'PLAT',
     prixUnitaire: 2800,
-    image: '/assets/images/plats/p1.jpg',
-    calories: 550
+    image: '/assets/images/plats/p1.jpg'
   });
   isEditModePlat = signal<boolean>(false);
   platIdEnEdition = signal<string>('');
@@ -96,8 +95,7 @@ export class SaCatalogueComponent {
       description: '',
       categorie: 'PLAT',
       prixUnitaire: 2800,
-      image: '/assets/images/plats/p1.jpg',
-      calories: 550
+      image: '/assets/images/plats/p1.jpg'
     });
     this.showModalPlat.set(true);
   }
@@ -125,8 +123,7 @@ export class SaCatalogueComponent {
         categorie: p.categorie || 'PLAT',
         prixUnitaire: p.prixUnitaire || 2500,
         image: p.image || '/assets/images/plats/p1.jpg',
-        allergene: p.allergene || 'Aucun allergène majeur',
-        calories: p.calories || 500
+        allergene: p.allergene || 'Aucun allergène majeur'
       });
     }
     this.showModalPlat.set(false);

@@ -36,6 +36,27 @@
     </div>
   </header>
 
+  <!-- ALERTES DE RELANCE RH -->
+  @for (alerte of alertesCommande(); track alerte.id) {
+    <div style="background: linear-gradient(90deg, #721513 0%, #991B1B 100%); color: #FFFFFF; border-radius: 16px; padding: 0.9rem 1.25rem; margin-top: 0.85rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; box-shadow: 0 8px 20px rgba(114, 21, 19, 0.22);">
+      <div style="display: flex; align-items: center; gap: 0.75rem; min-width: 0;">
+        <span style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.18); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <i class="fa-solid fa-bell"></i>
+        </span>
+        <div>
+          <div style="font-size: 0.74rem; font-weight: 800; text-transform: uppercase; opacity: 0.9;">
+            Alerte de {{ alerte.expediteurNom || 'Votre service RH' }}
+          </div>
+          <div style="font-size: 0.88rem; font-weight: 700;">{{ alerte.message }}</div>
+        </div>
+      </div>
+      <button type="button" (click)="marquerAlerteLue(alerte.id)"
+        style="background: #FFFFFF; color: #721513; border: none; border-radius: 9999px; padding: 0.45rem 0.95rem; font-size: 0.78rem; font-weight: 800; cursor: pointer; white-space: nowrap;">
+        <i class="fa-solid fa-check"></i> Compris
+      </button>
+    </div>
+  }
+
   <!-- 2. BARRE DE RECHERCHE HORS DU CARD DE FILTRE -->
   <div style="display: flex; justify-content: flex-end; width: 100%; margin-top: 0.85rem;">
     <div style="display: flex; align-items: center; gap: 0.5rem; background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 9999px; padding: 0.45rem 0.95rem; width: 100%; max-width: 340px; min-height: 44px; box-sizing: border-box; box-shadow: 0 2px 10px rgba(114, 21, 19, 0.04);">
@@ -63,15 +84,25 @@
         @for (jour of joursSemaine; track jour) {
           <button
             type="button"
+            [disabled]="isJourPasse(jour)"
             (click)="changerJourCommande(jour)"
-            [style.background]="jourSelectionne() === jour ? '#721513' : '#FAF8F4'"
-            [style.color]="jourSelectionne() === jour ? '#FFFFFF' : '#332724'"
-            [style.border-color]="jourSelectionne() === jour ? '#721513' : '#EDE7DC'"
-            style="flex: 1 0 100px; min-width: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; padding: 0.55rem 0.4rem; border-radius: 12px; border: 1.5px solid; cursor: pointer; text-align: center; transition: all 0.18s ease;">
+            [style.background]="jourSelectionne() === jour ? '#721513' : isJourPasse(jour) ? '#F1EDE6' : '#FAF8F4'"
+            [style.color]="jourSelectionne() === jour ? '#FFFFFF' : isJourPasse(jour) ? '#9E9088' : '#332724'"
+            [style.border-color]="jourSelectionne() === jour ? '#721513' : aDejaCommandeJour(jour) ? '#606C38' : '#EDE7DC'"
+            [style.opacity]="isJourPasse(jour) ? '0.55' : '1'"
+            [style.cursor]="isJourPasse(jour) ? 'not-allowed' : 'pointer'"
+            style="flex: 1 0 100px; min-width: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; padding: 0.55rem 0.4rem; border-radius: 12px; border: 1.5px solid; text-align: center; transition: all 0.18s ease;">
             <span style="font-size: 0.8rem; font-weight: 800; line-height: 1.15;">{{ jour }}</span>
             <span [style.color]="jourSelectionne() === jour ? '#FAF5EA' : '#6E5A56'" style="font-size: 0.68rem; font-weight: 600; white-space: nowrap;">
               {{ datesSemaineMap[jour] }}
             </span>
+            @if (isJourPasse(jour)) {
+              <span style="font-size: 0.62rem; font-weight: 700; color: #8C7E74;">Passé</span>
+            } @else if (aDejaCommandeJour(jour)) {
+              <span [style.color]="jourSelectionne() === jour ? '#D9F99D' : '#606C38'" style="font-size: 0.64rem; font-weight: 800;">
+                <i class="fa-solid fa-circle-check"></i> Commandé
+              </span>
+            }
           </button>
         }
       </div>
@@ -102,14 +133,45 @@
   <section class="mykiki-main-section">
     <div class="mykiki-dual-layout">
       <div class="mykiki-dishes-col">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.65rem; margin-bottom: 0.75rem;">
           <h2 style="margin: 0; font-size: 1.15rem; font-weight: 900; color: #721513;">
             Menu du {{ jourSelectionne() }}
           </h2>
-          <span style="font-size: 0.76rem; font-weight: 800; color: #721513; background: #FAF5EA; border: 1px solid #EDE7DC; padding: 0.25rem 0.7rem; border-radius: 9999px;">
-            {{ platsFiltres().length }} plat(s)
-          </span>
+          <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            @if (commandeDuJourActif(); as cmdJour) {
+              @if (cmdJour.plats.length > 0) {
+                <button type="button" (click)="ouvrirQrCodeJour()"
+                  style="min-height: 36px; background: #606C38; color: #FFFFFF; border: none; border-radius: 9999px; padding: 0.35rem 0.9rem; font-size: 0.76rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;">
+                  <i class="fa-solid fa-qrcode"></i> QR Code {{ jourSelectionne() }} ({{ cmdJour.plats.length }})
+                </button>
+              }
+            }
+            <span style="font-size: 0.76rem; font-weight: 800; color: #721513; background: #FAF5EA; border: 1px solid #EDE7DC; padding: 0.25rem 0.7rem; border-radius: 9999px;">
+              {{ platsFiltres().length }} plat(s)
+            </span>
+          </div>
         </div>
+
+        @if (commandeDuJourActif(); as cmdJour) {
+          @if (cmdJour.plats.length > 0) {
+            <div style="background: #F5F7EF; border: 1.5px solid #DCE4C8; border-radius: 14px; padding: 0.85rem 1rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+              <div>
+                <div style="font-size: 0.72rem; font-weight: 800; color: #606C38; text-transform: uppercase;">
+                  <i class="fa-solid fa-circle-check"></i> Commande du {{ jourSelectionne() }} enregistrée ({{ cmdJour.dateIso }})
+                </div>
+                <div style="font-size: 0.84rem; font-weight: 700; color: #2C1810; margin-top: 0.2rem;">
+                  @for (p of cmdJour.plats; track p.id; let last = $last) {
+                    <span>{{ p.nom }}{{ last ? '' : ' • ' }}</span>
+                  }
+                </div>
+              </div>
+              <button type="button" (click)="ouvrirQrCodeJour()"
+                style="min-height: 36px; background: #721513; color: #FFFFFF; border: none; border-radius: 9999px; padding: 0.4rem 0.95rem; font-size: 0.76rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; white-space: nowrap;">
+                <i class="fa-solid fa-qrcode"></i> Voir le QR Code du jour
+              </button>
+            </div>
+          }
+        }
 
         @if (platsFiltres().length === 0) {
         <div class="empty-phare-state">

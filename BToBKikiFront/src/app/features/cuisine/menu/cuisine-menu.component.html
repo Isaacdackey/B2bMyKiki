@@ -156,48 +156,70 @@
       </div>
   </main>
   @if (showModalAjoutPlat()) {
-    <div style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem;">
-      <div style="background: #FFFFFF; border-radius: 18px; max-width: 500px; width: 100%; padding: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
-        <h3 style="margin: 0 0 1rem; color: #721513; font-size: 1.25rem; font-weight: 900;">
-          Ajouter un plat au programme • {{ jourSelectionne() }}
-        </h3>
-
-        <div style="margin-bottom: 1rem;">
-          <label style="font-size: 0.8rem; font-weight: 800; color: #332724; display: block; margin-bottom: 0.35rem;">Sélectionnez le plat :</label>
-          <select 
-            [ngModel]="platSelectionnePourAjout()"
-            (ngModelChange)="platSelectionnePourAjout.set($event)"
-            style="width: 100%; padding: 0.65rem; border: 1.5px solid #CBD5E1; border-radius: 8px; font-size: 0.88rem; font-weight: 700;">
-            <option value="" disabled>-- Choisir un plat du Catalogue Global --</option>
-            @for (plat of catalogueGlobal(); track plat.id) {
-              <option [value]="plat.id">[{{ plat.categorie }}] {{ plat.nom }}</option>
-            }
-          </select>
-        </div>
-
-        <div style="margin-bottom: 1.25rem;">
-          <label style="font-size: 0.8rem; font-weight: 800; color: #332724; display: block; margin-bottom: 0.35rem;">Quantité initiale prévue :</label>
-          <input 
-            type="number"
-            min="1"
-            [ngModel]="quantiteInitialeAjout()"
-            (ngModelChange)="quantiteInitialeAjout.set($event)"
-            style="width: 100%; padding: 0.65rem; border: 1.5px solid #CBD5E1; border-radius: 8px; font-size: 0.88rem; font-weight: 800;">
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; align-items: stretch; gap: 0.75rem;">
-          <button 
-            type="button" 
-            (click)="fermerModalAjoutPlat()"
-            style="height: 42px; min-height: 42px; max-height: 42px; padding: 0 1.2rem; border: 1.5px solid #EDE7DC; background: #FAF8F4; border-radius: 9999px; font-weight: 800; font-size: 0.82rem; color: #6E5A56; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; box-sizing: border-box;">
-            Annuler
+    <div style="position: fixed; inset: 0; background: rgba(51, 39, 36, 0.65); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem;"
+      (click)="fermerModalAjoutPlat()">
+      <div style="background: #FFFFFF; border-radius: 22px; max-width: 680px; width: 100%; max-height: 88dvh; display: flex; flex-direction: column; overflow: hidden; padding: 1.5rem; box-shadow: 0 20px 50px rgba(0,0,0,0.22); border: 1.5px solid #EDE7DC;"
+        (click)="$event.stopPropagation()">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; flex-shrink: 0;">
+          <div>
+            <div style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase; letter-spacing: 0.05em;">
+              MENU DU SITE • {{ jourSelectionne() | uppercase }}
+            </div>
+            <h3 style="margin: 0.2rem 0 0; color: #721513; font-size: 1.35rem; font-weight: 900;">
+              Ajouter un met au programme
+            </h3>
+          </div>
+          <button type="button" (click)="fermerModalAjoutPlat()" style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 8px; width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; color: #6E5A56; cursor: pointer;">
+            <i class="fa-solid fa-xmark"></i>
           </button>
-          <button 
-            type="button" 
-            [disabled]="!platSelectionnePourAjout()"
-            (click)="confirmerAjoutPlat()"
-            style="height: 42px; min-height: 42px; max-height: 42px; padding: 0 1.4rem; border: 1.5px solid #721513; background: #721513; color: #FFFFFF; border-radius: 9999px; font-weight: 800; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; white-space: nowrap; box-sizing: border-box;">
-            <i class="fa-solid fa-check"></i> Ajouter au menu
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; flex-shrink: 0;">
+          <div style="display: flex; gap: 0.45rem; flex-wrap: wrap;">
+            @for (cat of categoriesAjoutDisponibles(); track cat.code) {
+              <button type="button" (click)="categorieAjoutModal.set(cat.code)"
+                [style.background]="categorieAjoutModal() === cat.code ? '#721513' : '#FAF8F4'"
+                [style.color]="categorieAjoutModal() === cat.code ? '#FFFFFF' : '#332724'"
+                [style.border-color]="categorieAjoutModal() === cat.code ? '#721513' : '#EDE7DC'"
+                style="border: 1.5px solid; border-radius: 9999px; padding: 0.45rem 0.95rem; font-size: 0.8rem; font-weight: 800; cursor: pointer;">
+                {{ cat.libelle }}
+              </button>
+            }
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.45rem; background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 9999px; padding: 0.25rem 0.75rem;">
+            <span style="font-size: 0.74rem; font-weight: 800; color: #6E5A56;">Portions :</span>
+            <input type="number" min="1" [ngModel]="quantiteInitialeAjout()" (ngModelChange)="quantiteInitialeAjout.set($event)"
+              style="width: 64px; height: 32px; border: 1px solid #E2D5BE; border-radius: 8px; text-align: center; font-weight: 900; color: #721513; font-size: 0.85rem; background: #FFFFFF;">
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.65rem; overflow-y: auto; flex: 1; min-height: 0; padding-right: 0.2rem;">
+          @for (plat of platsModalFiltres(); track plat.id) {
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.85rem; background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 0.7rem 0.9rem;">
+              <div style="display: flex; align-items: center; gap: 0.8rem; min-width: 0;">
+                <img [src]="plat.image" [alt]="plat.nom" style="width: 50px; height: 50px; border-radius: 10px; object-fit: cover; border: 1px solid #EDE7DC; flex-shrink: 0;">
+                <div style="min-width: 0;">
+                  <div style="font-size: 0.9rem; font-weight: 800; color: #332724; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ plat.nom }}</div>
+                  <div style="font-size: 0.75rem; color: #6E5A56; font-weight: 600;">{{ plat.prixUnitaire | number }} FCFA • {{ plat.calories || 500 }} kcal</div>
+                </div>
+              </div>
+              <button type="button" (click)="ajouterPlatDirect(plat)"
+                style="flex-shrink: 0; background: #721513; color: #FFFFFF; border: none; border-radius: 9999px; padding: 0.5rem 1rem; font-size: 0.78rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
+                <i class="fa-solid fa-plus"></i> Sélectionner
+              </button>
+            </div>
+          } @empty {
+            <div style="padding: 2rem 1rem; text-align: center; color: #6E5A56; font-size: 0.85rem;">
+              Aucun plat actif disponible dans cette catégorie.
+            </div>
+          }
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid #F0EAE1; flex-shrink: 0;">
+          <button type="button" (click)="fermerModalAjoutPlat()"
+            style="height: 40px; min-height: 40px; padding: 0 1.25rem; border: 1.5px solid #EDE7DC; background: #FFFFFF; border-radius: 9999px; font-weight: 800; font-size: 0.82rem; color: #6E5A56; cursor: pointer;">
+            Fermer
           </button>
         </div>
       </div>

@@ -94,14 +94,14 @@
           @if (modeVuePlanning() === 'semaine') {
             <!-- Ligne 3 : Choix de la semaine placé juste sous le filtre Semaine / Calendrier -->
             <div style="margin-bottom: 1rem;">
-              <div style="display: inline-flex; align-items: center; gap: 0.45rem; background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 9999px; padding: 0.22rem 0.5rem;">
-                <button type="button" (click)="changerSemaineSa(-1)" style="min-height: 0; width: 26px; height: 26px; border: none; border-radius: 50%; background: #FFFFFF; color: #721513; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06);" title="Semaine précédente">
+              <div class="sa-week-selector-pill" style="align-items: center; gap: 0.45rem; background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 9999px; padding: 0.22rem 0.5rem;">
+                <button type="button" (click)="changerSemaineSa(-1)" style="min-height: 0; width: 26px; height: 26px; border: none; border-radius: 50%; background: #FFFFFF; color: #721513; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06); flex-shrink: 0;" title="Semaine précédente">
                   <i class="fa-solid fa-chevron-left" style="font-size: 0.7rem;"></i>
                 </button>
-                <span style="font-size: 0.76rem; font-weight: 800; color: #332724; padding: 0 0.35rem; white-space: nowrap;">
+                <span style="font-size: 0.76rem; font-weight: 800; color: #332724; padding: 0 0.35rem; white-space: nowrap; text-align: center;">
                   {{ semaineLabelSa() }}
                 </span>
-                <button type="button" (click)="changerSemaineSa(1)" style="min-height: 0; width: 26px; height: 26px; border: none; border-radius: 50%; background: #FFFFFF; color: #721513; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06);" title="Semaine suivante">
+                <button type="button" (click)="changerSemaineSa(1)" style="min-height: 0; width: 26px; height: 26px; border: none; border-radius: 50%; background: #FFFFFF; color: #721513; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06); flex-shrink: 0;" title="Semaine suivante">
                   <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
                 </button>
               </div>
