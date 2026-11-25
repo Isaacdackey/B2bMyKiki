@@ -1,4 +1,4 @@
-﻿import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -351,4 +351,8 @@ export class SaPlanningComponent {
   // ==============================================================
   // ÉTAPE 2 : GESTION DE L'ENTREPRISE (5 ONGLETS)
   // ==============================================================
+
+  getPlatImage(platId: string, fallback?: string): string {
+    return this.b2b.catalogueJour().find(p => p.id === platId)?.image || fallback || '/assets/images/plats/p1.jpg';
+  }
 }

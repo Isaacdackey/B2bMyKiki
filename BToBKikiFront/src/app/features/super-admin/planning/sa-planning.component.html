@@ -157,7 +157,7 @@
                 @for (ligne of menuModeleGlobalJourActif()!.lignes; track ligne.id) {
                   <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 0.85rem; display: flex; gap: 0.85rem; align-items: center; position: relative; box-shadow: 0 2px 8px rgba(114, 21, 19, 0.03);">
                     <div style="width: 64px; height: 64px; border-radius: 12px; overflow: hidden; border: 1.5px solid #EDE7DC; flex-shrink: 0; background: #FFFFFF;">
-                      <img [src]="ligne.image || '/assets/images/plats/p1.jpg'" [alt]="ligne.nomPlat" style="width: 100%; height: 100%; object-fit: cover;">
+                      <img [src]="getPlatImage(ligne.platId, ligne.image)" [alt]="ligne.nomPlat" style="width: 100%; height: 100%; object-fit: cover;">
                     </div>
                     <div style="flex: 1; min-width: 0;">
                       <div style="display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.2rem;">
@@ -255,7 +255,7 @@
                   <div style="display: flex; flex-direction: column; gap: 0.6rem; max-height: 350px; overflow-y: auto; padding-right: 0.2rem;">
                     @for (ligne of menuModeleGlobalJourActif()!.lignes; track ligne.id) {
                       <div style="background: #FFFFFF; border: 1px solid #EDE7DC; border-radius: 12px; padding: 0.6rem 0.75rem; display: flex; gap: 0.75rem; align-items: center;">
-                        <img [src]="ligne.image || '/assets/images/plats/p1.jpg'" [alt]="ligne.nomPlat" style="width: 46px; height: 46px; border-radius: 8px; object-fit: cover; flex-shrink: 0;">
+                        <img [src]="getPlatImage(ligne.platId, ligne.image)" [alt]="ligne.nomPlat" style="width: 46px; height: 46px; border-radius: 8px; object-fit: cover; flex-shrink: 0;">
                         <div style="flex: 1; min-width: 0;">
                           <span [style.background]="ligne.categorie === 'PLAT' ? '#721513' : ligne.categorie === 'ENTREE' ? '#606C38' : ligne.categorie === 'DESSERT' ? '#C05621' : '#332724'"
                                 style="color: #FFFFFF; font-size: 0.6rem; font-weight: 800; padding: 0.1rem 0.4rem; border-radius: 4px; text-transform: uppercase;">
