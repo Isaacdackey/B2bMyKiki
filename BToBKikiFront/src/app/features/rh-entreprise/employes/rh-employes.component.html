@@ -160,8 +160,8 @@
         }
 
         <!-- BARRE DE PAGINATION MODERNE STYLE KIKI TRAITEUR -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; flex-wrap: wrap; gap: 1rem; padding: 0 0.5rem;">
-          <div style="font-size: 0.8rem; color: #6E5A56;">
+        <div class="rh-pagination-bar" style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; flex-wrap: wrap; gap: 1rem; padding: 0 0.5rem;">
+          <div class="rh-pagination-info" style="font-size: 0.8rem; color: #6E5A56;">
             Affichage de <strong>{{ totalEmployes() === 0 ? 0 : (pageEmployes() - 1) * pageSizeEmployes() + 1 }}</strong> à 
             <strong>{{ mathMin(pageEmployes() * pageSizeEmployes(), totalEmployes()) }}</strong> sur 
             <strong>{{ totalEmployes() }}</strong> collaborateurs

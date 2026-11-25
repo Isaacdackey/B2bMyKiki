@@ -107,8 +107,8 @@
                     <h3 style="margin: 0; font-size: 1.15rem; color: #721513; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
                       <i class="fa-solid fa-building"></i> Convention & Données Juridiques
                     </h3>
-                    <span style="font-size: 0.75rem; font-weight: 800; color: #606C38; background: rgba(96, 108, 56, 0.1); padding: 0.25rem 0.6rem; border-radius: 9999px;">
-                      <i class="fa-solid fa-circle-check"></i> Convention Active
+                    <span style="font-size: 0.75rem; font-weight: 800; color: #606C38; background: rgba(96, 108, 56, 0.1); padding: 0.25rem 0.65rem; border-radius: 9999px; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.35rem;">
+                      <i class="fa-solid fa-circle-check"></i> Active
                     </span>
                   </div>
 
@@ -220,7 +220,7 @@
                       </p>
                     </div>
 
-                    <button (click)="modalInvitationAdmin.set(true)" class="sa-btn-primary" style="font-size: 0.82rem; padding: 0.5rem 0.95rem;">
+                    <button (click)="modalInvitationAdmin.set(true)" class="sa-btn-primary" style="font-size: 0.82rem; padding: 0.5rem 0.95rem; margin-left: auto;">
                       <i class="fa-solid fa-paper-plane"></i> Inviter un Administrateur
                     </button>
                   </div>
@@ -278,11 +278,11 @@
                       </p>
                     </div>
 
-                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                      <button (click)="importerFichierEmployes()" class="sa-btn-action" style="font-size: 0.82rem; padding: 0.5rem 0.95rem; font-weight: 700; color: #606C38; border-color: #606C38;">
-                        <i class="fa-solid fa-file-import"></i> Importer un Fichier (CSV/Excel)
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: nowrap; margin-left: auto; justify-content: flex-end; max-width: 100%;">
+                      <button (click)="importerFichierEmployes()" class="sa-btn-action" style="font-size: 0.76rem; padding: 0.45rem 0.75rem; font-weight: 700; color: #606C38; border-color: #606C38; white-space: nowrap;">
+                        <i class="fa-solid fa-file-import"></i> Importer (CSV/Excel)
                       </button>
-                      <button (click)="modalNouvelEmploye.set(true)" class="sa-btn-primary" style="font-size: 0.82rem; padding: 0.5rem 0.95rem;">
+                      <button (click)="modalNouvelEmploye.set(true)" class="sa-btn-primary" style="font-size: 0.76rem; padding: 0.45rem 0.85rem; white-space: nowrap;">
                         <i class="fa-solid fa-user-plus"></i> Ajouter un Employé
                       </button>
                     </div>
@@ -375,7 +375,7 @@
                     </p>
                   </div>
 
-                  <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                  <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; margin-left: auto;">
                     <button (click)="modalDupliquerMenu.set(true)" class="sa-btn-action" style="font-weight: 800; color: #721513; border-color: #C5A880; background: #FAF5EA;">
                       <i class="fa-regular fa-copy"></i> Dupliquer ce jour...
                     </button>
@@ -551,36 +551,43 @@
                     </p>
                   </div>
 
-                  <!-- Sélecteur rapide de dates & filtres -->
-                  <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-                    <div style="display: flex; align-items: center; gap: 0.35rem; background: #FAF8F4; padding: 0.35rem 0.65rem; border-radius: 8px; border: 1px solid #EDE7DC;">
-                      <span style="font-size: 0.75rem; font-weight: 800; color: #6E5A56;">Du :</span>
-                      <input type="date" [(ngModel)]="dateDebutCommandes" style="height: 30px; font-size: 0.78rem; border: 1px solid #EDE7DC; border-radius: 4px; padding: 0 0.4rem;" />
-                      <span style="font-size: 0.75rem; font-weight: 800; color: #6E5A56;">Au :</span>
-                      <input type="date" [(ngModel)]="dateFinCommandes" style="height: 30px; font-size: 0.78rem; border: 1px solid #EDE7DC; border-radius: 4px; padding: 0 0.4rem;" />
+                  <!-- Sélecteur de période partagé & filtres alignés -->
+                  <div style="display: flex; flex-direction: column; gap: 0.65rem; width: 100%;">
+                    <app-b2b-period-filter
+                      defaultPeriode="MOIS"
+                      (periodChange)="onPeriodeCommandesEntChange($event)">
+                    </app-b2b-period-filter>
+
+                    <div class="sa-cat-selects" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; width: 100%;">
+                      <!-- Filtre Statut -->
+                      <select [(ngModel)]="filtreStatutCommande" style="width: 100%; height: 44px; min-height: 44px; padding: 0 0.75rem; font-size: 0.85rem; font-weight: 700; border-radius: 10px; border: 1.5px solid #EDE7DC; background: #FFFFFF; color: #332724;">
+                        <option value="TOUS">Tous les statuts</option>
+                        <option value="EN_COURS">En cours (Non récupéré)</option>
+                        <option value="SCANNE">Scanné (Présent à la cantine)</option>
+                        <option value="LIVRE">Livré (Plateau remis)</option>
+                      </select>
+
+                      <!-- Filtre Plat -->
+                      <select [(ngModel)]="filtrePlatCommande" style="width: 100%; height: 44px; min-height: 44px; padding: 0 0.75rem; font-size: 0.85rem; font-weight: 700; border-radius: 10px; border: 1.5px solid #EDE7DC; background: #FFFFFF; color: #332724;">
+                        <option value="TOUS">Tous les plats</option>
+                        @for (p of platsUniquesCommandes(); track p) {
+                          <option [value]="p">{{ p }}</option>
+                        }
+                      </select>
                     </div>
-
-                    <!-- Filtre Statut -->
-                    <select [(ngModel)]="filtreStatutCommande" style="height: 38px; padding: 0 0.6rem; font-size: 0.8rem; font-weight: 700; border-radius: 8px; border: 1.5px solid #EDE7DC; background: #FFFFFF; color: #332724;">
-                      <option value="TOUS">Tous les statuts</option>
-                      <option value="EN_COURS">En cours (Non récupéré)</option>
-                      <option value="SCANNE">Scanné (Présent à la cantine)</option>
-                      <option value="LIVRE">Livré (Plateau remis)</option>
-                    </select>
-
-                    <!-- Filtre Plat -->
-                    <select [(ngModel)]="filtrePlatCommande" style="height: 38px; padding: 0 0.6rem; font-size: 0.8rem; font-weight: 700; border-radius: 8px; border: 1.5px solid #EDE7DC; background: #FFFFFF; color: #332724;">
-                      <option value="TOUS">Tous les plats</option>
-                      @for (p of platsUniquesCommandes(); track p) {
-                        <option [value]="p">{{ p }}</option>
-                      }
-                    </select>
                   </div>
                 </div>
 
                 <!-- Tableau des commandes -->
+                @if (commandesFiltreesEntreprise().length === 0) {
+                  <div style="padding: 3rem 1.25rem; text-align: center; background: #FAF8F4; border: 1.5px dashed #E2D5BE; border-radius: 14px; color: #6E5A56;">
+                    <i class="fa-solid fa-receipt" style="font-size: 2rem; color: #C5A880; display: block; margin-bottom: 0.65rem;"></i>
+                    <p style="margin: 0; font-weight: 800; color: #721513;">Aucune commande trouvée sur cette période</p>
+                    <p style="margin: 0.25rem 0 0; font-size: 0.82rem;">Modifiez la période ou réinitialisez les filtres de statut et de plat.</p>
+                  </div>
+                } @else {
                 <div style="overflow-x: auto;">
-                  <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
+                  <table class="sa-responsive-table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
                     <thead>
                       <tr style="background: #FAF8F4; border-bottom: 2px solid #EDE7DC; color: #6E5A56; font-size: 0.75rem; text-transform: uppercase;">
                         <th style="padding: 0.75rem 1rem;">Réf. Commande</th>
@@ -595,24 +602,24 @@
                     <tbody>
                       @for (cmd of commandesFiltreesEntreprise(); track cmd.id) {
                         <tr style="border-bottom: 1px solid #F0EAE1;">
-                          <td style="padding: 0.75rem 1rem; font-weight: 800; color: #721513;">
+                          <td data-label="Réf. Commande" style="padding: 0.75rem 1rem; font-weight: 800; color: #721513;">
                             {{ cmd.codeCommande }}
                           </td>
-                          <td style="padding: 0.75rem 1rem; color: #6E5A56; font-size: 0.8rem;">
+                          <td data-label="Date & Heure" style="padding: 0.75rem 1rem; color: #6E5A56; font-size: 0.8rem;">
                             {{ cmd.date }} • {{ cmd.heure }}
                           </td>
-                          <td style="padding: 0.75rem 1rem;">
+                          <td data-label="Salarié" style="padding: 0.75rem 1rem;">
                             <div style="font-weight: 800; color: #332724;">{{ cmd.employeNom }}</div>
                             <div style="font-size: 0.75rem; color: #6E5A56;">{{ cmd.matricule }}</div>
                           </td>
-                          <td style="padding: 0.75rem 1rem; font-weight: 700; color: #332724;">
+                          <td data-label="Plat" style="padding: 0.75rem 1rem; font-weight: 700; color: #332724;">
                             {{ cmd.platNom }}
                           </td>
-                          <td style="padding: 0.75rem 1rem; text-align: right;">
+                          <td data-label="Montant" style="padding: 0.75rem 1rem; text-align: right;">
                             <div style="font-weight: 800; color: #721513;">{{ cmd.montantTotal | number }} FCFA</div>
                             <div style="font-size: 0.72rem; color: #606C38;">Kiki : {{ cmd.partEntreprise | number }} | Emp : {{ cmd.partEmploye | number }}</div>
                           </td>
-                          <td style="padding: 0.75rem 1rem; text-align: center;">
+                          <td data-label="Statut" style="padding: 0.75rem 1rem; text-align: center;">
                             @if (cmd.statut === 'EN_COURS') {
                               <span style="background: rgba(110, 90, 86, 0.1); color: #6E5A56; font-size: 0.72rem; font-weight: 800; padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;">
                                 <i class="fa-regular fa-clock"></i> En cours
@@ -653,6 +660,7 @@
                     </tbody>
                   </table>
                 </div>
+                }
 
               </div>
             }
@@ -663,7 +671,7 @@
             @if (gererActiveTab() === 'FACTURATION') {
               <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.5rem; box-shadow: 0 4px 18px rgba(114, 21, 19, 0.04);">
                 
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
                   <div>
                     <h3 style="margin: 0; font-size: 1.25rem; color: #721513; font-weight: 800;">
                       <i class="fa-solid fa-file-invoice-dollar"></i> Détail Journalier de Facturation
@@ -673,13 +681,11 @@
                     </p>
                   </div>
 
-                  <!-- Filtre Date début / Date fin -->
-                  <div style="display: flex; align-items: center; gap: 0.5rem; background: #FAF8F4; padding: 0.4rem 0.75rem; border-radius: 10px; border: 1px solid #EDE7DC;">
-                    <span style="font-size: 0.75rem; font-weight: 800; color: #6E5A56;">Date début :</span>
-                    <input type="date" [(ngModel)]="dateDebutFacturation" style="height: 32px; font-size: 0.8rem; border: 1px solid #EDE7DC; border-radius: 6px; padding: 0 0.5rem;" />
-                    <span style="font-size: 0.75rem; font-weight: 800; color: #6E5A56;">Date fin :</span>
-                    <input type="date" [(ngModel)]="dateFinFacturation" style="height: 32px; font-size: 0.8rem; border: 1px solid #EDE7DC; border-radius: 6px; padding: 0 0.5rem;" />
-                  </div>
+                  <!-- Filtre de période partagé -->
+                  <app-b2b-period-filter
+                    defaultPeriode="MOIS"
+                    (periodChange)="onPeriodeFacturationEntChange($event)">
+                  </app-b2b-period-filter>
                 </div>
 
                 <!-- KPIs Récapitulatifs de la Période -->
@@ -711,8 +717,15 @@
                 </div>
 
                 <!-- Tableau Journalier par Date -->
+                @if (lignesFacturationFiltrees().length === 0) {
+                  <div style="padding: 3rem 1.25rem; text-align: center; background: #FAF8F4; border: 1.5px dashed #E2D5BE; border-radius: 14px; color: #6E5A56;">
+                    <i class="fa-solid fa-file-invoice-dollar" style="font-size: 2rem; color: #C5A880; display: block; margin-bottom: 0.65rem;"></i>
+                    <p style="margin: 0; font-weight: 800; color: #721513;">Aucune donnée de facturation sur cette période</p>
+                    <p style="margin: 0.25rem 0 0; font-size: 0.82rem;">Sélectionnez une autre période pour consulter le détail journalier.</p>
+                  </div>
+                } @else {
                 <div style="overflow-x: auto;">
-                  <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
+                  <table class="sa-responsive-table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
                     <thead>
                       <tr style="background: #FAF8F4; border-bottom: 2px solid #EDE7DC; color: #6E5A56; font-size: 0.75rem; text-transform: uppercase;">
                         <th style="padding: 0.85rem 1rem;">Date de Prestation</th>
@@ -727,29 +740,29 @@
                     <tbody>
                       @for (ligne of lignesFacturationFiltrees(); track ligne.date) {
                         <tr (click)="facturationJourSelectionne.set(ligne)" style="border-bottom: 1px solid #F0EAE1; cursor: pointer;" title="Cliquer pour voir le détail nominatif">
-                          <td style="padding: 0.85rem 1rem; font-weight: 800; color: #332724;">
+                          <td data-label="Date" style="padding: 0.85rem 1rem; font-weight: 800; color: #332724;">
                             <div>
                               <i class="fa-regular fa-calendar" style="color: #721513; margin-right: 0.35rem;"></i>
                               {{ ligne.dateAffichee }}
                             </div>
                             <div style="font-size: 0.7rem; color: #721513; font-weight: 700; margin-top: 0.15rem;">Voir détail →</div>
                           </td>
-                          <td style="padding: 0.85rem 1rem; text-align: center; font-weight: 800; color: #721513;">
+                          <td data-label="Plats Livrés" style="padding: 0.85rem 1rem; text-align: center; font-weight: 800; color: #721513;">
                             {{ ligne.nbPlatsLivres }} plats
                           </td>
-                          <td style="padding: 0.85rem 1rem; text-align: center; font-weight: 700; color: #332724;">
+                          <td data-label="Présents" style="padding: 0.85rem 1rem; text-align: center; font-weight: 700; color: #332724;">
                             {{ ligne.nbPresents }}
                           </td>
-                          <td style="padding: 0.85rem 1rem; text-align: right; font-weight: 800; color: #721513;">
+                          <td data-label="Part Entreprise" style="padding: 0.85rem 1rem; text-align: right; font-weight: 800; color: #721513;">
                             {{ ligne.montantPartEntreprise | number }} FCFA
                           </td>
-                          <td style="padding: 0.85rem 1rem; text-align: right; color: #6E5A56;">
+                          <td data-label="Part Employés" style="padding: 0.85rem 1rem; text-align: right; color: #6E5A56;">
                             {{ ligne.montantPartEmploye | number }} FCFA
                           </td>
-                          <td style="padding: 0.85rem 1rem; text-align: right; font-weight: 900; color: #606C38; font-size: 0.95rem;">
+                          <td data-label="Montant Total" style="padding: 0.85rem 1rem; text-align: right; font-weight: 900; color: #606C38; font-size: 0.95rem;">
                             {{ ligne.montantTotal | number }} FCFA
                           </td>
-                          <td style="padding: 0.85rem 1rem; text-align: center;">
+                          <td data-label="Statut" style="padding: 0.85rem 1rem; text-align: center;">
                             <span style="font-size: 0.72rem; font-weight: 800; padding: 0.25rem 0.6rem; border-radius: 9999px;"
                               [style.background]="ligne.statut === 'FACTURE' ? 'rgba(96, 108, 56, 0.12)' : (ligne.statut === 'VALIDE' ? 'rgba(197, 168, 128, 0.2)' : 'rgba(110, 90, 86, 0.1)')"
                               [style.color]="ligne.statut === 'FACTURE' ? '#606C38' : (ligne.statut === 'VALIDE' ? '#721513' : '#6E5A56')">
@@ -761,6 +774,7 @@
                     </tbody>
                   </table>
                 </div>
+                }
 
               </div>
             }
@@ -791,30 +805,36 @@
 
             <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.5rem; box-shadow: 0 4px 18px rgba(114, 21, 19, 0.04); display: flex; flex-direction: column; gap: 1rem;">
         <!-- Barre Stepper 3 étapes -->
-        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.65rem; margin-bottom: 0.5rem;">
+        <div class="sa-stepper-progress">
+          <span>Étape {{ etapeEntreprise() }} / 3</span>
+          <div class="sa-stepper-progress-track">
+            <div class="sa-stepper-progress-fill" [style.width.%]="(etapeEntreprise() / 3) * 100"></div>
+          </div>
+        </div>
+        <div class="sa-stepper-grid">
           <button type="button" (click)="etapeEntreprise.set(1)"
+            class="sa-step-btn" [class.is-active]="etapeEntreprise() === 1"
             [style.background]="etapeEntreprise() === 1 ? '#721513' : '#FAF8F4'"
             [style.color]="etapeEntreprise() === 1 ? '#FFFFFF' : '#6E5A56'"
-            [style.border-color]="etapeEntreprise() === 1 ? '#721513' : '#EDE7DC'"
-            style="border: 1.5px solid; border-radius: 12px; padding: 0.65rem 0.75rem; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.45rem;">
-            <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.2); display: inline-flex; align-items: center; justify-content: center; font-size: 0.72rem;">1</span>
-            <span>Identité &amp; Contact</span>
+            [style.border-color]="etapeEntreprise() === 1 ? '#721513' : '#EDE7DC'">
+            <span class="sa-step-num" [style.background]="etapeEntreprise() === 1 ? 'rgba(255,255,255,0.22)' : 'rgba(114,21,19,0.1)'">1</span>
+            <span class="sa-step-label">Identité &amp; Contact</span>
           </button>
           <button type="button" (click)="allerEtape2()"
+            class="sa-step-btn" [class.is-active]="etapeEntreprise() === 2"
             [style.background]="etapeEntreprise() === 2 ? '#721513' : '#FAF8F4'"
             [style.color]="etapeEntreprise() === 2 ? '#FFFFFF' : '#6E5A56'"
-            [style.border-color]="etapeEntreprise() === 2 ? '#721513' : '#EDE7DC'"
-            style="border: 1.5px solid; border-radius: 12px; padding: 0.65rem 0.75rem; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.45rem;">
-            <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(114,21,19,0.1); display: inline-flex; align-items: center; justify-content: center; font-size: 0.72rem;">2</span>
-            <span>Tarif &amp; Cut-Off</span>
+            [style.border-color]="etapeEntreprise() === 2 ? '#721513' : '#EDE7DC'">
+            <span class="sa-step-num" [style.background]="etapeEntreprise() === 2 ? 'rgba(255,255,255,0.22)' : 'rgba(114,21,19,0.1)'">2</span>
+            <span class="sa-step-label">Tarif &amp; Cut-Off</span>
           </button>
           <button type="button" (click)="etapeEntreprise.set(3)"
+            class="sa-step-btn" [class.is-active]="etapeEntreprise() === 3"
             [style.background]="etapeEntreprise() === 3 ? '#721513' : '#FAF8F4'"
             [style.color]="etapeEntreprise() === 3 ? '#FFFFFF' : '#6E5A56'"
-            [style.border-color]="etapeEntreprise() === 3 ? '#721513' : '#EDE7DC'"
-            style="border: 1.5px solid; border-radius: 12px; padding: 0.65rem 0.75rem; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.45rem;">
-            <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(114,21,19,0.1); display: inline-flex; align-items: center; justify-content: center; font-size: 0.72rem;">3</span>
-            <span>Prestation &amp; Menu</span>
+            [style.border-color]="etapeEntreprise() === 3 ? '#721513' : '#EDE7DC'">
+            <span class="sa-step-num" [style.background]="etapeEntreprise() === 3 ? 'rgba(255,255,255,0.22)' : 'rgba(114,21,19,0.1)'">3</span>
+            <span class="sa-step-label">Prestation &amp; Menu</span>
           </button>
         </div>
 

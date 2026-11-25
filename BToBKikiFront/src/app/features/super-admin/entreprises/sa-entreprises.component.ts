@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { SaTopbarComponent } from '../sa-topbar.component';
+import { B2bPeriodFilterComponent, PeriodeFilterChange } from '../../../b2b/shared/b2b-period-filter.component';
 import { B2bStateService } from '../../../b2b/shared/b2b-state.service';
 import { EntrepriseB2B, SiteB2B, TypePrestationB2B, CategoriePlatB2B } from '../../../b2b/shared/b2b.models';
 
 @Component({
   selector: 'app-sa-entreprises',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SaTopbarComponent],
+  imports: [CommonModule, FormsModule, RouterModule, SaTopbarComponent, B2bPeriodFilterComponent],
   templateUrl: './sa-entreprises.component.html',
   styleUrls: ['../super-admin-shared.css']
 })
@@ -821,6 +822,16 @@ export class SaEntreprisesComponent {
     } else {
       prompt('Copiez ce lien d\'activation :', lien);
     }
+  }
+
+  onPeriodeCommandesEntChange(ev: PeriodeFilterChange) {
+    this.dateDebutCommandes.set(ev.dateDebut);
+    this.dateFinCommandes.set(ev.dateFin);
+  }
+
+  onPeriodeFacturationEntChange(ev: PeriodeFilterChange) {
+    this.dateDebutFacturation.set(ev.dateDebut);
+    this.dateFinFacturation.set(ev.dateFin);
   }
 
   // Commandes filtrées de l'entreprise

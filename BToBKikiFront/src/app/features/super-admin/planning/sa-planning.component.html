@@ -15,13 +15,13 @@
           </div>
 
           <!-- Actions Globales : Déploiement & Reconduction -->
-          <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; width: 100%; max-width: 480px;">
             <button
               type="button"
               (click)="modalDupliquerJourGlobal.set(true)"
               class="sa-btn-action"
               title="Dupliquer ce jour"
-              style="font-weight: 800; border: 1.5px solid #EDE7DC; background: #FFFFFF; color: #721513; padding: 0.55rem 0.95rem;">
+              style="width: 100%; justify-content: center; font-weight: 800; border: 1.5px solid #EDE7DC; background: #FFFFFF; color: #721513; padding: 0.55rem 0.5rem; font-size: 0.8rem;">
               <i class="fa-regular fa-copy"></i> Dupliquer
             </button>
 
@@ -30,7 +30,7 @@
               (click)="reconduireSemaineSuivante()"
               class="sa-btn-action"
               title="Reconduire la semaine suivante"
-              style="font-weight: 800; border: 1.5px solid #C5A880; background: #FAF8F4; color: #721513; padding: 0.55rem 0.95rem;">
+              style="width: 100%; justify-content: center; font-weight: 800; border: 1.5px solid #C5A880; background: #FAF8F4; color: #721513; padding: 0.55rem 0.5rem; font-size: 0.8rem;">
               <i class="fa-solid fa-arrows-rotate"></i> Reconduire
             </button>
 
@@ -39,14 +39,14 @@
               (click)="deployerVersTousLesSites()"
               class="sa-btn-primary"
               title="Publier et synchroniser vers les entreprises"
-              style="background: #606C38; border-color: #606C38; box-shadow: 0 4px 14px rgba(96, 108, 56, 0.35); font-weight: 800; font-size: 0.84rem; padding: 0.55rem 1.1rem;">
+              style="width: 100%; justify-content: center; background: #606C38; border-color: #606C38; box-shadow: 0 4px 14px rgba(96, 108, 56, 0.35); font-weight: 800; font-size: 0.8rem; padding: 0.55rem 0.5rem;">
               <i class="fa-solid fa-cloud-arrow-up"></i> Publier
             </button>
           </div>
         </div>
 
         <!-- NAVIGATION CALENDRIER DU LUNDI AU DIMANCHE -->
-        <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
+        <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.25rem; margin-bottom: 2rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
           
           <!-- Ligne 1 : Titre fixe (ne saute jamais) -->
           <div style="margin-bottom: 0.9rem;">
@@ -64,18 +64,18 @@
               type="button"
               (click)="modalAjouterPlatAuJourGlobal.set(true)"
               class="sa-btn-primary"
-              style="font-size: 0.8rem; padding: 0.5rem 1.05rem; white-space: nowrap;">
+              style="font-size: 0.82rem; padding: 0.55rem 1.15rem; min-height: 42px; white-space: nowrap;">
               <i class="fa-solid fa-plus"></i> Ajouter un plat
             </button>
           </div>
 
           <!-- Ligne 3 : Filtre Semaine | Calendrier -->
-          <div style="display: flex; align-items: center; margin-bottom: 0.85rem;">
-            <div style="display: inline-flex; background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 9999px; padding: 0.2rem; gap: 0.2rem; flex-shrink: 0;">
+          <div style="display: flex; align-items: center; margin-bottom: 0.9rem;">
+            <div style="display: inline-flex; width: 100%; max-width: 320px; background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 9999px; padding: 0.25rem; gap: 0.25rem;">
               <button
                 type="button"
                 (click)="modeVuePlanning.set('semaine')"
-                style="min-height: 0; border: 0; border-radius: 9999px; padding: 0.4rem 0.75rem; font-size: 0.74rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; transition: all 0.2s;"
+                style="flex: 1; justify-content: center; min-height: 40px; border: 0; border-radius: 9999px; padding: 0.45rem 0.9rem; font-size: 0.82rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.2s;"
                 [style.background]="modeVuePlanning() === 'semaine' ? '#721513' : 'transparent'"
                 [style.color]="modeVuePlanning() === 'semaine' ? '#FFFFFF' : '#6E5A56'">
                 <i class="fa-solid fa-table-columns"></i> Semaine
@@ -83,7 +83,7 @@
               <button
                 type="button"
                 (click)="modeVuePlanning.set('calendrier')"
-                style="min-height: 0; border: 0; border-radius: 9999px; padding: 0.4rem 0.75rem; font-size: 0.74rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; transition: all 0.2s;"
+                style="flex: 1; justify-content: center; min-height: 40px; border: 0; border-radius: 9999px; padding: 0.45rem 0.9rem; font-size: 0.82rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.2s;"
                 [style.background]="modeVuePlanning() === 'calendrier' ? '#721513' : 'transparent'"
                 [style.color]="modeVuePlanning() === 'calendrier' ? '#FFFFFF' : '#6E5A56'">
                 <i class="fa-solid fa-calendar-days"></i> Calendrier

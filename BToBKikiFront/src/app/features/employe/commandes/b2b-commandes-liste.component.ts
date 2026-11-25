@@ -307,7 +307,9 @@ import { CommandeHistoriqueB2B } from '../../../b2b/shared/b2b.models';
     .cmd-detail-grid span { display: block; font-size: 0.66rem; color: #6E5A56; font-weight: 700; text-transform: uppercase; margin-bottom: 0.15rem; }
     .cmd-detail-grid strong { color: #2C1810; font-weight: 800; word-break: break-word; }
     @media (max-width: 767px) {
-      .cmd-search-box { max-width: 100%; width: 100%; }
+      .cmd-search-box { max-width: 100%; width: 100%; min-height: 44px; }
+      .cmd-actions-row { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+      .cmd-btn-outline, .cmd-btn-qr { width: 100%; justify-content: center; min-height: 42px; padding: 0.5rem 0.75rem; font-size: 0.8rem; }
       .cmd-detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; padding: 0.75rem; }
       .cmd-pagination { justify-content: center; text-align: center; }
       .cmd-pagination > span { display: none; }

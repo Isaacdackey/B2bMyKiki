@@ -10,75 +10,68 @@
 
       <!-- En-tête Facturation avec Recette & Nombre de commandes -->
       <div
-        style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 20px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
-        <div style="margin-bottom: 1.25rem;">
-          <span
-            style="font-size: 0.72rem; color: #721513; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(114, 21, 19, 0.08); padding: 0.25rem 0.65rem; border-radius: 9999px; display: inline-flex; align-items: center; gap: 0.4rem;">
-            <i class="fa-solid fa-file-invoice-dollar"></i> RELEVÉ FINANCIER &amp; FACTURATION • {{
-            b2b.currentEntreprise().nom }}
-          </span>
-          <h2
-            style="margin: 0.35rem 0 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
-            Facturation &amp; Relevé Journalier des Repas
-          </h2>
-        </div>
-
-        <!-- KPIs : Recette / Total & Nombre de Commandes -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
-          <div
-            style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 1.15rem 1.25rem; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <div style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">
-                RECETTE / TOTAL FACTURÉ (MOIS EN COURS)
-              </div>
-              <div style="font-size: 1.85rem; font-weight: 900; color: #E51D24; margin: 0.25rem 0 0;">
-                {{ (totalMontantEntrepriseMoisEnCours() | number) }} <span
-                  style="font-size: 0.95rem; color: #332724;">FCFA</span>
-              </div>
-            </div>
-            <div
-              style="width: 46px; height: 46px; border-radius: 12px; background: rgba(229, 29, 36, 0.1); color: #E51D24; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
-              <i class="fa-solid fa-receipt"></i>
-            </div>
-          </div>
-
-          <div
-            style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 1.15rem 1.25rem; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <div style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">
-                NOMBRE DE COMMANDES LIVRÉES
-              </div>
-              <div style="font-size: 1.85rem; font-weight: 900; color: #606C38; margin: 0.25rem 0 0;">
-                {{ totalPlatsLivresMoisEnCours() }} <span style="font-size: 0.95rem; color: #332724;">repas</span>
-              </div>
-            </div>
-            <div
-              style="width: 46px; height: 46px; border-radius: 12px; background: rgba(96, 108, 56, 0.12); color: #606C38; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
-              <i class="fa-solid fa-utensils"></i>
-            </div>
-          </div>
-        </div>
+        style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 20px; padding: 1.25rem 1.5rem; margin-bottom: 1.25rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
+        <h2
+          style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.5rem; color: #721513; font-weight: 900;">
+          Facturation &amp; Relevé Journalier des Repas
+        </h2>
       </div>
 
-      <!-- Barre juste avant la table : Filtre période à gauche (sans libellé) + Exports à droite -->
+      <!-- Barre de filtres et exports AU-DESSUS des KPI cards -->
       <div
-        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.85rem; margin-bottom: 1rem;">
+        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.85rem; margin-bottom: 1.25rem;">
         <app-b2b-period-filter defaultPeriode="MOIS" referenceDate="2026-11-12"
           (periodChange)="onPeriodeFactureRhChange($event)">
         </app-b2b-period-filter>
 
-          <div class="rh-export-actions"
-            style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: nowrap; margin-left: auto; justify-content: flex-end;">
-            <button (click)="exporterExcelFacturation()" class="rh-btn-action"
-              style="background: #FAF8F4; border: 1.5px solid #606C38; color: #606C38; font-weight: 800; font-size: 0.74rem; padding: 0.48rem 0.78rem; border-radius: 9999px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
-              <i class="bi bi-file-earmark-spreadsheet"></i> Excel (.xlsx)
-            </button>
-            <button (click)="genererFacturePDF()" class="rh-btn-primary"
-              style="font-size: 0.74rem; padding: 0.48rem 0.85rem; white-space: nowrap;">
-              <i class="bi bi-file-earmark-pdf"></i> Relevé (PDF)
-            </button>
+        <div class="rh-export-actions"
+          style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: nowrap; margin-left: auto; justify-content: flex-end;">
+          <button (click)="exporterExcelFacturation()" class="rh-btn-action"
+            style="background: #FAF8F4; border: 1.5px solid #606C38; color: #606C38; font-weight: 800; font-size: 0.78rem; padding: 0.5rem 0.85rem; min-height: 42px; border-radius: 9999px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
+            <i class="bi bi-file-earmark-spreadsheet"></i> Excel (.xlsx)
+          </button>
+          <button (click)="genererFacturePDF()" class="rh-btn-primary"
+            style="font-size: 0.78rem; padding: 0.5rem 0.95rem; min-height: 42px; white-space: nowrap;">
+            <i class="bi bi-file-earmark-pdf"></i> Relevé (PDF)
+          </button>
+        </div>
+      </div>
+
+      <!-- KPIs : Recette / Total & Nombre de Commandes -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+        <div
+          style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.15rem 1.25rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 16px rgba(114, 21, 19, 0.03);">
+          <div>
+            <div style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">
+              RECETTE / TOTAL FACTURÉ (MOIS EN COURS)
+            </div>
+            <div style="font-size: 1.85rem; font-weight: 900; color: #E51D24; margin: 0.25rem 0 0;">
+              {{ (totalMontantEntrepriseMoisEnCours() | number) }} <span
+                style="font-size: 0.95rem; color: #332724;">FCFA</span>
+            </div>
+          </div>
+          <div
+            style="width: 46px; height: 46px; border-radius: 12px; background: rgba(229, 29, 36, 0.1); color: #E51D24; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+            <i class="fa-solid fa-receipt"></i>
           </div>
         </div>
+
+        <div
+          style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.15rem 1.25rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 16px rgba(114, 21, 19, 0.03);">
+          <div>
+            <div style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">
+              NOMBRE DE COMMANDES LIVRÉES
+            </div>
+            <div style="font-size: 1.85rem; font-weight: 900; color: #606C38; margin: 0.25rem 0 0;">
+              {{ totalPlatsLivresMoisEnCours() }} <span style="font-size: 0.95rem; color: #332724;">repas</span>
+            </div>
+          </div>
+          <div
+            style="width: 46px; height: 46px; border-radius: 12px; background: rgba(96, 108, 56, 0.12); color: #606C38; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+            <i class="fa-solid fa-utensils"></i>
+          </div>
+        </div>
+      </div>
 
         <!-- Tableau Récapitulatif par Date (Date | Nombre de plats livrés | Montant) -->
         <div class="rh-table-wrap">

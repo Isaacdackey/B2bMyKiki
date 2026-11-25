@@ -253,8 +253,9 @@ export interface PeriodeFilterChange {
       .b2b-period-pill {
         flex-shrink: 0;
         justify-content: center;
-        padding: 0.38rem 0.68rem;
-        font-size: 0.74rem;
+        min-height: 40px;
+        padding: 0.48rem 0.78rem;
+        font-size: 0.78rem;
         border-radius: 9999px;
       }
       .b2b-custom-date-row {
@@ -264,7 +265,7 @@ export interface PeriodeFilterChange {
         grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
         gap: 0.5rem;
         border-radius: 16px;
-        padding: 0.55rem 0.65rem;
+        padding: 0.6rem 0.7rem;
         box-sizing: border-box;
         overflow: hidden;
       }
@@ -272,21 +273,21 @@ export interface PeriodeFilterChange {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
-        gap: 0.2rem;
+        gap: 0.25rem;
         width: 100%;
         min-width: 0;
         overflow: hidden;
       }
       .b2b-custom-date-label {
-        font-size: 0.68rem;
+        font-size: 0.7rem;
       }
       .b2b-custom-date-input {
         width: 100%;
         max-width: 100%;
         min-width: 0;
-        height: 34px;
-        padding: 0.25rem 0.4rem;
-        font-size: 0.74rem;
+        height: 40px;
+        padding: 0.35rem 0.45rem;
+        font-size: 0.78rem;
         box-sizing: border-box;
         -webkit-appearance: none;
         appearance: none;

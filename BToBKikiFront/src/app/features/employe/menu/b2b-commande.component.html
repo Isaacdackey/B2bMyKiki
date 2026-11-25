@@ -555,10 +555,10 @@
   <!-- MESSAGE FLASH GARNITURE APRÈS SÉLECTION D'UN PLAT CHAUD -->
   @if (flashGarnitureMessage(); as msg) {
   <div
-    style="position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); z-index: 1200; background: #721513; color: #FAF5EA; padding: 0.85rem 1.35rem; border-radius: 9999px; box-shadow: 0 18px 40px rgba(114, 21, 19, 0.4); display: flex; align-items: center; gap: 0.85rem; font-size: 0.86rem; font-weight: 700; max-width: 92vw;">
-    <span><i class="fa-solid fa-bowl-rice" style="color: #E6DABA; margin-right: 0.4rem;"></i> {{ msg }}</span>
+    style="position: fixed; bottom: 1.25rem; left: 50%; transform: translateX(-50%); z-index: 1200; background: #721513; color: #FAF5EA; padding: 0.8rem 1rem; border-radius: 16px; box-shadow: 0 18px 40px rgba(114, 21, 19, 0.4); display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; font-size: 0.84rem; font-weight: 700; width: min(92vw, 460px); box-sizing: border-box;">
+    <span style="line-height: 1.35;"><i class="fa-solid fa-bowl-rice" style="color: #E6DABA; margin-right: 0.4rem;"></i> {{ msg }}</span>
     <button type="button" (click)="selectCategory('GARNITURE'); flashGarnitureMessage.set(null)"
-      style="min-height: 0; background: #E51D24; color: #FFFFFF; border: none; border-radius: 9999px; padding: 0.35rem 0.8rem; font-size: 0.75rem; font-weight: 800; cursor: pointer; white-space: nowrap;">
+      style="min-height: 36px; flex-shrink: 0; background: #E51D24; color: #FFFFFF; border: none; border-radius: 9999px; padding: 0.4rem 0.9rem; font-size: 0.76rem; font-weight: 800; cursor: pointer; white-space: nowrap;">
       Choisir →
     </button>
   </div>

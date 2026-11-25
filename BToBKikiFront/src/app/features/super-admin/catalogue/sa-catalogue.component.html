@@ -16,21 +16,21 @@
           <!-- Barre de filtres pleine largeur + bouton Ajouter sur sa propre ligne en bas à droite -->
           <div style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;">
             <div style="width: 100%; box-sizing: border-box; display: flex; flex-wrap: wrap; align-items: center; gap: 0.55rem; background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 0.5rem 0.65rem; box-shadow: 0 2px 8px rgba(114, 21, 19, 0.03);">
-              <div style="display: flex; align-items: center; gap: 0.5rem; background: #FAF8F4; border: 1px solid #E2D5BE; border-radius: 10px; padding: 0 0.75rem; height: 38px; flex: 1 1 200px; min-width: 0;">
-                <i class="fa-solid fa-magnifying-glass" style="color: #6E5A56; font-size: 0.82rem; flex-shrink: 0;"></i>
+              <div style="display: flex; align-items: center; gap: 0.5rem; background: #FAF8F4; border: 1px solid #E2D5BE; border-radius: 10px; padding: 0 0.85rem; height: 44px; flex: 1 1 200px; min-width: 0;">
+                <i class="fa-solid fa-magnifying-glass" style="color: #6E5A56; font-size: 0.85rem; flex-shrink: 0;"></i>
                 <input
                   type="text"
                   [ngModel]="recherchePlatCatalogue()"
                   (ngModelChange)="recherchePlatCatalogue.set($event)"
                   placeholder="Rechercher un plat..."
-                  style="border: none; outline: none; background: transparent; font-size: 0.84rem; width: 100%; color: #332724; font-weight: 600; padding: 0; margin: 0;">
+                  style="border: none; outline: none; background: transparent; font-size: 0.88rem; width: 100%; color: #332724; font-weight: 600; padding: 0; margin: 0;">
               </div>
 
               <div class="sa-cat-selects" style="display: flex; align-items: center; gap: 0.55rem;">
                 <select
                   [ngModel]="filtreCategorieCatalogue()"
                   (ngModelChange)="filtreCategorieCatalogue.set($event)"
-                  style="height: 38px; color: #721513;">
+                  style="height: 44px; min-height: 44px; font-size: 0.85rem; color: #721513;">
                   <option value="TOUS">Toutes les Catégories</option>
                   <option value="PLAT">Plats Chauds &amp; Spécialités</option>
                   <option value="ENTREE">Entrées &amp; Salades</option>
@@ -41,7 +41,7 @@
                 <select
                   [ngModel]="filtreArchivePlat()"
                   (ngModelChange)="filtreArchivePlat.set($event)"
-                  style="height: 38px;">
+                  style="height: 44px; min-height: 44px; font-size: 0.85rem;">
                   <option value="ACTIFS">Plats Actifs</option>
                   <option value="ARCHIVES">Plats Archivés</option>
                   <option value="TOUS">Tout le Répertoire</option>
@@ -188,27 +188,27 @@
       </div>
   </main>
   @if (showModalPlat()) {
-    <div class="sa-modal-overlay">
-      <div class="sa-modal-card" style="max-width: 680px; padding: 1.25rem 1.5rem; overflow: visible;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.9rem;">
-          <h3 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.25rem; color: #721513; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+    <div class="sa-modal-overlay" (click)="showModalPlat.set(false)">
+      <div class="sa-modal-card" (click)="$event.stopPropagation()" style="max-width: 680px; width: 100%; max-height: 88dvh; padding: 1.25rem; display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-shrink: 0;">
+          <h3 style="margin: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.2rem; color: #721513; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
             <i class="fa-solid fa-bowl-food"></i> {{ isEditModePlat() ? 'Modifier le Plat' : 'Ajouter un Plat au Catalogue' }}
           </h3>
-          <button (click)="showModalPlat.set(false)" style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 8px; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; color: #6E5A56; cursor: pointer;">
+          <button type="button" (click)="showModalPlat.set(false)" style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 8px; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; color: #6E5A56; cursor: pointer; flex-shrink: 0;">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <div style="display: flex; flex-direction: column; gap: 0.85rem; overflow-y: auto; flex: 1; min-height: 0; padding-right: 0.15rem;">
           <div class="sa-form-grid-2">
             <div>
               <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">Nom du Plat / Spécialité</label>
-              <input type="text" [(ngModel)]="platEnEdition().nom" placeholder="Ex: Poulet Yassa Braisé au Feu de Bois" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.55rem 0.75rem; font-size: 0.84rem; font-weight: 700;">
+              <input type="text" [(ngModel)]="platEnEdition().nom" placeholder="Ex: Poulet Yassa Braisé au Feu de Bois" style="width: 100%; min-height: 42px; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.55rem 0.75rem; font-size: 0.85rem; font-weight: 700; box-sizing: border-box;">
             </div>
 
             <div>
               <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">Catégorie Alimentaire</label>
-              <select [(ngModel)]="platEnEdition().categorie" style="width: 100%;">
+              <select [(ngModel)]="platEnEdition().categorie" style="width: 100%; min-height: 42px;">
                 <option value="PLAT">Plat Chaud Principal</option>
                 <option value="ENTREE">Entrée &amp; Salade</option>
                 <option value="DESSERT">Dessert &amp; Douceur</option>
@@ -219,7 +219,7 @@
 
           <div>
             <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">Description des Ingrédients &amp; Préparation</label>
-            <textarea [(ngModel)]="platEnEdition().description" rows="2" placeholder="Oignons caramélisés, citron vert, riz parfumé..." style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.5rem 0.75rem; font-size: 0.82rem; resize: none;"></textarea>
+            <textarea [(ngModel)]="platEnEdition().description" rows="2" placeholder="Oignons caramélisés, citron vert, riz parfumé..." style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.55rem 0.75rem; font-size: 0.84rem; resize: none; box-sizing: border-box;"></textarea>
           </div>
 
           <!-- Import Photo via Cloudinary (sans URL ni présélections) -->
@@ -227,8 +227,8 @@
             <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">
               <i class="fa-solid fa-camera"></i> Photo du Plat (Import Cloudinary)
             </label>
-            <label style="display: flex; align-items: center; justify-content: space-between; gap: 0.85rem; background: #FAF8F4; border: 1.5px dashed #C5A880; border-radius: 12px; padding: 0.6rem 0.9rem; cursor: pointer; transition: border-color 0.18s;">
-              <div style="display: flex; align-items: center; gap: 0.75rem; min-width: 0;">
+            <label style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; background: #FAF8F4; border: 1.5px dashed #C5A880; border-radius: 12px; padding: 0.65rem 0.85rem; cursor: pointer; transition: border-color 0.18s;">
+              <div style="display: flex; align-items: center; gap: 0.75rem; min-width: 0; flex: 1 1 180px;">
                 @if (platEnEdition().image) {
                   <img [src]="platEnEdition().image" alt="Aperçu du plat" style="width: 48px; height: 48px; border-radius: 10px; object-fit: cover; border: 1.5px solid #E2D5BE; flex-shrink: 0;">
                 } @else {
@@ -249,7 +249,7 @@
                   <div style="font-size: 0.7rem; color: #8C7E74;">PNG, JPG ou WEBP • Stockage sécurisé Cloudinary</div>
                 </div>
               </div>
-              <span style="background: #721513; color: #FFFFFF; border-radius: 8px; padding: 0.45rem 0.85rem; font-size: 0.75rem; font-weight: 800; white-space: nowrap; flex-shrink: 0;">
+              <span style="background: #721513; color: #FFFFFF; border-radius: 8px; padding: 0.5rem 0.9rem; font-size: 0.76rem; font-weight: 800; white-space: nowrap; flex-shrink: 0;">
                 <i class="fa-solid" [class.fa-upload]="!isUploadingImage()" [class.fa-spinner]="isUploadingImage()" [class.fa-spin]="isUploadingImage()"></i>
                 {{ isUploadingImage() ? 'Envoi...' : 'Choisir un fichier' }}
               </span>
@@ -257,24 +257,24 @@
             </label>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 0.75rem;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem;">
             <div>
               <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">Tarif Unitaire (FCFA)</label>
-              <input type="number" [(ngModel)]="platEnEdition().prixUnitaire" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.55rem 0.75rem; font-size: 0.84rem; font-weight: 800; color: #721513;">
+              <input type="number" [(ngModel)]="platEnEdition().prixUnitaire" style="width: 100%; min-height: 42px; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.55rem 0.75rem; font-size: 0.85rem; font-weight: 800; color: #721513; box-sizing: border-box;">
             </div>
 
             <div>
               <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">
                 <i class="fa-solid fa-fire-flame-curved"></i> Calories (kcal)
               </label>
-              <input type="number" [(ngModel)]="platEnEdition().calories" placeholder="550" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.55rem 0.75rem; font-size: 0.84rem;">
+              <input type="number" [(ngModel)]="platEnEdition().calories" placeholder="550" style="width: 100%; min-height: 42px; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.55rem 0.75rem; font-size: 0.85rem; box-sizing: border-box;">
             </div>
 
             <div>
               <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">
                 <i class="fa-solid fa-triangle-exclamation"></i> Allergènes
               </label>
-              <select [(ngModel)]="platEnEdition().allergene" style="width: 100%;">
+              <select [(ngModel)]="platEnEdition().allergene" style="width: 100%; min-height: 42px;">
                 <option value="Aucun allergène majeur">Aucun allergène majeur</option>
                 <option value="Gluten">Gluten</option>
                 <option value="Arachides">Arachides</option>
@@ -291,11 +291,11 @@
           </div>
         </div>
 
-        <div style="display: flex; gap: 0.75rem; margin-top: 1.15rem; align-items: stretch;">
-          <button (click)="showModalPlat.set(false)" class="sa-btn-action" style="flex: 1; height: 42px; min-height: 42px; color: #6E5A56;">
+        <div style="display: flex; gap: 0.75rem; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid #F0EAE1; align-items: stretch; flex-shrink: 0;">
+          <button type="button" (click)="showModalPlat.set(false)" class="sa-btn-action" style="flex: 1; height: 44px; min-height: 44px; color: #6E5A56; justify-content: center;">
             Annuler
           </button>
-          <button (click)="enregistrerPlat()" class="sa-btn-primary" style="flex: 1.4; height: 42px; min-height: 42px; justify-content: center;">
+          <button type="button" (click)="enregistrerPlat()" class="sa-btn-primary" style="flex: 1.4; height: 44px; min-height: 44px; justify-content: center;">
             <i class="fa-solid fa-check"></i> Enregistrer le Plat
           </button>
         </div>
