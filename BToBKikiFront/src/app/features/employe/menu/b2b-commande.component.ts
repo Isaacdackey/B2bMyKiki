@@ -156,7 +156,15 @@ export class B2bCommandeComponent implements OnInit {
     if (this.b2b.isEmployeDebloqueAujourdhui(this.b2b.currentEmploye().id)) {
       return false;
     }
-    return this.isAfterCutOff();
+    if (this.isAfterCutOff()) {
+      return true;
+    }
+    const now = new Date();
+    const [hStr, mStr] = (ent.cutOffHeure || '18:00').split(':');
+    const cutH = parseInt(hStr, 10) || 18;
+    const cutM = parseInt(mStr, 10) || 0;
+    const nowMins = now.getHours() * 60 + now.getMinutes();
+    return nowMins >= (cutH * 60 + cutM);
   });
 
   // MODAL DE RÉCLAMATION (Cut-Off Dépassé)
@@ -174,7 +182,12 @@ export class B2bCommandeComponent implements OnInit {
   }
 
   envoyerReclamation() {
-    this.b2b.soumettreReclamation(this.b2b.currentEmploye(), this.motifReclamationInput());
+    const emp = this.b2b.currentEmploye();
+    const session = this.b2b.currentSession();
+    const employeReel = session?.nomComplet
+      ? { ...emp, prenom: session.nomComplet, nom: '' }
+      : emp;
+    this.b2b.soumettreReclamation(employeReel, this.motifReclamationInput());
     this.reclamationEnvoyee.set(true);
     setTimeout(() => {
       this.showReclamationModal.set(false);

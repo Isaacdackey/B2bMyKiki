@@ -93,7 +93,7 @@
           </div>
 
           <button type="button" (click)="showModalRelance.set(true)"
-            style="text-align: left; background: #FFFFFF; border: 1.5px solid #E51D24; border-radius: 16px; padding: 1.15rem 1.25rem; cursor: pointer; box-shadow: 0 6px 18px rgba(229, 29, 36, 0.08); transition: transform 0.15s ease;">
+            style="display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; width: 100%; gap: 0.45rem; text-align: left; background: #FFFFFF; border: 1.5px solid #E51D24; border-radius: 16px; padding: 1.15rem 1.25rem; cursor: pointer; box-shadow: 0 6px 18px rgba(229, 29, 36, 0.08); transition: transform 0.15s ease;">
             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
               <span style="font-size: 0.72rem; font-weight: 800; color: #E51D24; text-transform: uppercase;">N'ont pas commandé</span>
               <span style="font-size: 0.72rem; font-weight: 800; color: #FFFFFF; background: #E51D24; padding: 0.2rem 0.6rem; border-radius: 9999px;">
@@ -235,8 +235,7 @@
                 <div style="font-weight: 800; color: #332724; font-size: 0.88rem;">{{ emp.prenom }} {{ emp.nom }}</div>
                 <div style="font-size: 0.75rem; color: #6E5A56;">{{ emp.matricule }} • {{ emp.email || 'Pas d’email' }}</div>
               </div>
-              <button type="button" [disabled]="envoiRelanceEnCours() || !emp.email" (click)="relancerIndividuel(emp)"
-                style="background: #FFFFFF; border: 1.5px solid #721513; color: #721513; border-radius: 9999px; padding: 0.4rem 0.9rem; font-size: 0.76rem; font-weight: 800; cursor: pointer; white-space: nowrap;">
+              <button type="button" class="rh-btn-relance" [disabled]="envoiRelanceEnCours() || !emp.email" (click)="relancerIndividuel(emp)">
                 <i class="fa-solid fa-paper-plane"></i> Relancer
               </button>
             </div>
@@ -249,7 +248,7 @@
         </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid #F0EAE1; flex-wrap: wrap; flex-shrink: 0;">
-          <button type="button" (click)="showModalRelance.set(false)" class="rh-btn-action">Fermer</button>
+          <button type="button" (click)="showModalRelance.set(false)" class="rh-btn-fermer">Fermer</button>
           @if (employesNonCommandes().length > 0) {
             <button type="button" [disabled]="envoiRelanceEnCours()" (click)="relancerGroupe()" class="rh-btn-primary">
               <i class="fa-solid fa-bullhorn"></i> Envoyer un message groupé ({{ employesNonCommandes().length }})

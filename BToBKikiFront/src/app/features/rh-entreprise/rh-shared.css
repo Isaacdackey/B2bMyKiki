@@ -231,6 +231,48 @@
 }
 
 /* BADGES */
+.rh-btn-relance {
+  background: #FFFFFF;
+  border: 1.5px solid #721513;
+  color: #721513;
+  border-radius: 9999px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.76rem;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.rh-btn-relance:hover:not(:disabled) {
+  background: #721513;
+  color: #FFFFFF;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(114, 21, 19, 0.2);
+}
+
+.rh-btn-relance:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.rh-btn-fermer {
+  border: 1.5px solid #D8CFC2;
+  background: #FAF8F4;
+  color: #6E5A56;
+  border-radius: 9999px;
+  padding: 0.55rem 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rh-btn-fermer:hover {
+  background: #EDE7DC;
+  border-color: #C5A880;
+  color: #332724;
+  transform: translateY(-1px);
+}
 .rh-badge-subv {
   background: rgba(96, 108, 56, 0.12) !important;
   color: #606C38 !important;

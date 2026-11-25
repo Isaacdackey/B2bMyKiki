@@ -42,6 +42,25 @@ export class CuisineCommandesComponent {
     return this.b2b.listeCommandesSite().filter(c => c.entrepriseId === entId);
   });
 
+  pageCommandes = signal<number>(1);
+  readonly pageSizeCommandes = 10;
+
+  totalPagesCommandes = computed(() => Math.max(1, Math.ceil(this.commandesSite().length / this.pageSizeCommandes)));
+
+  pagesArrayCommandes = computed(() => Array.from({ length: this.totalPagesCommandes() }, (_, i) => i + 1));
+
+  commandesSitePaginees = computed(() => {
+    const page = Math.min(this.pageCommandes(), this.totalPagesCommandes());
+    const start = (page - 1) * this.pageSizeCommandes;
+    return this.commandesSite().slice(start, start + this.pageSizeCommandes);
+  });
+
+  allerAPageCommandes(p: number) {
+    if (p >= 1 && p <= this.totalPagesCommandes()) {
+      this.pageCommandes.set(p);
+    }
+  }
+
   commandesScanneesCount = computed(() => {
     return this.commandesSite().filter(c => c.statut === 'SCANNE').length;
   });

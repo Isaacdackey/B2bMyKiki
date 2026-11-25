@@ -395,7 +395,7 @@ export class B2bCommandesListeComponent {
     const propres = toutes.filter(
       c => c.matricule === emp.matricule || c.employeNom.toLowerCase().includes(emp.nom.toLowerCase()) || nomComplet.includes(c.employeNom.toLowerCase())
     );
-    return propres.length > 0 ? propres : toutes;
+    return propres;
   });
 
   commandesFiltrees = computed(() => {

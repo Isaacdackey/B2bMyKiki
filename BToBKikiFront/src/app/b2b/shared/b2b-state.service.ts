@@ -426,6 +426,14 @@ export class B2bStateService {
       } catch {}
     }
     this.syncFromBackend();
+
+    if (typeof window !== 'undefined') {
+      setInterval(() => {
+        if (typeof document === 'undefined' || document.visibilityState === 'visible') {
+          this.syncFromBackend();
+        }
+      }, 8000);
+    }
   }
 
   syncFromBackend() {
@@ -1068,8 +1076,9 @@ export class B2bStateService {
   // Vérifier si un employé est débloqué pour aujourd'hui
   isEmployeDebloqueAujourdhui(employeId: string): boolean {
     const today = new Date().toISOString().slice(0, 10);
+    const sessionNom = (this.currentSession()?.nomComplet || '').trim().toLowerCase();
     return this.listeReclamations().some(r => 
-      r.employeId === employeId && 
+      (r.employeId === employeId || (!!sessionNom && (r.employeNom || '').trim().toLowerCase() === sessionNom)) && 
       (r.date === today || r.date === '2026-11-12') && 
       r.statut === 'DEBLOQUE'
     );
