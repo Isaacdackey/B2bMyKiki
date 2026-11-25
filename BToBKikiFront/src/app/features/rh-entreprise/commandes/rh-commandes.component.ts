@@ -1,4 +1,4 @@
-﻿import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -62,6 +62,73 @@ export class RhCommandesComponent {
   siteActif = computed(() => {
     return this.b2b.currentEntreprise().sites.find(s => s.id === this.selectedSiteId()) || this.b2b.currentEntreprise().sites[0];
   });
+
+  // Commande groupée RH avec quantité par plat
+  showModalCommandeGroupee = signal<boolean>(false);
+  groupeLibelle = signal<string>('Commande Groupée RH');
+  groupeDate = signal<string>(new Date().toISOString().slice(0, 10));
+  quantitesGroupe = signal<Record<string, number>>({});
+
+  platsDisponiblesGroupe = computed(() => this.b2b.catalogueJour().filter(p => !p.isArchive));
+
+  totalPlatsGroupe = computed(() => {
+    const q = this.quantitesGroupe();
+    return Object.values(q).reduce((acc, n) => acc + (n > 0 ? n : 0), 0);
+  });
+
+  totalMontantGroupe = computed(() => {
+    const q = this.quantitesGroupe();
+    return this.platsDisponiblesGroupe().reduce((acc, p) => acc + (p.prixUnitaire || 0) * (q[p.id] || 0), 0);
+  });
+
+  ouvrirModalCommandeGroupee() {
+    this.groupeLibelle.set('Commande Groupée RH');
+    this.groupeDate.set(new Date().toISOString().slice(0, 10));
+    this.quantitesGroupe.set({});
+    this.showModalCommandeGroupee.set(true);
+  }
+
+  changerQuantiteGroupe(platId: string, delta: number) {
+    this.quantitesGroupe.update(map => {
+      const next = Math.max(0, (map[platId] || 0) + delta);
+      return { ...map, [platId]: next };
+    });
+  }
+
+  setQuantiteGroupeDirect(platId: string, val: number) {
+    this.quantitesGroupe.update(map => ({ ...map, [platId]: Math.max(0, Number(val) || 0) }));
+  }
+
+  validerCommandeGroupee() {
+    const q = this.quantitesGroupe();
+    const lignes = this.platsDisponiblesGroupe().filter(p => (q[p.id] || 0) > 0);
+    if (lignes.length === 0) {
+      alert('Veuillez saisir une quantité pour au moins un plat.');
+      return;
+    }
+    const libelle = this.groupeLibelle().trim() || 'Commande Groupée RH';
+    const date = this.groupeDate() || new Date().toISOString().slice(0, 10);
+    const stamp = Date.now().toString().slice(-5);
+
+    lignes.forEach((plat, idx) => {
+      const qte = q[plat.id] || 1;
+      const montantTotal = (plat.prixUnitaire || 0) * qte;
+      this.b2b.enregistrerCommandeSite({
+        codeCommande: `GRP-${stamp}-${idx + 1}`,
+        platNom: `${plat.nom} (x${qte})`,
+        categorie: plat.categorie,
+        montantTotal,
+        partEntreprise: montantTotal,
+        partEmploye: 0,
+        date,
+        matricule: 'GROUPE-RH',
+        employeNom: libelle,
+        tauxSubvention: 100
+      });
+    });
+
+    this.showModalCommandeGroupee.set(false);
+  }
 
   // Commandes filtrées pour l'entreprise selon les 3 statuts stricts : EN_COURS -> SCANNE -> LIVRE
   commandesSiteFiltrees = computed(() => {

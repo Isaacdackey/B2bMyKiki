@@ -102,24 +102,36 @@ export class B2bStateService {
   sommePartEntreprise(acc: number, c: CommandeEntrepriseSite) { return acc + (c.partEntreprise || 0); }
 
   // Types de prestation configurables
-  typesPrestationConfigurables = signal<{ code: string; libelle: string; desc: string; categoriesDefaut: string[] }[]>([
+  typesPrestationConfigurables = signal<{ code: string; libelle: string; desc: string; categoriesDefaut: string[]; cutOffType?: string; cutOffHeure?: string; reglesCutOff?: string; joursDisponibles?: string[]; isArchive?: boolean }[]>([
     { 
       code: 'CUISINE_SUR_PLACE', 
       libelle: 'Cuisine et service sur place', 
       desc: 'Préparation et dressage en restaurant d’entreprise sur place', 
-      categoriesDefaut: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'] 
+      categoriesDefaut: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'],
+      cutOffType: 'JOUR_J',
+      cutOffHeure: '10:30',
+      reglesCutOff: 'Clôture le matin même avant lancement en cuisine sur site',
+      joursDisponibles: ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi']
     },
     { 
       code: 'SERVICE_SUR_PLACE', 
       libelle: 'Service sur place (Réfectoire)', 
       desc: 'Plats cuisinés acheminés chauds et servis à l’assiette au réfectoire', 
-      categoriesDefaut: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'] 
+      categoriesDefaut: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'],
+      cutOffType: 'J_MOINS_1',
+      cutOffHeure: '18:00',
+      reglesCutOff: 'Préparation centrale, clôture la veille au soir',
+      joursDisponibles: ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi']
     },
     { 
       code: 'LIVRAISON_BARQUETTES', 
       libelle: 'Livraison en barquettes', 
       desc: 'Conditionnement individuel hermétique scellé et étiqueté', 
-      categoriesDefaut: ['PLAT', 'BOISSON'] 
+      categoriesDefaut: ['PLAT', 'BOISSON'],
+      cutOffType: 'J_MOINS_1',
+      cutOffHeure: '16:00',
+      reglesCutOff: 'Conditionnement et étiquetage individuel J-1',
+      joursDisponibles: ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi']
     }
   ]);
 
@@ -156,7 +168,7 @@ export class B2bStateService {
   }
 
   // Ajouter un nouveau type de prestation
-  ajouterTypePrestation(item: { code: string; libelle: string; desc: string; categoriesDefaut: string[] }) {
+  ajouterTypePrestation(item: { code: string; libelle: string; desc: string; categoriesDefaut: string[]; cutOffType?: string; cutOffHeure?: string; reglesCutOff?: string; joursDisponibles?: string[] }) {
     this.typesPrestationConfigurables.update(list => {
       const next = [...list, item];
       if (typeof localStorage !== 'undefined') {
@@ -920,25 +932,57 @@ export class B2bStateService {
   scannerCommandeSite(cmdId: string) {
     const now = new Date();
     const heure = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    let codeCmd = '';
     this.listeCommandesSite.update(list => list.map(c => {
-      if (c.id === cmdId) {
+      if (c.id === cmdId || c.codeCommande === cmdId) {
+        codeCmd = c.codeCommande;
         return { ...c, statut: 'SCANNE' as StatutCommandeSite, scanneAt: heure };
       }
       return c;
     }));
+    this.historiqueCommandes.update(list => list.map(h =>
+      (h.id === cmdId || (codeCmd && h.id === codeCmd))
+        ? { ...h, statut: 'EN_PREPARATION' as const }
+        : h
+    ));
     this.api.scannerCommande(cmdId).subscribe({ error: () => {} });
+  }
+
+  scannerParQrOuCode(codeOrId: string): boolean {
+    const clean = (codeOrId || '').trim().toLowerCase();
+    if (!clean) return false;
+    const match = this.listeCommandesSite().find(c =>
+      c.id.toLowerCase() === clean ||
+      c.codeCommande.toLowerCase() === clean ||
+      (c.statut === 'EN_COURS' && clean.includes(c.matricule.toLowerCase()))
+    );
+    if (match) {
+      this.scannerCommandeSite(match.id);
+      return true;
+    }
+    this.historiqueCommandes.update(list => list.map(h =>
+      h.id.toLowerCase() === clean ? { ...h, statut: 'EN_PREPARATION' as const } : h
+    ));
+    return false;
   }
 
   // Marquer une commande comme livrée
   marquerCommandeLivree(cmdId: string) {
     const now = new Date();
     const heure = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    let codeCmd = '';
     this.listeCommandesSite.update(list => list.map(c => {
-      if (c.id === cmdId) {
+      if (c.id === cmdId || c.codeCommande === cmdId) {
+        codeCmd = c.codeCommande;
         return { ...c, statut: 'LIVRE' as StatutCommandeSite, livreAt: heure };
       }
       return c;
     }));
+    this.historiqueCommandes.update(list => list.map(h =>
+      (h.id === cmdId || (codeCmd && h.id === codeCmd))
+        ? { ...h, statut: 'LIVRE' as const }
+        : h
+    ));
     this.api.livrerCommande(cmdId).subscribe({ error: () => {} });
   }
 
@@ -1158,20 +1202,27 @@ export class B2bStateService {
     partEntreprise: number;
     partEmploye: number;
     qrCode?: string;
+    date?: string;
+    matricule?: string;
+    employeNom?: string;
+    tauxSubvention?: number;
   }) {
     const emp = this.currentEmploye();
     const ent = this.currentEntreprise();
     const site = this.siteActuel();
     const now = new Date();
-    const dateStr = now.toISOString().slice(0, 10);
+    const dateStr = payload.date || now.toISOString().slice(0, 10);
     const heureStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const matriculeFinal = payload.matricule || emp.matricule;
+    const employeNomFinal = payload.employeNom || `${emp.prenom} ${emp.nom}`;
+    const tauxFinal = payload.tauxSubvention ?? emp.tauxSubvention;
     const nouvelleCmd: CommandeEntrepriseSite = {
-      id: 'cmd-' + Date.now(),
+      id: 'cmd-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
       codeCommande: payload.codeCommande,
       entrepriseId: ent.id || 'ent-001',
       entrepriseNom: ent.nom || 'TotalEnergies — Siège Plateau',
-      matricule: emp.matricule,
-      employeNom: `${emp.prenom} ${emp.nom}`,
+      matricule: matriculeFinal,
+      employeNom: employeNomFinal,
       categorie: payload.categorie,
       platNom: payload.platNom,
       date: dateStr,
@@ -1182,14 +1233,20 @@ export class B2bStateService {
       statut: 'EN_COURS'
     };
 
-    this.listeCommandesSite.update(list => [nouvelleCmd, ...list]);
-    this.historiqueCommandes.update(list => [
-      {
+    this.listeCommandesSite.update(list => {
+      const idx = list.findIndex(c => c.codeCommande === payload.codeCommande);
+      if (idx >= 0) {
+        return list.map((c, i) => i === idx ? { ...c, platNom: payload.platNom, montantTotal: payload.montantTotal, partEntreprise: payload.partEntreprise, partEmploye: payload.partEmploye } : c);
+      }
+      return [nouvelleCmd, ...list];
+    });
+    this.historiqueCommandes.update(list => {
+      const entry = {
         id: payload.codeCommande,
         date: dateStr,
         heure: heureStr,
-        matricule: emp.matricule,
-        employeNom: `${emp.prenom} ${emp.nom}`,
+        matricule: matriculeFinal,
+        employeNom: employeNomFinal,
         siteId: site?.id || 'site-1',
         siteNom: site?.nom || 'Siège Plateau - Dakar',
         formuleNom: this.modeProfil() === 'AUTONOME' ? 'Panier Libre Autonome' : this.formuleActuelle().nom,
@@ -1197,11 +1254,15 @@ export class B2bStateService {
         prixTotal: payload.montantTotal,
         partEntreprise: payload.partEntreprise,
         partEmploye: payload.partEmploye,
-        tauxSubventionApplique: emp.tauxSubvention,
-        statut: 'VALIDE'
-      },
-      ...list
-    ]);
+        tauxSubventionApplique: tauxFinal,
+        statut: 'VALIDE' as const
+      };
+      const idx = list.findIndex(h => h.id === payload.codeCommande);
+      if (idx >= 0) {
+        return list.map((h, i) => i === idx ? entry : h);
+      }
+      return [entry, ...list];
+    });
 
     this.api.createCommande({
       ...nouvelleCmd,

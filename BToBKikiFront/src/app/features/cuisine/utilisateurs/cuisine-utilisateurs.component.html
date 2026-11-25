@@ -5,6 +5,38 @@
         <i class="fa-solid fa-bars"></i>
       </button>
     </div>
+      <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.35rem 1.5rem; margin-bottom: 1.25rem; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+        <h3 style="margin: 0 0 1rem; font-size: 1.15rem; color: #721513; font-weight: 900;">
+          <i class="fa-solid fa-building-shield"></i> Paramètres du Contrat &amp; Modalités de Prestation
+        </h3>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+          <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 800; text-transform: uppercase;">Entreprise Cliente</div>
+            <div style="font-size: 1.05rem; font-weight: 900; color: #721513; margin-top: 0.2rem;">{{ entreprise().nom }}</div>
+            <div style="font-size: 0.78rem; color: #6E5A56; margin-top: 0.2rem;">Code : {{ entreprise().codeEntreprise }} • NINEA : {{ entreprise().ninea || 'Non renseigné' }}</div>
+          </div>
+
+          <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 800; text-transform: uppercase;">Heure Limite (Cut-Off)</div>
+            <div style="font-size: 1.05rem; font-weight: 900; color: #E51D24; margin-top: 0.2rem;">{{ getLibelleCutOff(entreprise()) }}</div>
+            <div style="font-size: 0.78rem; color: #6E5A56; margin-top: 0.2rem;">Au-delà, une réclamation est requise</div>
+          </div>
+
+          <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 800; text-transform: uppercase;">Mode de Prestation</div>
+            <div style="font-size: 1.05rem; font-weight: 900; color: #332724; margin-top: 0.2rem;">{{ getLibellePrestation(entreprise().typePrestation) }}</div>
+            <div style="font-size: 0.78rem; color: #606C38; font-weight: 700; margin-top: 0.2rem;">Composantes autorisées : {{ getCategoriesLibelles(entreprise().categoriesAutorisees) }}</div>
+          </div>
+
+          <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 12px; padding: 1rem;">
+            <div style="font-size: 0.72rem; color: #6E5A56; font-weight: 800; text-transform: uppercase;">Prise en charge Kiki</div>
+            <div style="font-size: 1.05rem; font-weight: 900; color: #606C38; margin-top: 0.2rem;">{{ entreprise().montantPriseEnChargeRepas | number }} FCFA / repas</div>
+            <div style="font-size: 0.78rem; color: #6E5A56; margin-top: 0.2rem;">Facturation {{ (entreprise().cadenceFacturation || 'MENSUELLE').toLowerCase() }} consolidée</div>
+          </div>
+        </div>
+      </div>
+
       <div class="cuisine-table-card">
         <div class="cuisine-table-header">
           <div>

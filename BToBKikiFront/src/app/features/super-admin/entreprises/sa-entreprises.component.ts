@@ -99,10 +99,14 @@ export class SaEntreprisesComponent {
 
   // Modal Paramètres (Types de prestation et Catégories personnalisables)
   showModalParametres = signal<boolean>(false);
-  nouveauTypePrestation = signal<{ code: string; libelle: string; desc: string }>({
+  nouveauTypePrestation = signal<{ code: string; libelle: string; desc: string; cutOffType: string; cutOffHeure: string; reglesCutOff: string; joursDisponiblesText: string }>({
     code: '',
     libelle: '',
-    desc: ''
+    desc: '',
+    cutOffType: 'J_MOINS_1',
+    cutOffHeure: '18:00',
+    reglesCutOff: '',
+    joursDisponiblesText: 'Lundi, Mardi, Mercredi, Jeudi, Vendredi'
   });
   nouvelleCategorie = signal<{ code: string; libelle: string; icone: string; couleur: string }>({
     code: '',
@@ -133,7 +137,9 @@ export class SaEntreprisesComponent {
       this.entrepriseEnEdition.update(e => ({
         ...e,
         typePrestation: type,
-        categoriesAutorisees: [...trouv.categoriesDefaut]
+        categoriesAutorisees: [...trouv.categoriesDefaut],
+        cutOffType: (trouv.cutOffType as any) || e.cutOffType || 'J_MOINS_1',
+        cutOffHeure: trouv.cutOffHeure || e.cutOffHeure || '18:00'
       }));
     } else {
       this.entrepriseEnEdition.update(e => ({ ...e, typePrestation: type }));
@@ -166,13 +172,30 @@ export class SaEntreprisesComponent {
 
   getLibelleCutOff(ent: Partial<EntrepriseB2B>): string {
     if (!ent.cutOffType) return ent.cutOffHeure || '18:00 (J-1)';
-    const prefix = ent.cutOffType === 'J_MOINS_1' ? 'J - 1 (Veille)' : 'Jour J (Jour même)';
+    if (ent.cutOffType === 'SANS_CUTOFF') return 'Sans Cut-Off (Libre)';
+    const prefix = ent.cutOffType === 'J_MOINS_1'
+      ? 'J - 1 (Veille)'
+      : ent.cutOffType === 'J_MOINS_2'
+        ? 'J - 2 (Avant-veille)'
+        : 'Jour J (Jour même)';
     return `${prefix} à ${ent.cutOffHeure || '18:00'}`;
+  }
+
+  resetNouveauTypePrestation() {
+    this.nouveauTypePrestation.set({
+      code: '',
+      libelle: '',
+      desc: '',
+      cutOffType: 'J_MOINS_1',
+      cutOffHeure: '18:00',
+      reglesCutOff: '',
+      joursDisponiblesText: 'Lundi, Mardi, Mercredi, Jeudi, Vendredi'
+    });
   }
 
   // PARAMÈTRES PERSONNALISABLES
   ouvrirModalParametres() {
-    this.nouveauTypePrestation.set({ code: '', libelle: '', desc: '' });
+    this.resetNouveauTypePrestation();
     this.nouvelleCategorie.set({ code: '', libelle: '', icone: 'fa-utensils', couleur: '#721513' });
     this.showModalParametres.set(true);
   }
@@ -184,13 +207,21 @@ export class SaEntreprisesComponent {
       return;
     }
     const code = tp.code || tp.libelle.toUpperCase().replace(/[^A-Z0-9]/g, '_');
+    const jours = (tp.joursDisponiblesText || '')
+      .split(',')
+      .map(j => j.trim())
+      .filter(Boolean);
     this.b2b.ajouterTypePrestation({
       code,
       libelle: tp.libelle,
       desc: tp.desc || 'Prestation sur mesure Kiki Traiteur',
-      categoriesDefaut: ['PLAT', 'BOISSON']
+      categoriesDefaut: ['PLAT', 'BOISSON'],
+      cutOffType: tp.cutOffType || 'J_MOINS_1',
+      cutOffHeure: tp.cutOffHeure || '18:00',
+      reglesCutOff: tp.reglesCutOff || '',
+      joursDisponibles: jours.length > 0 ? jours : ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi']
     });
-    this.nouveauTypePrestation.set({ code: '', libelle: '', desc: '' });
+    this.resetNouveauTypePrestation();
     this.showModalAjoutPrestation.set(false);
   }
 
@@ -770,27 +801,79 @@ export class SaEntreprisesComponent {
     this.employeEnCreation.set({ matricule: '', nom: '', prenom: '', email: '', telephone: '', departement: 'Opérations', tauxSubvention: 100 });
   }
 
-  importerFichierEmployes() {
+  exporterModeleEmployes() {
     const ent = this.entrepriseEnGestion();
-    const code = ent?.codeEntreprise || 'TOT';
-    const importes = [
-      { matricule: `${code}-9850`, nom: 'Sene', prenom: 'Awa', email: `a.sene@${ent?.codeEntreprise.toLowerCase()}.sn`, telephone: '+221 77 810 20 30', departement: 'Comptabilité', tauxSubvention: 100 },
-      { matricule: `${code}-9851`, nom: 'Thiam', prenom: 'Moussa', email: `m.thiam@${ent?.codeEntreprise.toLowerCase()}.sn`, telephone: '+221 78 920 30 40', departement: 'Logistique', tauxSubvention: 50 },
-      { matricule: `${code}-9852`, nom: 'Gueye', prenom: 'Ndeye', email: `n.gueye@${ent?.codeEntreprise.toLowerCase()}.sn`, telephone: '+221 76 112 23 34', departement: 'Marketing', tauxSubvention: 100 },
-      { matricule: `${code}-EXT-04`, nom: 'Cisse', prenom: 'Djibril (Prestataire)', email: `d.cisse@prestataire.sn`, telephone: '+221 77 444 55 66', departement: 'Sécurité Informatique', tauxSubvention: 0 }
+    const code = ent?.codeEntreprise || 'ENT';
+    const domain = code.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const lignes = [
+      'Matricule;Prenom;Nom;Email;Telephone;Departement;TauxSubvention',
+      `${code}-1001;Awa;Diop;awa.diop@${domain}.sn;+221 77 123 45 67;Finance;100`,
+      `${code}-1002;Moussa;Thiam;moussa.thiam@${domain}.sn;+221 78 234 56 78;Operations;50`
     ];
-    importes.forEach(imp => {
-      this.b2b.ajouterEmploye({
-        ...imp,
-        siteId: ent?.id || 'site-1',
-        siteNom: ent?.nom || 'Siège',
-        type: imp.tauxSubvention === 0 ? 'AUTONOME' : 'SUBVENTIONNE',
-        actif: true,
-        repasConsommesMois: 0,
-        montantPrisEnChargeMois: 0
-      });
-    });
-    alert(`Importation réussie : ${importes.length} collaborateurs ont été ajoutés avec leurs taux de prise en charge respectifs.`);
+    const contenu = '\uFEFF' + lignes.join('\r\n');
+    const blob = new Blob([contenu], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `modele-employes-${code.toLowerCase()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  onImporterFichierEmployes(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    const ent = this.entrepriseEnGestion();
+    const reader = new FileReader();
+    reader.onload = () => {
+      const text = String(reader.result || '').replace(/^\uFEFF/, '');
+      const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      if (lines.length === 0) {
+        alert('Le fichier importé est vide.');
+        input.value = '';
+        return;
+      }
+
+      const sep = lines[0].includes(';') ? ';' : ',';
+      const startIndex = lines[0].toLowerCase().includes('matricule') ? 1 : 0;
+      let count = 0;
+
+      for (let i = startIndex; i < lines.length; i++) {
+        const cols = lines[i].split(sep).map(c => c.trim().replace(/^"|"$/g, ''));
+        if (cols.length < 4) continue;
+        const [matricule, prenom, nom, email, telephone = '', departement = 'Général', tauxRaw = '100'] = cols;
+        if (!matricule || !email) continue;
+        const tauxParsed = parseInt(tauxRaw.replace('%', '').trim(), 10);
+        const tauxSubvention = Number.isFinite(tauxParsed) ? Math.max(0, Math.min(100, tauxParsed)) : 100;
+
+        this.b2b.ajouterEmploye({
+          matricule,
+          prenom: prenom || 'Collaborateur',
+          nom: nom || '',
+          email,
+          telephone,
+          departement: departement || 'Général',
+          tauxSubvention,
+          siteId: ent?.id || 'site-1',
+          siteNom: ent?.nom || 'Siège',
+          type: tauxSubvention === 0 ? 'AUTONOME' : 'SUBVENTIONNE',
+          actif: true,
+          repasConsommesMois: 0,
+          montantPrisEnChargeMois: 0
+        });
+        count++;
+      }
+
+      input.value = '';
+      if (count > 0) {
+        alert(`Importation réussie : ${count} collaborateur(s) ajouté(s).`);
+      } else {
+        alert('Aucune ligne valide trouvée. Utilisez le modèle CSV (Matricule;Prenom;Nom;Email;Telephone;Departement;TauxSubvention).');
+      }
+    };
+    reader.readAsText(file, 'UTF-8');
   }
 
   // Création invitation admin

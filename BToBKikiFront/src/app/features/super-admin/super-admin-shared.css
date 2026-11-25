@@ -1360,6 +1360,69 @@
   box-shadow: 0 2px 8px rgba(114, 21, 19, 0.25);
 }
 
+.sa-week-selector-pill {
+  display: inline-flex;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .sa-week-selector-pill {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .sa-employes-table,
+  .sa-employes-table tbody,
+  .sa-employes-table tr,
+  .sa-employes-table td {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .sa-employes-table thead {
+    display: none;
+  }
+
+  .sa-employes-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .sa-employes-table tr {
+    background: #FAF8F4;
+    border: 1.5px solid #EDE7DC !important;
+    border-radius: 14px;
+    padding: 0.65rem 0.9rem;
+  }
+
+  .sa-employes-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.4rem 0 !important;
+    text-align: right !important;
+    border-bottom: 1px dashed #EDE7DC;
+  }
+
+  .sa-employes-table td:last-child {
+    border-bottom: none;
+  }
+
+  .sa-employes-table td::before {
+    content: attr(data-label);
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #6E5A56;
+    text-transform: uppercase;
+    text-align: left;
+    flex-shrink: 0;
+  }
+}
+
 @media (max-width: 640px) {
   .sa-filter-pill-box {
     width: 100%;
@@ -1673,6 +1736,69 @@
 @media (max-width: 1024px) {
   .sa-planning-calendar-split {
     grid-template-columns: 1fr;
+  }
+}
+
+.sa-week-selector-pill {
+  display: inline-flex;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .sa-week-selector-pill {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .sa-employes-table,
+  .sa-employes-table tbody,
+  .sa-employes-table tr,
+  .sa-employes-table td {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .sa-employes-table thead {
+    display: none;
+  }
+
+  .sa-employes-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .sa-employes-table tr {
+    background: #FAF8F4;
+    border: 1.5px solid #EDE7DC !important;
+    border-radius: 14px;
+    padding: 0.65rem 0.9rem;
+  }
+
+  .sa-employes-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.4rem 0 !important;
+    text-align: right !important;
+    border-bottom: 1px dashed #EDE7DC;
+  }
+
+  .sa-employes-table td:last-child {
+    border-bottom: none;
+  }
+
+  .sa-employes-table td::before {
+    content: attr(data-label);
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #6E5A56;
+    text-transform: uppercase;
+    text-align: left;
+    flex-shrink: 0;
   }
 }
 

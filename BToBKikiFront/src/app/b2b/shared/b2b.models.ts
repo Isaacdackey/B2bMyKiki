@@ -23,7 +23,18 @@ export interface PrestationConfigB2B {
   categoriesAutorisees: string[]; // Ex: ['PLAT', 'BOISSON']
 }
 
-export type TypeCutOffB2B = 'J_MOINS_1' | 'JOUR_J';
+export type TypeCutOffB2B = 'J_MOINS_1' | 'JOUR_J' | 'J_MOINS_2' | 'SANS_CUTOFF' | string;
+
+export interface AlerteCommandeB2B {
+  id: string;
+  entrepriseId?: string;
+  employeEmail: string;
+  employeNom?: string;
+  expediteurNom?: string;
+  message: string;
+  lu: boolean;
+  createdAt: string;
+}
 
 export interface CutOffConfigB2B {
   type: TypeCutOffB2B; // 'J_MOINS_1' (La veille) ou 'JOUR_J' (Le jour même)

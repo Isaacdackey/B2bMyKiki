@@ -30,6 +30,18 @@ public class TypePrestationEntity {
     @Builder.Default
     private List<String> categoriesDefaut = new ArrayList<>();
 
+    private String cutOffType; // J_MOINS_1, JOUR_J, J_MOINS_2, SANS_CUTOFF
+    private String cutOffHeure; // ex: 18:00, 10:30
+
+    @Column(length = 500)
+    private String reglesCutOff;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "b2b_prestation_jours_dispo", joinColumns = @JoinColumn(name = "prestation_code"))
+    @Column(name = "jour")
+    @Builder.Default
+    private List<String> joursDisponibles = new ArrayList<>();
+
     @Builder.Default
     @JsonProperty("isArchive")
     @Column(nullable = false, columnDefinition = "boolean default false")

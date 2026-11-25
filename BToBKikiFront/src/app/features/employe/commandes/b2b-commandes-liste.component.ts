@@ -191,20 +191,53 @@ import { CommandeHistoriqueB2B } from '../../../b2b/shared/b2b.models';
             </div>
 
             <h3 style="margin: 0 0 0.25rem; font-size: 1.25rem; color: #721513; font-weight: 900;">QR Code de Retrait</h3>
-            <p style="margin: 0 0 1rem; font-size: 0.8rem; color: #6E5A56;">Présentez ce code au comptoir lors de la récupération.</p>
+            <p style="margin: 0 0 0.85rem; font-size: 0.8rem; color: #6E5A56;">Présentez ce code au comptoir ou scannez le QR de la cantine.</p>
 
-            <div style="background: #FAF8F4; border: 2px solid #721513; border-radius: 18px; padding: 1.25rem; display: inline-block; margin-bottom: 1rem;">
-              <svg viewBox="0 0 25 25" width="180" height="180" shape-rendering="crispEdges">
-                <rect width="25" height="25" fill="#FFFFFF"/>
-                @for (row of qrMatrix(); track $index; let r = $index) {
-                  @for (cell of row; track $index; let c = $index) {
-                    @if (cell) {
-                      <rect [attr.x]="c" [attr.y]="r" width="1" height="1" fill="#721513"/>
+            <div style="display: inline-flex; background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 9999px; padding: 0.2rem; gap: 0.2rem; margin-bottom: 1rem;">
+              <button type="button" (click)="qrMode.set('MONTRER')"
+                style="min-height: 0; border: 0; border-radius: 9999px; padding: 0.4rem 0.85rem; font-size: 0.74rem; font-weight: 800; cursor: pointer;"
+                [style.background]="qrMode() === 'MONTRER' ? '#721513' : 'transparent'"
+                [style.color]="qrMode() === 'MONTRER' ? '#FFFFFF' : '#6E5A56'">
+                <i class="fa-solid fa-qrcode"></i> Projeter QR
+              </button>
+              <button type="button" (click)="qrMode.set('SCANNER'); scanValide.set(false)"
+                style="min-height: 0; border: 0; border-radius: 9999px; padding: 0.4rem 0.85rem; font-size: 0.74rem; font-weight: 800; cursor: pointer;"
+                [style.background]="qrMode() === 'SCANNER' ? '#721513' : 'transparent'"
+                [style.color]="qrMode() === 'SCANNER' ? '#FFFFFF' : '#6E5A56'">
+                <i class="fa-solid fa-camera"></i> Scanner QR
+              </button>
+            </div>
+
+            @if (qrMode() === 'MONTRER') {
+              <div style="background: #FAF8F4; border: 2px solid #721513; border-radius: 18px; padding: 1.25rem; display: inline-block; margin-bottom: 1rem;">
+                <svg viewBox="0 0 25 25" width="180" height="180" shape-rendering="crispEdges">
+                  <rect width="25" height="25" fill="#FFFFFF"/>
+                  @for (row of qrMatrix(); track $index; let r = $index) {
+                    @for (cell of row; track $index; let c = $index) {
+                      @if (cell) {
+                        <rect [attr.x]="c" [attr.y]="r" width="1" height="1" fill="#721513"/>
+                      }
                     }
                   }
+                </svg>
+              </div>
+            } @else {
+              <div style="background: #FAF8F4; border: 1.5px dashed #C5A880; border-radius: 16px; padding: 1.15rem; margin-bottom: 1rem;">
+                @if (!scanValide()) {
+                  <div style="font-size: 2rem; color: #721513; margin-bottom: 0.45rem;"><i class="fa-solid fa-camera"></i></div>
+                  <p style="font-size: 0.8rem; color: #6E5A56; margin: 0 0 0.85rem;">
+                    Scannez le QR Code cantine pour passer immédiatement le statut à « En préparation ».
+                  </p>
+                  <button type="button" (click)="scannerQrCantinePourCommande(qrCmd)"
+                    style="min-height: 0; padding: 0.55rem 1.15rem; border-radius: 9999px; background: #606C38; color: #FFFFFF; border: none; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.45rem;">
+                    <i class="fa-solid fa-qrcode"></i> Valider le scan QR
+                  </button>
+                } @else {
+                  <div style="font-size: 2rem; color: #606C38; margin-bottom: 0.35rem;"><i class="fa-solid fa-circle-check"></i></div>
+                  <strong style="color: #606C38; font-size: 0.9rem;">QR scanné — Statut mis à jour !</strong>
                 }
-              </svg>
-            </div>
+              </div>
+            }
 
             <div style="font-size: 0.82rem; font-weight: 800; color: #2C1810; margin-bottom: 1rem;">
               {{ qrCmd.platNom }} • {{ qrCmd.date }}
@@ -385,9 +418,20 @@ export class B2bCommandesListeComponent {
     return this.commandesFiltrees().slice(start, start + this.pageSize);
   });
 
+  qrMode = signal<'MONTRER' | 'SCANNER'>('MONTRER');
+  scanValide = signal<boolean>(false);
+
   ouvrirQr(cmd: CommandeHistoriqueB2B) {
+    this.qrMode.set('MONTRER');
+    this.scanValide.set(false);
     this.qrMatrix.set(this.buildQrMatrix(`${cmd.id}-${cmd.matricule}-${cmd.date}`));
     this.commandeQr.set(cmd);
+  }
+
+  scannerQrCantinePourCommande(cmd: CommandeHistoriqueB2B) {
+    this.b2b.scannerParQrOuCode(cmd.id);
+    this.scanValide.set(true);
+    this.commandeQr.set({ ...cmd, statut: 'EN_PREPARATION' });
   }
 
   private buildQrMatrix(seed: string): boolean[][] {

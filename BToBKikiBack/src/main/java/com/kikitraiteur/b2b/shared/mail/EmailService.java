@@ -64,6 +64,36 @@ public class EmailService {
         return sendHtmlEmail(toEmail, nomComplet, subject, html);
     }
 
+    public boolean sendOrderReminderEmail(
+            String toEmail,
+            String nomComplet,
+            String entrepriseNom,
+            String expediteurNom,
+            String message,
+            String orderUrl
+    ) {
+        String subject = "Rappel commande repas — " + (entrepriseNom != null && !entrepriseNom.isBlank() ? entrepriseNom : "Kiki Traiteur B2B");
+        String safeName = escapeHtml(nomComplet != null && !nomComplet.isBlank() ? nomComplet : toEmail);
+        String safeExp = escapeHtml(expediteurNom != null && !expediteurNom.isBlank() ? expediteurNom : "Votre service RH");
+        String safeMsg = escapeHtml(message != null && !message.isBlank() ? message : "N'oubliez pas de passer votre commande de repas avant l'heure limite.");
+
+        String html = buildEmailLayout(
+                "Alerte de commande repas",
+                "<p>Bonjour <strong>" + safeName + "</strong>,</p>"
+                        + "<p>Vous avez reçu un message de relance de la part de <strong>" + safeExp + "</strong> :</p>"
+                        + "<div style=\"background:#FAF8F4;border-left:4px solid #721513;padding:14px 16px;border-radius:8px;margin:16px 0;color:#332724;\">"
+                        + safeMsg.replace("\n", "<br>")
+                        + "</div>"
+                        + "<p>Cliquez sur le bouton ci-dessous pour rejoindre la plateforme et effectuer votre commande :</p>"
+                        + buildCtaButton(orderUrl, "Rejoindre la plateforme et commander")
+                        + "<p style=\"font-size:12px;color:#6E5A56;margin-top:16px;\">"
+                        + "Lien direct : <a href=\"" + escapeHtml(orderUrl) + "\" style=\"color:#721513;word-break:break-all;\">"
+                        + escapeHtml(orderUrl) + "</a></p>"
+        );
+
+        return sendHtmlEmail(toEmail, nomComplet, subject, html);
+    }
+
     public boolean sendPasswordResetEmail(String toEmail, String nomComplet, String resetUrl) {
         String subject = "Réinitialisation de votre mot de passe — Kiki Traiteur B2B";
         String safeName = escapeHtml(nomComplet != null && !nomComplet.isBlank() ? nomComplet : toEmail);

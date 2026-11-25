@@ -28,7 +28,7 @@ export const B2B_ROUTES: Routes = [
       { path: 'rh', redirectTo: 'rh/dashboard', pathMatch: 'full' },
       { path: 'cuisine', redirectTo: 'cuisine/dashboard', pathMatch: 'full' },
       { path: 'commande', redirectTo: 'employe/menu', pathMatch: 'full' },
-      { path: 'panier', redirectTo: 'employe/panier', pathMatch: 'full' },
+      { path: 'panier', redirectTo: 'employe/menu', pathMatch: 'full' },
       { path: 'commandes', redirectTo: 'employe/commandes', pathMatch: 'full' },
 
       // Super Admin
@@ -98,7 +98,8 @@ export const B2B_ROUTES: Routes = [
       },
       {
         path: 'cuisine/infos',
-        loadComponent: () => import('../features/cuisine/infos/cuisine-infos.component').then(m => m.CuisineInfosComponent)
+        redirectTo: 'cuisine/utilisateurs',
+        pathMatch: 'full'
       },
 
       // Employé
@@ -108,7 +109,8 @@ export const B2B_ROUTES: Routes = [
       },
       {
         path: 'employe/panier',
-        loadComponent: () => import('../features/employe/panier/b2b-panier.component').then(m => m.B2bPanierComponent)
+        redirectTo: 'employe/menu',
+        pathMatch: 'full'
       },
       {
         path: 'employe/commandes',

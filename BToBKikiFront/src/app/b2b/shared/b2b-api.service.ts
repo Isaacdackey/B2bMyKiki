@@ -229,4 +229,22 @@ export class B2bApiService {
   toggleArchiveCategorie(code: string): Observable<ApiResponse<any>> {
     return this.http.patch<ApiResponse<any>>(`${this.baseUrl}/b2b/parametres/categories/${encodeURIComponent(code)}/archive`, {}, { headers: this.getHeaders() });
   }
+
+  envoyerRelanceCommande(payload: {
+    entrepriseId: string;
+    entrepriseNom: string;
+    expediteurNom: string;
+    message: string;
+    destinataires: Array<{ email: string; nomComplet: string }>;
+  }): Observable<ApiResponse<any[]>> {
+    return this.http.post<ApiResponse<any[]>>(`${this.baseUrl}/b2b/alertes/relance`, payload, { headers: this.getHeaders() });
+  }
+
+  getAlertesEmploye(email: string): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/b2b/alertes?email=${encodeURIComponent(email)}`, { headers: this.getHeaders() });
+  }
+
+  marquerAlerteLue(id: string): Observable<ApiResponse<any>> {
+    return this.http.patch<ApiResponse<any>>(`${this.baseUrl}/b2b/alertes/${encodeURIComponent(id)}/lire`, {}, { headers: this.getHeaders() });
+  }
 }

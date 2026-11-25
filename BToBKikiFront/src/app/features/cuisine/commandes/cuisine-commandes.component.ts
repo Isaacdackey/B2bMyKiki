@@ -1,8 +1,9 @@
-﻿import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { B2bStateService } from '../../../b2b/shared/b2b-state.service';
+import { EmployeB2B } from '../../../b2b/shared/b2b.models';
 
 @Component({
   selector: 'app-cuisine-commandes',
@@ -52,5 +53,90 @@ export class CuisineCommandesComponent {
   commandesEnAttenteCount = computed(() => {
     return this.commandesSite().filter(c => c.statut === 'EN_COURS').length;
   });
+
+  // Commander pour un employé (avec ou sans compte)
+  showModalCommandeEmploye = signal<boolean>(false);
+  modeSansCompte = signal<boolean>(false);
+  rechercheEmploye = signal<string>('');
+  employeSelectionne = signal<EmployeB2B | null>(null);
+  inviteNom = signal<string>('');
+  inviteMatricule = signal<string>('');
+  platSelectionneId = signal<string>('');
+  quantiteProxy = signal<number>(1);
+
+  platsDisponibles = computed(() => this.b2b.catalogueJour().filter(p => !p.isArchive));
+
+  employesFiltres = computed(() => {
+    const q = this.rechercheEmploye().trim().toLowerCase();
+    const entId = this.entreprise().id;
+    const list = this.b2b.listeEmployes().filter(e => !e.siteId || e.siteId === entId || true);
+    if (!q) return list;
+    return list.filter(e =>
+      `${e.prenom} ${e.nom}`.toLowerCase().includes(q) ||
+      e.matricule.toLowerCase().includes(q)
+    );
+  });
+
+  ouvrirModalCommandeEmploye() {
+    this.modeSansCompte.set(false);
+    this.rechercheEmploye.set('');
+    this.employeSelectionne.set(null);
+    this.inviteNom.set('');
+    this.inviteMatricule.set('');
+    this.quantiteProxy.set(1);
+    const firstPlat = this.platsDisponibles()[0];
+    this.platSelectionneId.set(firstPlat?.id || '');
+    this.showModalCommandeEmploye.set(true);
+  }
+
+  validerCommandePourEmploye() {
+    const plat = this.platsDisponibles().find(p => p.id === this.platSelectionneId());
+    if (!plat) {
+      alert('Veuillez sélectionner un plat.');
+      return;
+    }
+
+    let matricule = '';
+    let employeNom = '';
+    let taux = 0;
+
+    if (this.modeSansCompte()) {
+      employeNom = this.inviteNom().trim();
+      matricule = this.inviteMatricule().trim() || `INV-${Date.now().toString().slice(-4)}`;
+      if (!employeNom) {
+        alert('Veuillez saisir le nom du collaborateur.');
+        return;
+      }
+    } else {
+      const emp = this.employeSelectionne();
+      if (!emp) {
+        alert('Veuillez sélectionner un employé dans la liste ou passer en mode sans compte.');
+        return;
+      }
+      matricule = emp.matricule;
+      employeNom = `${emp.prenom} ${emp.nom}`;
+      taux = emp.tauxSubvention;
+    }
+
+    const qte = Math.max(1, this.quantiteProxy());
+    const montantTotal = (plat.prixUnitaire || 0) * qte;
+    const partEntreprise = Math.round((montantTotal * taux) / 100);
+    const partEmploye = Math.max(0, montantTotal - partEntreprise);
+    const codeCommande = `CMD-SITE-${Date.now().toString().slice(-6)}`;
+
+    this.b2b.enregistrerCommandeSite({
+      codeCommande,
+      platNom: qte > 1 ? `${plat.nom} (x${qte})` : plat.nom,
+      categorie: plat.categorie,
+      montantTotal,
+      partEntreprise,
+      partEmploye,
+      matricule,
+      employeNom,
+      tauxSubvention: taux
+    });
+
+    this.showModalCommandeEmploye.set(false);
+  }
 
 }

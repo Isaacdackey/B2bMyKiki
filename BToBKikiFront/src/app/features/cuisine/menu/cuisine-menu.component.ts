@@ -1,4 +1,4 @@
-﻿import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -88,19 +88,52 @@ export class CuisineMenuComponent {
     };
   });
 
-  // GESTION DU QR CODE CANTINE DU JOUR À PROJETER (Grand Écran)
+  // MODAL AJOUT DE PLAT AU MENU DU JOUR (STYLE VISUEL PAR CATÉGORIE)
   showModalAjoutPlat = signal<boolean>(false);
   platSelectionnePourAjout = signal<string>('');
   quantiteInitialeAjout = signal<number>(40);
+  categorieAjoutModal = signal<string>('PLAT');
+
+  categoriesAjoutDisponibles = computed(() => {
+    const autorisees = this.entreprise().categoriesAutorisees;
+    const all = [
+      { code: 'ENTREE', libelle: 'Entrées' },
+      { code: 'PLAT', libelle: 'Plats Chauds' },
+      { code: 'DESSERT', libelle: 'Desserts' },
+      { code: 'BOISSON', libelle: 'Boissons' }
+    ];
+    if (autorisees && autorisees.length > 0) {
+      return all.filter(c => autorisees.includes(c.code));
+    }
+    return all;
+  });
+
+  platsModalFiltres = computed(() => {
+    const cat = this.categorieAjoutModal();
+    return this.catalogueGlobal().filter(p => p.categorie === cat);
+  });
 
   ouvrirModalAjoutPlat() {
     this.platSelectionnePourAjout.set('');
     this.quantiteInitialeAjout.set(this.employesSubventionnesCount() || 40);
+    const cats = this.categoriesAjoutDisponibles();
+    if (cats.length > 0 && !cats.some(c => c.code === this.categorieAjoutModal())) {
+      this.categorieAjoutModal.set(cats[0].code);
+    }
     this.showModalAjoutPlat.set(true);
   }
 
   fermerModalAjoutPlat() {
     this.showModalAjoutPlat.set(false);
+  }
+
+  ajouterPlatDirect(plat: any) {
+    const menuJour = this.menuJourActif();
+    const entId = menuJour ? menuJour.entrepriseId : this.entreprise().id;
+    const jourNom = menuJour ? menuJour.jourNom : this.jourSelectionne();
+    const qte = Math.max(1, Number(this.quantiteInitialeAjout()) || 1);
+    this.b2b.ajouterPlatMenuJour(entId, jourNom, plat, qte);
+    this.b2b.showToast(`${plat.nom} ajouté au menu de ${jourNom} (${qte} portions).`);
   }
 
   confirmerAjoutPlat() {

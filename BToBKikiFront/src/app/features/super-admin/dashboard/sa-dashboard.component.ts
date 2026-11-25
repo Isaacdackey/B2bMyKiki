@@ -1,4 +1,4 @@
-﻿import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -41,6 +41,7 @@ export class SaDashboardComponent {
   dateDebutDashboard = signal<string>('2026-11-12');
   dateFinDashboard = signal<string>('2026-11-12');
   periodeRapideDashboard = signal<PeriodeFilterType>('JOUR');
+  filtreSiteDashboard = signal<string>('TOUS');
   dashboardAnimKey = signal<number>(0);
 
   // États d'interactivité des graphes (Survol / Tooltips & Zoom Courbe)
@@ -63,8 +64,55 @@ export class SaDashboardComponent {
     this.dashboardAnimKey.update(k => k + 1);
   }
 
+  onSiteDashboardChange(siteId: string) {
+    this.filtreSiteDashboard.set(siteId);
+    this.reinitialiserZoomCourbe();
+    this.dashboardAnimKey.update(k => k + 1);
+  }
+
   statsDashboard = computed(() => {
     const p = this.periodeRapideDashboard();
+    const siteFilter = this.filtreSiteDashboard();
+    const entreprises = this.b2b.listeEntreprises();
+    const selectedEnt = siteFilter !== 'TOUS' ? entreprises.find(e => e.id === siteFilter) : null;
+    const scaleFactor = selectedEnt ? Math.max(0.18, 1 / Math.max(1, entreprises.length)) : 1;
+
+    const applySiteFilter = <T extends {
+      ca: number;
+      caPrecedent: number;
+      commandes: number;
+      commandesPrecedent: number;
+      seriesPoints: Array<{ label: string; dateFull: string; total: number; livrees: number; annulees: number; ca: number }>;
+      revenusParEntreprise: Array<{ nom: string; montant: number; pct: string; color: string; heightPct: number }>;
+      [key: string]: any;
+    }>(base: T): T => {
+      if (!selectedEnt) return base;
+      return {
+        ...base,
+        ca: Math.round(base.ca * scaleFactor),
+        caPrecedent: Math.round(base.caPrecedent * scaleFactor),
+        commandes: Math.round(base.commandes * scaleFactor),
+        commandesPrecedent: Math.round(base.commandesPrecedent * scaleFactor),
+        seriesPoints: base.seriesPoints.map(pt => ({
+          ...pt,
+          total: Math.round(pt.total * scaleFactor),
+          livrees: Math.round(pt.livrees * scaleFactor),
+          annulees: Math.max(0, Math.round(pt.annulees * scaleFactor)),
+          ca: Math.round(pt.ca * scaleFactor)
+        })),
+        revenusParEntreprise: [
+          {
+            nom: selectedEnt.nom,
+            montant: Math.round(base.ca * scaleFactor),
+            pct: '100%',
+            color: '#721513',
+            heightPct: 92
+          }
+        ]
+      };
+    };
+
+    const base = (() => {
     if (p === 'JOUR') {
       return {
         ca: 2200000,
@@ -200,6 +248,8 @@ export class SaDashboardComponent {
         ]
       };
     }
+    })();
+    return applySiteFilter(base);
   });
 
   // Points filtrés par le zoom actif sur la courbe
