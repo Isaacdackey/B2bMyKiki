@@ -157,16 +157,15 @@ import { CommandeHistoriqueB2B } from '../../../b2b/shared/b2b.models';
             </div>
 
             <div class="cmd-detail-grid">
-              <div><span>Date &amp; Heure</span><strong>{{ det.date }} à {{ det.heure }}</strong></div>
-              <div><span>Site de retrait</span><strong>{{ det.siteNom }}</strong></div>
-              <div><span>Formule</span><strong>{{ det.formuleNom }}</strong></div>
-              <div><span>Plat principal</span><strong>{{ det.platNom }}</strong></div>
-              <div><span>Montant total</span><strong>{{ det.prixTotal | number }} FCFA</strong></div>
-              <div><span>Prise en charge</span><strong style="color: #606C38;">{{ det.partEntreprise | number }} FCFA</strong></div>
-              <div><span>Reste / Payé</span><strong style="color: #721513;">{{ det.partEmploye | number }} FCFA</strong></div>
-              <div>
-                <span>Statut</span>
-                <strong>{{ det.statut === 'LIVRE' ? 'Livrée' : det.statut === 'EN_PREPARATION' ? 'En préparation' : 'Validée' }}</strong>
+              <div class="cmd-detail-item"><span>Date &amp; Heure</span><strong>{{ det.date }} • {{ det.heure }}</strong></div>
+              <div class="cmd-detail-item"><span>Statut</span><strong>{{ det.statut === 'LIVRE' ? 'Livrée' : det.statut === 'EN_PREPARATION' ? 'En préparation' : 'Validée' }}</strong></div>
+              <div class="cmd-detail-item cmd-detail-full"><span>Site de retrait</span><strong>{{ det.siteNom }}</strong></div>
+              <div class="cmd-detail-item cmd-detail-full"><span>Formule &amp; Plat principal</span><strong>{{ det.formuleNom }} — {{ det.platNom }}</strong></div>
+              <div class="cmd-detail-item"><span>Montant total</span><strong>{{ det.prixTotal | number }} FCFA</strong></div>
+              <div class="cmd-detail-item"><span>Prise en charge</span><strong style="color: #606C38;">{{ det.partEntreprise | number }} FCFA</strong></div>
+              <div class="cmd-detail-item cmd-detail-full" style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="margin: 0;">Reste / Payé</span>
+                <strong style="color: #721513; font-size: 0.95rem;">{{ det.partEmploye | number }} FCFA</strong>
               </div>
             </div>
 
@@ -298,14 +297,18 @@ import { CommandeHistoriqueB2B } from '../../../b2b/shared/b2b.models';
       border: 1.5px solid #EDE7DC; box-shadow: 0 20px 45px rgba(0, 0, 0, 0.2);
     }
     .cmd-detail-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; background: #FAF8F4;
-      border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 1rem; font-size: 0.82rem;
+      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.65rem; background: #FAF8F4;
+      border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 0.9rem; font-size: 0.82rem;
     }
-    .cmd-detail-grid span { display: block; font-size: 0.68rem; color: #6E5A56; font-weight: 700; text-transform: uppercase; }
-    .cmd-detail-grid strong { color: #2C1810; font-weight: 800; }
+    .cmd-detail-item {
+      background: #FFFFFF; border: 1px solid #EDE7DC; border-radius: 10px; padding: 0.6rem 0.75rem; min-width: 0;
+    }
+    .cmd-detail-full { grid-column: 1 / -1; }
+    .cmd-detail-grid span { display: block; font-size: 0.66rem; color: #6E5A56; font-weight: 700; text-transform: uppercase; margin-bottom: 0.15rem; }
+    .cmd-detail-grid strong { color: #2C1810; font-weight: 800; word-break: break-word; }
     @media (max-width: 767px) {
       .cmd-search-box { max-width: 100%; width: 100%; }
-      .cmd-detail-grid { grid-template-columns: 1fr; }
+      .cmd-detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; padding: 0.75rem; }
       .cmd-pagination { justify-content: center; text-align: center; }
       .cmd-pagination > span { display: none; }
       .cmd-table thead { display: none; }

@@ -203,6 +203,9 @@ export interface PeriodeFilterChange {
     }
 
     @media (max-width: 768px) {
+      :host {
+        width: 100%;
+      }
       .b2b-period-filter-wrap {
         align-items: stretch;
         width: 100%;
@@ -216,12 +219,13 @@ export interface PeriodeFilterChange {
         width: 100%;
         display: flex;
         flex-wrap: nowrap;
+        justify-content: space-between;
         overflow-x: auto;
         scrollbar-width: none;
         -ms-overflow-style: none;
-        gap: 0.25rem;
+        gap: 0.2rem;
         border-radius: 9999px;
-        padding: 0.25rem 2.1rem 0.25rem 0.25rem;
+        padding: 0.25rem 2rem 0.25rem 0.25rem;
         box-sizing: border-box;
       }
       .b2b-period-pills::-webkit-scrollbar {
@@ -233,7 +237,7 @@ export interface PeriodeFilterChange {
         top: 2px;
         bottom: 2px;
         right: 2px;
-        width: 34px;
+        width: 32px;
         display: flex;
         align-items: center;
         justify-content: flex-end;
@@ -249,30 +253,43 @@ export interface PeriodeFilterChange {
       .b2b-period-pill {
         flex-shrink: 0;
         justify-content: center;
-        padding: 0.38rem 0.72rem;
+        padding: 0.38rem 0.68rem;
         font-size: 0.74rem;
         border-radius: 9999px;
       }
       .b2b-custom-date-row {
         width: 100%;
+        max-width: 100%;
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.6rem;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 0.5rem;
         border-radius: 16px;
-        padding: 0.6rem 0.75rem;
+        padding: 0.55rem 0.65rem;
         box-sizing: border-box;
+        overflow: hidden;
       }
       .b2b-custom-date-field {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
-        gap: 0.25rem;
+        gap: 0.2rem;
+        width: 100%;
         min-width: 0;
+        overflow: hidden;
+      }
+      .b2b-custom-date-label {
+        font-size: 0.68rem;
       }
       .b2b-custom-date-input {
         width: 100%;
+        max-width: 100%;
         min-width: 0;
+        height: 34px;
+        padding: 0.25rem 0.4rem;
+        font-size: 0.74rem;
         box-sizing: border-box;
+        -webkit-appearance: none;
+        appearance: none;
       }
     }
   `]

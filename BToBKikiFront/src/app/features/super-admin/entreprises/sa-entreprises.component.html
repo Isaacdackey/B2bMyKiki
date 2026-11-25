@@ -1026,13 +1026,13 @@
             </p>
           </div>
 
-          <div style="display: inline-flex; background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 9999px; padding: 0.25rem; gap: 0.25rem; box-shadow: 0 2px 8px rgba(114, 21, 19, 0.04);">
+          <div style="display: flex; width: 100%; background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 9999px; padding: 0.25rem; gap: 0.25rem; box-shadow: 0 2px 8px rgba(114, 21, 19, 0.04); box-sizing: border-box;">
             <button
               type="button"
               (click)="entreprisesSubTab.set('ENTREPRISES')"
               [style.background]="entreprisesSubTab() === 'ENTREPRISES' ? '#721513' : 'transparent'"
               [style.color]="entreprisesSubTab() === 'ENTREPRISES' ? '#FFFFFF' : '#6E5A56'"
-              style="border: none; border-radius: 9999px; padding: 0.45rem 1rem; font-size: 0.8rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;">
+              style="flex: 1; justify-content: center; border: none; border-radius: 9999px; padding: 0.5rem 0.85rem; font-size: 0.8rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; white-space: nowrap;">
               <i class="fa-solid fa-building"></i> Entreprises ({{ b2b.listeEntreprises().length }})
             </button>
             <button
@@ -1040,7 +1040,7 @@
               (click)="entreprisesSubTab.set('PRESTATIONS')"
               [style.background]="entreprisesSubTab() === 'PRESTATIONS' ? '#721513' : 'transparent'"
               [style.color]="entreprisesSubTab() === 'PRESTATIONS' ? '#FFFFFF' : '#6E5A56'"
-              style="border: none; border-radius: 9999px; padding: 0.45rem 1rem; font-size: 0.8rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;">
+              style="flex: 1; justify-content: center; border: none; border-radius: 9999px; padding: 0.5rem 0.85rem; font-size: 0.8rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; white-space: nowrap;">
               <i class="fa-solid fa-sliders"></i> Prestations &amp; Catégories
             </button>
           </div>
@@ -1072,9 +1072,9 @@
             </button>
           </div>
 
-          <!-- Bouton Conventionner une Entreprise à droite -->
-          <button (click)="ouvrirModalNouvelleEntreprise()" class="sa-btn-primary" style="flex-shrink: 0; white-space: nowrap;">
-            <i class="fa-solid fa-plus"></i> Conventionner une Entreprise
+          <!-- Bouton Ajouter une Entreprise à droite -->
+          <button (click)="ouvrirModalNouvelleEntreprise()" class="sa-btn-primary" style="flex-shrink: 0; white-space: nowrap; margin-left: auto;">
+            <i class="fa-solid fa-plus"></i> Ajouter une Entreprise
           </button>
         </div>
 
@@ -1139,17 +1139,20 @@
                 </div>
 
                 <!-- Actions directes sur la fiche entreprise -->
-                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <div style="display: flex; gap: 0.5rem; flex-wrap: nowrap; align-items: center;">
                   <!-- BOUTON PRINCIPAL GÉRER L'ENTREPRISE (ÉTAPE 2) -->
-                  <button (click)="ouvrirGestionEntreprise(ent)" class="sa-btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem;" title="Gérer l'entreprise : Utilisateurs, Menus, Commandes & Facturation">
+                  <button (click)="ouvrirGestionEntreprise(ent)" class="sa-btn-primary" style="padding: 0.5rem 1rem; font-size: 0.84rem; white-space: nowrap;" title="Gérer l'entreprise : Utilisateurs, Menus, Commandes & Facturation">
                     <i class="fa-solid fa-sliders"></i> Gérer l'entreprise
                   </button>
-                  <button (click)="ouvrirModalModifierEntreprise(ent)" class="sa-btn-action" title="Modifier la convention">
-                    <i class="fa-regular fa-pen-to-square"></i> Modifier
+                  <button (click)="ouvrirModalModifierEntreprise(ent)" class="sa-btn-action" title="Modifier la convention" aria-label="Modifier"
+                    style="width: 40px; min-width: 40px; height: 40px; padding: 0; justify-content: center; border-radius: 10px;">
+                    <i class="fa-regular fa-pen-to-square"></i>
                   </button>
-                  <button (click)="b2b.toggleArchiverEntreprise(ent.id)" class="sa-btn-action" [style.color]="ent.isArchivee ? '#606C38' : '#E51D24'">
+                  <button (click)="b2b.toggleArchiverEntreprise(ent.id)" class="sa-btn-action"
+                    [title]="ent.isArchivee ? 'Restaurer' : 'Archiver'" [attr.aria-label]="ent.isArchivee ? 'Restaurer' : 'Archiver'"
+                    [style.color]="ent.isArchivee ? '#606C38' : '#E51D24'"
+                    style="width: 40px; min-width: 40px; height: 40px; padding: 0; justify-content: center; border-radius: 10px;">
                     <i class="fa-solid" [class.fa-box-archive]="!ent.isArchivee" [class.fa-rotate-left]="ent.isArchivee"></i>
-                    {{ ent.isArchivee ? 'Restaurer' : 'Archiver' }}
                   </button>
                 </div>
               </div>

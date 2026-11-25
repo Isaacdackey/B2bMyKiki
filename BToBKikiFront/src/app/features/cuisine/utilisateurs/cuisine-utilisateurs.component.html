@@ -18,6 +18,13 @@
         </div>
 
         <div class="cuisine-table-wrap">
+          @if (employesSite().length === 0) {
+            <div style="padding: 3rem 1.5rem; text-align: center; color: #6E5A56;">
+              <i class="fa-solid fa-users-slash" style="font-size: 2.25rem; color: #C5A880; display: block; margin-bottom: 0.75rem;"></i>
+              <p style="margin: 0; font-weight: 800; font-size: 0.95rem; color: #721513;">Aucun collaborateur rattaché à ce site pour le moment</p>
+              <p style="margin: 0.3rem 0 0; font-size: 0.8rem;">Les salariés conventionnés et autonomes apparaîtront ici dès leur inscription.</p>
+            </div>
+          } @else {
           <table class="cuisine-table">
             <thead>
               <tr>
@@ -65,6 +72,7 @@
               }
             </tbody>
           </table>
+          }
         </div>
       </div>
   </main>
