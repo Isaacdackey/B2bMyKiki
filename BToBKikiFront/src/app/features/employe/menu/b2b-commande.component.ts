@@ -209,17 +209,46 @@ export class B2bCommandeComponent implements OnInit {
           nom: l.nomPlat,
           description: platOrigine?.description || 'Plat cuisiné frais du jour par la brigade Kiki.',
           categorie: l.categorie as any,
+          garniture: platOrigine?.garniture,
           prixUnitaire: platOrigine?.prixUnitaire || 3000,
           image: platOrigine?.image || '/assets/images/plats/p1.jpg',
           calories: platOrigine?.calories || 500,
           disponible: l.disponible !== false
         };
       });
-      if (!listeBase.some(p => p.categorie === 'GARNITURE')) {
-        listeBase = [
-          ...listeBase,
-          ...this.b2b.catalogueJour().filter(p => !p.isArchive && p.categorie === 'GARNITURE')
-        ];
+      const existingIds = new Set(listeBase.map(p => p.id));
+      const garnituresCatalogue = this.b2b.catalogueJour().filter(
+        p => !p.isArchive && p.categorie === 'GARNITURE' && !existingIds.has(p.id)
+      );
+      listeBase = [...listeBase, ...garnituresCatalogue];
+
+      const nomsGarnituresPresentes = new Set(
+        listeBase
+          .filter(p => p.categorie === 'GARNITURE')
+          .map(p => p.nom.trim().toLowerCase())
+      );
+      const garnituresAssociees: PlatB2B[] = [];
+      for (const p of listeBase) {
+        const gNom = p.garniture?.trim();
+        if (gNom && !nomsGarnituresPresentes.has(gNom.toLowerCase())) {
+          nomsGarnituresPresentes.add(gNom.toLowerCase());
+          const ficheGarniture = this.b2b.catalogueJour().find(
+            c => c.categorie === 'GARNITURE' && c.nom.trim().toLowerCase() === gNom.toLowerCase()
+          );
+          garnituresAssociees.push({
+            id: ficheGarniture?.id || `garniture-${p.id}`,
+            nom: ficheGarniture?.nom || gNom,
+            description: ficheGarniture?.description || `Garniture d'accompagnement associée à ${p.nom}.`,
+            categorie: 'GARNITURE',
+            prixUnitaire: ficheGarniture?.prixUnitaire ?? 0,
+            image: ficheGarniture?.image || this.getImageDefautGarniture(gNom),
+            calories: ficheGarniture?.calories || 250,
+            disponible: p.disponible !== false
+          });
+        }
+      }
+      if (garnituresAssociees.length > 0) {
+        listeBase = [...listeBase, ...garnituresAssociees];
       }
     } else {
       // Fallback catalogue complet
@@ -374,7 +403,25 @@ export class B2bCommandeComponent implements OnInit {
 
   // Helper stock pour le template
   getStock(platId: string) {
-    return this.b2b.getStockInfoPlat(platId, this.jourSelectionne());
+    const cleanId = platId.startsWith('garniture-') ? platId.slice('garniture-'.length) : platId;
+    return this.b2b.getStockInfoPlat(cleanId, this.jourSelectionne());
+  }
+
+  private getImageDefautGarniture(nom: string): string {
+    const n = nom.trim().toLowerCase();
+    if (n.includes('riz')) {
+      return 'https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=800&q=80';
+    }
+    if (n.includes('frite') || n.includes('pomme')) {
+      return 'https://images.unsplash.com/photo-1576107232684-1279f3908594?auto=format&fit=crop&w=800&q=80';
+    }
+    if (n.includes('alloco') || n.includes('plantain')) {
+      return 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=800&q=80';
+    }
+    if (n.includes('légume') || n.includes('legume')) {
+      return 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80';
+    }
+    return 'https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=800&q=80';
   }
 
   // Ouvrir / fermer le tiroir latéral du panier ou scroll vers le panier

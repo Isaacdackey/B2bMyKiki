@@ -30,8 +30,9 @@
               <select [ngModel]="filtreCategorieCatalogue()" (ngModelChange)="filtreCategorieCatalogue.set($event)"
                 style="height: 44px; min-height: 44px; font-size: 0.85rem; color: #721513;">
                 <option value="TOUS">Toutes les Catégories</option>
-                <option value="PLAT">Plats Chauds &amp; Spécialités</option>
                 <option value="ENTREE">Entrées &amp; Salades</option>
+                <option value="PLAT">Plats Chauds &amp; Spécialités</option>
+                <option value="GARNITURE">Garnitures &amp; Accompagnements</option>
                 <option value="DESSERT">Desserts &amp; Douceurs</option>
                 <option value="BOISSON">Boissons &amp; Jus Frais</option>
               </select>
@@ -91,12 +92,13 @@
 
               <!-- Badge Catégorie -->
               <span
-                [style.background]="plat.categorie === 'PLAT' ? '#721513' : plat.categorie === 'ENTREE' ? '#606C38' : plat.categorie === 'DESSERT' ? '#C05621' : '#332724'"
+                [style.background]="plat.categorie === 'PLAT' ? '#721513' : plat.categorie === 'GARNITURE' ? '#8C6239' : plat.categorie === 'ENTREE' ? '#606C38' : plat.categorie === 'DESSERT' ? '#C05621' : '#332724'"
                 style="position: absolute; top: 12px; left: 12px; color: #FAF8F4; padding: 0.3rem 0.75rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,0.25); display: flex; align-items: center; gap: 0.35rem;">
                 <i class="fa-solid" [class.fa-bowl-food]="plat.categorie === 'PLAT'"
+                  [class.fa-bowl-rice]="plat.categorie === 'GARNITURE'"
                   [class.fa-leaf]="plat.categorie === 'ENTREE'" [class.fa-cake-candles]="plat.categorie === 'DESSERT'"
                   [class.fa-wine-glass]="plat.categorie === 'BOISSON'"></i>
-                {{ plat.categorie === 'PLAT' ? 'Plat Chaud' : plat.categorie === 'ENTREE' ? 'Entrée' : plat.categorie
+                {{ plat.categorie === 'PLAT' ? 'Plat Chaud' : plat.categorie === 'GARNITURE' ? 'Garniture' : plat.categorie === 'ENTREE' ? 'Entrée' : plat.categorie
                 === 'DESSERT' ? 'Dessert' : 'Boisson' }}
               </span>
 
@@ -122,6 +124,12 @@
 
               <!-- Fiche nutritionnelle / allergènes si renseignés -->
               <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.85rem;">
+                @if (plat.garniture) {
+                <span
+                  style="background: #FDF8EE; border: 1px solid #E2D5BE; color: #721513; font-size: 0.7rem; font-weight: 800; padding: 0.2rem 0.55rem; border-radius: 6px;">
+                  <i class="fa-solid fa-bowl-rice"></i> Garniture : {{ plat.garniture }}
+                </span>
+                }
                 @if (plat.calories) {
                 <span
                   style="background: rgba(96, 108, 56, 0.1); color: #606C38; font-size: 0.7rem; font-weight: 800; padding: 0.2rem 0.55rem; border-radius: 6px;">
@@ -224,11 +232,15 @@
             <label
               style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">Catégorie
               Alimentaire</label>
-            <select [(ngModel)]="platEnEdition().categorie" style="width: 100%; min-height: 42px;">
-              <option value="PLAT">Plat Chaud Principal</option>
-              <option value="ENTREE">Entrée &amp; Salade</option>
-              <option value="DESSERT">Dessert &amp; Douceur</option>
-              <option value="BOISSON">Boisson &amp; Jus Frais</option>
+            <select [(ngModel)]="platEnEdition().categorie" [disabled]="platEnEdition().categorie === 'GARNITURE'" style="width: 100%; min-height: 42px;">
+              @if (platEnEdition().categorie === 'GARNITURE') {
+                <option value="GARNITURE">Garniture &amp; Accompagnement</option>
+              } @else {
+                <option value="ENTREE">Entrée &amp; Salade</option>
+                <option value="PLAT">Plat Chaud Principal</option>
+                <option value="DESSERT">Dessert &amp; Douceur</option>
+                <option value="BOISSON">Boisson &amp; Jus Frais</option>
+              }
             </select>
           </div>
 
@@ -237,16 +249,49 @@
               <label style="font-size: 0.78rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">
                 <i class="fa-solid fa-bowl-rice"></i> Garniture associée (Plat Chaud)
               </label>
-              <select [(ngModel)]="platEnEdition().garniture" style="width: 100%; min-height: 42px;">
+              <select [ngModel]="platEnEdition().garniture" (ngModelChange)="onChangeGarnitureSelectionnee($event)" style="width: 100%; min-height: 42px;">
                 <option value="">Aucune / Au choix du client</option>
-                <option value="Riz Parfumé">Riz Parfumé</option>
-                <option value="Alloco Doré">Alloco Doré</option>
-                <option value="Frites Maison">Frites Maison</option>
-                <option value="Attiéké">Attiéké</option>
-                <option value="Légumes Sautés">Légumes Sautés</option>
-                <option value="Purée de Pommes de Terre">Purée de Pommes de Terre</option>
+                @for (g of optionsGarnituresDisponibles(); track g) {
+                  <option [value]="g">{{ g }}</option>
+                }
               </select>
             </div>
+
+            @if (platEnEdition().garniture) {
+              <div style="grid-column: 1 / -1;">
+                <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">
+                  <i class="fa-solid fa-camera"></i> Photo de la Garniture « {{ platEnEdition().garniture }} » (Import Cloudinary)
+                </label>
+                <label
+                  style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; background: #FDF8EE; border: 1.5px dashed #C5A880; border-radius: 12px; padding: 0.65rem 0.85rem; cursor: pointer;">
+                  <div style="display: flex; align-items: center; gap: 0.75rem; min-width: 0; flex: 1 1 180px;">
+                    @if (garnitureImageEnEdition()) {
+                      <img [src]="garnitureImageEnEdition()" alt="Aperçu garniture"
+                        style="width: 48px; height: 48px; border-radius: 10px; object-fit: cover; border: 1.5px solid #E2D5BE; flex-shrink: 0;">
+                    } @else {
+                      <div
+                        style="width: 48px; height: 48px; border-radius: 10px; background: rgba(114, 21, 19, 0.08); color: #721513; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; flex-shrink: 0;">
+                        <i class="fa-solid fa-bowl-rice"></i>
+                      </div>
+                    }
+                    <div style="min-width: 0;">
+                      <div style="font-size: 0.8rem; font-weight: 800; color: #332724;">
+                        {{ isUploadingGarnitureImage() ? 'Import Cloudinary en cours...' : 'Photo de ' + platEnEdition().garniture + ' — cliquez pour remplacer' }}
+                      </div>
+                      <div style="font-size: 0.72rem; color: #6E5A56;">
+                        Cette photo s'affichera dans l'onglet « 3. Garniture » côté client
+                      </div>
+                    </div>
+                  </div>
+                  <span
+                    style="background: #8C6239; color: #FFFFFF; padding: 0.45rem 0.85rem; border-radius: 8px; font-size: 0.75rem; font-weight: 800; white-space: nowrap; flex-shrink: 0;">
+                    <i class="fa-solid fa-upload"></i> {{ isUploadingGarnitureImage() ? 'Chargement...' : 'Photo Garniture' }}
+                  </span>
+                  <input type="file" accept="image/*" (change)="onUploadImageGarniture($event)" [disabled]="isUploadingGarnitureImage()"
+                    style="display: none;">
+                </label>
+              </div>
+            }
           }
         </div>
 
