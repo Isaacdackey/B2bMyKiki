@@ -43,9 +43,9 @@ public class EmployeService {
         if (emp.getEmail() != null && !emp.getEmail().isBlank() && !emp.getEmail().trim().matches(REGEX_EMAIL)) {
             throw new BusinessException("Adresse email invalide.");
         }
-        if (emp.getTelephone() != null && !emp.getTelephone().isBlank()
-                && !"+221".equals(emp.getTelephone().trim())
-                && !emp.getTelephone().trim().matches(REGEX_TEL_SN)) {
+        if (emp.getTelephone() == null || emp.getTelephone().isBlank()
+                || "+221".equals(emp.getTelephone().trim())
+                || !emp.getTelephone().trim().matches(REGEX_TEL_SN)) {
             throw new BusinessException("Numéro de téléphone sénégalais invalide (ex: +221 77 123 45 67).");
         }
         if (emp.getMatricule() != null && !emp.getMatricule().isBlank()

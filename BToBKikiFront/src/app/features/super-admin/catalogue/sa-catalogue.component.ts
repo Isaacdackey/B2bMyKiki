@@ -220,11 +220,13 @@ export class SaCatalogueComponent {
   ouvrirModalAjoutPlat() {
     this.isEditModePlat.set(false);
     this.garnitureImageEnEdition.set('');
+    const catFiltre = this.filtreCategorieCatalogue();
+    const catDefaut = catFiltre === 'TOUS' ? 'PLAT' : catFiltre;
     this.platEnEdition.set({
       nom: '',
       description: '',
-      categorie: 'PLAT',
-      prixUnitaire: 2800,
+      categorie: catDefaut,
+      prixUnitaire: catDefaut === 'GARNITURE' ? 0 : 2800,
       image: '/assets/images/plats/p1.jpg'
     });
     this.showModalPlat.set(true);

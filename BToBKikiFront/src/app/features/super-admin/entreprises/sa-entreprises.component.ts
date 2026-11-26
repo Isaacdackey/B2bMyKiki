@@ -391,8 +391,8 @@ export class SaEntreprisesComponent {
     return Object.keys(errs).length === 0;
   }
 
-  onTelephoneChange(value: string) {
-    let digits = (value || '').replace(/\D/g, '');
+  private formatSenegalPhone(raw: string): string {
+    let digits = (raw || '').replace(/\D/g, '');
     if (digits.startsWith('00221')) digits = digits.slice(5);
     else if (digits.startsWith('221')) digits = digits.slice(3);
     digits = digits.slice(0, 9);
@@ -403,7 +403,18 @@ export class SaEntreprisesComponent {
     if (digits.length > 5) parts.push(digits.slice(5, 7));
     if (digits.length > 7) parts.push(digits.slice(7, 9));
 
-    const formatted = parts.length > 0 ? `+221 ${parts.join(' ')}` : '+221 ';
+    return parts.length > 0 ? `+221 ${parts.join(' ')}` : '+221 ';
+  }
+
+  onTelephoneChange(value: string) {
+    const formatted = this.formatSenegalPhone(value);
+    this.entrepriseEnEdition.update(e => ({ ...e, telephone: formatted }));
+  }
+
+  onTelephoneInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const formatted = this.formatSenegalPhone(input.value);
+    input.value = formatted;
     this.entrepriseEnEdition.update(e => ({ ...e, telephone: formatted }));
   }
 
@@ -640,8 +651,8 @@ export class SaEntreprisesComponent {
   filtrePlatCommande = signal<string>('TOUS');
 
   // Onglet 5 : Facturation
-  dateDebutFacturation = signal<string>('2026-11-01');
-  dateFinFacturation = signal<string>('2026-11-30');
+  dateDebutFacturation = signal<string>((() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`; })());
+  dateFinFacturation = signal<string>((() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth() + 1, 0).toISOString().slice(0, 10); })());
 
   // Méthodes pour ouvrir / fermer la gestion de l'entreprise
   ouvrirGestionEntreprise(ent: EntrepriseB2B) {
@@ -760,18 +771,14 @@ export class SaEntreprisesComponent {
   readonly REGEX_MATRICULE = /^[A-Z0-9-]{3,20}$/i;
 
   onTelephoneEmployeChange(value: string) {
-    let digits = (value || '').replace(/\D/g, '');
-    if (digits.startsWith('00221')) digits = digits.slice(5);
-    else if (digits.startsWith('221')) digits = digits.slice(3);
-    digits = digits.slice(0, 9);
+    const formatted = this.formatSenegalPhone(value);
+    this.employeEnCreation.update(e => ({ ...e, telephone: formatted }));
+  }
 
-    const parts: string[] = [];
-    if (digits.length > 0) parts.push(digits.slice(0, 2));
-    if (digits.length > 2) parts.push(digits.slice(2, 5));
-    if (digits.length > 5) parts.push(digits.slice(5, 7));
-    if (digits.length > 7) parts.push(digits.slice(7, 9));
-
-    const formatted = parts.length > 0 ? `+221 ${parts.join(' ')}` : '+221 ';
+  onTelephoneEmployeInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const formatted = this.formatSenegalPhone(input.value);
+    input.value = formatted;
     this.employeEnCreation.update(e => ({ ...e, telephone: formatted }));
   }
 
@@ -786,24 +793,30 @@ export class SaEntreprisesComponent {
     if (cur.matricule && cur.matricule.trim() && !this.REGEX_MATRICULE.test(cur.matricule.trim())) {
       errs.matricule = 'Format invalide (ex: TOT-1042).';
     }
-    if (cur.email && cur.email.trim() && !this.REGEX_EMAIL.test(cur.email.trim())) {
+    if (!cur.email || !cur.email.trim()) {
+      errs.email = "L'adresse email est obligatoire.";
+    } else if (!this.REGEX_EMAIL.test(cur.email.trim())) {
       errs.email = 'Adresse email invalide.';
     }
-    if (cur.telephone && cur.telephone.trim() && cur.telephone.trim() !== '+221' && !this.REGEX_TEL_SN.test(cur.telephone.trim())) {
-      errs.telephone = 'Numéro sénégalais invalide (ex: +221 77 123 45 67).';
+    const telTrim = (cur.telephone || '').trim();
+    if (!telTrim || telTrim === '+221' || !this.REGEX_TEL_SN.test(telTrim)) {
+      errs.telephone = 'Veuillez saisir un numéro sénégalais valide (ex: +221 77 123 45 67).';
     }
 
     this.erreursEmploye.set(errs);
-    if (Object.keys(errs).length > 0) return;
+    if (Object.keys(errs).length > 0) {
+      this.b2b.showToast(errs.telephone || errs.email || errs.prenom || errs.nom || errs.matricule || 'Veuillez vérifier les champs saisis.', 'error');
+      return;
+    }
 
     const matricule = (cur.matricule || '').trim() || `${ent?.codeEntreprise || 'EMP'}-${Math.floor(1000 + Math.random() * 9000)}`;
-    const email = (cur.email || '').trim() || `${cur.prenom!.trim().toLowerCase()}.${cur.nom!.trim().toLowerCase()}@client.sn`;
+    const email = cur.email!.trim();
     this.b2b.ajouterEmploye({
       matricule,
       nom: cur.nom!.trim(),
       prenom: cur.prenom!.trim(),
       email,
-      telephone: (cur.telephone && cur.telephone.trim() !== '+221') ? cur.telephone.trim() : '+221 77 000 00 00',
+      telephone: telTrim,
       entrepriseId: ent?.id || 'ent-001',
       siteId: ent?.id || 'site-1',
       siteNom: ent?.nom || 'Siège',

@@ -136,7 +136,7 @@
 
             <div>
               <label style="font-size: 0.72rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.25rem;">Numéro Téléphone / Wave * :</label>
-              <input type="text" [(ngModel)]="newAutonome().telephone" placeholder="+221 77 000 00 00" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.5rem; font-size: 0.85rem;">
+              <input type="tel" maxlength="17" [ngModel]="newAutonome().telephone" (ngModelChange)="onTelephoneAutonomeChange($event)" (input)="onTelephoneAutonomeInput($event)" placeholder="+221 77 123 45 67" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.5rem; font-size: 0.85rem;">
             </div>
 
             <div>

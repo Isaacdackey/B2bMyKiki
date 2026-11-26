@@ -183,9 +183,13 @@ export class SaPlanningComponent {
     const menu = this.b2b.menusPlanifiesEntreprises().find(m => (m.entrepriseId === 'ent-001' || m.entrepriseId === 'GLOBAL') && m.jourNom === jour);
     if (!menu) return undefined;
     const archivedIds = new Set(this.b2b.catalogueJour().filter(p => !!p.isArchive).map(p => p.id));
+    const ordreCat: Record<string, number> = { ENTREE: 1, PLAT: 2, GARNITURE: 3, BOISSON: 4, DESSERT: 5 };
     return {
       ...menu,
-      lignes: menu.lignes.filter(l => !archivedIds.has(l.platId))
+      lignes: menu.lignes
+        .filter(l => !archivedIds.has(l.platId))
+        .slice()
+        .sort((a, b) => (ordreCat[a.categorie] ?? 99) - (ordreCat[b.categorie] ?? 99))
     };
   });
 
@@ -197,6 +201,12 @@ export class SaPlanningComponent {
 
   ajouterPlatAuProgrammeGlobal(plat: PlatB2B) {
     const jour = this.jourPlanningGlobalActif();
+    const dejaPresent = this.menuModeleGlobalJourActif()?.lignes?.some(l => l.platId === plat.id);
+    if (dejaPresent) {
+      this.b2b.showToast(`« ${plat.nom} » est déjà programmé pour ${jour}.`, 'error');
+      this.modalAjouterPlatAuJourGlobal.set(false);
+      return;
+    }
     this.b2b.ajouterPlatMenuJour('ent-001', jour, plat, 35);
     this.modalAjouterPlatAuJourGlobal.set(false);
   }

@@ -5,6 +5,8 @@ export interface UserSessionB2B {
   nomComplet: string;
   titrePoste: string;
   entite: string; // Ex: "TotalEnergies Sénégal" ou "Kiki Traiteur Exploitation"
+  email?: string;
+  entrepriseId?: string;
   siteId?: string;
   siteNom?: string;
   matricule?: string;

@@ -18,10 +18,11 @@ export class CuisineUtilisateursComponent {
 
   entreprise = computed(() => this.b2b.currentEntreprise());
   employesSite = computed(() => {
-    const entId = this.entreprise().id;
-    return this.b2b.listeEmployes().filter(e => {
-      return (e.siteNom && e.siteNom.toLowerCase().includes('plateau')) || e.siteId === 'site-1';
-    });
+    const ent = this.entreprise();
+    const siteIds = new Set((ent.sites || []).map(s => s.id));
+    const list = this.b2b.listeEmployes();
+    const matched = list.filter(e => siteIds.has(e.siteId) || (e as any).entrepriseId === ent.id);
+    return matched.length > 0 ? matched : list;
   });
 
   employesSubventionnesCount = computed(() => {

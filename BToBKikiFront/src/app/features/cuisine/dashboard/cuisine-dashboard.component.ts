@@ -1,4 +1,4 @@
-﻿import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -29,8 +29,9 @@ export class CuisineDashboardComponent {
     this.router.navigate([map[tab] || '/b2b/cuisine/dashboard']);
   }
 
-  dashboardDateDebut = signal<string>('2026-11-12');
-  dashboardDateFin = signal<string>('2026-11-12');
+  private readonly todayIso = new Date().toISOString().slice(0, 10);
+  dashboardDateDebut = signal<string>(this.todayIso);
+  dashboardDateFin = signal<string>(this.todayIso);
 
   onPeriodeDashboardCuisineChange(ev: PeriodeFilterChange) {
     this.dashboardDateDebut.set(ev.dateDebut);
@@ -64,10 +65,11 @@ export class CuisineDashboardComponent {
 
   // Utilisateurs du site géré
   employesSite = computed(() => {
-    const entId = this.entreprise().id;
-    return this.b2b.listeEmployes().filter(e => {
-      return (e.siteNom && e.siteNom.toLowerCase().includes('plateau')) || e.siteId === 'site-1';
-    });
+    const ent = this.entreprise();
+    const siteIds = new Set((ent.sites || []).map(s => s.id));
+    const list = this.b2b.listeEmployes();
+    const matched = list.filter(e => siteIds.has(e.siteId) || (e as any).entrepriseId === ent.id);
+    return matched.length > 0 ? matched : list;
   });
 
   employesSubventionnesCount = computed(() => {

@@ -18,11 +18,12 @@ export class RhEmployesComponent {
   constructor() {
   }
 
+  private readonly todayIso = new Date().toISOString().slice(0, 10);
   tauxSubventionError = signal<string>('');
   searchQuery = signal<string>('');
   selectedSiteFilter = signal<string>('TOUS');
-  employeDateDebut = signal<string>('2026-11-01');
-  employeDateFin = signal<string>('2026-11-12');
+  employeDateDebut = signal<string>(this.todayIso.slice(0, 8) + '01');
+  employeDateFin = signal<string>(this.todayIso);
 
   onPeriodeEmployesChange(ev: PeriodeFilterChange) {
     this.employeDateDebut.set(ev.dateDebut);
@@ -31,8 +32,8 @@ export class RhEmployesComponent {
   }
 
   // Filtres Facturation
-  factureDateDebut = signal<string>('2026-11-01');
-  factureDateFin = signal<string>('2026-11-12');
+  factureDateDebut = signal<string>(this.todayIso.slice(0, 8) + '01');
+  factureDateFin = signal<string>(this.todayIso);
 
   // Modal nouvel employé & modal détails employé
   showAddEmployeeModal = signal<boolean>(false);
@@ -100,6 +101,33 @@ export class RhEmployesComponent {
     }
   }
 
+  private formatSenegalPhone(raw: string): string {
+    let digits = (raw || '').replace(/\D/g, '');
+    if (digits.startsWith('00221')) digits = digits.slice(5);
+    else if (digits.startsWith('221')) digits = digits.slice(3);
+    digits = digits.slice(0, 9);
+
+    const parts: string[] = [];
+    if (digits.length > 0) parts.push(digits.slice(0, 2));
+    if (digits.length > 2) parts.push(digits.slice(2, 5));
+    if (digits.length > 5) parts.push(digits.slice(5, 7));
+    if (digits.length > 7) parts.push(digits.slice(7, 9));
+
+    return parts.length > 0 ? `+221 ${parts.join(' ')}` : '+221 ';
+  }
+
+  onTelephoneRhChange(value: string) {
+    const formatted = this.formatSenegalPhone(value);
+    this.newEmp.update(cur => ({ ...cur, telephone: formatted }));
+  }
+
+  onTelephoneRhInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const formatted = this.formatSenegalPhone(input.value);
+    input.value = formatted;
+    this.newEmp.update(cur => ({ ...cur, telephone: formatted }));
+  }
+
   ouvrirModalAjout() {
     this.tauxSubventionError.set('');
     this.newEmp.set({
@@ -118,8 +146,17 @@ export class RhEmployesComponent {
 
   enregistrerEmploye() {
     const val = this.newEmp();
-    if (!val.nom || !val.prenom || !val.email) {
+    if (!val.nom?.trim() || !val.prenom?.trim() || !val.email?.trim()) {
       this.b2b.showToast('Veuillez renseigner le nom, prénom et email du collaborateur.', 'error');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(val.email.trim())) {
+      this.b2b.showToast('Adresse email invalide.', 'error');
+      return;
+    }
+    const telTrim = (val.telephone || '').trim();
+    if (!telTrim || telTrim === '+221' || !/^(?:\+221|00221)?[\s.-]?(?:7[05678]|3[03])(?:[\s.-]?\d){7}$/.test(telTrim)) {
+      this.b2b.showToast('Veuillez saisir un numéro de téléphone sénégalais valide (ex: +221 77 123 45 67).', 'error');
       return;
     }
     const taux = Number(val.tauxSubvention);
@@ -130,6 +167,7 @@ export class RhEmployesComponent {
     this.tauxSubventionError.set('');
     this.b2b.ajouterEmploye({
       ...val,
+      telephone: telTrim,
       tauxSubvention: taux,
       type: 'SUBVENTIONNE'
     });

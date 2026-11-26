@@ -32,9 +32,10 @@ export class RhDashboardComponent {
     }
   };
 
+  private readonly todayIso = new Date().toISOString().slice(0, 10);
   selectedSiteId = signal<string>('TOUS');
-  dateDebut = signal<string>('2026-11-12');
-  dateFin = signal<string>('2026-11-12');
+  dateDebut = signal<string>(this.todayIso);
+  dateFin = signal<string>(this.todayIso);
 
   // Période active sélectionnée via composant réutilisable
   periodeActive = signal<PeriodeFilterType>('JOUR');
@@ -82,12 +83,12 @@ export class RhDashboardComponent {
   // Filtre recherche employé & filtre période récapitulatif employés
   searchQuery = signal<string>('');
   selectedSiteFilter = signal<string>('TOUS');
-  employeDateDebut = signal<string>('2026-11-01');
-  employeDateFin = signal<string>('2026-11-12');
+  employeDateDebut = signal<string>(this.todayIso.slice(0, 8) + '01');
+  employeDateFin = signal<string>(this.todayIso);
 
   // Filtres Facturation
-  factureDateDebut = signal<string>('2026-11-01');
-  factureDateFin = signal<string>('2026-11-12');
+  factureDateDebut = signal<string>(this.todayIso.slice(0, 8) + '01');
+  factureDateFin = signal<string>(this.todayIso);
 
   // Modal nouvel employé & modal détails employé
   siteActif = computed(() => {
@@ -219,18 +220,27 @@ export class RhDashboardComponent {
   definirPeriode(type: PeriodeFilterType | 'AUJOURDHUI') {
     const normalized: PeriodeFilterType = type === 'AUJOURDHUI' ? 'JOUR' : type;
     this.periodeActive.set(normalized);
+    const now = new Date();
+    const iso = (d: Date) => d.toISOString().slice(0, 10);
     if (normalized === 'JOUR') {
-      this.dateDebut.set('2026-11-12');
-      this.dateFin.set('2026-11-12');
+      this.dateDebut.set(iso(now));
+      this.dateFin.set(iso(now));
     } else if (normalized === 'SEMAINE') {
-      this.dateDebut.set('2026-11-09');
-      this.dateFin.set('2026-11-15');
+      const dayOfWeek = (now.getDay() + 6) % 7;
+      const mon = new Date(now);
+      mon.setDate(now.getDate() - dayOfWeek);
+      const sun = new Date(mon);
+      sun.setDate(mon.getDate() + 6);
+      this.dateDebut.set(iso(mon));
+      this.dateFin.set(iso(sun));
     } else if (normalized === 'MOIS') {
-      this.dateDebut.set('2026-11-01');
-      this.dateFin.set('2026-11-30');
+      const first = new Date(now.getFullYear(), now.getMonth(), 1);
+      const last = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      this.dateDebut.set(iso(first));
+      this.dateFin.set(iso(last));
     } else if (normalized === 'ANNEE') {
-      this.dateDebut.set('2026-01-01');
-      this.dateFin.set('2026-12-31');
+      this.dateDebut.set(`${now.getFullYear()}-01-01`);
+      this.dateFin.set(`${now.getFullYear()}-12-31`);
     }
   }
 

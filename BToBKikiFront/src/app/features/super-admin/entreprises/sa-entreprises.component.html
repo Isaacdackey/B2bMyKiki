@@ -906,7 +906,7 @@
               </div>
               <div>
                 <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">Téléphone Référent</label>
-                <input type="text" [ngModel]="entrepriseEnEdition().telephone" (ngModelChange)="onTelephoneChange($event)" placeholder="+221 77 765 76 56" [style.border-color]="erreursEtape1().telephone ? '#E51D24' : '#EDE7DC'" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 0.82rem;">
+                <input type="tel" maxlength="17" [ngModel]="entrepriseEnEdition().telephone" (ngModelChange)="onTelephoneChange($event)" (input)="onTelephoneInput($event)" placeholder="+221 77 765 76 56" [style.border-color]="erreursEtape1().telephone ? '#E51D24' : '#EDE7DC'" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 0.82rem;">
                 @if (erreursEtape1().telephone) {
                   <small style="color: #E51D24; font-size: 0.7rem; font-weight: 700; margin-top: 0.2rem; display: block;">{{ erreursEtape1().telephone }}</small>
                 }
@@ -1697,7 +1697,7 @@
             </div>
             <div>
               <label style="font-size: 0.75rem; font-weight: 800; color: #332724; display: block; margin-bottom: 0.35rem;">Téléphone</label>
-              <input type="tel" [ngModel]="employeEnCreation().telephone" (ngModelChange)="onTelephoneEmployeChange($event)" placeholder="+221 77 123 45 67" [style.border-color]="erreursEmploye().telephone ? '#E51D24' : '#EDE7DC'" style="width: 100%; height: 38px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.85rem;">
+              <input type="tel" maxlength="17" [ngModel]="employeEnCreation().telephone" (ngModelChange)="onTelephoneEmployeChange($event)" (input)="onTelephoneEmployeInput($event)" placeholder="+221 77 123 45 67" [style.border-color]="erreursEmploye().telephone ? '#E51D24' : '#EDE7DC'" style="width: 100%; height: 38px; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.85rem;">
               @if (erreursEmploye().telephone) {
                 <small style="color: #E51D24; font-size: 0.7rem; font-weight: 700; margin-top: 0.2rem; display: block;">{{ erreursEmploye().telephone }}</small>
               }

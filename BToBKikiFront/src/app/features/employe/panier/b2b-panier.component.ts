@@ -21,6 +21,32 @@ export class B2bPanierComponent {
   wavePhone = signal<string>('+221 77 654 32 10');
   qrDataString = signal<string>('');
 
+  private formatSenegalPhone(raw: string): string {
+    let digits = (raw || '').replace(/\D/g, '');
+    if (digits.startsWith('00221')) digits = digits.slice(5);
+    else if (digits.startsWith('221')) digits = digits.slice(3);
+    digits = digits.slice(0, 9);
+
+    const parts: string[] = [];
+    if (digits.length > 0) parts.push(digits.slice(0, 2));
+    if (digits.length > 2) parts.push(digits.slice(2, 5));
+    if (digits.length > 5) parts.push(digits.slice(5, 7));
+    if (digits.length > 7) parts.push(digits.slice(7, 9));
+
+    return parts.length > 0 ? `+221 ${parts.join(' ')}` : '+221 ';
+  }
+
+  onWavePhoneChange(value: string) {
+    this.wavePhone.set(this.formatSenegalPhone(value));
+  }
+
+  onWavePhoneInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const formatted = this.formatSenegalPhone(input.value);
+    input.value = formatted;
+    this.wavePhone.set(formatted);
+  }
+
   validerCommande() {
     if (this.b2b.modeProfil() === 'SUBVENTIONNE') {
       if (!this.b2b.isFormuleComplete()) return;
@@ -31,6 +57,13 @@ export class B2bPanierComponent {
   }
 
   confirmerPaiementEtEnvoi() {
+    if (this.b2b.modeProfil() === 'AUTONOME') {
+      const tel = (this.wavePhone() || '').trim();
+      if (!/^(?:\+221|00221)?[\s.-]?(?:7[05678]|3[03])(?:[\s.-]?\d){7}$/.test(tel)) {
+        this.b2b.showToast('Veuillez saisir un numéro Wave sénégalais valide (ex: +221 77 123 45 67).', 'error');
+        return;
+      }
+    }
     const matricule = this.b2b.currentEmploye().matricule;
     const site = this.b2b.siteActuel();
     const dateStr = new Date().toISOString().slice(0, 10);

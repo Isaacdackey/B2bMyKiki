@@ -25,6 +25,14 @@ public class CommandeService {
     private final EntrepriseRepository entrepriseRepository;
 
     public List<CommandeSiteEntity> findCommandes(String entrepriseId, String date) {
+        boolean allEnt = (entrepriseId == null || entrepriseId.isBlank() || "ALL".equalsIgnoreCase(entrepriseId));
+        if (allEnt) {
+            List<CommandeSiteEntity> all = commandeRepository.findAll();
+            if (date != null && !date.isBlank()) {
+                return all.stream().filter(c -> date.equals(c.getDate())).toList();
+            }
+            return all;
+        }
         if (date != null && !date.isBlank()) {
             return commandeRepository.findByEntrepriseIdAndDate(entrepriseId, date);
         }
@@ -105,6 +113,7 @@ public class CommandeService {
 
     public CommandeSiteEntity scannerCommande(String id) {
         CommandeSiteEntity cmd = commandeRepository.findById(id)
+                .or(() -> commandeRepository.findByCodeCommande(id))
                 .orElseThrow(() -> new ResourceNotFoundException("Commande introuvable : " + id));
         cmd.setStatut("SCANNE");
         cmd.setScanneAt(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
@@ -113,6 +122,7 @@ public class CommandeService {
 
     public CommandeSiteEntity marquerLivree(String id) {
         CommandeSiteEntity cmd = commandeRepository.findById(id)
+                .or(() -> commandeRepository.findByCodeCommande(id))
                 .orElseThrow(() -> new ResourceNotFoundException("Commande introuvable : " + id));
         if (!"SCANNE".equals(cmd.getStatut())) {
             throw new BusinessException("La commande doit d'abord être scannée au réfectoire avant d'être marquée livrée.");
@@ -123,6 +133,9 @@ public class CommandeService {
     }
 
     public List<ReclamationCutOffEntity> findReclamations(String entrepriseId) {
+        if (entrepriseId == null || entrepriseId.isBlank() || "ALL".equalsIgnoreCase(entrepriseId)) {
+            return reclamationRepository.findAll();
+        }
         return reclamationRepository.findByEntrepriseId(entrepriseId);
     }
 

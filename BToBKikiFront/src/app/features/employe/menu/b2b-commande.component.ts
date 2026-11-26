@@ -116,6 +116,32 @@ export class B2bCommandeComponent implements OnInit {
   // Numéro Wave pour le salarié autonome (0% de subvention)
   wavePhone = signal<string>('+221 77 654 32 10');
 
+  private formatSenegalPhone(raw: string): string {
+    let digits = (raw || '').replace(/\D/g, '');
+    if (digits.startsWith('00221')) digits = digits.slice(5);
+    else if (digits.startsWith('221')) digits = digits.slice(3);
+    digits = digits.slice(0, 9);
+
+    const parts: string[] = [];
+    if (digits.length > 0) parts.push(digits.slice(0, 2));
+    if (digits.length > 2) parts.push(digits.slice(2, 5));
+    if (digits.length > 5) parts.push(digits.slice(5, 7));
+    if (digits.length > 7) parts.push(digits.slice(7, 9));
+
+    return parts.length > 0 ? `+221 ${parts.join(' ')}` : '+221 ';
+  }
+
+  onWavePhoneChange(value: string) {
+    this.wavePhone.set(this.formatSenegalPhone(value));
+  }
+
+  onWavePhoneInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const formatted = this.formatSenegalPhone(input.value);
+    input.value = formatted;
+    this.wavePhone.set(formatted);
+  }
+
   // GESTION DU CUT-OFF & RÉCLAMATIONS (Exigence Mentor)
   isAfterCutOff = signal<boolean>(false);
 
@@ -457,10 +483,58 @@ export class B2bCommandeComponent implements OnInit {
     partEmploye: number;
   }>>({});
 
-  commandeDuJourActif = computed(() => this.commandesSemaine()[this.jourSelectionne()] || null);
+  private trouverCommandeBackendPourJour(jour: string) {
+    const dateIso = this.getDateIsoPourJour(jour);
+    const emp = this.b2b.currentEmploye();
+    const session = this.b2b.currentSession();
+    const mat = (emp.matricule || session.matricule || '').trim().toLowerCase();
+    const nomEmp = `${emp.prenom || ''} ${emp.nom || ''}`.trim().toLowerCase();
+    const nomSession = (session.nomComplet || '').trim().toLowerCase();
+
+    const cmd = this.b2b.listeCommandesSite().find(c => {
+      if (c.date !== dateIso) return false;
+      const cm = (c.matricule || '').trim().toLowerCase();
+      const ce = (c.employeNom || '').trim().toLowerCase();
+      if (mat && cm && cm === mat) return true;
+      if (nomSession && ce && ce === nomSession) return true;
+      if (nomEmp && ce && (ce === nomEmp || ce.includes(nomEmp) || nomEmp.includes(ce))) return true;
+      return false;
+    });
+    if (!cmd) return null;
+
+    const nomsPlats = (cmd.platNom || '').split('+').map(s => s.trim()).filter(Boolean);
+    const catalogue = this.b2b.catalogueJour();
+    const platsReconstitues: PlatB2B[] = nomsPlats.map((nom, idx) => {
+      const found = catalogue.find(p => p.nom.trim().toLowerCase() === nom.toLowerCase());
+      return found || {
+        id: `cmd-plat-${cmd.id}-${idx}`,
+        nom,
+        description: '',
+        categorie: (cmd.categorie as any) || 'PLAT',
+        prixUnitaire: cmd.montantTotal || 0,
+        image: '/assets/images/plats/p1.jpg'
+      };
+    });
+
+    const site = this.b2b.siteActuel();
+    return {
+      id: cmd.codeCommande || cmd.id,
+      dateIso,
+      plats: platsReconstitues,
+      qrCode: `KT-${cmd.matricule || emp.matricule}-${site.id}-${dateIso}`,
+      prixTotal: cmd.montantTotal ?? ((cmd.partEntreprise ?? 0) + (cmd.partEmploye ?? 0)),
+      partEntreprise: cmd.partEntreprise ?? 0,
+      partEmploye: cmd.partEmploye ?? 0
+    };
+  }
+
+  commandeDuJourActif = computed(() => {
+    const jour = this.jourSelectionne();
+    return this.commandesSemaine()[jour] || this.trouverCommandeBackendPourJour(jour);
+  });
 
   aDejaCommandeJour(jour: string): boolean {
-    const cmd = this.commandesSemaine()[jour];
+    const cmd = this.commandesSemaine()[jour] || this.trouverCommandeBackendPourJour(jour);
     return !!cmd && cmd.plats.length > 0;
   }
 
@@ -610,6 +684,14 @@ export class B2bCommandeComponent implements OnInit {
   }
 
   confirmerPaiementEtEnvoi() {
+    const estNonSub = this.b2b.modeProfil() === 'AUTONOME' || this.b2b.currentEmploye().tauxSubvention === 0;
+    if (estNonSub || this.b2b.resteAPayerEmploye() > 0) {
+      const tel = (this.wavePhone() || '').trim();
+      if (!/^(?:\+221|00221)?[\s.-]?(?:7[05678]|3[03])(?:[\s.-]?\d){7}$/.test(tel)) {
+        this.b2b.showToast('Veuillez saisir un numéro Wave sénégalais valide (ex: +221 77 123 45 67).', 'error');
+        return;
+      }
+    }
     const matricule = this.b2b.currentEmploye().matricule;
     const site = this.b2b.siteActuel();
     const dateStr = new Date().toISOString().slice(0, 10);

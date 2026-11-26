@@ -356,7 +356,7 @@
           <label style="font-size: 0.75rem; color: #475569; font-weight: 700; display: block; margin-bottom: 0.25rem;">
             Numéro de téléphone Wave :
           </label>
-          <input type="text" [ngModel]="wavePhone()" (ngModelChange)="wavePhone.set($event)"
+          <input type="tel" maxlength="17" [ngModel]="wavePhone()" (ngModelChange)="onWavePhoneChange($event)" (input)="onWavePhoneInput($event)" placeholder="+221 77 123 45 67"
             style="width: 100%; padding: 0.55rem 0.85rem; border: 1.5px solid #CBD5E1; border-radius: 8px; font-weight: 700; color: #0F172A; font-size: 0.9rem;">
           <p style="margin: 0.35rem 0 0; font-size: 0.72rem; color: #64748B;">
             Le paiement décrémentera automatiquement le stock disponible en cuisine.

@@ -31,8 +31,9 @@ export class SaDashboardComponent {
     if (typeof window !== 'undefined') { window.scrollTo({ top: 0, behavior: 'smooth' }); }
   }
 
-  dateDebutDashboard = signal<string>('2026-11-12');
-  dateFinDashboard = signal<string>('2026-11-12');
+  private readonly todayIso = new Date().toISOString().slice(0, 10);
+  dateDebutDashboard = signal<string>(this.todayIso);
+  dateFinDashboard = signal<string>(this.todayIso);
   periodeRapideDashboard = signal<PeriodeFilterType>('JOUR');
   filtreSiteDashboard = signal<string>('TOUS');
   dashboardAnimKey = signal<number>(0);
@@ -242,7 +243,65 @@ export class SaDashboardComponent {
       };
     }
     })();
-    return applySiteFilter(base);
+    const filtered = applySiteFilter(base);
+    const d1 = this.dateDebutDashboard();
+    const d2 = this.dateFinDashboard();
+    const allCmds = this.b2b.listeCommandesSite().filter(c => {
+      const matchSite = !selectedEnt || c.entrepriseId === selectedEnt.id;
+      const matchDate = (!d1 || c.date >= d1) && (!d2 || c.date <= d2);
+      return matchSite && matchDate;
+    });
+    if (allCmds.length === 0) {
+      return filtered;
+    }
+
+    const realCa = allCmds.reduce((s, c) => s + (c.montantTotal || 0), 0);
+    const realCmdCount = allCmds.length;
+    const colors = ['#721513', '#606C38', '#C5A880', '#D97706', '#E51D24'];
+
+    const byEnt = new Map<string, { nom: string; montant: number }>();
+    for (const c of allCmds) {
+      const ent = entreprises.find(e => e.id === c.entrepriseId);
+      const nom = ent?.nom || c.entrepriseNom || 'Entreprise Partenaire';
+      const cur = byEnt.get(nom) || { nom, montant: 0 };
+      cur.montant += c.montantTotal || 0;
+      byEnt.set(nom, cur);
+    }
+    const entSorted = Array.from(byEnt.values()).sort((a, b) => b.montant - a.montant).slice(0, 5);
+    const maxEnt = Math.max(1, entSorted[0]?.montant || 1);
+    const realRevenusParEntreprise = entSorted.map((item, idx) => ({
+      nom: item.nom,
+      montant: item.montant,
+      pct: `${((item.montant / Math.max(1, realCa)) * 100).toFixed(1)}%`,
+      color: colors[idx % colors.length],
+      heightPct: Math.max(18, Math.round((item.montant / maxEnt) * 95))
+    }));
+
+    const byPlat = new Map<string, { nom: string; qte: number; ca: number }>();
+    for (const c of allCmds) {
+      const nom = c.platNom || 'Plat du Jour';
+      const cur = byPlat.get(nom) || { nom, qte: 0, ca: 0 };
+      cur.qte += 1;
+      cur.ca += c.montantTotal || 0;
+      byPlat.set(nom, cur);
+    }
+    const platSorted = Array.from(byPlat.values()).sort((a, b) => b.qte - a.qte).slice(0, 5);
+    const maxPlat = Math.max(1, platSorted[0]?.qte || 1);
+    const realTopProduits = platSorted.map((item, idx) => ({
+      rang: idx + 1,
+      nom: item.nom,
+      qte: item.qte,
+      ca: item.ca,
+      pct: Math.max(20, Math.round((item.qte / maxPlat) * 96))
+    }));
+
+    return {
+      ...filtered,
+      ca: realCa,
+      commandes: realCmdCount,
+      revenusParEntreprise: realRevenusParEntreprise.length > 0 ? realRevenusParEntreprise : filtered.revenusParEntreprise,
+      topProduits: realTopProduits.length > 0 ? realTopProduits : filtered.topProduits
+    };
   });
 
   // Points filtrés par le zoom actif sur la courbe

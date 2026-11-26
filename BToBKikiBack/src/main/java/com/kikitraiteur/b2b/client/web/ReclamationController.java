@@ -19,9 +19,9 @@ public class ReclamationController {
 
     private final CommandeService commandeService;
 
-    @Operation(summary = "Lister les réclamations", description = "Retourne les réclamations cut-off d'une entreprise.")
+    @Operation(summary = "Lister les réclamations", description = "Retourne les réclamations cut-off d'une entreprise ou de toutes les entreprises.")
     @GetMapping
-    public ApiResponse<List<ReclamationCutOffEntity>> getAll(@RequestParam(defaultValue = "ent-001") String entrepriseId) {
+    public ApiResponse<List<ReclamationCutOffEntity>> getAll(@RequestParam(required = false) String entrepriseId) {
         return ApiResponse.ok(commandeService.findReclamations(entrepriseId));
     }
 

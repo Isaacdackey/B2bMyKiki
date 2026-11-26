@@ -178,7 +178,7 @@ export class B2bApiService {
     return this.http.post<ApiResponse<any>>(`${this.baseUrl}/b2b/entreprises/${entrepriseId}/invitations/${invitationId}/resend`, {}, { headers: this.getHeaders() });
   }
 
-  getCommandes(entrepriseId = 'ent-001'): Observable<ApiResponse<CommandeEntrepriseSite[]>> {
+  getCommandes(entrepriseId = 'ALL'): Observable<ApiResponse<CommandeEntrepriseSite[]>> {
     return this.http.get<ApiResponse<CommandeEntrepriseSite[]>>(`${this.baseUrl}/b2b/commandes?entrepriseId=${encodeURIComponent(entrepriseId)}`, { headers: this.getHeaders() });
   }
 
@@ -194,7 +194,7 @@ export class B2bApiService {
     return this.http.patch<ApiResponse<CommandeEntrepriseSite>>(`${this.baseUrl}/b2b/commandes/${id}/livrer`, {}, { headers: this.getHeaders() });
   }
 
-  getReclamations(entrepriseId = 'ent-001'): Observable<ApiResponse<ReclamationCutOffB2B[]>> {
+  getReclamations(entrepriseId = 'ALL'): Observable<ApiResponse<ReclamationCutOffB2B[]>> {
     return this.http.get<ApiResponse<ReclamationCutOffB2B[]>>(`${this.baseUrl}/b2b/reclamations?entrepriseId=${encodeURIComponent(entrepriseId)}`, { headers: this.getHeaders() });
   }
 
@@ -206,7 +206,7 @@ export class B2bApiService {
     return this.http.patch<ApiResponse<ReclamationCutOffB2B>>(`${this.baseUrl}/b2b/reclamations/${id}/debloquer`, { responsable }, { headers: this.getHeaders() });
   }
 
-  getFacturation(entrepriseId = 'ent-001'): Observable<ApiResponse<FacturationLigneJournaliere[]>> {
+  getFacturation(entrepriseId = 'ALL'): Observable<ApiResponse<FacturationLigneJournaliere[]>> {
     return this.http.get<ApiResponse<FacturationLigneJournaliere[]>>(`${this.baseUrl}/b2b/facturation?entrepriseId=${encodeURIComponent(entrepriseId)}`, { headers: this.getHeaders() });
   }
 

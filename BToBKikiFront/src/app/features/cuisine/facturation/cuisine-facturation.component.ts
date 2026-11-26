@@ -1,4 +1,4 @@
-﻿import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -18,8 +18,11 @@ export class CuisineFacturationComponent {
   constructor() {
   }
 
-  factureDateDebut = signal<string>('2026-11-01');
-  factureDateFin = signal<string>('2026-11-30');
+  private readonly now = new Date();
+  private readonly firstOfMonthIso = `${this.now.getFullYear()}-${String(this.now.getMonth() + 1).padStart(2, '0')}-01`;
+  private readonly lastOfMonthIso = new Date(this.now.getFullYear(), this.now.getMonth() + 1, 0).toISOString().slice(0, 10);
+  factureDateDebut = signal<string>(this.firstOfMonthIso);
+  factureDateFin = signal<string>(this.lastOfMonthIso);
 
   onPeriodeFactureCuisineChange(ev: PeriodeFilterChange) {
     this.factureDateDebut.set(ev.dateDebut);
@@ -29,8 +32,9 @@ export class CuisineFacturationComponent {
   facturationJournaliere = computed<FacturationLigneJournaliere[]>(() => {
     const d1 = this.factureDateDebut();
     const d2 = this.factureDateFin();
+    const entId = this.b2b.currentEntreprise().id;
     return this.b2b.lignesFacturationEntreprise().filter(
-      l => (!d1 || l.date >= d1) && (!d2 || l.date <= d2)
+      (l: any) => (!l.entrepriseId || !entId || l.entrepriseId === entId) && (!d1 || l.date >= d1) && (!d2 || l.date <= d2)
     );
   });
 

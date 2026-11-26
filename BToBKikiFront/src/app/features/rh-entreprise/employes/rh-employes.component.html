@@ -230,9 +230,15 @@
             </div>
           </div>
 
-          <div>
-            <label style="font-size: 0.75rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.25rem;">Email Professionnel :</label>
-            <input type="email" [(ngModel)]="newEmp().email" placeholder="m.kouame@totalenergies.ci" style="width: 100%;">
+          <div class="rh-form-grid-2">
+            <div>
+              <label style="font-size: 0.75rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.25rem;">Email Professionnel * :</label>
+              <input type="email" [(ngModel)]="newEmp().email" placeholder="m.kouame@entreprise.sn" style="width: 100%;">
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; color: #6E5A56; font-weight: 700; display: block; margin-bottom: 0.25rem;">Téléphone * :</label>
+              <input type="tel" maxlength="17" [ngModel]="newEmp().telephone" (ngModelChange)="onTelephoneRhChange($event)" (input)="onTelephoneRhInput($event)" placeholder="+221 77 123 45 67" style="width: 100%;">
+            </div>
           </div>
 
           <div class="rh-form-grid-2">

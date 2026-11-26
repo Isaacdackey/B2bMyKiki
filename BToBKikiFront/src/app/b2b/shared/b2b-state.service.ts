@@ -110,6 +110,7 @@ export class B2bStateService {
 
   // Archiver / Désarchiver un type de prestation
   toggleArchiverTypePrestation(code: string) {
+    this.lastMutationAt = Date.now();
     this.typesPrestationConfigurables.update(list => {
       const next = list.map((t: any) => t.code === code ? { ...t, isArchive: !t.isArchive } : t);
       if (typeof localStorage !== 'undefined') {
@@ -122,6 +123,7 @@ export class B2bStateService {
 
   // Archiver / Désarchiver une catégorie alimentaire
   toggleArchiverCategorie(code: string) {
+    this.lastMutationAt = Date.now();
     this.categoriesConfigurables.update(list => {
       const next = list.map((c: any) => c.code === code ? { ...c, isArchive: !c.isArchive } : c);
       if (typeof localStorage !== 'undefined') {
@@ -134,6 +136,7 @@ export class B2bStateService {
 
   // Ajouter un nouveau type de prestation
   ajouterTypePrestation(item: { code: string; libelle: string; desc: string; categoriesDefaut: string[]; cutOffType?: string; cutOffHeure?: string; reglesCutOff?: string; joursDisponibles?: string[] }) {
+    this.lastMutationAt = Date.now();
     this.typesPrestationConfigurables.update(list => {
       const next = [...list, item];
       if (typeof localStorage !== 'undefined') {
@@ -141,11 +144,21 @@ export class B2bStateService {
       }
       return next;
     });
-    this.api.createPrestation(item).subscribe({ error: () => {} });
+    this.api.createPrestation(item).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.typesPrestationConfigurables.update(list =>
+            list.map(t => t.code === item.code ? { ...t, ...res.data, desc: res.data.description || res.data.desc || t.desc } : t)
+          );
+        }
+      },
+      error: () => {}
+    });
   }
 
   // Ajouter une nouvelle catégorie alimentaire
   ajouterCategorie(item: { code: string; libelle: string; icone: string; couleur: string }) {
+    this.lastMutationAt = Date.now();
     this.categoriesConfigurables.update(list => {
       const next = [...list, item];
       if (typeof localStorage !== 'undefined') {
@@ -153,7 +166,16 @@ export class B2bStateService {
       }
       return next;
     });
-    this.api.createCategorie(item).subscribe({ error: () => {} });
+    this.api.createCategorie(item).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.categoriesConfigurables.update(list =>
+            list.map(c => c.code === item.code ? { ...c, ...res.data } : c)
+          );
+        }
+      },
+      error: () => {}
+    });
   }
 
   // Méthode pour ajouter une entreprise cliente
@@ -161,6 +183,7 @@ export class B2bStateService {
     nouvelle: Omit<EntrepriseB2B, 'id' | 'sites'>,
     adminsToInvite: Array<{ email: string; nomComplet: string; role: 'RESPONSABLE_ENTREPRISE' | 'RESPONSABLE_SITE_KIKI' }> = []
   ) {
+    this.lastMutationAt = Date.now();
     const id = 'ent-' + Date.now();
     const ent: EntrepriseB2B = {
       ...nouvelle,
@@ -193,6 +216,7 @@ export class B2bStateService {
 
   // Méthode pour modifier une entreprise cliente
   modifierEntreprise(id: string, updates: Partial<EntrepriseB2B>) {
+    this.lastMutationAt = Date.now();
     this.listeEntreprises.update(list => list.map(e => e.id === id ? { ...e, ...updates } : e));
     if (this.currentEntreprise().id === id) {
       this.currentEntreprise.update(e => ({ ...e, ...updates }));
@@ -212,6 +236,7 @@ export class B2bStateService {
 
   // Méthode pour archiver / désarchiver une entreprise
   toggleArchiverEntreprise(id: string) {
+    this.lastMutationAt = Date.now();
     this.listeEntreprises.update(list => list.map(e => e.id === id ? { ...e, isArchivee: !e.isArchivee } : e));
     this.api.toggleArchiveEntreprise(id).subscribe({
       next: (res) => {
@@ -225,6 +250,7 @@ export class B2bStateService {
 
   // Méthode pour ajouter un site à une entreprise
   ajouterSiteAEntreprise(entrepriseId: string, site: Omit<SiteB2B, 'id'>) {
+    this.lastMutationAt = Date.now();
     const siteId = 'site-' + Date.now();
     const nouveauSite: SiteB2B = { ...site, id: siteId };
     this.listeEntreprises.update(list => list.map(e => {
@@ -242,6 +268,7 @@ export class B2bStateService {
 
   // Méthode pour modifier un site
   modifierSite(entrepriseId: string, siteId: string, updates: Partial<SiteB2B>) {
+    this.lastMutationAt = Date.now();
     this.listeEntreprises.update(list => list.map(e => {
       if (e.id === entrepriseId) {
         return {
@@ -261,6 +288,7 @@ export class B2bStateService {
 
   // Méthodes Catalogue Global Super Admin (Ajouter, Modifier, Archiver)
   ajouterPlatCatalogue(plat: Omit<PlatB2B, 'id'>) {
+    this.lastMutationAt = Date.now();
     const tempId = 'plat-' + Date.now();
     const nouveauPlat: PlatB2B = { ...plat, id: tempId, disponible: true, isArchive: false };
     this.catalogueJour.update(list => [nouveauPlat, ...list]);
@@ -275,6 +303,7 @@ export class B2bStateService {
   }
 
   modifierPlatCatalogue(id: string, updates: Partial<PlatB2B>) {
+    this.lastMutationAt = Date.now();
     this.catalogueJour.update(list => list.map(p => p.id === id ? { ...p, ...updates } : p));
     this.api.updatePlat(id, updates).subscribe({
       next: (res) => {
@@ -287,6 +316,7 @@ export class B2bStateService {
   }
 
   toggleArchiverPlat(id: string) {
+    this.lastMutationAt = Date.now();
     let devientArchive = false;
     this.catalogueJour.update(list => list.map(p => {
       if (p.id === id) {
@@ -394,11 +424,116 @@ export class B2bStateService {
 
     if (typeof window !== 'undefined') {
       setInterval(() => {
-        if (typeof document === 'undefined' || document.visibilityState === 'visible') {
+        if ((typeof document === 'undefined' || document.visibilityState === 'visible')
+            && Date.now() - this.lastMutationAt > 10000) {
           this.syncFromBackend();
         }
       }, 8000);
     }
+  }
+
+  private lastMutationAt = 0;
+
+  private resolveActiveEntreprise(entreprises: EntrepriseB2B[]) {
+    if (!entreprises.length) return;
+    const session = this.currentSession();
+    const curId = this.currentEntreprise()?.id;
+    let match: EntrepriseB2B | undefined;
+
+    if (session?.entrepriseId) {
+      match = entreprises.find(e => e.id === session.entrepriseId);
+    }
+    if (!match && session?.entite) {
+      const entiteLower = session.entite.trim().toLowerCase();
+      match = entreprises.find(e => e.nom.trim().toLowerCase() === entiteLower || entiteLower.includes(e.nom.trim().toLowerCase()));
+    }
+    if (!match && session?.siteId) {
+      match = entreprises.find(e => e.sites?.some(s => s.id === session.siteId));
+    }
+    if (!match && curId) {
+      match = entreprises.find(e => e.id === curId);
+    }
+    this.currentEntreprise.set(match || entreprises[0]);
+    if (session?.siteId) {
+      this.selectedSiteId.set(session.siteId);
+    }
+  }
+
+  private resolveCurrentEmployeFromSession() {
+    const session = this.currentSession();
+    const list = this.listeEmployes();
+    const isSub = this.modeProfil() === 'SUBVENTIONNE';
+
+    if (session?.nomComplet || session?.matricule || session?.email) {
+      const sEmail = (session.email || '').trim().toLowerCase();
+      const sMat = (session.matricule || '').trim().toLowerCase();
+      const sNom = (session.nomComplet || '').trim().toLowerCase();
+
+      const found = list.find(e =>
+        (sEmail && (e.email || '').trim().toLowerCase() === sEmail) ||
+        (sMat && (e.matricule || '').trim().toLowerCase() === sMat) ||
+        (sNom && `${e.prenom || ''} ${e.nom || ''}`.trim().toLowerCase() === sNom)
+      );
+
+      if (found) {
+        this.currentEmploye.set(found);
+        return;
+      }
+
+      const parts = (session.nomComplet || 'Collaborateur Kiki').trim().split(/\s+/);
+      const prenom = parts[0] || 'Collaborateur';
+      const nom = parts.slice(1).join(' ') || '';
+      const site = this.siteActuel();
+      this.currentEmploye.set({
+        id: session.matricule || session.email || 'emp-session',
+        matricule: session.matricule || 'EMP-B2B',
+        nom,
+        prenom,
+        email: session.email || '',
+        telephone: '',
+        siteId: session.siteId || site.id || 'site-1',
+        siteNom: session.siteNom || site.nom || 'Siège Plateau - Dakar',
+        departement: session.titrePoste || 'Collaborateur',
+        type: isSub ? 'SUBVENTIONNE' : 'AUTONOME',
+        tauxSubvention: isSub ? 100 : 0,
+        actif: true,
+        repasConsommesMois: 0,
+        montantPrisEnChargeMois: 0
+      });
+      return;
+    }
+
+    if (list.length > 0) {
+      const fallback = list.find(e => (isSub ? e.type === 'SUBVENTIONNE' : e.type === 'AUTONOME')) || list[0];
+      this.currentEmploye.set(fallback);
+    }
+  }
+
+  private syncHistoriqueFromCommandesSite(commandes: CommandeEntrepriseSite[]) {
+    const site = this.siteActuel();
+    const mapped: CommandeHistoriqueB2B[] = commandes.map(c => ({
+      id: c.codeCommande || c.id,
+      date: c.date,
+      heure: c.heure || '12:00',
+      matricule: c.matricule,
+      employeNom: c.employeNom,
+      siteId: site?.id || 'site-1',
+      siteNom: c.entrepriseNom || site?.nom || 'Siège Plateau - Dakar',
+      formuleNom: this.formuleActuelle().nom,
+      platNom: c.platNom,
+      prixTotal: c.montantTotal ?? ((c.partEntreprise ?? 0) + (c.partEmploye ?? 0)),
+      partEntreprise: c.partEntreprise ?? 0,
+      partEmploye: c.partEmploye ?? 0,
+      tauxSubventionApplique: (c.montantTotal && c.montantTotal > 0)
+        ? Math.round(((c.partEntreprise ?? 0) / c.montantTotal) * 100)
+        : 100,
+      statut: c.statut === 'LIVRE'
+        ? 'LIVRE'
+        : c.statut === 'SCANNE'
+          ? 'EN_PREPARATION'
+          : 'VALIDE'
+    }));
+    this.historiqueCommandes.set(mapped);
   }
 
   syncFromBackend() {
@@ -407,9 +542,9 @@ export class B2bStateService {
     }
     this.api.getEntreprises().subscribe({
       next: (res) => {
-        if (res.success && res.data?.length) {
+        if (res.success && Array.isArray(res.data)) {
           this.listeEntreprises.set(res.data);
-          this.currentEntreprise.set(res.data[0]);
+          this.resolveActiveEntreprise(res.data);
         }
       },
       error: () => {}
@@ -417,8 +552,9 @@ export class B2bStateService {
 
     this.api.getEmployes().subscribe({
       next: (res) => {
-        if (res.success && res.data?.length) {
+        if (res.success && Array.isArray(res.data)) {
           this.listeEmployes.set(res.data);
+          this.resolveCurrentEmployeFromSession();
         }
       },
       error: () => {}
@@ -426,7 +562,7 @@ export class B2bStateService {
 
     this.api.getCatalogue(true).subscribe({
       next: (res) => {
-        if (res.success && res.data?.length) {
+        if (res.success && Array.isArray(res.data)) {
           this.catalogueJour.set(res.data);
           const archivedIds = new Set(res.data.filter(p => !!p.isArchive).map(p => p.id));
           if (archivedIds.size > 0) {
@@ -442,18 +578,19 @@ export class B2bStateService {
       error: () => {}
     });
 
-    this.api.getCommandes().subscribe({
+    this.api.getCommandes('ALL').subscribe({
       next: (res) => {
-        if (res.success && res.data?.length) {
+        if (res.success && Array.isArray(res.data)) {
           this.listeCommandesSite.set(res.data);
+          this.syncHistoriqueFromCommandesSite(res.data);
         }
       },
       error: () => {}
     });
 
-    this.api.getReclamations().subscribe({
+    this.api.getReclamations('ALL').subscribe({
       next: (res) => {
-        if (res.success && res.data?.length) {
+        if (res.success && Array.isArray(res.data)) {
           this.listeReclamations.set(res.data);
         }
       },
@@ -462,7 +599,7 @@ export class B2bStateService {
 
     this.api.getPlanning().subscribe({
       next: (res) => {
-        if (res.success && res.data?.length) {
+        if (res.success && Array.isArray(res.data)) {
           const archivedIds = new Set(this.catalogueJour().filter(p => !!p.isArchive).map(p => p.id));
           this.menusPlanifiesEntreprises.set(
             res.data.map(m => ({
@@ -475,9 +612,9 @@ export class B2bStateService {
       error: () => {}
     });
 
-    this.api.getFacturation().subscribe({
+    this.api.getFacturation('ALL').subscribe({
       next: (res) => {
-        if (res.success && res.data?.length) {
+        if (res.success && Array.isArray(res.data)) {
           this.lignesFacturationEntreprise.set(res.data);
         }
       },
@@ -486,7 +623,7 @@ export class B2bStateService {
 
     this.api.getInvitations('ALL').subscribe({
       next: (res) => {
-        if (res.success && res.data?.length) {
+        if (res.success && Array.isArray(res.data)) {
           this.listeInvitationsAdmins.set(res.data);
         }
       },
@@ -495,40 +632,21 @@ export class B2bStateService {
 
     this.api.getPrestations().subscribe({
       next: (res) => {
-        if (res.success && res.data?.length) {
-          this.typesPrestationConfigurables.set(
-            res.data.map((tp: any) => ({
-              code: tp.code,
-              libelle: tp.libelle,
-              desc: tp.description || tp.desc || '',
-              categoriesDefaut: tp.categoriesDefaut || ['PLAT', 'BOISSON'],
-              cutOffType: tp.cutOffType,
-              cutOffHeure: tp.cutOffHeure,
-              reglesCutOff: tp.reglesCutOff,
-              joursDisponibles: tp.joursDisponibles,
-              isArchive: tp.isArchive
-            }))
-          );
-        }
-      },
-      error: () => {}
-    });
-
-    this.api.getCategories().subscribe({
-      next: (res) => {
-        if (res.success && res.data?.length) {
-          this.categoriesConfigurables.set(res.data);
-        }
-      },
-      error: () => {}
-    });
-
-    this.api.getPrestations().subscribe({
-      next: (res) => {
-        if (res.success && res.data?.length) {
-          this.typesPrestationConfigurables.set(res.data);
+        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+          const mapped = res.data.map((tp: any) => ({
+            code: tp.code,
+            libelle: tp.libelle,
+            desc: tp.description || tp.desc || '',
+            categoriesDefaut: Array.from(new Set<string>(tp.categoriesDefaut || ['PLAT', 'BOISSON'])),
+            cutOffType: tp.cutOffType,
+            cutOffHeure: tp.cutOffHeure,
+            reglesCutOff: tp.reglesCutOff,
+            joursDisponibles: tp.joursDisponibles,
+            isArchive: tp.isArchive ?? tp.archive ?? false
+          }));
+          this.typesPrestationConfigurables.set(mapped);
           if (typeof localStorage !== 'undefined') {
-            localStorage.setItem('b2b_types_prestation', JSON.stringify(res.data));
+            localStorage.setItem('b2b_types_prestation', JSON.stringify(mapped));
           }
         }
       },
@@ -537,7 +655,7 @@ export class B2bStateService {
 
     this.api.getCategories().subscribe({
       next: (res) => {
-        if (res.success && res.data?.length) {
+        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
           this.categoriesConfigurables.set(res.data);
           if (typeof localStorage !== 'undefined') {
             localStorage.setItem('b2b_categories_config', JSON.stringify(res.data));
@@ -640,6 +758,7 @@ export class B2bStateService {
 
   // Méthode pour ajouter un employé
   ajouterEmploye(emp: Partial<EmployeB2B>) {
+    this.lastMutationAt = Date.now();
     const site = this.currentEntreprise().sites.find(s => s.id === emp.siteId);
     const nouvelEmploye: EmployeB2B = {
       id: 'emp-' + Date.now(),
@@ -658,7 +777,14 @@ export class B2bStateService {
       montantPrisEnChargeMois: emp.montantPrisEnChargeMois || 0
     };
     this.listeEmployes.update(list => [nouvelEmploye, ...list]);
-    this.api.createEmploye(nouvelEmploye).subscribe({ error: () => {} });
+    this.api.createEmploye(nouvelEmploye).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.listeEmployes.update(list => list.map(e => e.id === nouvelEmploye.id ? res.data : e));
+        }
+      },
+      error: () => {}
+    });
   }
 
   importerEmployesBatch(employes: Partial<EmployeB2B>[]) {
@@ -740,12 +866,15 @@ export class B2bStateService {
 
   // Scanner une commande (QR code cantine)
   scannerCommandeSite(cmdId: string) {
+    this.lastMutationAt = Date.now();
     const now = new Date();
     const heure = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     let codeCmd = '';
+    let realId = cmdId;
     this.listeCommandesSite.update(list => list.map(c => {
       if (c.id === cmdId || c.codeCommande === cmdId) {
         codeCmd = c.codeCommande;
+        realId = c.id;
         return { ...c, statut: 'SCANNE' as StatutCommandeSite, scanneAt: heure };
       }
       return c;
@@ -755,7 +884,17 @@ export class B2bStateService {
         ? { ...h, statut: 'EN_PREPARATION' as const }
         : h
     ));
-    this.api.scannerCommande(cmdId).subscribe({ error: () => {} });
+    this.api.scannerCommande(codeCmd || realId).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.listeCommandesSite.update(list =>
+            list.map(c => (c.id === realId || c.codeCommande === codeCmd || c.id === res.data.id) ? res.data : c)
+          );
+          this.syncHistoriqueFromCommandesSite(this.listeCommandesSite());
+        }
+      },
+      error: () => {}
+    });
   }
 
   scannerParQrOuCode(codeOrId: string): boolean {
@@ -778,12 +917,15 @@ export class B2bStateService {
 
   // Marquer une commande comme livrée
   marquerCommandeLivree(cmdId: string) {
+    this.lastMutationAt = Date.now();
     const now = new Date();
     const heure = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     let codeCmd = '';
+    let realId = cmdId;
     this.listeCommandesSite.update(list => list.map(c => {
       if (c.id === cmdId || c.codeCommande === cmdId) {
         codeCmd = c.codeCommande;
+        realId = c.id;
         return { ...c, statut: 'LIVRE' as StatutCommandeSite, livreAt: heure };
       }
       return c;
@@ -793,11 +935,22 @@ export class B2bStateService {
         ? { ...h, statut: 'LIVRE' as const }
         : h
     ));
-    this.api.livrerCommande(cmdId).subscribe({ error: () => {} });
+    this.api.livrerCommande(codeCmd || realId).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.listeCommandesSite.update(list =>
+            list.map(c => (c.id === realId || c.codeCommande === codeCmd || c.id === res.data.id) ? res.data : c)
+          );
+          this.syncHistoriqueFromCommandesSite(this.listeCommandesSite());
+        }
+      },
+      error: () => {}
+    });
   }
 
   // Mettre à jour la quantité d'un plat dans un jour planifié
   updateQuantitePlatMenu(menuJourId: string, ligneId: string, quantite: number, subventionnesCount: number) {
+    this.lastMutationAt = Date.now();
     this.api.updateQuantitePlanning(ligneId, Math.max(0, quantite)).subscribe({ error: () => {} });
     this.menusPlanifiesEntreprises.update(list => list.map(m => {
       if (m.id === menuJourId) {
@@ -829,6 +982,7 @@ export class B2bStateService {
 
   // Ajouter une réclamation d'employé
   soumettreReclamation(employe: EmployeB2B, motif: string): ReclamationCutOffB2B {
+    this.lastMutationAt = Date.now();
     const now = new Date();
     const heure = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     const dateStr = now.toISOString().slice(0, 10);
@@ -859,6 +1013,7 @@ export class B2bStateService {
 
   // Débloquer un employé retardataire (Responsable de site)
   debloquerReclamation(reclamationId: string) {
+    this.lastMutationAt = Date.now();
     const now = new Date();
     const heure = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     this.listeReclamations.update(list => list.map(r => {
@@ -893,14 +1048,16 @@ export class B2bStateService {
     const ligne = menuJour?.lignes.find(l => l.platId === platId);
     const quotaPrevu = ligne?.quantitePrevue || 30; // Quota prévu
     
-    // Commandes passées pour ce plat
-    const commandesCount = this.listeCommandesSite().filter(c => 
-      c.entrepriseId === entId && 
-      (c.platNom.includes(ligne?.nomPlat || '') || c.categorie === ligne?.categorie)
-    ).length;
+    // Commandes passées pour ce plat (comptage réel depuis le backend)
+    const nomPlat = (ligne?.nomPlat || '').trim().toLowerCase();
+    const commandesCount = nomPlat
+      ? this.listeCommandesSite().filter(c =>
+          c.entrepriseId === entId &&
+          (c.platNom || '').toLowerCase().includes(nomPlat)
+        ).length
+      : 0;
 
-    // Déjà commandé ajusté
-    const dejaCommande = Math.min(quotaPrevu, Math.max(1, (commandesCount * 7) % quotaPrevu));
+    const dejaCommande = Math.min(quotaPrevu, commandesCount);
     const resteDisponible = Math.max(0, quotaPrevu - dejaCommande);
 
     return {
@@ -941,6 +1098,7 @@ export class B2bStateService {
 
   // Ajouter un plat à un jour planifié (et synchroniser avec le backend)
   ajouterPlatMenuJour(entrepriseId: string, jourNom: 'Lundi' | 'Mardi' | 'Mercredi' | 'Jeudi' | 'Vendredi' | 'Samedi' | 'Dimanche', plat: PlatB2B, quantitePrevue: number = 35) {
+    this.lastMutationAt = Date.now();
     const tempLigneId = 'l-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4);
     this.menusPlanifiesEntreprises.update(list => list.map(m => {
       if ((m.entrepriseId === entrepriseId || (entrepriseId === 'ent-001' && m.entrepriseId === 'GLOBAL')) && m.jourNom === jourNom) {
@@ -979,6 +1137,7 @@ export class B2bStateService {
 
   // Supprimer une ligne d'un jour planifié (et synchroniser avec le backend)
   supprimerLigneMenuJour(menuIdOrJourNom: string, ligneId: string) {
+    this.lastMutationAt = Date.now();
     this.menusPlanifiesEntreprises.update(list => list.map(m => {
       if (m.id === menuIdOrJourNom || m.jourNom === menuIdOrJourNom) {
         return {
@@ -1075,6 +1234,7 @@ export class B2bStateService {
       return [entry, ...list];
     });
 
+    this.lastMutationAt = Date.now();
     this.api.createCommande({
       ...nouvelleCmd,
       ...(payload.qrCode ? { qrCode: payload.qrCode } : {})
@@ -1082,6 +1242,7 @@ export class B2bStateService {
       next: (res) => {
         if (res.success && res.data) {
           this.listeCommandesSite.update(list => list.map(c => c.id === nouvelleCmd.id ? res.data : c));
+          this.syncHistoriqueFromCommandesSite(this.listeCommandesSite());
         }
       },
       error: () => {}
@@ -1272,11 +1433,15 @@ export class B2bStateService {
   ]);
 
   totalRepasMois = computed(() => {
-    return this.historiqueCommandes().length * 15 + 180;
+    const fromFact = this.lignesFacturationEntreprise().reduce((sum, l) => sum + (l.nbPlatsLivres || 0), 0);
+    if (fromFact > 0) return fromFact;
+    return this.listeCommandesSite().length;
   });
 
   totalFactureMois = computed(() => {
-    return this.totalRepasMois() * 5000;
+    const fromFact = this.lignesFacturationEntreprise().reduce((sum, l) => sum + (l.montantPartEntreprise || l.montantTotal || 0), 0);
+    if (fromFact > 0) return fromFact;
+    return this.listeCommandesSite().reduce((sum, c) => sum + (c.partEntreprise || c.montantTotal || 0), 0);
   });
 
   tauxUtilisationBudget = computed(() => {
@@ -1291,6 +1456,7 @@ export class B2bStateService {
   }
 
   toggleStatutEmploye(empId: string) {
+    this.lastMutationAt = Date.now();
     this.api.toggleActifEmploye(empId).subscribe({ error: () => {} });
     let updatedEmp: EmployeB2B | null = null;
     this.listeEmployes.update(list => list.map(emp => {
@@ -1387,57 +1553,25 @@ export class B2bStateService {
   // Mutation de la session de rôle actif
   setSessionRole(session: UserSessionB2B) {
     this.currentSession.set(session);
+    this.resolveActiveEntreprise(this.listeEntreprises());
     if (session.role === 'SALARIE_CONVENTIONNE') {
       this.setModeProfil('SUBVENTIONNE');
     } else if (session.role === 'SALARIE_AUTONOME') {
       this.setModeProfil('AUTONOME');
+    } else {
+      this.resolveCurrentEmployeFromSession();
     }
   }
 
   // ACTIONS PANIER AUTONOME (Employé non pris en charge / Wave direct)
   setModeProfil(mode: 'SUBVENTIONNE' | 'AUTONOME') {
     this.modeProfil.set(mode);
-    if (mode === 'AUTONOME') {
-      const consultant = this.listeEmployes().find(e => e.id === 'emp-106') || {
-        id: 'emp-106',
-        matricule: 'TOT-EXT-01',
-        nom: 'Ba',
-        prenom: 'Ousmane (Consultant)',
-        email: 'o.ba@consultant.sn',
-        telephone: '+221 76 890 12 34',
-        siteId: 'site-1',
-        siteNom: 'Siège Plateau',
-        departement: 'Direction Projet IT',
-        type: 'AUTONOME' as const,
-        tauxSubvention: 0,
-        actif: true,
-        repasConsommesMois: 14,
-        montantPrisEnChargeMois: 0
-      };
-      this.currentEmploye.set(consultant);
-    } else {
-      const subventionne = this.listeEmployes().find(e => e.id === 'emp-101') || {
-        id: 'emp-101',
-        matricule: 'TOT-9842',
-        nom: 'Ndiaye',
-        prenom: 'Babacar',
-        email: 'b.ndiaye@totalenergies.sn',
-        telephone: '+221 77 123 45 67',
-        siteId: 'site-1',
-        siteNom: 'Siège Plateau - Dakar',
-        departement: 'Finance & Comptabilité',
-        type: 'SUBVENTIONNE' as const,
-        tauxSubvention: 100,
-        actif: true,
-        repasConsommesMois: 19,
-        montantPrisEnChargeMois: 95000
-      };
-      this.currentEmploye.set(subventionne);
-    }
+    this.resolveCurrentEmployeFromSession();
   }
 
   // Mettre à jour le taux de subvention d'un collaborateur
   setTauxSubventionEmploye(empId: string, nouveauTaux: number) {
+    this.lastMutationAt = Date.now();
     this.listeEmployes.update(list => list.map(emp => {
       if (emp.id === empId) {
         const type = nouveauTaux === 0 ? 'AUTONOME' : 'SUBVENTIONNE';

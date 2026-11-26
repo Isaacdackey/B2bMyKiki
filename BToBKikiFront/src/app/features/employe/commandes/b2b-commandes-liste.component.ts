@@ -104,12 +104,12 @@ import { CommandeHistoriqueB2B } from '../../../b2b/shared/b2b.models';
                         <span class="cmd-badge encours"><i class="fa-solid fa-check"></i> Validée</span>
                       }
                     </td>
-                    <td data-label="Actions" style="text-align: right;">
-                      <div class="cmd-actions-row">
-                        <button type="button" class="cmd-btn-outline" (click)="commandeDetail.set(cmd)">
+                    <td data-label="Actions" style="text-align: right; white-space: nowrap;">
+                      <div class="cmd-actions-row" style="display: inline-flex; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-end; gap: 0.45rem;">
+                        <button type="button" class="cmd-btn-outline" style="white-space: nowrap;" (click)="commandeDetail.set(cmd)">
                           <i class="fa-regular fa-eye"></i> Détails
                         </button>
-                        <button type="button" class="cmd-btn-qr" (click)="ouvrirQr(cmd)">
+                        <button type="button" class="cmd-btn-qr" style="white-space: nowrap;" (click)="ouvrirQr(cmd)">
                           <i class="fa-solid fa-qrcode"></i> QR Code
                         </button>
                       </div>
@@ -388,14 +388,49 @@ export class B2bCommandesListeComponent {
     this.page.set(1);
   }
 
-  mesCommandes = computed(() => {
+  mesCommandes = computed<CommandeHistoriqueB2B[]>(() => {
     const emp = this.b2b.currentEmploye();
-    const nomComplet = `${emp.prenom} ${emp.nom}`.toLowerCase();
-    const toutes = this.b2b.historiqueCommandes();
-    const propres = toutes.filter(
-      c => c.matricule === emp.matricule || c.employeNom.toLowerCase().includes(emp.nom.toLowerCase()) || nomComplet.includes(c.employeNom.toLowerCase())
+    const mat = (emp.matricule || '').trim().toLowerCase();
+    const nomComplet = `${emp.prenom || ''} ${emp.nom || ''}`.trim().toLowerCase();
+    const nom = (emp.nom || '').trim().toLowerCase();
+
+    const matchesEmploye = (matricule?: string, employeNom?: string) => {
+      const m = (matricule || '').trim().toLowerCase();
+      const e = (employeNom || '').trim().toLowerCase();
+      if (mat && m && m === mat) return true;
+      if (nom && e && e.includes(nom)) return true;
+      if (nomComplet && e && (e === nomComplet || nomComplet.includes(e))) return true;
+      return false;
+    };
+
+    const depuisBackend: CommandeHistoriqueB2B[] = this.b2b.listeCommandesSite()
+      .filter(c => matchesEmploye(c.matricule, c.employeNom))
+      .map(c => ({
+        id: c.codeCommande || c.id,
+        date: c.date,
+        heure: c.heure || '12:00',
+        employeNom: c.employeNom,
+        matricule: c.matricule,
+        platNom: c.platNom,
+        formuleNom: this.b2b.formuleActuelle().nom,
+        statut: c.statut === 'LIVRE'
+          ? 'LIVRE'
+          : c.statut === 'SCANNE'
+            ? 'EN_PREPARATION'
+            : 'VALIDE',
+        partEntreprise: c.partEntreprise ?? 0,
+        partEmploye: c.partEmploye ?? 0,
+        prixTotal: c.montantTotal ?? ((c.partEntreprise ?? 0) + (c.partEmploye ?? 0)),
+        siteId: this.b2b.siteActuel().id,
+        siteNom: this.b2b.siteActuel().nom
+      }));
+
+    const idsBackend = new Set(depuisBackend.map(c => c.id));
+    const locauxUniquement = this.b2b.historiqueCommandes().filter(
+      c => !idsBackend.has(c.id) && matchesEmploye(c.matricule, c.employeNom)
     );
-    return propres;
+
+    return [...depuisBackend, ...locauxUniquement];
   });
 
   commandesFiltrees = computed(() => {

@@ -305,7 +305,7 @@ export class B2bPeriodFilterComponent implements OnInit {
   dateFin = signal<string>('');
 
   ngOnInit(): void {
-    this.selectionnerPeriode(this.defaultPeriode, false);
+    this.selectionnerPeriode(this.defaultPeriode, true);
   }
 
   private getBaseDate(): Date {

@@ -18,10 +18,10 @@ public class CommandeController {
 
     private final CommandeService commandeService;
 
-    @Operation(summary = "Lister les commandes d'une entreprise", description = "Retourne les commandes du site filtrées optionnellement par date.")
+    @Operation(summary = "Lister les commandes d'une entreprise", description = "Retourne les commandes du site filtrées optionnellement par entreprise et par date.")
     @GetMapping
     public ApiResponse<List<CommandeSiteEntity>> getAll(
-            @RequestParam(defaultValue = "ent-001") String entrepriseId,
+            @RequestParam(required = false) String entrepriseId,
             @RequestParam(required = false) String date) {
         return ApiResponse.ok(commandeService.findCommandes(entrepriseId, date));
     }

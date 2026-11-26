@@ -317,7 +317,7 @@
           <label>
             <i class="fa-solid fa-mobile-screen text-blue"></i> Numéro de téléphone Wave :
           </label>
-          <input type="text" [(ngModel)]="wavePhone" class="wave-input" placeholder="+221 7X XXX XX XX">
+          <input type="tel" maxlength="17" [ngModel]="wavePhone()" (ngModelChange)="onWavePhoneChange($event)" (input)="onWavePhoneInput($event)" class="wave-input" placeholder="+221 77 123 45 67">
           <p class="wave-helper-text">
             <i class="fa-solid fa-shield-halved"></i> Une demande de débit sera envoyée directement sur votre compte
             Wave.

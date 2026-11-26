@@ -26,7 +26,7 @@ interface InvitationDetails {
         <div class="auth-brand">
           <img src="assets/images/logo.png" alt="Kiki Traiteur" onerror="this.src='assets/images/KIKI TRAITEUR Logo Picto Rouge bordeau.png'">
           <h1 class="font-serif-luxury">Kiki Traiteur <span class="badge-pro">B2B Pro</span></h1>
-          <p>Activation de votre Espace Administrateur</p>
+          <p>Activation de votre Espace {{ invitation()?.roleLibelle || 'Collaborateur B2B' }}</p>
         </div>
 
         @if (verifying()) {
@@ -236,6 +236,8 @@ export class B2bActivationComponent implements OnInit {
             nomComplet: res.data.nomComplet,
             titrePoste: res.data.titrePoste,
             entite: res.data.entite,
+            email: res.data.email || this.invitation()?.email,
+            entrepriseId: res.data.entrepriseId || this.invitation()?.entrepriseId,
             badge: res.data.badge,
             badgeColor: res.data.badgeColor,
             siteId: res.data.siteId,
@@ -245,7 +247,11 @@ export class B2bActivationComponent implements OnInit {
           this.b2b.syncFromBackend();
           this.activated.set(true);
 
-          const dest = role === 'RESPONSABLE_SITE_KIKI' ? '/b2b/cuisine' : '/b2b/rh';
+          const dest =
+            role === 'SUPER_ADMIN' ? '/b2b/super-admin' :
+            role === 'RESPONSABLE_SITE_KIKI' ? '/b2b/cuisine' :
+            role === 'RESPONSABLE_ENTREPRISE' ? '/b2b/rh' :
+            '/b2b/commande';
           setTimeout(() => this.router.navigateByUrl(dest), 1100);
         }
       },

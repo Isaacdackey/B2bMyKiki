@@ -46,10 +46,48 @@ export class B2bLoginComponent {
     this.showRegisterAutonomeModal.set(false);
   }
 
+  private formatSenegalPhone(raw: string): string {
+    let digits = (raw || '').replace(/\D/g, '');
+    if (digits.startsWith('00221')) digits = digits.slice(5);
+    else if (digits.startsWith('221')) digits = digits.slice(3);
+    digits = digits.slice(0, 9);
+
+    const parts: string[] = [];
+    if (digits.length > 0) parts.push(digits.slice(0, 2));
+    if (digits.length > 2) parts.push(digits.slice(2, 5));
+    if (digits.length > 5) parts.push(digits.slice(5, 7));
+    if (digits.length > 7) parts.push(digits.slice(7, 9));
+
+    return parts.length > 0 ? `+221 ${parts.join(' ')}` : '+221 ';
+  }
+
+  onTelephoneAutonomeChange(value: string) {
+    const formatted = this.formatSenegalPhone(value);
+    this.newAutonome.update(cur => ({ ...cur, telephone: formatted }));
+  }
+
+  onTelephoneAutonomeInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const formatted = this.formatSenegalPhone(input.value);
+    input.value = formatted;
+    this.newAutonome.update(cur => ({ ...cur, telephone: formatted }));
+  }
+
   inscrireAutonome() {
     const val = this.newAutonome();
-    if (!val.nom || !val.prenom || !val.telephone) {
+    if (!val.nom?.trim() || !val.prenom?.trim() || !val.telephone?.trim()) {
       this.b2b.showToast('Veuillez renseigner votre prénom, nom et numéro de téléphone.', 'error');
+      return;
+    }
+
+    const phoneClean = val.telephone.replace(/[\s-]/g, '');
+    if (!/^(\+221)?(70|75|76|77|78)\d{7}$/.test(phoneClean)) {
+      this.b2b.showToast('Numéro Téléphone / Wave invalide (ex: +221 77 123 45 67).', 'error');
+      return;
+    }
+
+    if (val.email?.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.email.trim())) {
+      this.b2b.showToast('Adresse email professionnelle invalide.', 'error');
       return;
     }
 
@@ -74,6 +112,8 @@ export class B2bLoginComponent {
             nomComplet: res.data.nomComplet,
             titrePoste: res.data.titrePoste,
             entite: res.data.entite,
+            email: res.data.email || val.email,
+            entrepriseId: res.data.entrepriseId || val.entrepriseId,
             badge: res.data.badge,
             badgeColor: res.data.badgeColor,
             siteId: res.data.siteId,
@@ -116,6 +156,8 @@ export class B2bLoginComponent {
             nomComplet: res.data.nomComplet,
             titrePoste: res.data.titrePoste,
             entite: res.data.entite,
+            email: res.data.email || this.username(),
+            entrepriseId: res.data.entrepriseId,
             badge: res.data.badge,
             badgeColor: res.data.badgeColor,
             siteId: res.data.siteId,

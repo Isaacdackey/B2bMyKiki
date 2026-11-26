@@ -21,14 +21,14 @@ public class FacturationController {
 
     @Operation(summary = "Relevé de facturation d'une entreprise", description = "Retourne les lignes journalières de facturation (part entreprise, part employé, total).")
     @GetMapping
-    public ApiResponse<List<FacturationJournaliereEntity>> getByEntreprise(@RequestParam(defaultValue = "ent-001") String entrepriseId) {
+    public ApiResponse<List<FacturationJournaliereEntity>> getByEntreprise(@RequestParam(required = false) String entrepriseId) {
         return ApiResponse.ok(facturationService.findByEntreprise(entrepriseId));
     }
 
     @Operation(summary = "Détail nominatif d'une journée", description = "Retourne le détail des commandes d'une entreprise pour une date donnée.")
     @GetMapping("/details")
     public ApiResponse<List<CommandeSiteEntity>> getDetailsJour(
-            @RequestParam(defaultValue = "ent-001") String entrepriseId,
+            @RequestParam(required = false) String entrepriseId,
             @RequestParam String date) {
         return ApiResponse.ok(facturationService.findDetailsJour(entrepriseId, date));
     }
