@@ -27,7 +27,7 @@
               </button>
               <app-b2b-period-filter
                 defaultPeriode="JOUR"
-                referenceDate="2026-11-12"
+                [referenceDate]="todayIso"
                 (periodChange)="onPeriodeRhChange($event)">
               </app-b2b-period-filter>
             </div>
@@ -67,7 +67,7 @@
                 </tr>
               </thead>
               <tbody>
-                @for (c of commandesSiteFiltrees(); track c.id) {
+                @for (c of paginatedCommandesSite(); track c.id) {
                   <tr>
                     <td data-label="Date">
                       <div>
@@ -120,6 +120,33 @@
                 }
               </tbody>
             </table>
+
+            @if (totalSiteCommandesPages() > 1) {
+              <div class="sa-pagination-bar">
+                <div class="sa-pagination-info">
+                  Affichage de <strong>{{ (pageSiteCommandes() - 1) * pageSizeSiteCommandes + 1 }}</strong> à <strong>{{ mathMin(pageSiteCommandes() * pageSizeSiteCommandes, commandesSiteFiltrees().length) }}</strong> sur <strong>{{ commandesSiteFiltrees().length }}</strong> commandes
+                </div>
+
+                <div class="sa-pagination-controls">
+                  <button type="button" class="sa-page-btn" [disabled]="pageSiteCommandes() <= 1"
+                    (click)="changerPageSiteCommandes(pageSiteCommandes() - 1)">
+                    <i class="fa-solid fa-chevron-left"></i> Précédent
+                  </button>
+
+                  @for (p of pagesSiteCommandesArray(); track p) {
+                    <button type="button" class="sa-page-num" [class.active]="pageSiteCommandes() === p"
+                      (click)="changerPageSiteCommandes(p)">
+                      {{ p }}
+                    </button>
+                  }
+
+                  <button type="button" class="sa-page-btn" [disabled]="pageSiteCommandes() >= totalSiteCommandesPages()"
+                    (click)="changerPageSiteCommandes(pageSiteCommandes() + 1)">
+                    Suivant <i class="fa-solid fa-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+            }
 
             <div style="background: #FAF8F4; border-top: 2px solid #721513; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.5rem; padding: 0.9rem 1.25rem; width: 100%; box-sizing: border-box;">
               <span style="font-weight: 800; color: #721513; font-size: 0.9rem; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">

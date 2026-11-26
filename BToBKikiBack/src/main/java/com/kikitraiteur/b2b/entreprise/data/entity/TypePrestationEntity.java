@@ -81,5 +81,13 @@ public class TypePrestationEntity {
     @Builder.Default
     @JsonProperty("isArchive")
     @Column(nullable = false, columnDefinition = "boolean default false")
-    private boolean isArchive = false;
+    private Boolean isArchive = false;
+
+    public boolean isArchive() {
+        return Boolean.TRUE.equals(isArchive);
+    }
+
+    public void setArchive(Boolean isArchive) {
+        this.isArchive = Boolean.TRUE.equals(isArchive);
+    }
 }

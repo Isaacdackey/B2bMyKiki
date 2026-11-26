@@ -170,7 +170,7 @@ export class B2bStateService {
       }
       return next;
     });
-    this.api.createPrestation(item).subscribe({
+    this.api.createPrestation({ ...item, isArchive: false }).subscribe({
       next: (res) => {
         if (res.success && res.data) {
           this.typesPrestationConfigurables.update(list =>
@@ -192,7 +192,7 @@ export class B2bStateService {
       }
       return next;
     });
-    this.api.createCategorie(item).subscribe({
+    this.api.createCategorie({ ...item, isArchive: false }).subscribe({
       next: (res) => {
         if (res.success && res.data) {
           this.categoriesConfigurables.update(list =>
@@ -569,8 +569,12 @@ export class B2bStateService {
     this.api.getEntreprises().subscribe({
       next: (res) => {
         if (res.success && Array.isArray(res.data)) {
-          this.listeEntreprises.set(res.data);
-          this.resolveActiveEntreprise(res.data);
+          const normalized = res.data.map(e => ({
+            ...e,
+            categoriesAutorisees: Array.from(new Set(e.categoriesAutorisees || []))
+          }));
+          this.listeEntreprises.set(normalized);
+          this.resolveActiveEntreprise(normalized);
         }
       },
       error: () => {}

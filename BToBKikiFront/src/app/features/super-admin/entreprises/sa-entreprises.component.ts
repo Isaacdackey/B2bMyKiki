@@ -710,11 +710,14 @@ export class SaEntreprisesComponent {
     });
   });
 
-  // Invitations pour l'entreprise en gestion
+  // Invitations pour l'entreprise en gestion (uniquement les rôles Administrateurs Référents)
   invitationsEntrepriseEnGestion = computed(() => {
     const ent = this.entrepriseEnGestion();
     if (!ent) return [];
-    return this.b2b.listeInvitationsAdmins().filter(inv => inv.entrepriseId === ent.id);
+    return this.b2b.listeInvitationsAdmins().filter(
+      inv => inv.entrepriseId === ent.id &&
+        (inv.role === 'RESPONSABLE_ENTREPRISE' || inv.role === 'RESPONSABLE_SITE_KIKI')
+    );
   });
 
   // Menu du jour actif pour l'entreprise en gestion
@@ -1010,6 +1013,31 @@ export class SaEntreprisesComponent {
 
     return list;
   });
+
+  pageCommandesEnt = signal<number>(1);
+  pageSizeCommandesEnt = signal<number>(8);
+
+  totalPagesCommandesEnt = computed(() => {
+    return Math.max(1, Math.ceil(this.commandesFiltreesEntreprise().length / this.pageSizeCommandesEnt()));
+  });
+
+  commandesPagineesEntreprise = computed(() => {
+    const list = this.commandesFiltreesEntreprise();
+    const size = this.pageSizeCommandesEnt();
+    const page = Math.min(this.pageCommandesEnt(), Math.max(1, Math.ceil(list.length / size)));
+    const start = (page - 1) * size;
+    return list.slice(start, start + size);
+  });
+
+  pagesCommandesEntArray = computed(() => {
+    return Array.from({ length: this.totalPagesCommandesEnt() }, (_, i) => i + 1);
+  });
+
+  changerPageCommandesEnt(page: number) {
+    if (page >= 1 && page <= this.totalPagesCommandesEnt()) {
+      this.pageCommandesEnt.set(page);
+    }
+  }
 
   // Plats uniques dans les commandes
   platsUniquesCommandes = computed(() => {

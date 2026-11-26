@@ -23,7 +23,7 @@ export class RhCommandesComponent {
   }
 
 
-  private readonly todayIso = new Date().toISOString().slice(0, 10);
+  readonly todayIso = new Date().toISOString().slice(0, 10);
   selectedSiteId = signal<string>('TOUS');
   dateDebut = signal<string>(this.todayIso);
   dateFin = signal<string>(this.todayIso);
@@ -36,6 +36,7 @@ export class RhCommandesComponent {
     this.periodeActive.set(ev.periode);
     this.dateDebut.set(ev.dateDebut);
     this.dateFin.set(ev.dateFin);
+    this.pageSiteCommandes.set(1);
   }
 
   onPeriodeFactureRhChange(ev: PeriodeFilterChange) {
@@ -146,6 +147,30 @@ export class RhCommandesComponent {
       return matchDate;
     });
   });
+
+  // Pagination Commandes du Jour & Suivi des Retraits (8 par page)
+  pageSiteCommandes = signal<number>(1);
+  readonly pageSizeSiteCommandes = 8;
+
+  totalSiteCommandesPages = computed(() =>
+    Math.max(1, Math.ceil(this.commandesSiteFiltrees().length / this.pageSizeSiteCommandes))
+  );
+
+  pagesSiteCommandesArray = computed(() =>
+    Array.from({ length: this.totalSiteCommandesPages() }, (_, i) => i + 1)
+  );
+
+  paginatedCommandesSite = computed(() => {
+    const page = Math.min(this.pageSiteCommandes(), this.totalSiteCommandesPages());
+    const start = (page - 1) * this.pageSizeSiteCommandes;
+    return this.commandesSiteFiltrees().slice(start, start + this.pageSizeSiteCommandes);
+  });
+
+  changerPageSiteCommandes(nouvellePage: number) {
+    if (nouvellePage >= 1 && nouvellePage <= this.totalSiteCommandesPages()) {
+      this.pageSiteCommandes.set(nouvellePage);
+    }
+  }
 
   // Facturation consolidée filtrée
   commandesFiltrees = computed(() => {

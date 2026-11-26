@@ -604,7 +604,7 @@
                       </tr>
                     </thead>
                     <tbody>
-                      @for (cmd of commandesFiltreesEntreprise(); track cmd.id) {
+                      @for (cmd of commandesPagineesEntreprise(); track cmd.id) {
                         <tr style="border-bottom: 1px solid #F0EAE1;">
                           <td data-label="Réf. Commande" style="padding: 0.75rem 1rem; font-weight: 800; color: #721513;">
                             {{ cmd.codeCommande }}
@@ -664,6 +664,34 @@
                     </tbody>
                   </table>
                 </div>
+
+                <!-- BARRE DE PAGINATION COMMANDES -->
+                @if (commandesFiltreesEntreprise().length > 0) {
+                  <div class="sa-pagination-bar">
+                    <div class="sa-pagination-info">
+                      Affichage de <strong>{{ ((pageCommandesEnt() - 1) * pageSizeCommandesEnt()) + 1 }}</strong> à <strong>{{ ((pageCommandesEnt() * pageSizeCommandesEnt()) > commandesFiltreesEntreprise().length) ? commandesFiltreesEntreprise().length : (pageCommandesEnt() * pageSizeCommandesEnt()) }}</strong> sur <strong>{{ commandesFiltreesEntreprise().length }}</strong> commandes
+                    </div>
+
+                    <div class="sa-pagination-controls">
+                      <button type="button" class="sa-page-btn" [disabled]="pageCommandesEnt() <= 1"
+                        (click)="changerPageCommandesEnt(pageCommandesEnt() - 1)">
+                        <i class="fa-solid fa-chevron-left"></i> Précédent
+                      </button>
+
+                      @for (p of pagesCommandesEntArray(); track p) {
+                        <button type="button" class="sa-page-num" [class.active]="pageCommandesEnt() === p"
+                          (click)="changerPageCommandesEnt(p)">
+                          {{ p }}
+                        </button>
+                      }
+
+                      <button type="button" class="sa-page-btn" [disabled]="pageCommandesEnt() >= totalPagesCommandesEnt()"
+                        (click)="changerPageCommandesEnt(pageCommandesEnt() + 1)">
+                        Suivant <i class="fa-solid fa-chevron-right"></i>
+                      </button>
+                    </div>
+                  </div>
+                }
                 }
 
               </div>
@@ -1839,7 +1867,7 @@
   <!-- ============================================================== -->
   @if (facturationJourSelectionne(); as jour) {
     <div class="sa-modal-backdrop" (click)="facturationJourSelectionne.set(null)">
-      <div class="sa-modal-card" (click)="$event.stopPropagation()" style="max-width: 720px; padding: 1.5rem;">
+      <div class="sa-modal-card" (click)="$event.stopPropagation()" style="max-width: 720px; max-height: 85vh; padding: 1.5rem; overflow: hidden; display: flex; flex-direction: column;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
           <div>
             <span style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">Détail journalier</span>
@@ -1857,6 +1885,7 @@
             Aucun détail nominatif enregistré pour cette journée dans les données de démonstration.
           </div>
         } @else {
+          <div style="overflow-y: auto; flex: 1; min-height: 0; padding-right: 0.35rem; scrollbar-width: thin; scrollbar-color: rgba(114, 21, 19, 0.25) transparent;">
           <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
             <thead>
               <tr style="background: #FAF8F4; border-bottom: 1.5px solid #EDE7DC; text-align: left;">
@@ -1877,6 +1906,7 @@
               }
             </tbody>
           </table>
+          </div>
         }
       </div>
     </div>
