@@ -174,13 +174,20 @@
         }
 
         @if (platsFiltres().length === 0) {
-        <div class="empty-phare-state">
-          <i class="fa-solid fa-utensils mb-2"></i>
-          <p>Aucun plat disponible pour {{ jourSelectionne() }} dans cette catégorie.</p>
-          <button class="btn-reset-filters" (click)="selectCategory('all'); termeRecherche.set('')">
-            Voir tous les plats
-          </button>
-        </div>
+        @if (b2b.menusPlanifiesEntreprises().length === 0) {
+          <div class="empty-phare-state">
+            <i class="fa-solid fa-spinner fa-spin mb-2" style="color: #721513;"></i>
+            <p>Chargement du menu du {{ jourSelectionne() }}...</p>
+          </div>
+        } @else {
+          <div class="empty-phare-state">
+            <i class="fa-solid fa-utensils mb-2"></i>
+            <p>Aucun plat disponible pour {{ jourSelectionne() }} dans cette catégorie.</p>
+            <button class="btn-reset-filters" (click)="selectCategory('all'); termeRecherche.set('')">
+              Voir tous les plats
+            </button>
+          </div>
+        }
         } @else {
         <div class="dishes-grid">
           @for (plat of platsPagines(); track plat.id) {
@@ -217,6 +224,12 @@
               </div>
 
               <p class="dish-desc">{{ plat.description }}</p>
+
+              @if (plat.categorie === 'PLAT' && plat.garniture) {
+                <div style="display: inline-flex; align-items: center; gap: 0.35rem; background: #FDF8EE; border: 1px solid #E2D5BE; color: #721513; border-radius: 9999px; padding: 0.22rem 0.65rem; font-size: 0.72rem; font-weight: 800; margin-top: 0.35rem; width: fit-content;">
+                  <i class="fa-solid fa-bowl-rice"></i> Garniture : {{ plat.garniture }}
+                </div>
+              }
 
               <!-- BADGE DES STOCKS / QUOTAS EN TEMPS RÉEL (Exigence Mentor) -->
               <div
