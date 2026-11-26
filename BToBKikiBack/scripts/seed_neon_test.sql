@@ -7,6 +7,7 @@
 -- ============================================================================
 
 -- 1. Types de Prestation & Catégories Alimentaires
+-- Note : cut_off_type encode le nombre de jours avant ('JOUR_J' = 0 jour, 'J_MOINS_1' = 1 jour, 'J_MOINS_2' = 2 jours, etc.)
 INSERT INTO b2b_types_prestation (code, libelle, description_texte, cut_off_type, cut_off_heure, regles_cut_off, is_archive) VALUES
     ('CUISINE_SUR_PLACE', 'Cuisine et service sur place', 'Préparation et dressage en restaurant d''entreprise sur place', 'JOUR_J', '10:30', 'Clôture le matin même avant lancement en cuisine sur site', FALSE),
     ('SERVICE_SUR_PLACE', 'Service sur place (Réfectoire)', 'Plats cuisinés acheminés chauds et servis à l''assiette au réfectoire', 'J_MOINS_1', '18:00', 'Préparation centrale, clôture la veille au soir', FALSE),
@@ -40,7 +41,7 @@ INSERT INTO b2b_entreprises (
     'ent-001', 'TotalEnergies Sénégal', 'TOT-SN', '001294829 2V1', 'SN-DKR-2012-B-1428',
     'Route de l''Aéroport, Dakar', 'rh@totalenergies.sn', '+221 33 800 10 20',
     'Mme Fatou Fall', 5000, 100, 5000, 15000000, 5000, 'MENSUELLE',
-    'J_MOINS_1', '18:00', 'CUISINE_SUR_PLACE', FALSE
+    'JOUR_J', '10:30', 'CUISINE_SUR_PLACE', FALSE
 ) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO b2b_entreprise_categories (entreprise_id, categorie) VALUES

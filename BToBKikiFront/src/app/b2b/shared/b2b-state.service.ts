@@ -66,14 +66,38 @@ export class B2bStateService {
   sommeMontantEntreprise(acc: number, l: FacturationLigneJournaliere) { return acc + (l.montantPartEntreprise || 0); }
   sommePartEntreprise(acc: number, c: CommandeEntrepriseSite) { return acc + (c.partEntreprise || 0); }
 
+  resolveCutOffJoursAvant(obj?: { cutOffJoursAvant?: number | null; cutOffType?: string | null }): number {
+    if (obj && typeof obj.cutOffJoursAvant === 'number' && !isNaN(obj.cutOffJoursAvant) && obj.cutOffJoursAvant >= 0) {
+      return Math.floor(obj.cutOffJoursAvant);
+    }
+    const t = (obj?.cutOffType || '').trim().toUpperCase();
+    if (t === 'JOUR_J' || t === '0') return 0;
+    if (t.startsWith('J_MOINS_')) {
+      const n = parseInt(t.replace('J_MOINS_', ''), 10);
+      return !isNaN(n) && n >= 0 ? n : 1;
+    }
+    const parsed = parseInt(t, 10);
+    return !isNaN(parsed) && parsed >= 0 ? parsed : 1;
+  }
+
+  formatCutOffLibelle(obj?: { cutOffJoursAvant?: number | null; cutOffType?: string | null; cutOffHeure?: string | null }): string {
+    if (!obj) return 'J-1 à 18:00';
+    if (obj.cutOffType === 'SANS_CUTOFF') return 'Sans Cut-Off (Libre)';
+    const j = this.resolveCutOffJoursAvant(obj);
+    const h = obj.cutOffHeure || '18:00';
+    const prefix = j === 0 ? 'Jour J' : `J-${j}`;
+    return `${prefix} à ${h}`;
+  }
+
   // Types de prestation configurables
-  typesPrestationConfigurables = signal<{ code: string; libelle: string; desc: string; categoriesDefaut: string[]; cutOffType?: string; cutOffHeure?: string; reglesCutOff?: string; joursDisponibles?: string[]; isArchive?: boolean }[]>([
+  typesPrestationConfigurables = signal<{ code: string; libelle: string; desc: string; categoriesDefaut: string[]; cutOffType?: string; cutOffJoursAvant?: number; cutOffHeure?: string; reglesCutOff?: string; joursDisponibles?: string[]; isArchive?: boolean }[]>([
     { 
       code: 'CUISINE_SUR_PLACE', 
       libelle: 'Cuisine et service sur place', 
       desc: 'Préparation et dressage en restaurant d’entreprise sur place', 
       categoriesDefaut: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'],
       cutOffType: 'JOUR_J',
+      cutOffJoursAvant: 0,
       cutOffHeure: '10:30',
       reglesCutOff: 'Clôture le matin même avant lancement en cuisine sur site',
       joursDisponibles: ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi']
@@ -84,6 +108,7 @@ export class B2bStateService {
       desc: 'Plats cuisinés acheminés chauds et servis à l’assiette au réfectoire', 
       categoriesDefaut: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'],
       cutOffType: 'J_MOINS_1',
+      cutOffJoursAvant: 1,
       cutOffHeure: '18:00',
       reglesCutOff: 'Préparation centrale, clôture la veille au soir',
       joursDisponibles: ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi']
@@ -94,6 +119,7 @@ export class B2bStateService {
       desc: 'Conditionnement individuel hermétique scellé et étiqueté', 
       categoriesDefaut: ['PLAT', 'BOISSON'],
       cutOffType: 'J_MOINS_1',
+      cutOffJoursAvant: 1,
       cutOffHeure: '16:00',
       reglesCutOff: 'Conditionnement et étiquetage individuel J-1',
       joursDisponibles: ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi']
@@ -135,7 +161,7 @@ export class B2bStateService {
   }
 
   // Ajouter un nouveau type de prestation
-  ajouterTypePrestation(item: { code: string; libelle: string; desc: string; categoriesDefaut: string[]; cutOffType?: string; cutOffHeure?: string; reglesCutOff?: string; joursDisponibles?: string[] }) {
+  ajouterTypePrestation(item: { code: string; libelle: string; desc: string; categoriesDefaut: string[]; cutOffType?: string; cutOffJoursAvant?: number; cutOffHeure?: string; reglesCutOff?: string; joursDisponibles?: string[] }) {
     this.lastMutationAt = Date.now();
     this.typesPrestationConfigurables.update(list => {
       const next = [...list, item];
@@ -639,6 +665,7 @@ export class B2bStateService {
             desc: tp.description || tp.desc || '',
             categoriesDefaut: Array.from(new Set<string>(tp.categoriesDefaut || ['PLAT', 'BOISSON'])),
             cutOffType: tp.cutOffType,
+            cutOffJoursAvant: this.resolveCutOffJoursAvant(tp),
             cutOffHeure: tp.cutOffHeure,
             reglesCutOff: tp.reglesCutOff,
             joursDisponibles: tp.joursDisponibles,
@@ -1047,17 +1074,33 @@ export class B2bStateService {
     const menuJour = this.menusPlanifiesEntreprises().find(m => m.entrepriseId === entId && m.jourNom === jourNom);
     const ligne = menuJour?.lignes.find(l => l.platId === platId);
     const quotaPrevu = ligne?.quantitePrevue || 30; // Quota prévu
-    
-    // Commandes passées pour ce plat (comptage réel depuis le backend)
+
+    // Date ISO correspondant au jour sélectionné dans la semaine courante
+    const joursOrdre = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+    const now = new Date();
+    const todayIdx = (now.getDay() + 6) % 7;
+    const targetIdx = Math.max(0, joursOrdre.indexOf(jourNom));
+    const targetDate = new Date(now);
+    targetDate.setDate(now.getDate() - todayIdx + targetIdx);
+    const targetDateIso = targetDate.toISOString().slice(0, 10);
+
+    // Commandes passées pour ce plat sur ce jour (en prenant en compte les commandes groupées "(xN)")
     const nomPlat = (ligne?.nomPlat || '').trim().toLowerCase();
     const commandesCount = nomPlat
-      ? this.listeCommandesSite().filter(c =>
-          c.entrepriseId === entId &&
-          (c.platNom || '').toLowerCase().includes(nomPlat)
-        ).length
+      ? this.listeCommandesSite()
+          .filter(c =>
+            c.entrepriseId === entId &&
+            (!c.date || c.date === targetDateIso || c.date === menuJour?.dateStr) &&
+            (c.platNom || '').toLowerCase().includes(nomPlat)
+          )
+          .reduce((sum, c) => {
+            const matchMult = (c.platNom || '').match(/\(x(\d+)\)/i);
+            const qte = matchMult ? Math.max(1, parseInt(matchMult[1], 10) || 1) : 1;
+            return sum + qte;
+          }, 0)
       : 0;
 
-    const dejaCommande = Math.min(quotaPrevu, commandesCount);
+    const dejaCommande = commandesCount;
     const resteDisponible = Math.max(0, quotaPrevu - dejaCommande);
 
     return {

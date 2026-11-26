@@ -46,6 +46,25 @@ public class ParametreController {
             finalCode = finalCode + "_" + (System.currentTimeMillis() % 100000);
         }
         item.setCode(finalCode);
+        if (item.getCutOffJoursAvant() != null && item.getCutOffJoursAvant() >= 0) {
+            int j = item.getCutOffJoursAvant();
+            if (!"SANS_CUTOFF".equalsIgnoreCase(item.getCutOffType())) {
+                item.setCutOffType(j == 0 ? "JOUR_J" : "J_MOINS_" + j);
+            }
+        } else {
+            String t = item.getCutOffType() != null ? item.getCutOffType().trim().toUpperCase() : "J_MOINS_1";
+            if ("JOUR_J".equals(t) || "0".equals(t)) {
+                item.setCutOffJoursAvant(0);
+            } else if (t.startsWith("J_MOINS_")) {
+                try {
+                    item.setCutOffJoursAvant(Math.max(0, Integer.parseInt(t.substring("J_MOINS_".length()).trim())));
+                } catch (NumberFormatException ignored) {
+                    item.setCutOffJoursAvant(1);
+                }
+            } else {
+                item.setCutOffJoursAvant(1);
+            }
+        }
         return ApiResponse.ok("Type de prestation enregistré", typePrestationRepository.save(item));
     }
 

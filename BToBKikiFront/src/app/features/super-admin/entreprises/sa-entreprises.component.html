@@ -935,19 +935,17 @@
               </div>
               <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 12px; padding: 0.9rem;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
-                  <label style="font-size: 0.75rem; font-weight: 800; color: #721513; margin: 0;">Cut-Off Heure Limite</label>
-                  <span style="font-size: 0.68rem; color: #E51D24; font-weight: 700;">Clôture auto</span>
+                  <label style="font-size: 0.75rem; font-weight: 800; color: #721513; margin: 0;">Cut-Off (Jours avant &amp; Heure)</label>
+                  <span style="font-size: 0.68rem; color: #E51D24; font-weight: 700;">0 = Jour J</span>
                 </div>
-                <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 0.5rem;">
-                  <select [(ngModel)]="entrepriseEnEdition().cutOffType" style="border: 1px solid #EDE7DC; border-radius: 8px; padding: 0.45rem 0.5rem; font-size: 0.8rem; font-weight: 700; color: #721513; background: #FFFFFF;">
-                    <option value="J_MOINS_1">J - 1 (La veille)</option>
-                    <option value="J_MOINS_2">J - 2 (Avant-veille)</option>
-                    <option value="JOUR_J">Jour J (Jour même)</option>
-                    <option value="SANS_CUTOFF">Sans Cut-Off (Libre)</option>
-                  </select>
-                  <input type="time" [(ngModel)]="entrepriseEnEdition().cutOffHeure" [disabled]="entrepriseEnEdition().cutOffType === 'SANS_CUTOFF'" style="border: 1px solid #EDE7DC; border-radius: 8px; padding: 0.45rem 0.5rem; font-size: 0.84rem; font-weight: 800; color: #E51D24; background: #FFFFFF;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                  <div style="position: relative; display: flex; align-items: center;">
+                    <input type="number" min="0" max="30" [ngModel]="entrepriseEnEdition().cutOffJoursAvant ?? 1" (ngModelChange)="onCutOffJoursEntrepriseChange($event)" placeholder="0 = Jour J" style="width: 100%; border: 1px solid #EDE7DC; border-radius: 8px; padding: 0.45rem 0.5rem; font-size: 0.84rem; font-weight: 800; color: #721513; background: #FFFFFF; box-sizing: border-box;">
+                    <span style="position: absolute; right: 0.55rem; font-size: 0.68rem; font-weight: 700; color: #6E5A56; pointer-events: none;">jour(s)</span>
+                  </div>
+                  <input type="time" [(ngModel)]="entrepriseEnEdition().cutOffHeure" style="border: 1px solid #EDE7DC; border-radius: 8px; padding: 0.45rem 0.5rem; font-size: 0.84rem; font-weight: 800; color: #E51D24; background: #FFFFFF;">
                 </div>
-                <small style="font-size: 0.68rem; color: #6E5A56; margin-top: 0.25rem; display: block;">Passé ce délai, commandes verrouillées.</small>
+                <small style="font-size: 0.68rem; color: #6E5A56; margin-top: 0.25rem; display: block;">0 = Jour même ({{ entrepriseEnEdition().cutOffHeure || '10:30' }}) • 1 = Veille (J-1), etc.</small>
               </div>
             </div>
           }
@@ -1327,7 +1325,7 @@
                       <div style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.4rem;">
                         <span style="font-size: 0.68rem; font-weight: 800; color: #721513; background: #FFF5F2; border: 1px solid #F1DCD6; padding: 0.12rem 0.5rem; border-radius: 9999px;">
                           <i class="fa-regular fa-clock"></i>
-                          {{ tp.cutOffType === 'SANS_CUTOFF' ? 'Sans Cut-Off (Libre)' : (tp.cutOffType || 'J_MOINS_1') + ' • ' + (tp.cutOffHeure || '18:00') }}
+                          {{ b2b.formatCutOffLibelle(tp) }}
                         </span>
                         @if (tp.joursDisponibles?.length) {
                           <span style="font-size: 0.68rem; font-weight: 700; color: #606C38; background: #F5F7EF; border: 1px solid #DCE4C8; padding: 0.12rem 0.5rem; border-radius: 9999px;">
@@ -1415,19 +1413,14 @@
             <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.3rem;">Description courte</label>
             <input type="text" [(ngModel)]="nouveauTypePrestation().desc" placeholder="Ex: Service traiteur pour événements..." style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.6rem 0.75rem; font-size: 0.85rem;">
           </div>
-          <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 0.65rem;">
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 0.65rem;">
             <div>
-              <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.3rem;">Cut-Off par défaut</label>
-              <select [(ngModel)]="nouveauTypePrestation().cutOffType" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.6rem 0.65rem; font-size: 0.82rem; font-weight: 700; color: #721513; background: #FFFFFF;">
-                <option value="J_MOINS_1">J - 1 (La veille)</option>
-                <option value="J_MOINS_2">J - 2 (Avant-veille)</option>
-                <option value="JOUR_J">Jour J (Jour même)</option>
-                <option value="SANS_CUTOFF">Sans Cut-Off (Libre)</option>
-              </select>
+              <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.3rem;">Jours avant (0 = Jour J)</label>
+              <input type="number" min="0" max="30" [ngModel]="nouveauTypePrestation().cutOffJoursAvant" (ngModelChange)="onCutOffJoursPrestationChange($event)" placeholder="0 = Jour J" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.58rem 0.65rem; font-size: 0.85rem; font-weight: 800; color: #721513; background: #FFFFFF; box-sizing: border-box;">
             </div>
             <div>
               <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.3rem;">Heure limite</label>
-              <input type="time" [(ngModel)]="nouveauTypePrestation().cutOffHeure" [disabled]="nouveauTypePrestation().cutOffType === 'SANS_CUTOFF'" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.55rem 0.65rem; font-size: 0.85rem; font-weight: 800; color: #E51D24;">
+              <input type="time" [(ngModel)]="nouveauTypePrestation().cutOffHeure" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.55rem 0.65rem; font-size: 0.85rem; font-weight: 800; color: #E51D24; box-sizing: border-box;">
             </div>
           </div>
           <div>

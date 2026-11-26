@@ -60,6 +60,14 @@ export class RhCommandesComponent {
 
   platsDisponiblesGroupe = computed(() => this.b2b.catalogueJour().filter(p => !p.isArchive));
 
+  employesActifsCount = computed(() => {
+    const entId = this.b2b.currentEntreprise().id;
+    const siteIds = new Set((this.b2b.currentEntreprise().sites || []).map(s => s.id));
+    const list = this.b2b.listeEmployes().filter(e => e.actif);
+    const matched = list.filter(e => siteIds.has(e.siteId) || (e as any).entrepriseId === entId);
+    return matched.length > 0 ? matched.length : list.length;
+  });
+
   totalPlatsGroupe = computed(() => {
     const q = this.quantitesGroupe();
     return Object.values(q).reduce((acc, n) => acc + (n > 0 ? n : 0), 0);
@@ -93,6 +101,15 @@ export class RhCommandesComponent {
     const lignes = this.platsDisponiblesGroupe().filter(p => (q[p.id] || 0) > 0);
     if (lignes.length === 0) {
       this.b2b.showToast('Veuillez saisir une quantité pour au moins un plat.', 'error');
+      return;
+    }
+    const minEmployes = this.employesActifsCount();
+    const totalSaisi = this.totalPlatsGroupe();
+    if (minEmployes > 0 && totalSaisi < minEmployes) {
+      this.b2b.showToast(
+        `La quantité totale (${totalSaisi} plats) ne peut pas être inférieure au nombre d'employés actifs (${minEmployes}). Elle doit être égale ou supérieure.`,
+        'error'
+      );
       return;
     }
     const libelle = this.groupeLibelle().trim() || 'Commande Groupée RH';

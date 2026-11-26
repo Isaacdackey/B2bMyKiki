@@ -34,10 +34,7 @@ export class CuisineUtilisateursComponent {
   }
 
   getLibelleCutOff(ent: any): string {
-    if (!ent) return '18:00 (J-1)';
-    if (ent.cutOffType === 'SANS_CUTOFF') return 'Libre (Sans Cut-Off)';
-    const label = ent.cutOffType === 'JOUR_J' ? 'Le jour même (Jour J)' : ent.cutOffType === 'J_MOINS_2' ? '48h avant (J-2)' : 'La veille (J-1)';
-    return `${ent.cutOffHeure || '18:00'} (${label})`;
+    return this.b2b.formatCutOffLibelle(ent);
   }
 
   getCategoriesLibelles(cats?: string[]): string {

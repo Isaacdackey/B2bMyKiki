@@ -5,16 +5,21 @@ import com.kikitraiteur.b2b.commande.data.entity.ReclamationCutOffEntity;
 import com.kikitraiteur.b2b.commande.data.repository.CommandeSiteRepository;
 import com.kikitraiteur.b2b.commande.data.repository.ReclamationCutOffRepository;
 import com.kikitraiteur.b2b.entreprise.data.entity.EntrepriseEntity;
+import com.kikitraiteur.b2b.entreprise.data.entity.TypePrestationEntity;
 import com.kikitraiteur.b2b.entreprise.data.repository.EntrepriseRepository;
+import com.kikitraiteur.b2b.entreprise.data.repository.TypePrestationRepository;
 import com.kikitraiteur.b2b.shared.exceptions.BusinessException;
 import com.kikitraiteur.b2b.shared.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +28,17 @@ public class CommandeService {
     private final CommandeSiteRepository commandeRepository;
     private final ReclamationCutOffRepository reclamationRepository;
     private final EntrepriseRepository entrepriseRepository;
+    private final TypePrestationRepository typePrestationRepository;
+
+    private static final Map<DayOfWeek, String> JOURS_FR = Map.of(
+            DayOfWeek.MONDAY, "Lundi",
+            DayOfWeek.TUESDAY, "Mardi",
+            DayOfWeek.WEDNESDAY, "Mercredi",
+            DayOfWeek.THURSDAY, "Jeudi",
+            DayOfWeek.FRIDAY, "Vendredi",
+            DayOfWeek.SATURDAY, "Samedi",
+            DayOfWeek.SUNDAY, "Dimanche"
+    );
 
     public List<CommandeSiteEntity> findCommandes(String entrepriseId, String date) {
         boolean allEnt = (entrepriseId == null || entrepriseId.isBlank() || "ALL".equalsIgnoreCase(entrepriseId));
@@ -86,22 +102,50 @@ public class CommandeService {
             }
         }
 
+        LocalDate parsedDate;
+        try {
+            parsedDate = (cmd.getDate() != null && !cmd.getDate().isBlank())
+                    ? LocalDate.parse(cmd.getDate().trim())
+                    : LocalDate.now();
+        } catch (Exception ignored) {
+            parsedDate = LocalDate.now();
+        }
+        final LocalDate dateService = parsedDate;
+        final String dateServiceStr = dateService.toString();
+
+        if (ent.getTypePrestation() != null && !ent.getTypePrestation().isBlank()) {
+            String jourFr = JOURS_FR.get(dateService.getDayOfWeek());
+            if (jourFr != null) {
+                TypePrestationEntity tp = typePrestationRepository.findById(ent.getTypePrestation()).orElse(null);
+                if (tp != null && tp.getJoursDisponibles() != null && !tp.getJoursDisponibles().isEmpty()) {
+                    boolean jourAutorise = tp.getJoursDisponibles().stream()
+                            .anyMatch(j -> j.equalsIgnoreCase(jourFr));
+                    if (!jourAutorise) {
+                        throw new BusinessException("Les commandes ne sont pas ouvertes le " + jourFr + " pour la prestation de votre entreprise.");
+                    }
+                }
+            }
+        }
+
         if ("SANS_CUTOFF".equalsIgnoreCase(ent.getCutOffType())) {
             return;
         }
 
-        String todayStr = LocalDate.now().toString();
-        if (todayStr.equals(cmd.getDate()) && ent.getCutOffHeure() != null && !ent.getCutOffHeure().isBlank()) {
+        if (ent.getCutOffHeure() != null && !ent.getCutOffHeure().isBlank()) {
             try {
                 LocalTime cutOff = LocalTime.parse(ent.getCutOffHeure().trim());
-                if (LocalTime.now().isAfter(cutOff)) {
+                int joursAvant = ent.resolveCutOffJoursAvant();
+                LocalDateTime dateHeureLimite = LocalDateTime.of(dateService.minusDays(joursAvant), cutOff);
+                String todayStr = LocalDate.now().toString();
+                if (LocalDateTime.now().isAfter(dateHeureLimite)) {
                     boolean debloque = reclamationRepository.findByEntrepriseId(ent.getId()).stream()
                             .anyMatch(r -> "DEBLOQUE".equalsIgnoreCase(r.getStatut())
-                                    && todayStr.equals(r.getDate())
+                                    && (todayStr.equals(r.getDate()) || dateServiceStr.equals(r.getDate()))
                                     && ((cmd.getMatricule() != null && cmd.getMatricule().equalsIgnoreCase(r.getMatricule()))
                                         || (cmd.getEmployeNom() != null && cmd.getEmployeNom().equalsIgnoreCase(r.getEmployeNom()))));
                     if (!debloque) {
-                        throw new BusinessException("L'heure limite de commande (" + ent.getCutOffHeure() + ") est dépassée pour aujourd'hui.");
+                        String libelleDelai = joursAvant == 0 ? "Jour J" : ("J-" + joursAvant);
+                        throw new BusinessException("L'heure limite de commande (" + libelleDelai + " à " + ent.getCutOffHeure() + ") est dépassée pour le " + dateServiceStr + ".");
                     }
                 }
             } catch (BusinessException ex) {

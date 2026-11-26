@@ -25,6 +25,7 @@ import com.kikitraiteur.b2b.planning.data.entity.MenuPlanifieJourEntity;
 import com.kikitraiteur.b2b.planning.data.repository.MenuPlanifieJourRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +37,7 @@ import java.util.List;
 import java.util.Locale;
 
 @Component
+@Profile("dev-seed")
 @RequiredArgsConstructor
 public class B2bDataSeeder implements CommandLineRunner {
 

@@ -83,6 +83,7 @@ export class SaEntreprisesComponent {
     contactReferent: '',
     montantPriseEnChargeRepas: 5000,
     cutOffType: 'J_MOINS_1',
+    cutOffJoursAvant: 1,
     cutOffHeure: '18:00',
     cadenceFacturation: 'MENSUELLE',
     typePrestation: 'CUISINE_SUR_PLACE',
@@ -92,11 +93,12 @@ export class SaEntreprisesComponent {
 
   // Modal Paramètres (Types de prestation et Catégories personnalisables)
   showModalParametres = signal<boolean>(false);
-  nouveauTypePrestation = signal<{ code: string; libelle: string; desc: string; cutOffType: string; cutOffHeure: string; reglesCutOff: string; joursDisponiblesText: string }>({
+  nouveauTypePrestation = signal<{ code: string; libelle: string; desc: string; cutOffType: string; cutOffJoursAvant: number; cutOffHeure: string; reglesCutOff: string; joursDisponiblesText: string }>({
     code: '',
     libelle: '',
     desc: '',
     cutOffType: 'J_MOINS_1',
+    cutOffJoursAvant: 1,
     cutOffHeure: '18:00',
     reglesCutOff: '',
     joursDisponiblesText: 'Lundi, Mardi, Mercredi, Jeudi, Vendredi'
@@ -127,16 +129,36 @@ export class SaEntreprisesComponent {
   onTypePrestationEntrepriseChange(type: string) {
     const trouv = this.b2b.typesPrestationConfigurables().find(t => t.code === type);
     if (trouv) {
+      const jours = this.b2b.resolveCutOffJoursAvant(trouv);
       this.entrepriseEnEdition.update(e => ({
         ...e,
         typePrestation: type,
         categoriesAutorisees: [...trouv.categoriesDefaut],
-        cutOffType: (trouv.cutOffType as any) || e.cutOffType || 'J_MOINS_1',
+        cutOffJoursAvant: jours,
+        cutOffType: jours === 0 ? 'JOUR_J' : `J_MOINS_${jours}`,
         cutOffHeure: trouv.cutOffHeure || e.cutOffHeure || '18:00'
       }));
     } else {
       this.entrepriseEnEdition.update(e => ({ ...e, typePrestation: type }));
     }
+  }
+
+  onCutOffJoursEntrepriseChange(val: number) {
+    const j = Math.max(0, Math.floor(Number(val) || 0));
+    this.entrepriseEnEdition.update(e => ({
+      ...e,
+      cutOffJoursAvant: j,
+      cutOffType: j === 0 ? 'JOUR_J' : `J_MOINS_${j}`
+    }));
+  }
+
+  onCutOffJoursPrestationChange(val: number) {
+    const j = Math.max(0, Math.floor(Number(val) || 0));
+    this.nouveauTypePrestation.update(tp => ({
+      ...tp,
+      cutOffJoursAvant: j,
+      cutOffType: j === 0 ? 'JOUR_J' : `J_MOINS_${j}`
+    }));
   }
 
   toggleCategorieEntreprise(cat: string) {
@@ -164,14 +186,7 @@ export class SaEntreprisesComponent {
   }
 
   getLibelleCutOff(ent: Partial<EntrepriseB2B>): string {
-    if (!ent.cutOffType) return ent.cutOffHeure || '18:00 (J-1)';
-    if (ent.cutOffType === 'SANS_CUTOFF') return 'Sans Cut-Off (Libre)';
-    const prefix = ent.cutOffType === 'J_MOINS_1'
-      ? 'J - 1 (Veille)'
-      : ent.cutOffType === 'J_MOINS_2'
-        ? 'J - 2 (Avant-veille)'
-        : 'Jour J (Jour même)';
-    return `${prefix} à ${ent.cutOffHeure || '18:00'}`;
+    return this.b2b.formatCutOffLibelle(ent);
   }
 
   resetNouveauTypePrestation() {
@@ -180,6 +195,7 @@ export class SaEntreprisesComponent {
       libelle: '',
       desc: '',
       cutOffType: 'J_MOINS_1',
+      cutOffJoursAvant: 1,
       cutOffHeure: '18:00',
       reglesCutOff: '',
       joursDisponiblesText: 'Lundi, Mardi, Mercredi, Jeudi, Vendredi'
@@ -229,12 +245,14 @@ export class SaEntreprisesComponent {
       .split(',')
       .map(j => j.trim())
       .filter(Boolean);
+    const j = Math.max(0, Math.floor(Number(tp.cutOffJoursAvant) || 0));
     this.b2b.ajouterTypePrestation({
       code,
       libelle: tp.libelle,
       desc: tp.desc || 'Prestation sur mesure Kiki Traiteur',
       categoriesDefaut: ['PLAT', 'BOISSON'],
-      cutOffType: tp.cutOffType || 'J_MOINS_1',
+      cutOffJoursAvant: j,
+      cutOffType: j === 0 ? 'JOUR_J' : `J_MOINS_${j}`,
       cutOffHeure: tp.cutOffHeure || '18:00',
       reglesCutOff: tp.reglesCutOff || '',
       joursDisponibles: jours.length > 0 ? jours : ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi']
@@ -324,8 +342,9 @@ export class SaEntreprisesComponent {
       telephone: '+221 ',
       contactReferent: '',
       montantPriseEnChargeRepas: 5000,
-      cutOffType: 'J_MOINS_1',
-      cutOffHeure: '18:00',
+      cutOffType: 'JOUR_J',
+      cutOffJoursAvant: 0,
+      cutOffHeure: '10:30',
       cadenceFacturation: 'MENSUELLE',
       typePrestation: 'CUISINE_SUR_PLACE',
       categoriesAutorisees: ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON']
@@ -337,13 +356,15 @@ export class SaEntreprisesComponent {
 
   ouvrirModalModifierEntreprise(ent: EntrepriseB2B) {
     this.isEditModeEntreprise.set(true);
+    const jours = this.b2b.resolveCutOffJoursAvant(ent);
     this.entrepriseEnEdition.set({
       ...ent,
       rccm: ent.rccm || '',
       adresse: ent.adresse || (ent.sites && ent.sites[0] ? ent.sites[0].adresse : ''),
       contactReferent: ent.contactReferent || (ent.sites && ent.sites[0] ? ent.sites[0].contactReferent : ''),
       montantPriseEnChargeRepas: ent.montantPriseEnChargeRepas || 5000,
-      cutOffType: ent.cutOffType || 'J_MOINS_1',
+      cutOffJoursAvant: jours,
+      cutOffType: jours === 0 ? 'JOUR_J' : `J_MOINS_${jours}`,
       cutOffHeure: ent.cutOffHeure || '18:00',
       typePrestation: ent.typePrestation || 'CUISINE_SUR_PLACE',
       categoriesAutorisees: ent.categoriesAutorisees ? [...ent.categoriesAutorisees] : ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON']
@@ -428,15 +449,20 @@ export class SaEntreprisesComponent {
     if (!this.validerEtape1()) return;
     const val = this.entrepriseEnEdition();
 
+    const jours = Math.max(0, Math.floor(Number(val.cutOffJoursAvant ?? this.b2b.resolveCutOffJoursAvant(val)) || 0));
+    const cutOffTypeSync = jours === 0 ? 'JOUR_J' : `J_MOINS_${jours}`;
+
     if (this.isEditModeEntreprise() && val.id) {
       this.b2b.modifierEntreprise(val.id, {
         ...val,
+        cutOffJoursAvant: jours,
+        cutOffType: cutOffTypeSync,
         sites: [
           {
             id: 'site-' + val.id,
             nom: val.nom!,
             adresse: val.adresse || 'Dakar',
-            heureCutOff: `${val.cutOffHeure || '18:00'} (${val.cutOffType === 'JOUR_J' ? 'Jour J' : 'J-1'})`,
+            heureCutOff: `${val.cutOffHeure || '18:00'} (${jours === 0 ? 'Jour J' : 'J-' + jours})`,
             contactReferent: val.contactReferent || 'Contact RH',
             telephoneReferent: val.telephone || '+221',
             typePrestation: val.typePrestation || 'CUISINE_SUR_PLACE',
@@ -487,7 +513,8 @@ export class SaEntreprisesComponent {
         budgetMensuelAlloue: 15000000,
         tarifNegocieHtva: val.montantPriseEnChargeRepas || 5000,
         cadenceFacturation: val.cadenceFacturation || 'MENSUELLE',
-        cutOffType: val.cutOffType || 'J_MOINS_1',
+        cutOffType: cutOffTypeSync,
+        cutOffJoursAvant: jours,
         cutOffHeure: val.cutOffHeure || '18:00',
         typePrestation: val.typePrestation || 'CUISINE_SUR_PLACE',
         categoriesAutorisees: val.categoriesAutorisees || ['ENTREE', 'PLAT', 'DESSERT', 'BOISSON'],

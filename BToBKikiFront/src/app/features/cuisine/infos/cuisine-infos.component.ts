@@ -1,4 +1,4 @@
-﻿import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -26,7 +26,6 @@ export class CuisineInfosComponent {
   }
 
   getLibelleCutOff(e: EntrepriseB2B): string {
-    const moment = e.cutOffType === 'J_MOINS_1' ? 'La veille (J-1)' : 'Le jour même (Jour J)';
-    return `${e.cutOffHeure} (${moment})`;
+    return this.b2b.formatCutOffLibelle(e);
   }
 }

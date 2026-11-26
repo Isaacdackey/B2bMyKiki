@@ -69,10 +69,22 @@ public class EntrepriseService {
 
     public EntrepriseEntity create(EntrepriseEntity ent) {
         validerEntreprise(ent);
+        synchroniserCutOff(ent);
         if (ent.getId() == null || ent.getId().isBlank()) {
             ent.setId("ent-" + System.currentTimeMillis());
         }
         return entrepriseRepository.save(ent);
+    }
+
+    private void synchroniserCutOff(EntrepriseEntity ent) {
+        if (ent.getCutOffJoursAvant() != null && ent.getCutOffJoursAvant() >= 0) {
+            int j = ent.getCutOffJoursAvant();
+            if (!"SANS_CUTOFF".equalsIgnoreCase(ent.getCutOffType())) {
+                ent.setCutOffType(j == 0 ? "JOUR_J" : "J_MOINS_" + j);
+            }
+        } else {
+            ent.setCutOffJoursAvant(ent.resolveCutOffJoursAvant());
+        }
     }
 
     public EntrepriseEntity update(String id, EntrepriseEntity updates) {
@@ -88,6 +100,15 @@ public class EntrepriseService {
         if (updates.getMontantPriseEnChargeRepas() != null) existing.setMontantPriseEnChargeRepas(updates.getMontantPriseEnChargeRepas());
         if (updates.getCadenceFacturation() != null) existing.setCadenceFacturation(updates.getCadenceFacturation());
         if (updates.getCutOffType() != null) existing.setCutOffType(updates.getCutOffType());
+        if (updates.getCutOffJoursAvant() != null) {
+            int j = Math.max(0, updates.getCutOffJoursAvant());
+            existing.setCutOffJoursAvant(j);
+            if (!"SANS_CUTOFF".equalsIgnoreCase(updates.getCutOffType())) {
+                existing.setCutOffType(j == 0 ? "JOUR_J" : "J_MOINS_" + j);
+            }
+        } else if (updates.getCutOffType() != null) {
+            existing.setCutOffJoursAvant(existing.resolveCutOffJoursAvant());
+        }
         if (updates.getCutOffHeure() != null) existing.setCutOffHeure(updates.getCutOffHeure());
         if (updates.getTypePrestation() != null) existing.setTypePrestation(updates.getTypePrestation());
         if (updates.getCategoriesAutorisees() != null && !updates.getCategoriesAutorisees().isEmpty()) {

@@ -75,7 +75,8 @@ export interface EntrepriseB2B {
   cadenceFacturation?: 'HEBDOMADAIRE' | 'MENSUELLE' | 'BIMESTRIELLE';
   
   // Cut-off heure limite de commande
-  cutOffType: TypeCutOffB2B; // 'J_MOINS_1' ou 'JOUR_J'
+  cutOffType: TypeCutOffB2B; // 'JOUR_J', 'J_MOINS_1', 'J_MOINS_2', etc.
+  cutOffJoursAvant?: number; // 0 = Jour J, 1 = 1 jour avant, 2 = 2 jours avant...
   cutOffHeure: string; // Ex: '18:00' ou '09:00'
 
   // Prestation et catégories

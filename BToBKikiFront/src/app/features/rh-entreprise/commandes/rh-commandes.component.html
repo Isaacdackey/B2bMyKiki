@@ -181,8 +181,13 @@
           }
         </div>
 
-        <div style="background: #FAF5EA; border: 1px solid #E2D5BE; border-radius: 12px; padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-          <span style="font-size: 0.82rem; font-weight: 800; color: #721513;">Total : {{ totalPlatsGroupe() }} plat(s)</span>
+        <div style="background: #FAF5EA; border: 1px solid #E2D5BE; border-radius: 12px; padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
+          <div style="display: flex; flex-direction: column; gap: 0.15rem;">
+            <span style="font-size: 0.82rem; font-weight: 800;" [style.color]="totalPlatsGroupe() >= employesActifsCount() ? '#606C38' : '#E51D24'">
+              Total : {{ totalPlatsGroupe() }} plat(s) / Min. requis : {{ employesActifsCount() }} employé(s)
+            </span>
+            <small style="font-size: 0.7rem; color: #6E5A56;">Le total doit être supérieur ou égal au nombre d'employés ({{ employesActifsCount() }}).</small>
+          </div>
           <span style="font-size: 0.95rem; font-weight: 900; color: #606C38;">{{ totalMontantGroupe() | number }} FCFA</span>
         </div>
 
@@ -192,7 +197,10 @@
             Annuler
           </button>
           <button type="button" (click)="validerCommandeGroupee()"
-            style="flex: 1.4; border: none; background: #721513; color: #FFFFFF; border-radius: 9999px; padding: 0.65rem; font-weight: 800; cursor: pointer;">
+            [disabled]="employesActifsCount() > 0 && totalPlatsGroupe() < employesActifsCount()"
+            [style.opacity]="employesActifsCount() > 0 && totalPlatsGroupe() < employesActifsCount() ? '0.55' : '1'"
+            [style.cursor]="employesActifsCount() > 0 && totalPlatsGroupe() < employesActifsCount() ? 'not-allowed' : 'pointer'"
+            style="flex: 1.4; border: none; background: #721513; color: #FFFFFF; border-radius: 9999px; padding: 0.65rem; font-weight: 800;">
             <i class="fa-solid fa-check"></i> Valider la commande groupée
           </button>
         </div>

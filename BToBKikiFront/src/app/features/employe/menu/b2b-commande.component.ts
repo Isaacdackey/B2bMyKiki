@@ -163,9 +163,6 @@ export class B2bCommandeComponent implements OnInit {
     if (prest?.joursDisponibles?.length && !prest.joursDisponibles.includes(jour)) {
       return true;
     }
-    if (jour === 'Vendredi' || jour === 'Samedi' || jour === 'Dimanche') {
-      return false;
-    }
     if (this.b2b.isEmployeDebloqueAujourdhui(this.b2b.currentEmploye().id)) {
       return false;
     }
@@ -173,11 +170,21 @@ export class B2bCommandeComponent implements OnInit {
       return true;
     }
     const now = new Date();
+    const idxJour = Math.max(0, this.joursSemaine.indexOf(jour as any));
+    const dateService = new Date(now);
+    dateService.setHours(0, 0, 0, 0);
+    dateService.setDate(dateService.getDate() - this.todayIndex + idxJour);
+
+    const joursAvant = this.b2b.resolveCutOffJoursAvant(ent);
     const [hStr, mStr] = (ent.cutOffHeure || '18:00').split(':');
     const cutH = parseInt(hStr, 10) || 18;
     const cutM = parseInt(mStr, 10) || 0;
-    const nowMins = now.getHours() * 60 + now.getMinutes();
-    return nowMins >= (cutH * 60 + cutM);
+
+    const dateHeureLimite = new Date(dateService);
+    dateHeureLimite.setDate(dateService.getDate() - joursAvant);
+    dateHeureLimite.setHours(cutH, cutM, 0, 0);
+
+    return now.getTime() >= dateHeureLimite.getTime();
   });
 
   // MODAL DE RÉCLAMATION (Cut-Off Dépassé)

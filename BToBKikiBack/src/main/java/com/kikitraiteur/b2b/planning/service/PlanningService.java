@@ -3,6 +3,7 @@ package com.kikitraiteur.b2b.planning.service;
 import com.kikitraiteur.b2b.catalogue.data.entity.PlatEntity;
 import com.kikitraiteur.b2b.catalogue.data.repository.PlatRepository;
 import com.kikitraiteur.b2b.entreprise.data.entity.EntrepriseEntity;
+import com.kikitraiteur.b2b.entreprise.data.repository.EmployeRepository;
 import com.kikitraiteur.b2b.entreprise.data.repository.EntrepriseRepository;
 import com.kikitraiteur.b2b.planning.data.entity.LigneMenuPlanifieEntity;
 import com.kikitraiteur.b2b.planning.data.entity.MenuPlanifieJourEntity;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,6 +28,7 @@ public class PlanningService {
     private final LigneMenuPlanifieRepository ligneRepository;
     private final PlatRepository platRepository;
     private final EntrepriseRepository entrepriseRepository;
+    private final EmployeRepository employeRepository;
 
     public List<MenuPlanifieJourEntity> findByEntreprise(String entrepriseId) {
         if (entrepriseId == null || entrepriseId.isBlank() || "TOUTES".equalsIgnoreCase(entrepriseId)) {
@@ -183,6 +186,28 @@ public class PlanningService {
     private void recalculerConformite(MenuPlanifieJourEntity menu) {
         boolean allZero = menu.getLignes().stream().allMatch(l -> l.getQuantitePrevue() == null || l.getQuantitePrevue() <= 0);
         menu.setQuantitesSaisies(!allZero);
-        menu.setStatutConformite(allZero ? "NON_SAISI" : "CONFORME");
+        if (allZero || menu.getLignes().isEmpty()) {
+            menu.setStatutConformite("NON_SAISI");
+            return;
+        }
+        long minEffectif = 1;
+        if (menu.getEntrepriseId() != null && !menu.getEntrepriseId().isBlank()) {
+            long count = employeRepository.findByEntrepriseId(menu.getEntrepriseId()).stream()
+                    .filter(e -> e.isActif() && (e.getType() == null || "SUBVENTIONNE".equalsIgnoreCase(e.getType())))
+                    .count();
+            if (count > 0) {
+                minEffectif = count;
+            }
+        }
+        Map<String, Integer> sommesParCategorie = menu.getLignes().stream()
+                .filter(l -> l.getCategorie() != null)
+                .collect(Collectors.groupingBy(
+                        LigneMenuPlanifieEntity::getCategorie,
+                        Collectors.summingInt(l -> l.getQuantitePrevue() != null ? l.getQuantitePrevue() : 0)
+                ));
+        final long seuil = minEffectif;
+        boolean conforme = !sommesParCategorie.isEmpty()
+                && sommesParCategorie.values().stream().allMatch(somme -> somme >= seuil);
+        menu.setStatutConformite(conforme ? "CONFORME" : "NON_CONFORME");
     }
 }

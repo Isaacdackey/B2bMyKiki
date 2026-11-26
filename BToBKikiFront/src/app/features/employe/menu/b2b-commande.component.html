@@ -19,7 +19,7 @@
         <span style="color: #D6C9B8;">•</span>
         <span [style.color]="isBloqueParCutOff() ? '#DC2626' : '#6E5A56'">
           <i class="fa-regular fa-clock" [style.color]="isBloqueParCutOff() ? '#DC2626' : '#721513'"></i>
-          Cut-Off : <strong>{{ b2b.currentEntreprise().cutOffHeure }}</strong>
+          Cut-Off : <strong>{{ b2b.formatCutOffLibelle(b2b.currentEntreprise()) }}</strong>
           @if (isBloqueParCutOff()) {
             <strong style="color: #DC2626; margin-left: 0.25rem;">(Dépassé)</strong>
           }
