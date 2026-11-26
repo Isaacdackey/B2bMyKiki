@@ -1,0 +1,17 @@
+name: Keep Alive Neon DB (08h-00h)
+
+on:
+  schedule:
+    # Ping léger (SELECT 1) toutes les 4 minutes entre 08h00 et 23h59 UTC (heure Dakar).
+    # Aucun wake entre 00h00 et 07h59 pour économiser le compute Neon.
+    - cron: '*/4 8-23 * * *'
+  workflow_dispatch:
+
+jobs:
+  ping-neon:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Lightweight Neon DB keep-alive (SELECT 1)
+        run: |
+          curl -fsS --max-time 60 --retry 2 "https://b2bmykiki.onrender.com/api/ping/db"
+          echo ""

@@ -41,7 +41,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/v1/auth/**",
                                 "/api/v1/b2b/paiements/wave/webhook",
-                                "/api/ping",
+                                "/api/ping/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**"
