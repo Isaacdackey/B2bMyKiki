@@ -33,6 +33,19 @@ public class ParametreController {
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PostMapping("/prestations")
     public ApiResponse<TypePrestationEntity> createPrestation(@RequestBody TypePrestationEntity item) {
+        String rawCode = item.getCode();
+        if (rawCode == null || rawCode.isBlank()) {
+            String base = item.getLibelle() != null ? item.getLibelle() : "PRESTATION";
+            rawCode = base.trim().toUpperCase().replaceAll("[^A-Z0-9]+", "_").replaceAll("^_|_$", "");
+            if (rawCode.isBlank()) {
+                rawCode = "PREST_" + System.currentTimeMillis();
+            }
+        }
+        String finalCode = rawCode.trim().toUpperCase();
+        if (typePrestationRepository.existsById(finalCode)) {
+            finalCode = finalCode + "_" + (System.currentTimeMillis() % 100000);
+        }
+        item.setCode(finalCode);
         return ApiResponse.ok("Type de prestation enregistré", typePrestationRepository.save(item));
     }
 
@@ -46,6 +59,19 @@ public class ParametreController {
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PostMapping("/categories")
     public ApiResponse<CategoriePlatEntity> createCategorie(@RequestBody CategoriePlatEntity item) {
+        String rawCode = item.getCode();
+        if (rawCode == null || rawCode.isBlank()) {
+            String base = item.getLibelle() != null ? item.getLibelle() : "CATEGORIE";
+            rawCode = base.trim().toUpperCase().replaceAll("[^A-Z0-9]+", "_").replaceAll("^_|_$", "");
+            if (rawCode.isBlank()) {
+                rawCode = "CAT_" + System.currentTimeMillis();
+            }
+        }
+        String finalCode = rawCode.trim().toUpperCase();
+        if (categoriePlatRepository.existsById(finalCode)) {
+            finalCode = finalCode + "_" + (System.currentTimeMillis() % 100000);
+        }
+        item.setCode(finalCode);
         return ApiResponse.ok("Catégorie enregistrée", categoriePlatRepository.save(item));
     }
 

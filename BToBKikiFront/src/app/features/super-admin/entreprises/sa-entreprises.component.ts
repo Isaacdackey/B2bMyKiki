@@ -193,6 +193,31 @@ export class SaEntreprisesComponent {
     this.showModalParametres.set(true);
   }
 
+  isJourPrestationSelected(jour: string): boolean {
+    const jours = (this.nouveauTypePrestation().joursDisponiblesText || '')
+      .split(',')
+      .map(j => j.trim().toLowerCase())
+      .filter(Boolean);
+    return jours.includes(jour.toLowerCase());
+  }
+
+  toggleJourPrestation(jour: string) {
+    const ordre = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+    const actuels = new Set(
+      (this.nouveauTypePrestation().joursDisponiblesText || '')
+        .split(',')
+        .map(j => j.trim())
+        .filter(Boolean)
+    );
+    if (actuels.has(jour)) {
+      actuels.delete(jour);
+    } else {
+      actuels.add(jour);
+    }
+    const tries = ordre.filter(j => actuels.has(j));
+    this.nouveauTypePrestation.update(tp => ({ ...tp, joursDisponiblesText: tries.join(', ') }));
+  }
+
   creerNouveauTypePrestation() {
     const tp = this.nouveauTypePrestation();
     if (!tp.libelle) {

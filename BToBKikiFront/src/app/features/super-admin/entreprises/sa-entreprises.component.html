@@ -1431,12 +1431,22 @@
             </div>
           </div>
           <div>
-            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.3rem;">Règles de Cut-Off</label>
-            <input type="text" [(ngModel)]="nouveauTypePrestation().reglesCutOff" placeholder="Ex: Tolérance 30 min sur validation cuisine..." style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.6rem 0.75rem; font-size: 0.85rem;">
-          </div>
-          <div>
-            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.3rem;">Jours disponibles</label>
-            <input type="text" [(ngModel)]="nouveauTypePrestation().joursDisponiblesText" placeholder="Lundi, Mardi, Mercredi, Jeudi, Vendredi" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 10px; padding: 0.6rem 0.75rem; font-size: 0.85rem;">
+            <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.45rem;">
+              <i class="fa-regular fa-calendar-days"></i> Jours disponibles
+            </label>
+            <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.35rem; background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 12px; padding: 0.5rem;">
+              @for (jour of ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']; track jour) {
+                <button
+                  type="button"
+                  (click)="toggleJourPrestation(jour)"
+                  [style.background]="isJourPrestationSelected(jour) ? '#721513' : '#FFFFFF'"
+                  [style.color]="isJourPrestationSelected(jour) ? '#FFFFFF' : '#6E5A56'"
+                  [style.borderColor]="isJourPrestationSelected(jour) ? '#721513' : '#EDE7DC'"
+                  style="border: 1.5px solid; border-radius: 9px; padding: 0.45rem 0.2rem; font-size: 0.72rem; font-weight: 800; cursor: pointer; text-align: center; transition: all 0.15s;">
+                  {{ jour.slice(0, 3) }}
+                </button>
+              }
+            </div>
           </div>
         </div>
         <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem;">

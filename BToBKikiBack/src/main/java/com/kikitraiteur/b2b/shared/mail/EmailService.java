@@ -49,13 +49,18 @@ public class EmailService {
         String safeRole = escapeHtml(roleLibelle);
         String safeEntreprise = escapeHtml(entrepriseNom);
 
+        String roleLower = roleLibelle != null ? roleLibelle.toLowerCase() : "";
+        String ctaLabel = (roleLower.contains("admin") || roleLower.contains("rh") || roleLower.contains("responsable"))
+                ? "Activer mon compte administrateur"
+                : "Activer mon compte salarié";
+
         String html = buildEmailLayout(
                 "Bienvenue sur Kiki Traiteur B2B",
                 "<p>Bonjour <strong>" + safeName + "</strong>,</p>"
                         + "<p>Vous avez été désigné(e) en tant que <strong>" + safeRole + "</strong> "
                         + "pour l'entreprise <strong>" + safeEntreprise + "</strong> sur le portail Kiki Traiteur B2B.</p>"
                         + "<p>Cliquez sur le bouton ci-dessous pour définir votre mot de passe et activer votre espace :</p>"
-                        + buildCtaButton(activationUrl, "Activer mon compte administrateur")
+                        + buildCtaButton(activationUrl, ctaLabel)
                         + "<p style=\"font-size:13px;color:#6E5A56;margin-top:20px;\">"
                         + "Si le bouton ne fonctionne pas, copiez et collez ce lien dans votre navigateur :<br>"
                         + "<a href=\"" + escapeHtml(activationUrl) + "\" style=\"color:#721513;word-break:break-all;\">"
