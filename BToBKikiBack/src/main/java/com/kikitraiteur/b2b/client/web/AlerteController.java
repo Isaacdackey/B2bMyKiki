@@ -6,6 +6,8 @@ import com.kikitraiteur.b2b.shared.exceptions.BusinessException;
 import com.kikitraiteur.b2b.shared.exceptions.ResourceNotFoundException;
 import com.kikitraiteur.b2b.shared.mail.EmailService;
 import com.kikitraiteur.b2b.shared.response.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +22,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/b2b/alertes")
 @RequiredArgsConstructor
+@Tag(name = "Alertes & Relances RH", description = "Envoi d'alertes plateforme et emails de rappel de commande via Brevo")
 public class AlerteController {
 
     private final AlerteCommandeRepository alerteRepository;

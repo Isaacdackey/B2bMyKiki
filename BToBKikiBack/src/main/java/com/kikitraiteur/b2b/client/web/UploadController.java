@@ -2,6 +2,8 @@ package com.kikitraiteur.b2b.client.web;
 
 import com.kikitraiteur.b2b.shared.exceptions.BusinessException;
 import com.kikitraiteur.b2b.shared.response.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
@@ -17,6 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/b2b/upload")
+@Tag(name = "Upload Médias (Cloudinary)", description = "Upload signé d'images de plats vers Cloudinary")
 public class UploadController {
 
     @Value("${cloudinary.cloud-name:}")
@@ -31,6 +34,7 @@ public class UploadController {
     @Value("${cloudinary.folder:kikitraiteur}")
     private String folder;
 
+    @Operation(summary = "Uploader une image de plat", description = "Envoie un fichier image multipart vers Cloudinary et retourne son URL sécurisée.")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
