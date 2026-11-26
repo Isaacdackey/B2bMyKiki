@@ -225,7 +225,7 @@
                     </button>
                   </div>
 
-                  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem;">
+                  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, ), 1fr)); gap: 1rem;">
                     @for (inv of invitationsEntrepriseEnGestion(); track inv.id) {
                       <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 12px; padding: 1rem;">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
@@ -496,7 +496,7 @@
                     </p>
                   </div>
                 } @else {
-                  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;">
+                  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, ), 1fr)); gap: 1rem;">
                     @for (ligne of lignesMenuFiltreesParCategories(); track ligne.id) {
                       <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 12px; padding: 1rem; display: flex; flex-direction: column; justify-content: space-between;">
                         <div>
@@ -693,7 +693,7 @@
                 </div>
 
                 <!-- KPIs Récapitulatifs de la Période -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, ), 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
                   <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 12px; padding: 1rem;">
                     <div style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">Total Plats Livrés</div>
                     <div style="font-size: 1.65rem; font-weight: 900; color: #721513; margin-top: 0.2rem;">
@@ -875,7 +875,7 @@
               </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, ), 1fr)); gap: 0.75rem;">
               <div>
                 <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">NINEA</label>
                 <input type="text" [(ngModel)]="entrepriseEnEdition().ninea" placeholder="Ex: 001294829 2V1" [style.border-color]="erreursEtape1().ninea ? '#E51D24' : '#EDE7DC'" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 0.82rem; font-weight: 700;">
@@ -896,7 +896,7 @@
               </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, ), 1fr)); gap: 0.75rem;">
               <div>
                 <label style="font-size: 0.72rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.25rem;">Email Référent RH / DAF</label>
                 <input type="email" [(ngModel)]="entrepriseEnEdition().emailContact" placeholder="rh@client.sn" [style.border-color]="erreursEtape1().email ? '#E51D24' : '#EDE7DC'" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 0.82rem;">
@@ -915,7 +915,7 @@
           }
 
           @if (etapeEntreprise() === 2) {
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.85rem;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, ), 1fr)); gap: 0.85rem;">
               <div style="background: #FAF8F4; border: 1px solid #EDE7DC; border-radius: 12px; padding: 0.9rem;">
                 <label style="font-size: 0.75rem; font-weight: 800; color: #721513; display: block; margin-bottom: 0.35rem;">Cadence Facturation</label>
                 <select [(ngModel)]="entrepriseEnEdition().cadenceFacturation" style="width: 100%; border: 1.5px solid #EDE7DC; border-radius: 8px; padding: 0.5rem 0.65rem; font-size: 0.84rem; font-weight: 700; color: #721513; background: #FFFFFF;">
@@ -998,7 +998,7 @@
                     <div style="font-size: 0.74rem; font-weight: 800; color: #721513; margin-bottom: 0.45rem;">
                       <i class="fa-solid fa-briefcase"></i> Admin Entreprise (RH / DAF)
                     </div>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.5rem;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, ), 1fr)); gap: 0.5rem;">
                       <input type="text" [(ngModel)]="adminsCreation().rhNomComplet" placeholder="Nom complet (ex: Fatou Fall)"
                         style="width: 100%; height: 36px; border: 1px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.8rem; box-sizing: border-box;">
                       <input type="email" [(ngModel)]="adminsCreation().rhEmail" placeholder="Email RH (ex: rh@entreprise.sn)"
@@ -1010,7 +1010,7 @@
                     <div style="font-size: 0.74rem; font-weight: 800; color: #C05621; margin-bottom: 0.45rem;">
                       <i class="fa-solid fa-clipboard-check"></i> Admin Site Kiki (Responsable de Site)
                     </div>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.5rem;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, ), 1fr)); gap: 0.5rem;">
                       <input type="text" [(ngModel)]="adminsCreation().siteNomComplet" placeholder="Nom complet (ex: Babacar Samb)"
                         style="width: 100%; height: 36px; border: 1px solid #EDE7DC; border-radius: 8px; padding: 0 0.65rem; font-size: 0.8rem; box-sizing: border-box;">
                       <input type="email" [(ngModel)]="adminsCreation().siteEmail" placeholder="Email site (ex: site@kikitraiteur.sn)"
@@ -1188,7 +1188,7 @@
               </div>
 
               <!-- Cartouches Caractéristiques : Tarif Repas, Cut-off, Type de Prestation, Catégories -->
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; align-items: stretch;">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, ), 1fr)); gap: 1rem; align-items: stretch;">
                 
                 <!-- Bloc 1 : Montant Offre Repas / Prise en charge -->
                 <div style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 12px; padding: 0.95rem;">
@@ -1298,7 +1298,7 @@
 
         } @else {
           <!-- ONGLET PRESTATIONS & CATÉGORIES DIRECTEMENT DANS LA PAGE -->
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; align-items: start;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, ), 1fr)); gap: 1.5rem; align-items: start;">
             <!-- Carte 1 : Types de Prestation -->
             <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 18px; padding: 1.5rem; box-shadow: 0 4px 18px rgba(114, 21, 19, 0.04);">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; gap: 0.75rem;">

@@ -1154,6 +1154,12 @@ body:has(.fidelite-modal-overlay) .mykiki-main-content,
   }
 }
 
+@media (max-width: 390px) {
+  html {
+    font-size: 13px;
+  }
+}
+
 /* ══════════ LIGHTBOX OVERLAYS (PRIORITÉ ABSOLUE AU-DESSUS DE TOUTES LES MODALES) ══════════ */
 .lightbox-overlay,
 .lightbox {
