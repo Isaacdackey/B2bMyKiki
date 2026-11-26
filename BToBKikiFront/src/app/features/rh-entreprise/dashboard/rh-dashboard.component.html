@@ -29,7 +29,7 @@
         </div>
 
         <!-- 2 GRANDES CARTES HERO (STYLE SUPER ADMIN) -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, ), 1fr)); gap: 1.25rem; margin-bottom: 1.5rem;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem;">
           <div class="kiki-dash-card-enter" style="--stagger: 0; background: linear-gradient(135deg, #721513 0%, #4A0D0B 100%); color: #FFFFFF; border-radius: 20px; padding: 1.5rem; box-shadow: 0 12px 28px rgba(114, 21, 19, 0.2); display: flex; flex-direction: column; justify-content: space-between; gap: 1.15rem;">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
               <div>
@@ -74,7 +74,7 @@
         </div>
 
         <!-- COMPARAISON EFFECTIF / COMMANDÉS / NON-COMMANDÉS (CARDS CLIQUABLES + RELANCE) -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, ), 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
           <div style="background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 16px; padding: 1.15rem 1.25rem; box-shadow: 0 4px 16px rgba(114, 21, 19, 0.03);">
             <div style="font-size: 0.72rem; font-weight: 800; color: #6E5A56; text-transform: uppercase;">Effectif Actif</div>
             <div style="font-size: 1.85rem; font-weight: 900; color: #332724; margin: 0.25rem 0;">{{ employesActifsEntreprise().length }} <span style="font-size: 0.85rem; font-weight: 700; color: #6E5A56;">salariés</span></div>
@@ -106,7 +106,7 @@
         </div>
 
         <!-- GRAPHIQUES SITE ENTREPRISE (STATUTS & TOP PLATS) -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, ), 1fr)); gap: 1.25rem; margin-bottom: 1.5rem;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem;">
           <div class="kiki-dash-card-enter" style="--stagger: 2; background: #FFFFFF; border: 1.5px solid #EDE7DC; border-radius: 20px; padding: 1.4rem; box-shadow: 0 4px 20px rgba(114, 21, 19, 0.04);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
               <div>
@@ -177,7 +177,7 @@
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, ), 1fr)); gap: 1rem;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem;">
             <div (click)="activeSection.set('COMMANDES_SITE')" style="background: #FAF8F4; border: 1.5px solid #EDE7DC; border-radius: 14px; padding: 1.25rem; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='#721513'" onmouseout="this.style.borderColor='#EDE7DC'">
               <div style="font-size: 1.2rem; color: #721513; margin-bottom: 0.5rem;"><i class="fa-solid fa-list-check"></i></div>
               <strong style="color: #332724; font-size: 1rem; display: block;">Commandes du Jour</strong>
