@@ -397,9 +397,8 @@ export class B2bCommandesListeComponent {
     const matchesEmploye = (matricule?: string, employeNom?: string) => {
       const m = (matricule || '').trim().toLowerCase();
       const e = (employeNom || '').trim().toLowerCase();
-      if (mat && m && m === mat) return true;
-      if (nom && e && e.includes(nom)) return true;
-      if (nomComplet && e && (e === nomComplet || nomComplet.includes(e))) return true;
+      if (mat && m) return m === mat;
+      if (nomComplet && e) return e === nomComplet;
       return false;
     };
 
