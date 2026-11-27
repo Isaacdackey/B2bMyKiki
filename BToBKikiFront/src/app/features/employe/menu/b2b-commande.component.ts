@@ -678,6 +678,10 @@ export class B2bCommandeComponent implements OnInit {
   }
 
   validerCommande() {
+    if (this.aDejaCommandeJour(this.jourSelectionne())) {
+      this.b2b.showToast('Vous avez déjà passé votre commande pour ce jour.', 'error');
+      return;
+    }
     if (this.isBloqueParCutOff()) {
       this.ouvrirModalReclamation();
       return;

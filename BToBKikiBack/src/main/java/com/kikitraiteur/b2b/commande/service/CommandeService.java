@@ -78,7 +78,7 @@ public class CommandeService {
                 existing.setPartEntreprise(cmd.getPartEntreprise());
                 existing.setPartEmploye(cmd.getPartEmploye());
                 existing.setHeure(cmd.getHeure());
-                return commandeRepository.save(existing);
+                throw new BusinessException("Vous avez déjà passé une commande pour cette journée.");
             }
         }
 
