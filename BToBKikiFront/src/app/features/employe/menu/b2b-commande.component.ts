@@ -581,15 +581,21 @@ export class B2bCommandeComponent implements OnInit {
       this.ouvrirModalReclamation();
       return;
     }
-    if (this.b2b.modeProfil() === 'SUBVENTIONNE') {
-      this.b2b.choisirPlat(plat);
-    }
-
     const emp = this.b2b.currentEmploye();
     const site = this.b2b.siteActuel();
     const dateIso = this.getDateIsoPourJour(jour);
     const codeCommande = `CMD-${emp.matricule}-${dateIso}`;
     const qrCode = `KT-${emp.matricule}-${site.id}-${dateIso}`;
+
+    const cmdExistante = this.b2b.listeCommandesSite().find(c => c.codeCommande === codeCommande);
+    if (cmdExistante && (cmdExistante.statut === 'SCANNE' || cmdExistante.statut === 'LIVRE')) {
+      this.b2b.showToast('Vous avez déjà passé et retiré votre commande pour ce jour.', 'error');
+      return;
+    }
+
+    if (this.b2b.modeProfil() === 'SUBVENTIONNE') {
+      this.b2b.choisirPlat(plat);
+    }
 
     const existante = this.commandesSemaine()[jour];
     let platsJour = existante ? [...existante.plats] : [];
