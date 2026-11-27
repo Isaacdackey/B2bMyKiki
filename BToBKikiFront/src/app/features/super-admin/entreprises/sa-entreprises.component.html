@@ -254,7 +254,7 @@
                           <div style="font-size: 0.72rem; color: #6E5A56;">
                             Jeton : <code>{{ inv.tokenActivation }}</code>
                           </div>
-                          @if (inv.statut !== 'ACTIF') {
+                          @if (inv.statut !== 'ACTIVE') {
                             <button 
                               type="button"
                               (click)="copierLienActivation('https://kikitraiteur.sn/b2b/activation?token=' + inv.tokenActivation + '&email=' + inv.email)"
