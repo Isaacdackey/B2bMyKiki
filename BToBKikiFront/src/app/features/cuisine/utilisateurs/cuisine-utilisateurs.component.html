@@ -69,7 +69,7 @@
               </tr>
             </thead>
             <tbody>
-              @for (emp of employesSite(); track emp.id) {
+              @for (emp of paginatedEmployesSite(); track emp.id) {
                 <tr>
                   <td data-label="Matricule">
                     <span style="font-family: monospace; font-size: 0.78rem; font-weight: 800; color: #721513; background: #FAF5EA; padding: 0.2rem 0.5rem; border-radius: 6px;">
@@ -106,6 +106,33 @@
           </table>
           }
         </div>
+
+        @if (totalPagesEmployes() > 1) {
+          <div class="sa-pagination-bar">
+            <div class="sa-pagination-info">
+              Affichage de <strong>{{ (pageEmployes() - 1) * pageSizeEmployes + 1 }}</strong> à <strong>{{ mathMin(pageEmployes() * pageSizeEmployes, employesSite().length) }}</strong> sur <strong>{{ employesSite().length }}</strong> collaborateurs
+            </div>
+
+            <div class="sa-pagination-controls">
+              <button type="button" class="sa-page-btn" [disabled]="pageEmployes() <= 1"
+                (click)="changerPageEmployes(pageEmployes() - 1)">
+                <i class="fa-solid fa-chevron-left"></i> Précédent
+              </button>
+
+              @for (p of pagesEmployesArray(); track p) {
+                <button type="button" class="sa-page-num" [class.active]="pageEmployes() === p"
+                  (click)="changerPageEmployes(p)">
+                  {{ p }}
+                </button>
+              }
+
+              <button type="button" class="sa-page-btn" [disabled]="pageEmployes() >= totalPagesEmployes()"
+                (click)="changerPageEmployes(pageEmployes() + 1)">
+                Suivant <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        }
       </div>
   </main>
 </div>

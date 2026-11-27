@@ -1,4 +1,4 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -28,6 +28,34 @@ export class CuisineUtilisateursComponent {
   employesSubventionnesCount = computed(() => {
     return this.employesSite().filter(e => e.type === 'SUBVENTIONNE' && e.actif).length;
   });
+
+  // Pagination Effectifs du Site (8 par page)
+  pageEmployes = signal<number>(1);
+  readonly pageSizeEmployes = 8;
+
+  totalPagesEmployes = computed(() =>
+    Math.max(1, Math.ceil(this.employesSite().length / this.pageSizeEmployes))
+  );
+
+  pagesEmployesArray = computed(() =>
+    Array.from({ length: this.totalPagesEmployes() }, (_, i) => i + 1)
+  );
+
+  paginatedEmployesSite = computed(() => {
+    const page = Math.min(this.pageEmployes(), this.totalPagesEmployes());
+    const start = (page - 1) * this.pageSizeEmployes;
+    return this.employesSite().slice(start, start + this.pageSizeEmployes);
+  });
+
+  changerPageEmployes(nouvellePage: number) {
+    if (nouvellePage >= 1 && nouvellePage <= this.totalPagesEmployes()) {
+      this.pageEmployes.set(nouvellePage);
+    }
+  }
+
+  mathMin(a: number, b: number): number {
+    return Math.min(a, b);
+  }
 
   getLibellePrestation(type: string): string {
     return this.b2b.typesPrestationConfigurables().find(t => t.code === type)?.libelle || type || 'Standard';

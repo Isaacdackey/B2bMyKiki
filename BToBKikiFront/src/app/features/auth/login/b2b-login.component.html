@@ -20,7 +20,7 @@
         <div class="ent-info">
           <span class="ent-tag">CONVENTION ENTREPRISE ACTIVE</span>
           <strong class="ent-name">{{ b2b.currentEntreprise().nom }}</strong>
-          <span class="ent-sites">{{ b2b.currentEntreprise().sites.length }} sites de distribution • Dakar & Régions</span>
+          <span class="ent-sites">{{ b2b.currentEntreprise().sites.length || 1 }} site{{ (b2b.currentEntreprise().sites.length || 1) > 1 ? 's' : '' }} de distribution • {{ b2b.currentEntreprise().adresse || 'Dakar' }}</span>
         </div>
       </div>
       <!-- FORMULAIRE CLASSIQUE IDENTIFIANT / MOT DE PASSE (JWT) -->

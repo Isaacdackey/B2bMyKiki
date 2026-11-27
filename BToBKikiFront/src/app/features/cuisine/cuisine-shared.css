@@ -378,3 +378,90 @@
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 340px));
   gap: 1rem;
 }
+
+/* PAGINATION HARMONISÉE (MÊME STYLE QUE SUPER ADMIN) */
+.sa-pagination-bar {
+  margin: 1rem 1.25rem;
+  padding: 1rem 1.25rem;
+  background: #FFFFFF;
+  border: 1.5px solid #EDE7DC;
+  border-radius: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  box-shadow: 0 2px 10px rgba(114, 21, 19, 0.03);
+}
+
+.sa-pagination-info {
+  font-size: 0.8rem;
+  color: #6E5A56;
+}
+
+.sa-pagination-info strong {
+  color: #721513;
+  font-weight: 800;
+}
+
+.sa-pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.sa-page-btn {
+  background: #FAF8F4;
+  border: 1.5px solid #EDE7DC;
+  color: #721513;
+  border-radius: 8px;
+  padding: 0.4rem 0.8rem;
+  min-height: 36px !important;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s;
+}
+
+.sa-page-btn:hover:not(:disabled) {
+  background: #EDE7DC;
+}
+
+.sa-page-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.sa-page-num {
+  background: #FFFFFF;
+  border: 1.5px solid #EDE7DC;
+  color: #332724;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  min-height: 36px !important;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.sa-page-num:hover {
+  border-color: #721513;
+  color: #721513;
+}
+
+.sa-page-num.active {
+  background: #721513;
+  border-color: #721513;
+  color: #FFFFFF;
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(114, 21, 19, 0.25);
+}

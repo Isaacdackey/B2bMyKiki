@@ -7,10 +7,15 @@
         <h1 style="margin: 0; font-size: 1.35rem; font-weight: 900; color: #721513; letter-spacing: -0.01em;">
           Bonjour, {{ b2b.currentEmploye().prenom }}
         </h1>
-        @if (b2b.modeProfil() === 'SUBVENTIONNE') {
+        @if (b2b.modeProfil() === 'SUBVENTIONNE' && b2b.currentEmploye().tauxSubvention > 0) {
           <span class="b2b-badge-statut-pill is-subventionne" style="font-size: 0.72rem; padding: 0.2rem 0.65rem;">
             <i class="fa-solid fa-circle-check"></i>
             Conventionné {{ b2b.currentEmploye().tauxSubvention }}%
+          </span>
+        } @else {
+          <span class="b2b-badge-statut-pill" style="font-size: 0.72rem; padding: 0.2rem 0.65rem; background: rgba(192, 86, 33, 0.12); color: #C05621; border: 1px solid rgba(192, 86, 33, 0.28); border-radius: 9999px; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem;">
+            <i class="fa-solid fa-wallet"></i>
+            Autonome (0%)
           </span>
         }
       </div>

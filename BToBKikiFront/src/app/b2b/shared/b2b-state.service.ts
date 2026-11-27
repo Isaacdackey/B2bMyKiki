@@ -462,26 +462,49 @@ export class B2bStateService {
 
   private resolveActiveEntreprise(entreprises: EntrepriseB2B[]) {
     if (!entreprises.length) return;
+    const activeEntreprises = entreprises.filter(e => !e.isArchivee);
+    const pool = activeEntreprises.length > 0 ? activeEntreprises : entreprises;
     const session = this.currentSession();
+    const emp = this.currentEmploye();
     const curId = this.currentEntreprise()?.id;
     let match: EntrepriseB2B | undefined;
 
     if (session?.entrepriseId) {
-      match = entreprises.find(e => e.id === session.entrepriseId);
+      match = pool.find(e => e.id === session.entrepriseId) || entreprises.find(e => e.id === session.entrepriseId);
     }
     if (!match && session?.entite) {
       const entiteLower = session.entite.trim().toLowerCase();
-      match = entreprises.find(e => e.nom.trim().toLowerCase() === entiteLower || entiteLower.includes(e.nom.trim().toLowerCase()));
+      match = pool.find(e => e.nom.trim().toLowerCase() === entiteLower || entiteLower.includes(e.nom.trim().toLowerCase()));
     }
     if (!match && session?.siteId) {
-      match = entreprises.find(e => e.sites?.some(s => s.id === session.siteId));
+      match = pool.find(e => e.id === session.siteId || e.sites?.some(s => s.id === session.siteId));
+    }
+    if (!match && emp?.id) {
+      const empEntId = (emp as any).entrepriseId || emp.siteId;
+      if (empEntId) {
+        match = pool.find(e => e.id === empEntId || e.sites?.some(s => s.id === empEntId));
+      }
+      if (!match && emp.matricule) {
+        const matUpper = emp.matricule.trim().toUpperCase();
+        match = pool.find(e => e.codeEntreprise && matUpper.startsWith(e.codeEntreprise.trim().toUpperCase()));
+      }
+      if (!match && emp.siteNom) {
+        const siteNomLower = emp.siteNom.trim().toLowerCase();
+        match = pool.find(e => e.nom.trim().toLowerCase() === siteNomLower || e.sites?.some(s => s.nom.trim().toLowerCase() === siteNomLower));
+      }
     }
     if (!match && curId) {
-      match = entreprises.find(e => e.id === curId);
+      match = pool.find(e => e.id === curId);
     }
-    this.currentEntreprise.set(match || entreprises[0]);
-    if (session?.siteId) {
+    const resolved = match || pool[0];
+    this.currentEntreprise.set(resolved);
+    if (resolved?.montantPriseEnChargeRepas) {
+      this.formuleActuelle.update(f => ({ ...f, prixForfait: resolved.montantPriseEnChargeRepas }));
+    }
+    if (session?.siteId && resolved.sites?.some(s => s.id === session.siteId)) {
       this.selectedSiteId.set(session.siteId);
+    } else if (resolved.sites?.length) {
+      this.selectedSiteId.set(resolved.sites[0].id);
     }
   }
 
@@ -502,14 +525,29 @@ export class B2bStateService {
       );
 
       if (found) {
-        this.currentEmploye.set(found);
+        const realType: 'SUBVENTIONNE' | 'AUTONOME' = (found.tauxSubvention ?? 0) > 0 ? 'SUBVENTIONNE' : 'AUTONOME';
+        this.currentEmploye.set({ ...found, type: realType });
+        if (this.modeProfil() !== realType) {
+          this.modeProfil.set(realType);
+        }
+        this.resolveActiveEntreprise(this.listeEntreprises());
         return;
       }
 
       const parts = (session.nomComplet || 'Collaborateur Kiki').trim().split(/\s+/);
       const prenom = parts[0] || 'Collaborateur';
       const nom = parts.slice(1).join(' ') || '';
+      const ent = this.currentEntreprise();
       const site = this.siteActuel();
+      const mode: 'SUBVENTIONNE' | 'AUTONOME' =
+        session.role === 'SALARIE_AUTONOME'
+          ? 'AUTONOME'
+          : session.role === 'SALARIE_CONVENTIONNE'
+            ? 'SUBVENTIONNE'
+            : (isSub ? 'SUBVENTIONNE' : 'AUTONOME');
+      if (this.modeProfil() !== mode) {
+        this.modeProfil.set(mode);
+      }
       this.currentEmploye.set({
         id: session.matricule || session.email || 'emp-session',
         matricule: session.matricule || 'EMP-B2B',
@@ -517,11 +555,11 @@ export class B2bStateService {
         prenom,
         email: session.email || '',
         telephone: '',
-        siteId: session.siteId || site.id || 'site-1',
-        siteNom: session.siteNom || site.nom || 'Siège Plateau - Dakar',
+        siteId: session.siteId || ent?.id || site.id || 'site-1',
+        siteNom: session.siteNom || (ent?.nom && ent.nom !== 'Chargement...' ? ent.nom : site.nom) || 'Dakar',
         departement: session.titrePoste || 'Collaborateur',
-        type: isSub ? 'SUBVENTIONNE' : 'AUTONOME',
-        tauxSubvention: isSub ? 100 : 0,
+        type: mode,
+        tauxSubvention: mode === 'SUBVENTIONNE' ? 100 : 0,
         actif: true,
         repasConsommesMois: 0,
         montantPrisEnChargeMois: 0

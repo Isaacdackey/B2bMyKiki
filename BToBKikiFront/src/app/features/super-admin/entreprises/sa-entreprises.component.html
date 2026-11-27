@@ -254,12 +254,14 @@
                           <div style="font-size: 0.72rem; color: #6E5A56;">
                             Jeton : <code>{{ inv.tokenActivation }}</code>
                           </div>
-                          <button 
-                            type="button"
-                            (click)="copierLienActivation('https://kikitraiteur.sn/b2b/activation?token=' + inv.tokenActivation + '&email=' + inv.email)"
-                            class="sa-btn-action" style="font-size: 0.72rem; padding: 0.3rem 0.65rem;">
-                            <i class="fa-regular fa-copy"></i> Copier lien d'activation
-                          </button>
+                          @if (inv.statut !== 'ACTIF') {
+                            <button 
+                              type="button"
+                              (click)="copierLienActivation('https://kikitraiteur.sn/b2b/activation?token=' + inv.tokenActivation + '&email=' + inv.email)"
+                              class="sa-btn-action" style="font-size: 0.72rem; padding: 0.3rem 0.65rem;">
+                              <i class="fa-regular fa-copy"></i> Copier lien d'activation
+                            </button>
+                          }
                         </div>
                       </div>
                     }
