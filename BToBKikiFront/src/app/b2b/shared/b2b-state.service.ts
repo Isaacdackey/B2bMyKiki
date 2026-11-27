@@ -469,8 +469,15 @@ export class B2bStateService {
     const curId = this.currentEntreprise()?.id;
     let match: EntrepriseB2B | undefined;
 
-    if (session?.entrepriseId) {
-      match = pool.find(e => e.id === session.entrepriseId) || entreprises.find(e => e.id === session.entrepriseId);
+    // Priorité : l'entreprise réelle de l'employé connecté (fiche employé en base)
+    if (emp?.id && emp.email) {
+      const empEntId = (emp as any).entrepriseId || emp.siteId;
+      if (empEntId) {
+        match = pool.find(e => e.id === empEntId || e.sites?.some(s => s.id === empEntId));
+      }
+    }
+    if (!match && session?.entrepriseId) {
+      match = pool.find(e => e.id === session.entrepriseId);
     }
     if (!match && session?.entite) {
       const entiteLower = session.entite.trim().toLowerCase();

@@ -59,6 +59,10 @@ public class EmployeService {
             emp.setMatricule("EMP-" + (System.currentTimeMillis() % 10000));
         }
         emp.setType(emp.getTauxSubvention() != null && emp.getTauxSubvention() > 0 ? "SUBVENTIONNE" : "AUTONOME");
+        if ((emp.getEntrepriseId() == null || emp.getEntrepriseId().isBlank())
+                && emp.getSiteId() != null && emp.getSiteId().startsWith("ent-")) {
+            emp.setEntrepriseId(emp.getSiteId());
+        }
         EmployeEntity saved = employeRepository.save(emp);
         if (saved.getEmail() != null && !saved.getEmail().isBlank()) {
             envoyerInvitationActivationEmploye(saved);
@@ -70,7 +74,10 @@ public class EmployeService {
         try {
             InvitationAdminEntity inv = new InvitationAdminEntity();
             inv.setId("inv-" + System.currentTimeMillis());
-            inv.setEntrepriseId(emp.getEntrepriseId() != null && !emp.getEntrepriseId().isBlank() ? emp.getEntrepriseId() : "ent-001");
+            String entId = emp.getEntrepriseId() != null && !emp.getEntrepriseId().isBlank()
+                    ? emp.getEntrepriseId()
+                    : (emp.getSiteId() != null && !emp.getSiteId().isBlank() ? emp.getSiteId() : "ent-001");
+            inv.setEntrepriseId(entId);
             inv.setEmail(emp.getEmail().trim().toLowerCase());
             inv.setNomComplet(((emp.getPrenom() != null ? emp.getPrenom() : "") + " " + (emp.getNom() != null ? emp.getNom() : "")).trim());
             boolean subv = "SUBVENTIONNE".equals(emp.getType());
